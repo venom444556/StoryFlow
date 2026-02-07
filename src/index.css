@@ -1,0 +1,494 @@
+@import "tailwindcss";
+
+@theme {
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+  --color-glass-hover: rgba(255, 255, 255, 0.1);
+  --color-glass-active: rgba(255, 255, 255, 0.15);
+
+  --color-surface-primary: #0f172a;
+  --color-surface-secondary: #1e293b;
+  --color-surface-tertiary: #334155;
+
+  --color-accent-purple: #8b5cf6;
+  --color-accent-blue: #3b82f6;
+  --color-accent-cyan: #06b6d4;
+  --color-accent-green: #10b981;
+  --color-accent-yellow: #f59e0b;
+  --color-accent-red: #ef4444;
+  --color-accent-pink: #ec4899;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ===== Theme switching via CSS custom properties ===== */
+
+/* Dark theme (default) */
+.theme-dark {
+  --th-bg: #0f172a;
+  --th-bg-secondary: #1e293b;
+  --th-bg-tertiary: #334155;
+  --th-text: #f8fafc;
+  --th-text-secondary: #94a3b8;
+  --th-text-muted: #64748b;
+  --th-text-faint: #475569;
+  --th-border: rgba(255, 255, 255, 0.08);
+  --th-border-hover: rgba(255, 255, 255, 0.12);
+  --th-glass-bg: rgba(255, 255, 255, 0.05);
+  --th-glass-bg-hover: rgba(255, 255, 255, 0.1);
+  --th-glass-sidebar: rgba(15, 23, 42, 0.8);
+  --th-input-bg: rgba(255, 255, 255, 0.05);
+  --th-input-bg-focus: rgba(255, 255, 255, 0.08);
+  --th-input-border: rgba(255, 255, 255, 0.1);
+  --th-card-shadow: rgba(0, 0, 0, 0.3);
+  --th-scrollbar: rgba(255, 255, 255, 0.15);
+  --th-scrollbar-hover: rgba(255, 255, 255, 0.25);
+  --th-orb-purple: rgba(124, 58, 237, 0.15);
+  --th-orb-blue: rgba(37, 99, 235, 0.10);
+  --th-orb-cyan: rgba(6, 182, 212, 0.10);
+  --th-selection: rgba(139, 92, 246, 0.3);
+  --th-selection-text: white;
+  --th-hover-bg: rgba(255, 255, 255, 0.05);
+  --th-active-bg: rgba(255, 255, 255, 0.10);
+  --th-panel-solid: rgba(15, 23, 42, 0.95);
+  --th-panel-heavy: rgba(15, 23, 42, 0.92);
+  --th-panel: rgba(15, 23, 42, 0.85);
+  --th-panel-medium: rgba(15, 23, 42, 0.6);
+  --th-panel-light: rgba(15, 23, 42, 0.5);
+}
+
+/* Light theme */
+.theme-light {
+  --th-bg: #f8fafc;
+  --th-bg-secondary: #f1f5f9;
+  --th-bg-tertiary: #e2e8f0;
+  --th-text: #0f172a;
+  --th-text-secondary: #475569;
+  --th-text-muted: #64748b;
+  --th-text-faint: #94a3b8;
+  --th-border: rgba(0, 0, 0, 0.08);
+  --th-border-hover: rgba(0, 0, 0, 0.15);
+  --th-glass-bg: rgba(255, 255, 255, 0.7);
+  --th-glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --th-glass-sidebar: rgba(248, 250, 252, 0.85);
+  --th-input-bg: rgba(0, 0, 0, 0.03);
+  --th-input-bg-focus: rgba(0, 0, 0, 0.05);
+  --th-input-border: rgba(0, 0, 0, 0.12);
+  --th-card-shadow: rgba(0, 0, 0, 0.08);
+  --th-scrollbar: rgba(0, 0, 0, 0.12);
+  --th-scrollbar-hover: rgba(0, 0, 0, 0.2);
+  --th-orb-purple: rgba(124, 58, 237, 0.08);
+  --th-orb-blue: rgba(37, 99, 235, 0.06);
+  --th-orb-cyan: rgba(6, 182, 212, 0.06);
+  --th-selection: rgba(139, 92, 246, 0.2);
+  --th-selection-text: #0f172a;
+  --th-hover-bg: rgba(0, 0, 0, 0.04);
+  --th-active-bg: rgba(0, 0, 0, 0.08);
+  --th-panel-solid: rgba(255, 255, 255, 0.95);
+  --th-panel-heavy: rgba(255, 255, 255, 0.92);
+  --th-panel: rgba(255, 255, 255, 0.88);
+  --th-panel-medium: rgba(241, 245, 249, 0.85);
+  --th-panel-light: rgba(241, 245, 249, 0.8);
+}
+
+/* Glassmorphism utilities — now theme-aware */
+.glass {
+  background: var(--th-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--th-border);
+}
+
+.glass-card {
+  background: var(--th-glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--th-border);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px var(--th-card-shadow);
+}
+
+.glass-card:hover {
+  background: var(--th-glass-bg-hover);
+  border-color: var(--th-border-hover);
+}
+
+.glass-sidebar {
+  background: var(--th-glass-sidebar);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid var(--th-border);
+}
+
+.glass-input {
+  background: var(--th-input-bg);
+  border: 1px solid var(--th-input-border);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  background: var(--th-input-bg-focus);
+  border-color: rgba(var(--accent-active-rgb, 139, 92, 246), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.15);
+  outline: none;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-active, #8b5cf6), #3b82f6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated gradient background orbs */
+@keyframes float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -50px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(50px, 30px) scale(1.05); }
+}
+
+@keyframes float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-40px, 30px) scale(1.05); }
+  50% { transform: translate(30px, -40px) scale(1.1); }
+  75% { transform: translate(-20px, -20px) scale(0.95); }
+}
+
+@keyframes float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(20px, 40px) scale(0.95); }
+  50% { transform: translate(-50px, -20px) scale(1.05); }
+  75% { transform: translate(40px, -30px) scale(1.1); }
+}
+
+.orb-1 { animation: float-1 20s ease-in-out infinite; }
+.orb-2 { animation: float-2 25s ease-in-out infinite; }
+.orb-3 { animation: float-3 30s ease-in-out infinite; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--th-scrollbar);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--th-scrollbar-hover);
+}
+
+/* Selection */
+::selection {
+  background: rgba(var(--accent-active-rgb, 139, 92, 246), 0.3);
+  color: var(--th-selection-text);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid rgba(var(--accent-active-rgb, 139, 92, 246), 0.5);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Theme transition */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Light mode overrides for common Tailwind dark-hardcoded patterns */
+.theme-light {
+  color-scheme: light;
+}
+
+.theme-light .text-white {
+  color: var(--th-text);
+}
+
+.theme-light .text-slate-400 {
+  color: var(--th-text-muted);
+}
+
+.theme-light .text-slate-500 {
+  color: var(--th-text-muted);
+}
+
+.theme-light .text-slate-600 {
+  color: var(--th-text-faint);
+}
+
+.theme-light .bg-surface-primary {
+  background-color: var(--th-bg);
+}
+
+.theme-light .bg-surface-secondary {
+  background-color: var(--th-bg-secondary);
+}
+
+.theme-light .bg-surface-tertiary {
+  background-color: var(--th-bg-tertiary);
+}
+
+.theme-light .border-white\/5 {
+  border-color: var(--th-border);
+}
+
+.theme-light .border-white\/10 {
+  border-color: var(--th-border);
+}
+
+.theme-light .bg-white\/5 {
+  background-color: var(--th-hover-bg);
+}
+
+.theme-light .bg-white\/10 {
+  background-color: var(--th-active-bg);
+}
+
+.theme-light .hover\:bg-white\/5:hover {
+  background-color: var(--th-hover-bg);
+}
+
+.theme-light .hover\:bg-white\/10:hover {
+  background-color: var(--th-active-bg);
+}
+
+.theme-light .hover\:text-white:hover {
+  color: var(--th-text);
+}
+
+.theme-light .hover\:text-slate-200:hover {
+  color: var(--th-text);
+}
+
+/* ===== Comprehensive light mode overrides ===== */
+
+/* --- Group 1: REMOVED — arbitrary bg classes now use var(--th-panel-*) directly --- */
+
+/* --- Group 2: Slate-800/900 backgrounds → light equivalents --- */
+
+.theme-light .bg-slate-800 {
+  background-color: #f1f5f9;
+}
+
+.theme-light .border-t-slate-800 {
+  border-top-color: #f1f5f9;
+}
+
+.theme-light .border-b-slate-800 {
+  border-bottom-color: #f1f5f9;
+}
+
+.theme-light .border-l-slate-800 {
+  border-left-color: #f1f5f9;
+}
+
+.theme-light .border-r-slate-800 {
+  border-right-color: #f1f5f9;
+}
+
+/* --- Group 3: White-alpha backgrounds → dark-alpha for visibility --- */
+
+.theme-light .bg-white\/\[0\.02\] {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.theme-light .bg-white\/\[0\.03\] {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .bg-white\/\[0\.04\] {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .bg-white\/\[0\.06\] {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .bg-white\/\[0\.07\] {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .bg-white\/\[0\.08\] {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .bg-white\/\[0\.12\] {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .bg-white\/\[0\.15\] {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Hover variants */
+.theme-light .hover\:bg-white\/\[0\.03\]:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.theme-light .hover\:bg-white\/\[0\.04\]:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .hover\:bg-white\/\[0\.05\]:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .hover\:bg-white\/\[0\.06\]:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .hover\:bg-white\/\[0\.07\]:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .hover\:bg-white\/\[0\.08\]:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .hover\:bg-white\/\[0\.12\]:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .hover\:bg-white\/\[0\.15\]:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- Group 4: White-alpha borders → dark-alpha for visibility --- */
+
+.theme-light .border-white\/\[0\.04\] {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.theme-light .border-white\/\[0\.05\] {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .border-white\/\[0\.06\] {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .border-white\/\[0\.08\] {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .border-white\/\[0\.1\] {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.theme-light .border-white\/\[0\.12\] {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Hover variants */
+.theme-light .hover\:border-white\/\[0\.06\]:hover {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .hover\:border-white\/\[0\.1\]:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .hover\:border-white\/\[0\.12\]:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .hover\:border-white\/10:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* --- Group 5: Light text → dark text for light backgrounds --- */
+
+.theme-light .text-slate-200 {
+  color: var(--th-text);
+}
+
+.theme-light .text-slate-300 {
+  color: var(--th-text-secondary);
+}
+
+.theme-light .hover\:text-slate-300:hover {
+  color: var(--th-text);
+}
+
+/* --- Group 6: Slate-700/600/500 backgrounds → light equivalents --- */
+
+.theme-light .bg-slate-700 {
+  background-color: #e2e8f0;
+}
+
+.theme-light .bg-slate-700\/50 {
+  background-color: rgba(226, 232, 240, 0.6);
+}
+
+.theme-light .bg-slate-700\/60 {
+  background-color: rgba(226, 232, 240, 0.7);
+}
+
+.theme-light .bg-slate-600 {
+  background-color: #cbd5e1;
+}
+
+.theme-light .bg-slate-500\/20 {
+  background-color: rgba(100, 116, 139, 0.12);
+}
+
+/* --- Group 7: Gradient orb opacity reduction --- */
+
+.theme-light .bg-purple-600\/15 {
+  background-color: rgba(124, 58, 237, 0.06);
+}
+
+.theme-light .bg-blue-600\/10 {
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.theme-light .bg-cyan-500\/10 {
+  background-color: rgba(6, 182, 212, 0.04);
+}
+
+/* --- Group 8: Misc light mode fixes --- */
+
+.theme-light .ring-offset-slate-900 {
+  --tw-ring-offset-color: #f8fafc;
+}
+
+.theme-light .divide-white\/\[0\.06\] > * + * {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .text-blue-400 {
+  color: #2563eb;
+}
+
+.theme-light .hover\:text-blue-300:hover {
+  color: #1d4ed8;
+}
+
+.theme-light .text-purple-300 {
+  color: #7c3aed;
+}
