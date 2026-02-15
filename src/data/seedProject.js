@@ -1,7 +1,7 @@
 import { generateId } from '../utils/ids'
 
 export const SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 46
+export const SEED_VERSION = 47
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -2054,11 +2054,27 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        {
+          id: generateId(),
+          key: 'SF-84',
+          type: 'task',
+          title: 'SF-84: Archive unused modules to _archived/',
+          description: 'Identified 33 unused source files across ai, comments, customfields, presence, 11 UI components, 2 hooks, 2 utils, stores barrel, and skills directory. Moved all to _archived/ to declutter the repo. Build output is identical (same chunk hashes). Transitively unused files (Switch, DatePicker only imported by unused customfields) also archived.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['cleanup', 'dx'],
+          epicId: epic6Id,
+          sprintId: sprint5Id,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 84,
+      nextIssueNumber: 85,
     },
 
     pages: [
