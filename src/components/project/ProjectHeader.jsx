@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { Download, Check } from 'lucide-react'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
@@ -29,7 +29,7 @@ function StatusDropdown({ status, onChange }) {
   return (
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen((prev) => !prev)}>
-        <Badge variant={current.variant} dot size="md">
+        <Badge variant={current.variant} dot size="sm">
           {current.label}
         </Badge>
       </button>
@@ -46,8 +46,8 @@ function StatusDropdown({ status, onChange }) {
               className={[
                 'flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors',
                 status === opt.value
-                  ? 'bg-white/10 text-white'
-                  : 'text-slate-300 hover:bg-white/5 hover:text-white',
+                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                  : 'text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
               ].join(' ')}
             >
               <Badge variant={opt.variant} dot size="sm">
@@ -126,12 +126,12 @@ export default function ProjectHeader({ project, onUpdate }) {
             onChange={(e) => setNameValue(e.target.value)}
             onBlur={commitName}
             onKeyDown={handleKeyDown}
-            className="w-full border-none bg-transparent text-lg font-semibold text-white outline-none"
+            className="w-full border-none bg-transparent text-lg font-semibold text-[var(--color-fg-default)] outline-none"
           />
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="truncate text-lg font-semibold text-white transition-colors"
+            className="truncate text-lg font-semibold text-[var(--color-fg-default)] transition-colors"
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'}
             onMouseLeave={(e) => e.currentTarget.style.color = ''}
           >
@@ -148,7 +148,7 @@ export default function ProjectHeader({ project, onUpdate }) {
 
       {/* Right - Saved indicator + export */}
       <div className="flex shrink-0 items-center gap-3">
-        <span className="hidden text-xs text-slate-500 sm:inline">{savedText}</span>
+        <span className="hidden text-xs text-[var(--color-fg-muted)] sm:inline">{savedText}</span>
         <Button variant="ghost" size="sm" icon={Download}>
           Export
         </Button>

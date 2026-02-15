@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   X,
@@ -11,7 +11,6 @@ import {
   Send,
 } from 'lucide-react';
 import IssueTypeIcon from './IssueTypeIcon';
-import Badge from '../ui/Badge';
 import Select from '../ui/Select';
 import TextArea from '../ui/TextArea';
 import TagInput from '../ui/TagInput';
@@ -19,6 +18,7 @@ import Avatar from '../ui/Avatar';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants';
 import { generateId } from '../../utils/ids';
+import { getSuggestions } from '../../utils/labelDefinitions';
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.EPIC, label: 'Epic' },
@@ -50,8 +50,8 @@ const ASSIGNEE_OPTIONS = [
 function SectionHeader({ icon: Icon, children }) {
   return (
     <div className="mb-2 flex items-center gap-2">
-      {Icon && <Icon size={14} className="text-slate-500" />}
-      <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+      {Icon && <Icon size={14} className="text-[var(--color-fg-muted)]" />}
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
         {children}
       </h4>
     </div>
@@ -176,14 +176,14 @@ export default function IssueDetail({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="fixed right-0 top-0 z-40 flex h-full w-[480px] max-w-full flex-col border-l border-white/[0.06] backdrop-blur-2xl"
+          className="fixed right-0 top-0 z-40 flex h-full w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
           style={{ backgroundColor: 'var(--th-panel-solid)' }}
         >
           {/* Header */}
-          <div className="flex shrink-0 items-start gap-3 border-b border-white/[0.06] px-5 py-4">
+          <div className="flex shrink-0 items-start gap-3 border-b border-[var(--color-border-default)] px-5 py-4">
             <IssueTypeIcon type={issue.type} size={20} />
             <div className="min-w-0 flex-1">
-              <span className="mb-0.5 block text-xs font-medium text-slate-500">
+              <span className="mb-0.5 block text-xs font-medium text-[var(--color-fg-muted)]">
                 {issue.key}
               </span>
               {editingTitle ? (
@@ -194,11 +194,11 @@ export default function IssueDetail({
                   onBlur={handleTitleSave}
                   onKeyDown={handleTitleKeyDown}
                   autoFocus
-                  className="w-full border-none bg-transparent text-base font-semibold text-white outline-none"
+                  className="w-full border-none bg-transparent text-base font-semibold text-[var(--color-fg-default)] outline-none"
                 />
               ) : (
                 <h2
-                  className="cursor-pointer truncate text-base font-semibold text-white transition-colors"
+                  className="cursor-pointer truncate text-base font-semibold text-[var(--color-fg-default)] transition-colors"
                   onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'}
                   onMouseLeave={(e) => e.currentTarget.style.color = ''}
                   onClick={() => {
@@ -212,7 +212,7 @@ export default function IssueDetail({
             </div>
             <button
               onClick={onClose}
-              className="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="shrink-0 rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             >
               <X size={18} />
             </button>
@@ -257,7 +257,7 @@ export default function IssueDetail({
               {/* Details row: Points, Assignee, Epic */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="mb-1.5 block text-sm text-slate-400">
+                  <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
                     Story Points
                   </label>
                   <input
@@ -272,7 +272,7 @@ export default function IssueDetail({
                       })
                     }
                     placeholder="--"
-                    className="glass-input w-full px-3 py-2 text-sm text-white placeholder-slate-500"
+                    className="glass-input w-full px-3 py-2 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
                   />
                 </div>
                 <Select
@@ -299,25 +299,14 @@ export default function IssueDetail({
 
               {/* Labels */}
               <div>
-                <label className="mb-1.5 block text-sm text-slate-400">
+                <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
                   Labels
                 </label>
                 <TagInput
                   tags={issue.labels || []}
                   onChange={(labels) => handleUpdate({ labels })}
                   placeholder="Add label..."
-                  suggestions={[
-                    'frontend',
-                    'backend',
-                    'design',
-                    'infrastructure',
-                    'testing',
-                    'documentation',
-                    'performance',
-                    'security',
-                    'ux',
-                    'api',
-                  ]}
+                  suggestions={getSuggestions()}
                 />
               </div>
 
@@ -326,7 +315,7 @@ export default function IssueDetail({
                 <SectionHeader icon={ListChecks}>
                   Subtasks{' '}
                   {subtasksTotal > 0 && (
-                    <span className="ml-1 font-normal text-slate-600">
+                    <span className="ml-1 font-normal text-[var(--color-fg-subtle)]">
                       ({subtasksDone}/{subtasksTotal})
                     </span>
                   )}
@@ -334,7 +323,7 @@ export default function IssueDetail({
 
                 {/* Progress bar for subtasks */}
                 {subtasksTotal > 0 && (
-                  <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-white/5">
+                  <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-[var(--color-bg-glass)]">
                     <div
                       className="h-full rounded-full transition-all duration-300"
                       style={{
@@ -350,7 +339,7 @@ export default function IssueDetail({
                   {(issue.subtasks || []).map((st) => (
                     <div
                       key={st.id}
-                      className="group/st flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-white/[0.04]"
+                      className="group/st flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-[var(--color-bg-glass-hover)]"
                     >
                       <button
                         onClick={() => handleToggleSubtask(st.id)}
@@ -358,7 +347,7 @@ export default function IssueDetail({
                           'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all',
                           st.completed
                             ? 'border-green-500/40 bg-green-500/20 text-green-400'
-                            : 'border-white/20 text-transparent hover:border-white/40',
+                            : 'border-[var(--color-border-emphasis)] text-transparent hover:border-[var(--color-border-emphasis)]',
                         ].join(' ')}
                       >
                         <Check size={10} />
@@ -367,15 +356,15 @@ export default function IssueDetail({
                         className={[
                           'flex-1 text-sm',
                           st.completed
-                            ? 'text-slate-500 line-through'
-                            : 'text-slate-300',
+                            ? 'text-[var(--color-fg-muted)] line-through'
+                            : 'text-[var(--color-fg-muted)]',
                         ].join(' ')}
                       >
                         {st.title}
                       </span>
                       <button
                         onClick={() => handleDeleteSubtask(st.id)}
-                        className="shrink-0 rounded p-0.5 text-slate-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover/st:opacity-100"
+                        className="shrink-0 rounded p-0.5 text-[var(--color-fg-subtle)] opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover/st:opacity-100"
                       >
                         <X size={12} />
                       </button>
@@ -396,12 +385,12 @@ export default function IssueDetail({
                       }
                     }}
                     placeholder="Add subtask..."
-                    className="glass-input flex-1 px-3 py-1.5 text-sm text-white placeholder-slate-500"
+                    className="glass-input flex-1 px-3 py-1.5 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
                   />
                   <button
                     onClick={handleAddSubtask}
                     disabled={!newSubtask.trim()}
-                    className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white disabled:pointer-events-none disabled:opacity-30"
+                    className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)] disabled:pointer-events-none disabled:opacity-30"
                   >
                     <Plus size={14} />
                   </button>
@@ -413,7 +402,7 @@ export default function IssueDetail({
                 <SectionHeader icon={MessageSquare}>
                   Comments
                   {(issue.comments || []).length > 0 && (
-                    <span className="ml-1 font-normal text-slate-600">
+                    <span className="ml-1 font-normal text-[var(--color-fg-subtle)]">
                       ({(issue.comments || []).length})
                     </span>
                   )}
@@ -424,19 +413,19 @@ export default function IssueDetail({
                   {(issue.comments || []).map((comment) => (
                     <div
                       key={comment.id}
-                      className="rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5"
+                      className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-3 py-2.5"
                     >
                       <div className="mb-1.5 flex items-center gap-2">
                         <Avatar name={comment.author} size="sm" />
-                        <span className="text-xs font-medium text-slate-300">
+                        <span className="text-xs font-medium text-[var(--color-fg-muted)]">
                           {comment.author}
                         </span>
-                        <span className="flex items-center gap-1 text-[10px] text-slate-600">
+                        <span className="flex items-center gap-1 text-[10px] text-[var(--color-fg-subtle)]">
                           <Clock size={9} />
                           {formatDate(comment.createdAt)}
                         </span>
                       </div>
-                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-400">
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-fg-muted)]">
                         {comment.text}
                       </p>
                     </div>
@@ -451,12 +440,12 @@ export default function IssueDetail({
                     onKeyDown={handleCommentKeyDown}
                     placeholder="Write a comment... (Enter to send)"
                     rows={2}
-                    className="glass-input flex-1 resize-none px-3 py-2 text-sm text-white placeholder-slate-500"
+                    className="glass-input flex-1 resize-none px-3 py-2 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
                   />
                   <button
                     onClick={handleAddComment}
                     disabled={!newComment.trim()}
-                    className="rounded-lg p-2 text-slate-400 transition-colors disabled:pointer-events-none disabled:opacity-30"
+                    className="rounded-lg p-2 text-[var(--color-fg-muted)] transition-colors disabled:pointer-events-none disabled:opacity-30"
                     onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)'; e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
                   >
@@ -466,14 +455,14 @@ export default function IssueDetail({
               </div>
 
               {/* Timestamps */}
-              <div className="border-t border-white/[0.04] pt-4">
-                <div className="grid grid-cols-2 gap-4 text-xs text-slate-600">
+              <div className="border-t border-[var(--color-border-default)] pt-4">
+                <div className="grid grid-cols-2 gap-4 text-xs text-[var(--color-fg-subtle)]">
                   <div>
-                    <span className="text-slate-500">Created:</span>{' '}
+                    <span className="text-[var(--color-fg-muted)]">Created:</span>{' '}
                     {formatDate(issue.createdAt)}
                   </div>
                   <div>
-                    <span className="text-slate-500">Updated:</span>{' '}
+                    <span className="text-[var(--color-fg-muted)]">Updated:</span>{' '}
                     {formatDate(issue.updatedAt)}
                   </div>
                 </div>
@@ -482,7 +471,7 @@ export default function IssueDetail({
           </div>
 
           {/* Footer */}
-          <div className="shrink-0 border-t border-white/[0.06] px-5 py-3">
+          <div className="shrink-0 border-t border-[var(--color-border-default)] px-5 py-3">
             <button
               onClick={() => setShowDeleteConfirm(true)}
               className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10"

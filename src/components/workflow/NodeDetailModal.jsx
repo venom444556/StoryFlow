@@ -143,7 +143,7 @@ function ChildStatusIcon({ status }) {
     case 'error':
       return <XCircle size={13} className="text-red-400" />;
     default:
-      return <CircleDot size={13} className="text-slate-600" />;
+      return <CircleDot size={13} className="text-[var(--color-fg-subtle)]" />;
   }
 }
 
@@ -263,20 +263,20 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
               type="text"
               value={node.title}
               onChange={handleTitleChange}
-              className="glass-input mb-2 w-full bg-transparent px-3 py-2 text-lg font-semibold text-white placeholder-slate-500 focus:outline-none"
+              className="glass-input mb-2 w-full bg-transparent px-3 py-2 text-lg font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] focus:outline-none"
               placeholder="Node title"
             />
 
             {/* Badges */}
             <div className="flex items-center gap-2">
-              <Badge variant={getTypeBadgeVariant(node.type)} dot size="md">
+              <Badge variant={getTypeBadgeVariant(node.type)} dot size="sm">
                 {typeDef?.label || node.type}
               </Badge>
-              <Badge variant={STATUS_BADGE_VARIANT[node.status] || 'gray'} dot size="md">
+              <Badge variant={STATUS_BADGE_VARIANT[node.status] || 'gray'} dot size="sm">
                 {STATUS_LABELS[node.status] || node.status}
               </Badge>
               {hasChildren && (
-                <Badge variant="purple" dot size="md">
+                <Badge variant="purple" dot size="sm">
                   {childStats.actionableTotal} sub-steps
                 </Badge>
               )}
@@ -289,9 +289,9 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {/* TYPE INFO (for non-terminal nodes)                                   */}
       {/* ================================================================== */}
       {!isTerminal && typeDef?.description && (
-        <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-          <Info size={14} className="mt-0.5 flex-shrink-0 text-slate-500" />
-          <p className="text-xs leading-relaxed text-slate-400">
+        <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-[var(--color-bg-glass)] bg-[var(--color-bg-glass)] px-4 py-3">
+          <Info size={14} className="mt-0.5 flex-shrink-0 text-[var(--color-fg-muted)]" />
+          <p className="text-xs leading-relaxed text-[var(--color-fg-muted)]">
             {typeDef.description}
           </p>
         </div>
@@ -303,24 +303,24 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {hasChildren && childStats && (
         <div className="mb-6">
           <div className="mb-3 flex items-center gap-2">
-            <ListChecks size={14} className="text-slate-500" />
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <ListChecks size={14} className="text-[var(--color-fg-muted)]" />
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
               Sub-Workflow Progress
             </h4>
           </div>
 
-          <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-4">
             {/* Progress bar */}
             <div className="mb-3">
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-[var(--color-fg-default)]">
                   {progressPercent}% Complete
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-[var(--color-fg-muted)]">
                   {childStats.completed} of {childStats.actionableTotal} steps done
                 </span>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-700/60">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--color-bg-subtle)]">
                 {childStats.completed > 0 && (
                   <div
                     className="inline-block h-full rounded-full bg-green-500 transition-all duration-300"
@@ -369,7 +369,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
                 </span>
               )}
               {childStats.idle > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 px-2.5 py-1 text-xs font-medium text-slate-400">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-bg-glass)] px-2.5 py-1 text-xs font-medium text-[var(--color-fg-muted)]">
                   <CircleDot size={11} />
                   {childStats.idle} pending
                 </span>
@@ -388,7 +388,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
                 return (
                   <div
                     key={child.id}
-                    className="flex items-start gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-white/[0.04]"
+                    className="flex items-start gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-[var(--color-bg-glass)]"
                   >
                     {/* Status icon */}
                     <div className="mt-0.5 flex-shrink-0">
@@ -402,10 +402,10 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
                           className={[
                             'text-sm font-medium',
                             child.status === 'success'
-                              ? 'text-slate-400 line-through'
+                              ? 'text-[var(--color-fg-muted)] line-through'
                               : child.status === 'error'
                                 ? 'text-red-300'
-                                : 'text-white',
+                                : 'text-[var(--color-fg-default)]',
                           ].join(' ')}
                         >
                           {child.title}
@@ -424,13 +424,13 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
                       {(assignee || notes) && (
                         <div className="mt-0.5 flex items-center gap-3">
                           {assignee && (
-                            <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                            <span className="flex items-center gap-1 text-[10px] text-[var(--color-fg-muted)]">
                               <Users size={9} />
                               {assignee}
                             </span>
                           )}
                           {notes && (
-                            <span className="truncate text-[10px] text-slate-600">
+                            <span className="truncate text-[10px] text-[var(--color-fg-subtle)]">
                               {notes.length > 50 ? notes.slice(0, 48) + '\u2026' : notes}
                             </span>
                           )}
@@ -444,7 +444,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
 
                     {/* Sub-node children indicator */}
                     {child.children?.nodes?.length > 0 && (
-                      <span className="flex items-center gap-0.5 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[9px] text-slate-400">
+                      <span className="flex items-center gap-0.5 rounded-full bg-[var(--color-bg-glass)] px-1.5 py-0.5 text-[9px] text-[var(--color-fg-muted)]">
                         <Layers size={9} />
                         {child.children.nodes.length}
                       </span>
@@ -462,8 +462,8 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {/* ================================================================== */}
       <div className="mb-6">
         <div className="mb-3 flex items-center gap-2">
-          <FileText size={14} className="text-slate-500" />
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <FileText size={14} className="text-[var(--color-fg-muted)]" />
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
             Description
           </h4>
         </div>
@@ -481,13 +481,13 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {configFields.length > 0 && (
         <div className="mb-6">
           <div className="mb-3 flex items-center gap-2">
-            <Settings size={14} className="text-slate-500" />
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <Settings size={14} className="text-[var(--color-fg-muted)]" />
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
               Configuration
             </h4>
           </div>
 
-          <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-4">
+          <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-4">
             <div className="space-y-4">
               {configFields.map((field) =>
                 field.type === 'textarea' ? (
@@ -520,8 +520,8 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {(node.status === 'success' || node.status === 'error') && (
         <div className="mb-6">
           <div className="mb-3 flex items-center gap-2">
-            <Zap size={14} className="text-slate-500" />
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <Zap size={14} className="text-[var(--color-fg-muted)]" />
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
               Last Execution
             </h4>
           </div>
@@ -559,7 +559,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {/* ================================================================== */}
       {/* FOOTER                                                              */}
       {/* ================================================================== */}
-      <div className="flex items-center justify-between border-t border-white/[0.08] pt-5">
+      <div className="flex items-center justify-between border-t border-[var(--color-border-default)] pt-5">
         {/* Delete -- left-aligned (hidden for terminal nodes) */}
         {!isTerminal ? (
           <button
@@ -576,7 +576,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
         {/* Done -- right-aligned */}
         <button
           onClick={onClose}
-          className="rounded-lg bg-white/10 px-5 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/[0.15]"
+          className="rounded-lg bg-[var(--color-bg-glass-hover)] px-5 py-2 text-sm font-medium text-[var(--color-fg-default)] transition-all duration-200 hover:bg-[var(--color-bg-emphasis)]"
         >
           Done
         </button>

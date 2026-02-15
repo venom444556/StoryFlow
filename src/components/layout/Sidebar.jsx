@@ -1,5 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { NavLink, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   FolderKanban,
@@ -8,58 +8,59 @@ import {
   ChevronRight,
   X,
   Zap,
-} from 'lucide-react'
-import { useProjects } from '../../hooks/useProjects'
-import Tooltip from '../ui/Tooltip'
+} from 'lucide-react';
+import { useProjects } from '../../hooks/useProjects';
+import Tooltip from '../ui/Tooltip';
 
 const STATUS_DOT_COLORS = {
-  planning: 'bg-blue-400',
-  'in-progress': 'bg-yellow-400',
-  completed: 'bg-green-400',
-  archived: 'bg-gray-400',
-}
+  planning: 'bg-[var(--status-info)]',
+  'in-progress': 'bg-[var(--status-warning)]',
+  completed: 'bg-[var(--status-success)]',
+  archived: 'bg-[var(--color-fg-muted)]',
+};
 
 export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileMenuClose }) {
-  const { projects, addProject } = useProjects()
-  const navigate = useNavigate()
+  const { projects, addProject } = useProjects();
+  const navigate = useNavigate();
 
   const handleNewProject = () => {
-    const project = addProject('New Project')
-    navigate(`/project/${project.id}`)
-    onMobileMenuClose?.()
-  }
+    const project = addProject('New Project');
+    navigate(`/project/${project.id}`);
+    onMobileMenuClose?.();
+  };
 
   const handleNavClick = (path) => {
-    navigate(path)
-    onMobileMenuClose?.()
-  }
+    navigate(path);
+    onMobileMenuClose?.();
+  };
 
   return (
     <motion.aside
       className={[
         'glass-sidebar flex flex-col',
         // Mobile: fixed overlay or hidden
-        mobileMenuOpen ? 'fixed inset-y-0 left-0 z-40 h-full' : 'hidden',
+        mobileMenuOpen ? 'fixed inset-y-0 left-0 h-full' : 'hidden',
         // Desktop: always visible, relative position
-        'md:relative md:flex md:z-20 md:h-full',
+        'md:relative md:flex md:h-full',
       ].join(' ')}
+      style={{ zIndex: mobileMenuOpen ? 'var(--z-overlay)' : 'var(--z-sticky)' }}
       animate={{ width: mobileMenuOpen ? 260 : (collapsed ? 64 : 260) }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
     >
       {/* Brand */}
-      <div className="flex h-14 items-center gap-2.5 border-b border-white/5 px-4">
+      <div className="flex h-14 items-center gap-[var(--space-3)] border-b border-[var(--color-border-default)] px-[var(--space-4)]">
         <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-lg)]"
           style={{ backgroundImage: 'linear-gradient(to bottom right, var(--accent-active, #8b5cf6), #3b82f6)' }}
         >
-          <Zap size={16} className="text-white" />
+          <Zap size={16} className="text-[var(--color-fg-default)]" />
         </div>
         {(!collapsed || mobileMenuOpen) && (
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="gradient-text text-lg font-bold tracking-tight"
+            className="gradient-text text-[var(--text-lg)] font-[var(--font-bold)] tracking-tight"
           >
             StoryFlow
           </motion.span>
@@ -69,7 +70,13 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {mobileMenuOpen && (
           <button
             onClick={onMobileMenuClose}
-            className="ml-auto rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white md:hidden"
+            className={[
+              'ml-auto rounded-[var(--radius-lg)] p-[var(--space-2)]',
+              'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+              'transition-colors md:hidden',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+            ].join(' ')}
+            style={{ transitionDuration: 'var(--duration-fast)' }}
           >
             <X size={18} />
           </button>
@@ -77,7 +84,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-[var(--space-3)] py-[var(--space-4)]">
         {/* Dashboard link */}
         <NavLink
           to="/"
@@ -85,12 +92,16 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           onClick={() => onMobileMenuClose?.()}
           className={({ isActive }) =>
             [
-              'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              'group flex items-center gap-[var(--space-3)] rounded-[var(--radius-lg)]',
+              'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
+              'transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
               isActive
-                ? 'bg-white/10 text-white'
-                : 'text-slate-400 hover:bg-white/5 hover:text-slate-200',
+                ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
             ].join(' ')
           }
+          style={{ transitionDuration: 'var(--duration-fast)' }}
         >
           {collapsed && !mobileMenuOpen ? (
             <Tooltip content="Dashboard" position="right">
@@ -105,15 +116,15 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         </NavLink>
 
         {/* Divider */}
-        <div className="my-4 border-t border-white/5" />
+        <div className="my-[var(--space-4)] border-t border-[var(--color-border-default)]" />
 
         {/* Projects section */}
         {(!collapsed || mobileMenuOpen) && (
-          <div className="mb-2 flex items-center justify-between px-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+          <div className="mb-[var(--space-2)] flex items-center justify-between px-[var(--space-3)]">
+            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] uppercase tracking-wider text-[var(--color-fg-muted)]">
               Projects
             </span>
-            <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
+            <span className="rounded-full bg-[var(--color-bg-glass-hover)] px-[var(--space-2)] py-0.5 text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]">
               {projects.length}
             </span>
           </div>
@@ -122,43 +133,64 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Project list */}
         <div className="space-y-0.5">
           {projects.map((project) => {
-            const dotColor = STATUS_DOT_COLORS[project.status] || 'bg-gray-400'
+            const dotColor = STATUS_DOT_COLORS[project.status] || 'bg-[var(--color-fg-muted)]';
 
             if (collapsed && !mobileMenuOpen) {
               return (
                 <Tooltip key={project.id} content={project.name} position="right">
                   <button
                     onClick={() => handleNavClick(`/project/${project.id}`)}
-                    className="flex w-full items-center justify-center rounded-lg px-3 py-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+                    className={[
+                      'flex w-full items-center justify-center rounded-[var(--radius-lg)]',
+                      'px-[var(--space-3)] py-[var(--space-2)]',
+                      'text-[var(--color-fg-muted)] transition-colors',
+                      'hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+                    ].join(' ')}
+                    style={{ transitionDuration: 'var(--duration-fast)' }}
                   >
                     <FolderKanban size={18} className="shrink-0" />
                   </button>
                 </Tooltip>
-              )
+              );
             }
 
             return (
               <button
                 key={project.id}
                 onClick={() => handleNavClick(`/project/${project.id}`)}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+                className={[
+                  'flex w-full items-center gap-[var(--space-3)] rounded-[var(--radius-lg)]',
+                  'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)]',
+                  'text-[var(--color-fg-muted)] transition-colors',
+                  'hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+                ].join(' ')}
+                style={{ transitionDuration: 'var(--duration-fast)' }}
               >
                 <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`} />
                 <span className="truncate">{project.name}</span>
               </button>
-            )
+            );
           })}
         </div>
       </nav>
 
       {/* Bottom section */}
-      <div className="border-t border-white/5 p-3">
+      <div className="border-t border-[var(--color-border-default)] p-[var(--space-3)]">
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="New Project" position="right">
             <button
               onClick={handleNewProject}
-              className="flex w-full items-center justify-center rounded-lg p-2 text-white transition-all hover:brightness-110"
-              style={{ backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)' }}
+              className={[
+                'flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)]',
+                'text-[var(--color-fg-default)] transition-all hover:brightness-110',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
+              ].join(' ')}
+              style={{
+                backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                transitionDuration: 'var(--duration-fast)',
+              }}
             >
               <Plus size={18} />
             </button>
@@ -166,8 +198,16 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         ) : (
           <button
             onClick={handleNewProject}
-            className="flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all hover:brightness-110"
-            style={{ backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)' }}
+            className={[
+              'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
+              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
+              'text-[var(--color-fg-default)] transition-all hover:brightness-110',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
+            ].join(' ')}
+            style={{
+              backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+              transitionDuration: 'var(--duration-fast)',
+            }}
           >
             <Plus size={16} />
             <span>New Project</span>
@@ -178,10 +218,21 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
       {/* Collapse toggle (desktop only) */}
       <button
         onClick={onToggle}
-        className="absolute -right-3 top-20 z-30 hidden h-6 w-6 items-center justify-center rounded-full border border-white/10 bg-surface-secondary text-slate-400 shadow-lg transition-colors hover:bg-surface-tertiary hover:text-white md:flex"
+        className={[
+          'absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full',
+          'border border-[var(--color-border-default)] bg-[var(--color-bg-subtle)]',
+          'text-[var(--color-fg-muted)] shadow-lg transition-colors',
+          'hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-fg-default)]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+          'md:flex',
+        ].join(' ')}
+        style={{
+          zIndex: 'var(--z-sticky)',
+          transitionDuration: 'var(--duration-fast)',
+        }}
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
     </motion.aside>
-  )
+  );
 }

@@ -168,7 +168,9 @@ export default function WorkflowTab({ project, onUpdate }) {
     const resetNodes = nodes.map((n) => ({ ...n, status: 'idle', error: null }));
     saveNodes(resetNodes);
 
-    const workingNodes = resetNodes;
+    // Mutable working copy — separate from React state to avoid
+    // "Cannot assign to read only property" on frozen state objects.
+    const workingNodes = resetNodes.map((n) => ({ ...n }));
 
     const addLog = (message, level) => {
       setExecutionLog((prev) => [
@@ -182,16 +184,12 @@ export default function WorkflowTab({ project, onUpdate }) {
     };
 
     const onNodeStart = (nodeId) => {
-      saveNodes(
-        workingNodes.map((n) =>
-          n.id === nodeId ? { ...n, status: 'running', error: null } : n
-        )
-      );
       const wn = workingNodes.find((n) => n.id === nodeId);
       if (wn) {
         wn.status = 'running';
         wn.error = null;
       }
+      saveNodes(workingNodes.map((n) => ({ ...n })));
     };
 
     const onNodeComplete = (nodeId, _result) => {
@@ -267,7 +265,7 @@ export default function WorkflowTab({ project, onUpdate }) {
         <div className="relative flex items-stretch">
           <button
             onClick={() => setLogPanelOpen((prev) => !prev)}
-            className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-white/[0.08] p-1.5 text-slate-400 backdrop-blur-lg transition-colors hover:text-white"
+            className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-[var(--color-border-default)] p-1.5 text-[var(--color-fg-muted)] backdrop-blur-lg transition-colors hover:text-[var(--color-fg-default)]"
             style={{ backgroundColor: 'var(--th-panel)' }}
             title={logPanelOpen ? 'Hide log' : 'Show log'}
           >

@@ -60,7 +60,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
             {/* Header row */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <h4 className="text-sm font-semibold text-white truncate">{phase.name}</h4>
+                <h4 className="text-sm font-semibold text-[var(--color-fg-default)] truncate">{phase.name}</h4>
                 <Badge variant={status.variant} size="sm" dot>
                   {status.label}
                 </Badge>
@@ -74,7 +74,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                       e.stopPropagation()
                       onEdit?.(phase)
                     }}
-                    className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                    className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
                   >
                     <Edit3 size={14} />
                   </button>
@@ -85,7 +85,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                       e.stopPropagation()
                       onDelete?.(phase)
                     }}
-                    className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-red-500/20 hover:text-red-400"
+                    className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -94,7 +94,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
             </div>
 
             {/* Date range */}
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)]">
               <Calendar size={12} />
               {hasDateRange ? (
                 <span>
@@ -112,7 +112,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
               <div className="mt-2.5">
                 <p
                   className={[
-                    'text-sm text-slate-400 leading-relaxed',
+                    'text-sm text-[var(--color-fg-muted)] leading-relaxed',
                     !expanded && 'line-clamp-2',
                   ]
                     .filter(Boolean)
@@ -143,8 +143,8 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
             {/* Progress */}
             <div className="mt-3">
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-xs text-slate-500">Progress</span>
-                <span className="text-xs font-medium text-slate-400">
+                <span className="text-xs text-[var(--color-fg-muted)]">Progress</span>
+                <span className="text-xs font-medium text-[var(--color-fg-muted)]">
                   {Math.round(phase.progress || 0)}%
                 </span>
               </div>

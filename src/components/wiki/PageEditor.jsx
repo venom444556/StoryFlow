@@ -162,9 +162,9 @@ export default function PageEditor({ page, onSave, onCancel }) {
   const rt = readingTime(content)
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02]">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]">
       {/* Top bar: title + icon */}
-      <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.06] px-4 py-2.5">
+      <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-2.5">
         {/* Emoji icon input */}
         <input
           type="text"
@@ -172,7 +172,7 @@ export default function PageEditor({ page, onSave, onCancel }) {
           onChange={(e) => setIcon(e.target.value)}
           placeholder="icon"
           maxLength={2}
-          className="w-10 rounded bg-white/5 px-1.5 py-1 text-center text-lg text-white outline-none transition-colors focus:bg-white/10"
+          className="w-10 rounded bg-[var(--color-bg-glass)] px-1.5 py-1 text-center text-lg text-[var(--color-fg-default)] outline-none transition-colors focus:bg-[var(--color-bg-glass-hover)]"
           title="Page icon (emoji)"
         />
         {/* Title */}
@@ -181,27 +181,27 @@ export default function PageEditor({ page, onSave, onCancel }) {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Page title..."
-          className="flex-1 bg-transparent text-lg font-semibold text-white placeholder-slate-600 outline-none"
+          className="flex-1 bg-transparent text-lg font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-subtle)] outline-none"
         />
       </div>
 
       {/* Toolbar */}
-      <div className="flex shrink-0 items-center gap-0.5 border-b border-white/[0.06] px-3 py-1.5">
+      <div className="flex shrink-0 items-center gap-0.5 border-b border-[var(--color-border-default)] px-3 py-1.5">
         {TOOLBAR_ITEMS.map((item) => (
           <button
             key={item.id}
             onClick={() => insertAtCursor(item)}
             title={item.title}
-            className="rounded p-1.5 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+            className="rounded p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
           >
             <item.icon size={15} />
           </button>
         ))}
 
-        <span className="mx-2 h-4 w-px bg-white/10" />
+        <span className="mx-2 h-4 w-px bg-[var(--color-border-default)]" />
 
         {/* Preview indicator */}
-        <span className="flex items-center gap-1 text-xs text-slate-600">
+        <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
           <Eye size={13} />
           Live preview
         </span>
@@ -210,13 +210,13 @@ export default function PageEditor({ page, onSave, onCancel }) {
       {/* Split pane: Editor | Preview */}
       <div className="flex flex-1 overflow-hidden">
         {/* Editor pane */}
-        <div className="flex flex-1 flex-col border-r border-white/[0.06]">
+        <div className="flex flex-1 flex-col border-r border-[var(--color-border-default)]">
           <textarea
             ref={textareaRef}
             value={content}
             onChange={handleContentChange}
             placeholder="Start writing in markdown..."
-            className="flex-1 resize-none bg-transparent px-5 py-4 font-mono text-sm leading-relaxed text-slate-300 placeholder-slate-600 outline-none"
+            className="flex-1 resize-none bg-transparent px-5 py-4 font-mono text-sm leading-relaxed text-[var(--color-fg-default)] placeholder-[var(--color-fg-subtle)] outline-none"
             spellCheck={false}
           />
         </div>
@@ -228,7 +228,7 @@ export default function PageEditor({ page, onSave, onCancel }) {
       </div>
 
       {/* Bottom bar */}
-      <div className="flex shrink-0 items-center gap-4 border-t border-white/[0.06] px-4 py-2.5">
+      <div className="flex shrink-0 items-center gap-4 border-t border-[var(--color-border-default)] px-4 py-2.5">
         {/* Labels */}
         <div className="flex-1">
           <TagInput
@@ -239,7 +239,7 @@ export default function PageEditor({ page, onSave, onCancel }) {
         </div>
 
         {/* Stats */}
-        <span className="flex items-center gap-1 text-xs text-slate-600">
+        <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
           <Clock size={12} />
           {wc} words &middot; {rt} min read
         </span>

@@ -1,10 +1,8 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Tag } from 'lucide-react';
 import IssueTypeIcon from './IssueTypeIcon';
 import Avatar from '../ui/Avatar';
 import Badge from '../ui/Badge';
-import { getPriorityColor } from '../../utils/colors';
 
 const PRIORITY_BADGE_VARIANT = {
   critical: 'red',
@@ -28,7 +26,7 @@ export default function IssueCard({
     onDragStart?.(issue);
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = () => {
     onDragEnd?.(issue);
   };
 
@@ -46,10 +44,10 @@ export default function IssueCard({
       onClick={() => onClick?.(issue)}
       className={[
         'group cursor-grab rounded-xl border p-3 transition-all duration-200 active:cursor-grabbing',
-        'bg-white/[0.04] backdrop-blur-sm hover:bg-white/[0.07]',
+        'bg-[var(--color-bg-glass)] backdrop-blur-sm hover:bg-[var(--color-bg-glass-hover)]',
         isDragging
           ? 'ring-2'
-          : 'border-white/[0.06] hover:border-white/[0.12]',
+          : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
       ].join(' ')}
       style={isDragging ? {
         borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
@@ -59,11 +57,11 @@ export default function IssueCard({
       {/* Top row: type icon + key */}
       <div className="mb-2 flex items-center gap-2">
         <IssueTypeIcon type={issue.type} size={14} />
-        <span className="text-xs font-medium text-slate-500">{issue.key}</span>
+        <span className="text-xs font-medium text-[var(--color-fg-muted)]">{issue.key}</span>
       </div>
 
       {/* Title */}
-      <p className="mb-2.5 line-clamp-2 text-sm font-medium leading-snug text-slate-200 group-hover:text-white">
+      <p className="mb-2.5 line-clamp-2 text-sm font-medium leading-snug text-[var(--color-fg-default)] group-hover:text-[var(--color-fg-default)]">
         {issue.title}
       </p>
 
@@ -71,15 +69,15 @@ export default function IssueCard({
       <div className="flex items-center gap-2">
         {/* Priority badge */}
         {issue.priority && (
-          <Badge variant={priorityVariant} size="sm" dot>
+          <Badge variant={priorityVariant} size="xs" dot>
             {issue.priority}
           </Badge>
         )}
 
         {/* Story points */}
-        {issue.storyPoints != null && (
+        {issue.storyPoints !== null && issue.storyPoints !== undefined && (
           <span
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-500/20 text-[10px] font-bold text-slate-400"
+            className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[10px] font-bold text-[var(--color-fg-muted)]"
             title={`${issue.storyPoints} story points`}
           >
             {issue.storyPoints}
@@ -92,7 +90,7 @@ export default function IssueCard({
         {/* Labels count */}
         {issue.labels && issue.labels.length > 0 && (
           <span
-            className="flex items-center gap-1 text-[10px] text-slate-500"
+            className="flex items-center gap-1 text-[10px] text-[var(--color-fg-muted)]"
             title={issue.labels.join(', ')}
           >
             <Tag size={10} />

@@ -14,8 +14,8 @@ export default function TableOfContents({ markdown, onHeadingClick }) {
   return (
     <div className="glass-card hidden w-48 shrink-0 self-start p-3 md:block">
       <div className="mb-2 flex items-center gap-1.5">
-        <List size={13} className="text-slate-500" />
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <List size={13} className="text-[var(--color-fg-muted)]" />
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
           On this page
         </h4>
       </div>
@@ -27,7 +27,7 @@ export default function TableOfContents({ markdown, onHeadingClick }) {
             <button
               key={`${heading.id}-${idx}`}
               onClick={() => onHeadingClick?.(heading.id)}
-              className="block w-full truncate rounded px-2 py-1 text-left text-xs text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+              className="block w-full truncate rounded px-2 py-1 text-left text-xs text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
               style={{ paddingLeft: `${indent + 8}px` }}
               title={heading.text}
             >

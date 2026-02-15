@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import TextArea from '../ui/TextArea'
@@ -88,12 +88,12 @@ export default function DecisionForm({ isOpen, onClose, onSave }) {
           onChange={handleChange('status')}
         />
 
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[var(--color-fg-muted)]">
           You can add alternatives, consequences, and tags after creation.
         </p>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-2 border-t border-[var(--color-border-default)]">
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>

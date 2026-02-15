@@ -43,8 +43,8 @@ export default function WorkflowToolbar({
           className={[
             'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
             isExecuting
-              ? 'cursor-not-allowed bg-white/5 text-slate-500'
-              : 'bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white',
+              ? 'cursor-not-allowed bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)]'
+              : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
           ].join(' ')}
         >
           <Plus size={16} />
@@ -69,7 +69,7 @@ export default function WorkflowToolbar({
               'inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200',
               isExecuting
                 ? 'cursor-not-allowed bg-green-900/30 text-green-500/60'
-                : 'bg-green-600 text-white shadow-lg shadow-green-600/25 hover:bg-green-500',
+                : 'bg-green-600 text-[var(--color-fg-default)] shadow-lg shadow-green-600/25 hover:bg-green-500',
             ].join(' ')}
           >
             {isExecuting ? (
@@ -91,8 +91,8 @@ export default function WorkflowToolbar({
             className={[
               'inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
               isExecuting
-                ? 'cursor-not-allowed bg-white/5 text-slate-500'
-                : 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white',
+                ? 'cursor-not-allowed bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)]'
+                : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
             ].join(' ')}
           >
             <RotateCcw size={15} />
@@ -102,7 +102,7 @@ export default function WorkflowToolbar({
       )}
 
       {/* Right – stats */}
-      <div className="flex items-center gap-4 text-xs text-slate-400">
+      <div className="flex items-center gap-4 text-xs text-[var(--color-fg-muted)]">
         <span className="inline-flex items-center gap-1.5">
           <GitBranch size={13} />
           {nodeCount} node{nodeCount !== 1 ? 's' : ''}

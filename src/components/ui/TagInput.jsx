@@ -58,14 +58,17 @@ export default function TagInput({
   return (
     <div ref={containerRef} className={['relative', className].filter(Boolean).join(' ')}>
       <div
-        className="glass-input flex flex-wrap items-center gap-1.5 px-2 py-1.5"
+        className={[
+          'glass-input flex flex-wrap items-center gap-1.5',
+          'px-2 py-1.5 cursor-text',
+        ].join(' ')}
         onClick={() => inputRef.current?.focus()}
       >
         {tags.map((tag, i) => (
           <Badge
             key={`${tag}-${i}`}
             variant="purple"
-            size="sm"
+            size="xs"
             removable
             onRemove={() => removeTag(i)}
           >
@@ -83,17 +86,34 @@ export default function TagInput({
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(true)}
           placeholder={tags.length === 0 ? placeholder : ''}
-          className="min-w-[80px] flex-1 border-none bg-transparent py-1 text-sm text-white placeholder-slate-500 outline-none"
+          className={[
+            'min-w-[80px] flex-1 border-none bg-transparent',
+            'py-[var(--space-1)] text-[var(--text-sm)]',
+            'text-[var(--color-fg-default)] placeholder-[var(--color-input-placeholder)]',
+            'outline-none',
+          ].join(' ')}
         />
       </div>
 
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <div className="glass-card absolute left-0 right-0 top-full z-20 mt-1 max-h-40 overflow-y-auto p-1">
+        <div
+          className={[
+            'glass-card absolute left-0 right-0 top-full mt-[var(--space-1)]',
+            'max-h-40 overflow-y-auto p-[var(--space-1)]',
+          ].join(' ')}
+          style={{ zIndex: 'var(--z-dropdown)' }}
+        >
           {filteredSuggestions.map((suggestion) => (
             <button
               key={suggestion}
               onClick={() => addTag(suggestion)}
-              className="w-full rounded-md px-3 py-1.5 text-left text-sm text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+              className={[
+                'w-full rounded-[var(--radius-md)] px-[var(--space-3)] py-[var(--space-2)]',
+                'text-left text-[var(--text-sm)] text-[var(--color-fg-muted)]',
+                'transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--interactive-default)]',
+              ].join(' ')}
+              style={{ transitionDuration: 'var(--duration-fast)' }}
             >
               {suggestion}
             </button>

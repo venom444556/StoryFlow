@@ -29,14 +29,14 @@ function SettingRow({ icon: Icon, label, description, children }) {
     <div className="flex items-center justify-between gap-4 py-3">
       <div className="flex items-center gap-3 min-w-0">
         {Icon && (
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--th-hover-bg)' }}>
-            <Icon size={16} style={{ color: 'var(--th-text-secondary)' }} />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-bg-glass-hover)]">
+            <Icon size={16} className="text-[var(--color-fg-muted)]" />
           </div>
         )}
         <div className="min-w-0">
-          <div className="text-sm font-medium" style={{ color: 'var(--th-text)' }}>{label}</div>
+          <div className="text-sm font-medium text-[var(--color-fg-default)]">{label}</div>
           {description && (
-            <div className="text-xs" style={{ color: 'var(--th-text-muted)' }}>{description}</div>
+            <div className="text-xs text-[var(--color-fg-muted)]">{description}</div>
           )}
         </div>
       </div>
@@ -52,11 +52,11 @@ function Toggle({ checked, onChange }) {
       aria-checked={checked}
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out"
-      style={{ backgroundColor: checked ? 'var(--accent-active, #8b5cf6)' : '#475569' }}
+      style={{ backgroundColor: checked ? 'var(--accent-active, #8b5cf6)' : 'var(--color-bg-emphasis)' }}
     >
       <span
         className={[
-          'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+          'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-[var(--color-fg-default)] shadow ring-0 transition duration-200 ease-in-out',
           checked ? 'translate-x-5' : 'translate-x-0',
         ].join(' ')}
       />
@@ -66,7 +66,7 @@ function Toggle({ checked, onChange }) {
 
 function SectionLabel({ children }) {
   return (
-    <div className="mb-1 mt-4 first:mt-0 text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--th-text-faint)' }}>
+    <div className="mb-1 mt-4 first:mt-0 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-faint)]">
       {children}
     </div>
   )
@@ -99,19 +99,14 @@ export default function SettingsPanel({ isOpen, onClose }) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-[380px] max-w-[90vw] flex-col border-l shadow-2xl"
-            style={{
-              backgroundColor: 'var(--th-bg)',
-              borderColor: 'var(--th-border)',
-            }}
+            className="fixed right-0 top-0 z-50 flex h-full w-[380px] max-w-[90vw] flex-col border-l border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] shadow-2xl"
           >
             {/* Header */}
-            <div className="flex h-14 shrink-0 items-center justify-between border-b px-5" style={{ borderColor: 'var(--th-border)' }}>
-              <h2 className="text-base font-semibold" style={{ color: 'var(--th-text)' }}>Settings</h2>
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-border-default)] px-5">
+              <h2 className="text-base font-semibold text-[var(--color-fg-default)]">Settings</h2>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 transition-colors hover:bg-white/10"
-                style={{ color: 'var(--th-text-muted)' }}
+                className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)]"
               >
                 <X size={18} />
               </button>
@@ -154,7 +149,7 @@ export default function SettingsPanel({ isOpen, onClose }) {
                       style={{
                         backgroundColor: c.color,
                         '--tw-ring-color': c.color,
-                        '--tw-ring-offset-color': 'var(--th-bg)',
+                        '--tw-ring-offset-color': 'var(--color-bg-subtle)',
                       }}
                     />
                   ))}
@@ -244,8 +239,7 @@ export default function SettingsPanel({ isOpen, onClose }) {
                 <select
                   value={settings.workflowGridSize}
                   onChange={(e) => setSetting('workflowGridSize', Number(e.target.value))}
-                  className="glass-input rounded-md px-2 py-1 text-xs"
-                  style={{ color: 'var(--th-text)' }}
+                  className="glass-input rounded-md px-2 py-1 text-xs text-[var(--color-fg-default)]"
                 >
                   <option value={10}>10px</option>
                   <option value={20}>20px</option>
@@ -271,8 +265,8 @@ export default function SettingsPanel({ isOpen, onClose }) {
             </div>
 
             {/* Footer */}
-            <div className="shrink-0 border-t px-5 py-3" style={{ borderColor: 'var(--th-border)' }}>
-              <p className="text-center text-[11px]" style={{ color: 'var(--th-text-faint)' }}>
+            <div className="shrink-0 border-t border-[var(--color-border-default)] px-5 py-3">
+              <p className="text-center text-[11px] text-[var(--color-fg-faint)]">
                 Settings are saved automatically
               </p>
             </div>

@@ -81,8 +81,8 @@ function TreeNode({
         className={[
           'group flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition-colors cursor-pointer select-none',
           isSelected
-            ? 'text-white'
-            : 'text-slate-400 hover:bg-white/5 hover:text-slate-200',
+            ? 'text-[var(--color-fg-default)]'
+            : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
@@ -97,7 +97,7 @@ function TreeNode({
               e.stopPropagation()
               toggleExpanded(node.id)
             }}
-            className="shrink-0 rounded p-0.5 hover:bg-white/10"
+            className="shrink-0 rounded p-0.5 hover:bg-[var(--color-bg-glass-hover)]"
           >
             {isExpanded ? (
               <ChevronDown size={14} />
@@ -113,7 +113,7 @@ function TreeNode({
         {icon ? (
           <span className="shrink-0 text-base leading-none">{icon}</span>
         ) : (
-          <FileText size={14} className="shrink-0 text-slate-500" />
+          <FileText size={14} className="shrink-0 text-[var(--color-fg-muted)]" />
         )}
 
         {/* Title */}
@@ -131,7 +131,7 @@ function TreeNode({
               e.stopPropagation()
               onAddPage(node.id)
             }}
-            className="rounded p-0.5 text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+            className="rounded p-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             title="Add child page"
           >
             <Plus size={13} />
@@ -141,7 +141,7 @@ function TreeNode({
               e.stopPropagation()
               onDeletePage(node.id)
             }}
-            className="rounded p-0.5 text-slate-500 transition-colors hover:bg-red-500/20 hover:text-red-400"
+            className="rounded p-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
             title="Delete page"
           >
             <Trash2 size={13} />
@@ -216,9 +216,9 @@ export default function PageTree({
   return (
     <div className="glass-sidebar flex h-full w-64 shrink-0 flex-col">
       {/* Header */}
-      <div className="shrink-0 border-b border-white/[0.06] px-3 py-3">
+      <div className="shrink-0 border-b border-[var(--color-border-default)] px-3 py-3">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
             Pages
           </h3>
           <Button
@@ -241,7 +241,7 @@ export default function PageTree({
       {/* Tree */}
       <div className="flex-1 overflow-y-auto px-2 py-2">
         {tree.length === 0 && (
-          <p className="px-2 py-4 text-center text-xs text-slate-600">
+          <p className="px-2 py-4 text-center text-xs text-[var(--color-fg-subtle)]">
             No pages yet. Click <strong>New</strong> to create one.
           </p>
         )}

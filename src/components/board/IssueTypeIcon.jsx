@@ -1,4 +1,3 @@
-import React from 'react';
 import { Zap, BookOpen, CheckSquare, Bug, GitCommitHorizontal } from 'lucide-react';
 
 const TYPE_CONFIG = {

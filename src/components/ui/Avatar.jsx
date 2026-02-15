@@ -30,29 +30,47 @@ function getInitials(name) {
 
 const SIZES = {
   sm: { container: 'h-6 w-6', text: 'text-[10px]' },
-  md: { container: 'h-8 w-8', text: 'text-xs' },
-  lg: { container: 'h-10 w-10', text: 'text-sm' },
+  md: { container: 'h-8 w-8', text: 'text-[var(--text-xs)]' },
+  lg: { container: 'h-10 w-10', text: 'text-[var(--text-sm)]' },
+  xl: { container: 'h-12 w-12', text: 'text-[var(--text-base)]' },
 };
 
 export default function Avatar({
   name = '',
   size = 'md',
   className = '',
+  src,
 }) {
   const gradient = GRADIENTS[hashName(name) % GRADIENTS.length];
   const initials = getInitials(name);
   const sizeClasses = SIZES[size] || SIZES.md;
 
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        className={[
+          'inline-flex items-center justify-center rounded-full object-cover',
+          sizeClasses.container,
+          className,
+        ].join(' ')}
+      />
+    );
+  }
+
   return (
     <div
       className={[
-        'inline-flex items-center justify-center rounded-full bg-gradient-to-br font-semibold text-white',
+        'inline-flex items-center justify-center rounded-full bg-gradient-to-br',
+        'font-[var(--font-semibold)] text-[var(--color-fg-on-accent)]',
         gradient,
         sizeClasses.container,
         sizeClasses.text,
         className,
       ].join(' ')}
       title={name}
+      aria-label={name}
     >
       {initials}
     </div>

@@ -22,12 +22,12 @@ function OverlayBreadcrumb({ parentTitle, viewStack, onNavigate }) {
 
   return (
     <div
-      className="flex items-center gap-1 border-b border-white/[0.06] px-4 py-1.5 text-xs backdrop-blur-md"
+      className="flex items-center gap-1 border-b border-[var(--color-bg-glass)] px-4 py-1.5 text-xs backdrop-blur-md"
       style={{ backgroundColor: 'var(--th-panel-medium)' }}
     >
       <button
         onClick={() => onNavigate(-1)}
-        className="flex items-center gap-1 rounded-md px-2 py-0.5 font-medium text-slate-400 transition-colors hover:bg-white/[0.08] hover:text-white"
+        className="flex items-center gap-1 rounded-md px-2 py-0.5 font-medium text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
       >
         <Home size={11} />
         <span>{parentTitle}</span>
@@ -35,14 +35,14 @@ function OverlayBreadcrumb({ parentTitle, viewStack, onNavigate }) {
 
       {viewStack.map((entry, index) => (
         <React.Fragment key={entry.nodeId}>
-          <ChevronRight size={11} className="text-slate-600" />
+          <ChevronRight size={11} className="text-[var(--color-fg-subtle)]" />
           <button
             onClick={() => onNavigate(index)}
             className={[
               'rounded-md px-2 py-0.5 font-medium transition-colors',
               index === viewStack.length - 1
-                ? 'text-white'
-                : 'text-slate-400 hover:bg-white/[0.08] hover:text-white',
+                ? 'text-[var(--color-fg-default)]'
+                : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
             ].join(' ')}
           >
             {entry.title}
@@ -246,7 +246,8 @@ export default function SubWorkflowOverlay({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-40 flex items-center justify-center"
+          className="fixed inset-0 flex items-center justify-center"
+          style={{ zIndex: 'var(--z-drawer, 400)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -263,7 +264,7 @@ export default function SubWorkflowOverlay({
 
           {/* Overlay panel */}
           <motion.div
-            className="relative z-10 flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] shadow-2xl"
+            className="relative z-10 flex flex-col overflow-hidden rounded-2xl border border-[var(--color-border-default)] shadow-2xl"
             style={{
               width: '85vw',
               height: '85vh',
@@ -275,7 +276,7 @@ export default function SubWorkflowOverlay({
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-white/[0.08] px-5 py-3">
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-default)] px-5 py-3">
               <div className="flex items-center gap-3">
                 {parentType && (
                   <div
@@ -283,16 +284,16 @@ export default function SubWorkflowOverlay({
                     style={{ backgroundColor: parentType.color }}
                   />
                 )}
-                <h2 className="text-base font-semibold text-white">
+                <h2 className="text-base font-semibold text-[var(--color-fg-default)]">
                   {parentNode?.title || 'Sub-Workflow'}
                 </h2>
-                <span className="rounded-full bg-white/[0.06] px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
+                <span className="rounded-full bg-[var(--color-bg-glass)] px-2.5 py-0.5 text-[10px] font-medium text-[var(--color-fg-muted)]">
                   Sub-workflow
                 </span>
               </div>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
               >
                 <X size={18} />
               </button>
@@ -327,7 +328,7 @@ export default function SubWorkflowOverlay({
                 onDrillDown={handleDrillDown}
                 onNodeDoubleClick={setDetailNodeId}
                 onAddChildren={handleAddChildren}
-                canvasId="sub-workflow"
+                canvasId={`sub-workflow-${parentNode?.id || 'root'}${viewStack.length > 0 ? '-' + viewStack.map((v) => v.nodeId).join('-') : ''}`}
               />
             </div>
 

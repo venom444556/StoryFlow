@@ -16,7 +16,7 @@ export default function MarkdownRenderer({ content, className = '' }) {
 
   if (!content) {
     return (
-      <p className="py-8 text-center text-sm italic text-slate-600">
+      <p className="py-8 text-center text-sm italic text-[var(--color-fg-subtle)]">
         No content yet.
       </p>
     )

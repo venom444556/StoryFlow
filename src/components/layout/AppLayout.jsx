@@ -6,8 +6,10 @@ import Header from './Header'
 import CommandPalette from './CommandPalette'
 import SettingsPanel from './SettingsPanel'
 import ShortcutsModal from './ShortcutsModal'
+import ToastContainer from '../ui/Toast'
 import { useProjects } from '../../hooks/useProjects'
 import { useKeyboardShortcuts, SHORTCUTS } from '../../hooks/useKeyboardShortcuts'
+import { useUIStore } from '../../stores/uiStore'
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false)
@@ -18,6 +20,10 @@ export default function AppLayout() {
   const location = useLocation()
   const params = useParams()
   const { getProject } = useProjects()
+
+  // Toast notifications from UI store
+  const toasts = useUIStore((state) => state.toasts)
+  const removeToast = useUIStore((state) => state.removeToast)
 
   const toggleCommandPalette = useCallback(() => {
     setShowCommandPalette((prev) => !prev)
@@ -62,7 +68,7 @@ export default function AppLayout() {
   }, [location.pathname, params.id, getProject])
 
   return (
-    <div className="flex h-screen bg-surface-primary text-white">
+    <div className="flex h-screen bg-[var(--color-bg-subtle)] text-[var(--color-fg-default)]">
       <GradientBackground />
       <Sidebar
         collapsed={collapsed}
@@ -86,7 +92,7 @@ export default function AppLayout() {
           onSettingsClick={() => setShowSettings(true)}
           onHamburgerClick={() => setMobileMenuOpen((prev) => !prev)}
         />
-        <main className="relative z-10 flex-1 overflow-auto">
+        <main className="relative z-10 flex-1 overflow-hidden">
           <Outlet />
         </main>
       </div>
@@ -99,6 +105,9 @@ export default function AppLayout() {
 
       {/* Shortcuts modal */}
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+      {/* Toast notifications */}
+      <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>
   )
 }

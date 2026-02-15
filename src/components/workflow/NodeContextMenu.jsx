@@ -187,7 +187,7 @@ export default function NodeContextMenu({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.12, ease: 'easeOut' }}
-        className="absolute z-50 min-w-[192px] rounded-xl border border-white/[0.1] p-1.5 shadow-2xl backdrop-blur-2xl"
+        className="absolute z-50 min-w-[192px] rounded-xl border border-[var(--color-border-emphasis)] p-1.5 shadow-2xl backdrop-blur-2xl"
         style={{
           left: position.left,
           top: position.top,
@@ -201,7 +201,7 @@ export default function NodeContextMenu({
             return (
               <div
                 key={item.id}
-                className="mx-1 my-1 h-px bg-white/[0.06]"
+                className="mx-1 my-1 h-px bg-[var(--color-bg-glass)]"
               />
             );
           }
@@ -222,10 +222,10 @@ export default function NodeContextMenu({
               className={[
                 'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors duration-100',
                 isDisabled
-                  ? 'cursor-not-allowed text-slate-600'
+                  ? 'cursor-not-allowed text-[var(--color-fg-subtle)]'
                   : isDanger
                     ? 'text-red-400 hover:bg-red-500/10'
-                    : 'text-slate-200 hover:bg-white/[0.08]',
+                    : 'text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass-hover)]',
               ]
                 .filter(Boolean)
                 .join(' ')}
@@ -234,10 +234,10 @@ export default function NodeContextMenu({
                 size={14}
                 className={
                   isDisabled
-                    ? 'text-slate-600'
+                    ? 'text-[var(--color-fg-subtle)]'
                     : isDanger
                       ? 'text-red-400'
-                      : 'text-slate-400'
+                      : 'text-[var(--color-fg-muted)]'
                 }
               />
               <span>{item.label}</span>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   LayoutGrid,
@@ -13,6 +13,7 @@ import EpicSidebar from '../board/EpicSidebar';
 import IssueDetail from '../board/IssueDetail';
 import BurndownChart from '../board/BurndownChart';
 import VelocityChart from '../board/VelocityChart';
+import { canonicalizeLabel } from '../../utils/labelDefinitions';
 
 const SUB_TABS = [
   { key: 'board', label: 'Board', icon: LayoutGrid },
@@ -93,13 +94,15 @@ export default function BoardTab({
   const [activeEpicId, setActiveEpicId] = useState(null);
 
   const board = project?.board;
-  const allIssues = board?.issues ?? [];
+  const allIssues = useMemo(() => board?.issues ?? [], [board?.issues]);
   const statusColumns = board?.statusColumns ?? ['To Do', 'In Progress', 'Done'];
 
-  // Collect all unique labels for filter bar
+  // Collect all unique labels for filter bar (canonicalized)
   const allLabels = useMemo(() => {
     const labelSet = new Set();
-    allIssues.forEach((i) => (i.labels || []).forEach((l) => labelSet.add(l)));
+    allIssues.forEach((i) =>
+      (i.labels || []).forEach((l) => labelSet.add(canonicalizeLabel(l)))
+    );
     return Array.from(labelSet).sort();
   }, [allIssues]);
 
@@ -218,7 +221,7 @@ export default function BoardTab({
   return (
     <div className="flex h-full flex-col">
       {/* Sub-navigation tabs */}
-      <div className="mb-4 flex items-center gap-1 overflow-x-auto rounded-xl border border-white/[0.05] bg-white/[0.02] p-1">
+      <div className="mb-4 flex items-center gap-1 overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-1">
         {SUB_TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeView === tab.key;
@@ -235,8 +238,8 @@ export default function BoardTab({
               className={[
                 'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-white/10 text-white shadow-sm'
-                  : 'text-slate-500 hover:bg-white/[0.04] hover:text-slate-300',
+                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)] shadow-sm'
+                  : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
               ].join(' ')}
             >
               <Icon size={15} />
@@ -254,8 +257,8 @@ export default function BoardTab({
             className={[
               'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
               showEpicSidebar
-                ? 'text-white'
-                : 'text-slate-500 hover:bg-white/[0.05] hover:text-slate-300',
+                ? 'text-[var(--color-fg-default)]'
+                : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
             ].join(' ')}
             style={showEpicSidebar ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' } : undefined}
           >

@@ -1,0 +1,595 @@
+/* =====================================================
+   STORYFLOW DESIGN TOKENS v2.0
+
+   Single source of truth for all design values.
+   - Foundational tokens: spacing, typography, animation, etc.
+   - Semantic color tokens: automatically switch between themes
+   ===================================================== */
+
+/* =====================================================
+   FOUNDATIONAL TOKENS (Theme-agnostic)
+   ===================================================== */
+
+:root {
+  /* -------------------------------------------------
+     SPACING SCALE (4px base unit)
+     ------------------------------------------------- */
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-3-5: 0.875rem;  /* 14px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-7: 1.75rem;     /* 28px */
+  --space-8: 2rem;        /* 32px */
+  --space-9: 2.25rem;     /* 36px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-11: 2.75rem;    /* 44px */
+  --space-12: 3rem;       /* 48px */
+  --space-14: 3.5rem;     /* 56px */
+  --space-16: 4rem;       /* 64px */
+  --space-20: 5rem;       /* 80px */
+  --space-24: 6rem;       /* 96px */
+  --space-28: 7rem;       /* 112px */
+  --space-32: 8rem;       /* 128px */
+
+  /* -------------------------------------------------
+     TYPOGRAPHY SCALE
+     ------------------------------------------------- */
+  --text-2xs: 0.625rem;   /* 10px */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1rem;      /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.25rem;     /* 20px */
+  --text-2xl: 1.5rem;     /* 24px */
+  --text-3xl: 1.875rem;   /* 30px */
+  --text-4xl: 2.25rem;    /* 36px */
+  --text-5xl: 3rem;       /* 48px */
+
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* Font weights */
+  --font-thin: 100;
+  --font-extralight: 200;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+
+  /* Letter spacing */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* -------------------------------------------------
+     ANIMATION
+     ------------------------------------------------- */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+  --duration-slowest: 700ms;
+
+  /* Easing curves */
+  --ease-linear: linear;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* -------------------------------------------------
+     BORDER RADIUS
+     ------------------------------------------------- */
+  --radius-none: 0;
+  --radius-xs: 0.125rem;  /* 2px */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.375rem;  /* 6px */
+  --radius-DEFAULT: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-3xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+
+  /* -------------------------------------------------
+     SHADOWS (theme-aware, see themed section)
+     ------------------------------------------------- */
+  --shadow-xs: 0 1px 2px var(--shadow-color, rgba(0, 0, 0, 0.05));
+  --shadow-sm: 0 1px 3px var(--shadow-color, rgba(0, 0, 0, 0.1)), 0 1px 2px var(--shadow-color, rgba(0, 0, 0, 0.06));
+  --shadow-md: 0 4px 6px -1px var(--shadow-color, rgba(0, 0, 0, 0.1)), 0 2px 4px -1px var(--shadow-color, rgba(0, 0, 0, 0.06));
+  --shadow-lg: 0 10px 15px -3px var(--shadow-color, rgba(0, 0, 0, 0.1)), 0 4px 6px -2px var(--shadow-color, rgba(0, 0, 0, 0.05));
+  --shadow-xl: 0 20px 25px -5px var(--shadow-color, rgba(0, 0, 0, 0.1)), 0 10px 10px -5px var(--shadow-color, rgba(0, 0, 0, 0.04));
+  --shadow-2xl: 0 25px 50px -12px var(--shadow-color, rgba(0, 0, 0, 0.25));
+  --shadow-inner: inset 0 2px 4px 0 var(--shadow-color, rgba(0, 0, 0, 0.06));
+
+  /* Glow shadows */
+  --shadow-glow-sm: 0 0 10px var(--glow-color, rgba(99, 102, 241, 0.2));
+  --shadow-glow-md: 0 0 20px var(--glow-color, rgba(99, 102, 241, 0.3));
+  --shadow-glow-lg: 0 0 30px var(--glow-color, rgba(99, 102, 241, 0.4));
+
+  /* -------------------------------------------------
+     Z-INDEX SCALE
+     ------------------------------------------------- */
+  --z-hide: -1;
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-drawer: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-max: 9999;
+
+  /* -------------------------------------------------
+     COMPONENT SIZES
+     ------------------------------------------------- */
+  /* Input/Button heights */
+  --size-input-xs: 1.5rem;   /* 24px */
+  --size-input-sm: 2rem;     /* 32px */
+  --size-input-md: 2.5rem;   /* 40px */
+  --size-input-lg: 3rem;     /* 48px */
+  --size-input-xl: 3.5rem;   /* 56px */
+
+  /* Icon sizes */
+  --size-icon-xs: 0.75rem;   /* 12px */
+  --size-icon-sm: 1rem;      /* 16px */
+  --size-icon-md: 1.25rem;   /* 20px */
+  --size-icon-lg: 1.5rem;    /* 24px */
+  --size-icon-xl: 2rem;      /* 32px */
+
+  /* Avatar sizes */
+  --size-avatar-xs: 1.5rem;  /* 24px */
+  --size-avatar-sm: 2rem;    /* 32px */
+  --size-avatar-md: 2.5rem;  /* 40px */
+  --size-avatar-lg: 3rem;    /* 48px */
+  --size-avatar-xl: 4rem;    /* 64px */
+
+  /* -------------------------------------------------
+     LAYOUT
+     ------------------------------------------------- */
+  --sidebar-width: 16rem;      /* 256px */
+  --sidebar-collapsed: 4rem;   /* 64px */
+  --header-height: 4rem;       /* 64px */
+  --max-content-width: 80rem;  /* 1280px */
+
+  /* -------------------------------------------------
+     FOCUS
+     ------------------------------------------------- */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* -------------------------------------------------
+     BREAKPOINTS (for reference, use Tailwind classes)
+     ------------------------------------------------- */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* -------------------------------------------------
+     ACCENT COLORS (Brand, fixed across themes)
+     ------------------------------------------------- */
+  --accent-purple: #8b5cf6;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-yellow: #f59e0b;
+  --accent-orange: #f97316;
+  --accent-red: #ef4444;
+  --accent-pink: #ec4899;
+  --accent-indigo: #6366f1;
+
+  /* Accent RGB values for alpha compositing */
+  --accent-purple-rgb: 139, 92, 246;
+  --accent-blue-rgb: 59, 130, 246;
+  --accent-cyan-rgb: 6, 182, 212;
+  --accent-green-rgb: 16, 185, 129;
+  --accent-yellow-rgb: 245, 158, 11;
+  --accent-orange-rgb: 249, 115, 22;
+  --accent-red-rgb: 239, 68, 68;
+  --accent-pink-rgb: 236, 72, 153;
+  --accent-indigo-rgb: 99, 102, 241;
+
+  /* Interactive colors */
+  --interactive-default: var(--accent-indigo);
+  --interactive-hover: #4f46e5;
+  --interactive-active: #4338ca;
+  --interactive-disabled: #94a3b8;
+  --interactive-rgb: var(--accent-indigo-rgb);
+}
+
+/* =====================================================
+   DARK THEME (Default)
+   ===================================================== */
+
+.theme-dark {
+  color-scheme: dark;
+
+  /* -------------------------------------------------
+     BACKGROUND COLORS
+     ------------------------------------------------- */
+  --color-bg-base: #0f172a;
+  --color-bg-subtle: #1e293b;
+  --color-bg-muted: #334155;
+  --color-bg-emphasis: #475569;
+  --color-bg-inverse: #f8fafc;
+
+  /* Glass/translucent backgrounds */
+  --color-bg-glass: rgba(255, 255, 255, 0.05);
+  --color-bg-glass-hover: rgba(255, 255, 255, 0.08);
+  --color-bg-glass-active: rgba(255, 255, 255, 0.12);
+  --color-bg-glass-emphasis: rgba(255, 255, 255, 0.15);
+
+  /* Overlay backgrounds */
+  --color-bg-overlay: rgba(15, 23, 42, 0.85);
+  --color-bg-overlay-heavy: rgba(15, 23, 42, 0.92);
+  --color-bg-backdrop: rgba(0, 0, 0, 0.6);
+
+  /* -------------------------------------------------
+     FOREGROUND/TEXT COLORS
+     ------------------------------------------------- */
+  --color-fg-default: #f8fafc;
+  --color-fg-muted: #94a3b8;
+  --color-fg-subtle: #64748b;
+  --color-fg-faint: #475569;
+  --color-fg-inverse: #0f172a;
+  --color-fg-on-accent: #ffffff;
+
+  /* -------------------------------------------------
+     BORDER COLORS
+     ------------------------------------------------- */
+  --color-border-default: rgba(255, 255, 255, 0.08);
+  --color-border-muted: rgba(255, 255, 255, 0.05);
+  --color-border-emphasis: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
+
+  /* -------------------------------------------------
+     STATUS COLORS
+     ------------------------------------------------- */
+  --color-success: #22c55e;
+  --color-success-subtle: rgba(34, 197, 94, 0.15);
+  --color-success-fg: #22c55e;
+  --color-warning: #f59e0b;
+  --color-warning-subtle: rgba(245, 158, 11, 0.15);
+  --color-warning-fg: #f59e0b;
+  --color-danger: #ef4444;
+  --color-danger-subtle: rgba(239, 68, 68, 0.15);
+  --color-danger-fg: #ef4444;
+  --color-info: #3b82f6;
+  --color-info-subtle: rgba(59, 130, 246, 0.15);
+  --color-info-fg: #3b82f6;
+
+  /* -------------------------------------------------
+     INPUT COLORS
+     ------------------------------------------------- */
+  --color-input-bg: rgba(255, 255, 255, 0.05);
+  --color-input-bg-hover: rgba(255, 255, 255, 0.07);
+  --color-input-bg-focus: rgba(255, 255, 255, 0.08);
+  --color-input-border: rgba(255, 255, 255, 0.1);
+  --color-input-placeholder: #64748b;
+
+  /* -------------------------------------------------
+     SCROLLBAR
+     ------------------------------------------------- */
+  --color-scrollbar-track: transparent;
+  --color-scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --color-scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+
+  /* -------------------------------------------------
+     SELECTION
+     ------------------------------------------------- */
+  --color-selection-bg: rgba(139, 92, 246, 0.3);
+  --color-selection-fg: #ffffff;
+
+  /* -------------------------------------------------
+     SHADOWS
+     ------------------------------------------------- */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --glow-color: rgba(139, 92, 246, 0.3);
+
+  /* Card-specific shadow */
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+
+  /* -------------------------------------------------
+     GRADIENT ORB BACKGROUNDS
+     ------------------------------------------------- */
+  --color-orb-purple: rgba(124, 58, 237, 0.15);
+  --color-orb-blue: rgba(37, 99, 235, 0.10);
+  --color-orb-cyan: rgba(6, 182, 212, 0.10);
+
+  /* -------------------------------------------------
+     FOCUS RING
+     ------------------------------------------------- */
+  --focus-ring-color: var(--interactive-default);
+
+  /* -------------------------------------------------
+     THEME BRIDGE (--th-* aliases)
+     Used by charts, graphs, canvas, and panels.
+     Maps to semantic tokens for theme-awareness.
+     ------------------------------------------------- */
+  --th-bg: #0f172a;
+  --th-panel: rgba(255, 255, 255, 0.06);
+  --th-panel-light: rgba(255, 255, 255, 0.04);
+  --th-panel-medium: rgba(15, 23, 42, 0.6);
+  --th-panel-heavy: rgba(15, 23, 42, 0.85);
+  --th-panel-solid: #1e293b;
+  --th-border: rgba(255, 255, 255, 0.08);
+  --th-border-hover: rgba(255, 255, 255, 0.15);
+  --th-text-muted: #94a3b8;
+  --th-text-faint: #475569;
+  --th-text-secondary: #94a3b8;
+
+  /* -------------------------------------------------
+     BADGE COLORS
+     Pastel text for dark backgrounds
+     ------------------------------------------------- */
+  --badge-purple-bg: rgba(168, 85, 247, 0.20);
+  --badge-purple-fg: #c4b5fd;
+  --badge-blue-bg: rgba(59, 130, 246, 0.20);
+  --badge-blue-fg: #93c5fd;
+  --badge-green-bg: rgba(34, 197, 94, 0.20);
+  --badge-green-fg: #86efac;
+  --badge-yellow-bg: rgba(234, 179, 8, 0.20);
+  --badge-yellow-fg: #fde68a;
+  --badge-red-bg: rgba(239, 68, 68, 0.20);
+  --badge-red-fg: #fca5a5;
+  --badge-pink-bg: rgba(236, 72, 153, 0.20);
+  --badge-pink-fg: #f9a8d4;
+  --badge-cyan-bg: rgba(6, 182, 212, 0.20);
+  --badge-cyan-fg: #67e8f9;
+  --badge-gray-bg: rgba(107, 114, 128, 0.20);
+  --badge-gray-fg: #d1d5db;
+  --badge-purple-border: rgba(168, 85, 247, 0.40);
+  --badge-blue-border: rgba(59, 130, 246, 0.40);
+  --badge-green-border: rgba(34, 197, 94, 0.40);
+  --badge-yellow-border: rgba(234, 179, 8, 0.40);
+  --badge-red-border: rgba(239, 68, 68, 0.40);
+  --badge-pink-border: rgba(236, 72, 153, 0.40);
+  --badge-cyan-border: rgba(6, 182, 212, 0.40);
+  --badge-gray-border: rgba(107, 114, 128, 0.40);
+}
+
+/* =====================================================
+   LIGHT THEME — "Warm Linen"
+   Warm bone/eggshell base with amber undertones.
+   No cold Slate grays — all neutrals are warm Stone.
+   ===================================================== */
+
+.theme-light {
+  color-scheme: light;
+
+  /* -------------------------------------------------
+     BACKGROUND COLORS
+     Warm bone → eggshell → linen → warm stone
+     ------------------------------------------------- */
+  --color-bg-base: #F9F7F4;      /* Bone */
+  --color-bg-subtle: #F3F0EB;    /* Eggshell */
+  --color-bg-muted: #EBE7E0;     /* Linen */
+  --color-bg-emphasis: #DDD8CF;   /* Warm stone */
+  --color-bg-inverse: #2C2825;    /* Warm charcoal */
+
+  /* Glass/card backgrounds - warm-tinted translucency */
+  --color-bg-glass: rgba(249, 247, 244, 0.92);
+  --color-bg-glass-hover: rgba(249, 247, 244, 0.96);
+  --color-bg-glass-active: #F9F7F4;
+  --color-bg-glass-emphasis: #F9F7F4;
+
+  /* Overlay backgrounds */
+  --color-bg-overlay: rgba(249, 247, 244, 0.95);
+  --color-bg-overlay-heavy: rgba(249, 247, 244, 0.98);
+  --color-bg-backdrop: rgba(44, 40, 37, 0.3);
+
+  /* -------------------------------------------------
+     FOREGROUND/TEXT COLORS
+     Warm charcoal scale — no blue tint
+     ------------------------------------------------- */
+  --color-fg-default: #2C2825;
+  --color-fg-muted: #6B6560;
+  --color-fg-subtle: #8A8279;
+  --color-fg-faint: #B0A89E;
+  --color-fg-inverse: #F9F7F4;
+  --color-fg-on-accent: #ffffff;
+
+  /* -------------------------------------------------
+     BORDER COLORS
+     Warm, defined — structured like a well-made book
+     ------------------------------------------------- */
+  --color-border-default: #DDD8CF;
+  --color-border-muted: #EBE7E0;
+  --color-border-emphasis: #C7BFB5;
+  --color-border-strong: #9E958B;
+
+  /* -------------------------------------------------
+     STATUS COLORS
+     Warm-adjusted for contrast on bone backgrounds
+     ------------------------------------------------- */
+  --color-success: #15803D;
+  --color-success-subtle: #F0FAF0;
+  --color-success-fg: #166534;
+  --color-warning: #C2410C;
+  --color-warning-subtle: #FEF7EC;
+  --color-warning-fg: #9A3412;
+  --color-danger: #DC2626;
+  --color-danger-subtle: #FEF2F2;
+  --color-danger-fg: #B91C1C;
+  --color-info: #2563EB;
+  --color-info-subtle: #EFF6FF;
+  --color-info-fg: #1E40AF;
+
+  /* -------------------------------------------------
+     INPUT COLORS
+     Slightly lighter than base for inset feel
+     ------------------------------------------------- */
+  --color-input-bg: #FDFCFA;
+  --color-input-bg-hover: #F7F4F0;
+  --color-input-bg-focus: #FDFCFA;
+  --color-input-border: #CBC4BA;
+  --color-input-placeholder: #A39B91;
+
+  /* -------------------------------------------------
+     SCROLLBAR
+     ------------------------------------------------- */
+  --color-scrollbar-track: #EBE7E0;
+  --color-scrollbar-thumb: #C7BFB5;
+  --color-scrollbar-thumb-hover: #9E958B;
+
+  /* -------------------------------------------------
+     SELECTION
+     ------------------------------------------------- */
+  --color-selection-bg: rgba(99, 102, 241, 0.12);
+  --color-selection-fg: #2C2825;
+
+  /* -------------------------------------------------
+     SHADOWS
+     Warm-tinted, soft depth
+     ------------------------------------------------- */
+  --shadow-color: rgba(44, 40, 37, 0.06);
+  --glow-color: rgba(99, 102, 241, 0.12);
+
+  /* Card-specific shadow — warm undertone */
+  --shadow-card:
+    0 1px 3px rgba(44, 40, 37, 0.04),
+    0 4px 12px rgba(44, 40, 37, 0.06),
+    0 0 0 1px rgba(44, 40, 37, 0.03);
+  --shadow-card-hover:
+    0 2px 4px rgba(44, 40, 37, 0.04),
+    0 8px 24px rgba(44, 40, 37, 0.10),
+    0 0 0 1px rgba(44, 40, 37, 0.04);
+
+  /* -------------------------------------------------
+     GRADIENT ORB BACKGROUNDS
+     Warm amber/rose/gold instead of purple/blue/cyan
+     ------------------------------------------------- */
+  --color-orb-purple: rgba(180, 130, 80, 0.05);
+  --color-orb-blue: rgba(160, 100, 120, 0.04);
+  --color-orb-cyan: rgba(140, 120, 90, 0.03);
+
+  /* -------------------------------------------------
+     FOCUS RING
+     ------------------------------------------------- */
+  --focus-ring-color: var(--interactive-default);
+
+  /* -------------------------------------------------
+     INTERACTIVE COLORS (indigo — the brand)
+     ------------------------------------------------- */
+  --interactive-default: #4f46e5;
+  --interactive-hover: #4338ca;
+  --interactive-active: #3730a3;
+
+  /* -------------------------------------------------
+     THEME BRIDGE (--th-* aliases)
+     Warm equivalents for light mode
+     ------------------------------------------------- */
+  --th-bg: #F9F7F4;
+  --th-panel: rgba(44, 40, 37, 0.04);
+  --th-panel-light: rgba(44, 40, 37, 0.03);
+  --th-panel-medium: rgba(249, 247, 244, 0.85);
+  --th-panel-heavy: rgba(249, 247, 244, 0.95);
+  --th-panel-solid: #F3F0EB;
+  --th-border: #DDD8CF;
+  --th-border-hover: #C7BFB5;
+  --th-text-muted: #6B6560;
+  --th-text-faint: #B0A89E;
+  --th-text-secondary: #8A8279;
+
+  /* -------------------------------------------------
+     BADGE COLORS
+     Saturated text for warm light backgrounds
+     ------------------------------------------------- */
+  --badge-purple-bg: rgba(147, 51, 234, 0.12);
+  --badge-purple-fg: #7e22ce;
+  --badge-blue-bg: rgba(37, 99, 235, 0.12);
+  --badge-blue-fg: #1d4ed8;
+  --badge-green-bg: rgba(22, 163, 74, 0.12);
+  --badge-green-fg: #15803d;
+  --badge-yellow-bg: rgba(202, 138, 4, 0.12);
+  --badge-yellow-fg: #a16207;
+  --badge-red-bg: rgba(220, 38, 38, 0.12);
+  --badge-red-fg: #b91c1c;
+  --badge-pink-bg: rgba(219, 39, 119, 0.12);
+  --badge-pink-fg: #be185d;
+  --badge-cyan-bg: rgba(8, 145, 178, 0.12);
+  --badge-cyan-fg: #0e7490;
+  --badge-gray-bg: rgba(75, 85, 99, 0.10);
+  --badge-gray-fg: #4b5563;
+  --badge-purple-border: rgba(147, 51, 234, 0.30);
+  --badge-blue-border: rgba(37, 99, 235, 0.30);
+  --badge-green-border: rgba(22, 163, 74, 0.30);
+  --badge-yellow-border: rgba(202, 138, 4, 0.30);
+  --badge-red-border: rgba(220, 38, 38, 0.30);
+  --badge-pink-border: rgba(219, 39, 119, 0.30);
+  --badge-cyan-border: rgba(8, 145, 178, 0.30);
+  --badge-gray-border: rgba(75, 85, 99, 0.25);
+}
+
+/* =====================================================
+   UTILITY CLASSES
+   ===================================================== */
+
+/* Focus ring utility */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Interactive surface states */
+.surface-interactive {
+  background-color: var(--color-bg-glass);
+  transition: background-color var(--duration-fast) var(--ease-default);
+}
+
+.surface-interactive:hover {
+  background-color: var(--color-bg-glass-hover);
+}
+
+.surface-interactive:active {
+  background-color: var(--color-bg-glass-active);
+}
+
+/* Text color utilities using semantic tokens */
+.text-default { color: var(--color-fg-default); }
+.text-muted { color: var(--color-fg-muted); }
+.text-subtle { color: var(--color-fg-subtle); }
+.text-faint { color: var(--color-fg-faint); }
+.text-inverse { color: var(--color-fg-inverse); }
+
+/* Background utilities */
+.bg-base { background-color: var(--color-bg-base); }
+.bg-subtle { background-color: var(--color-bg-subtle); }
+.bg-muted { background-color: var(--color-bg-muted); }
+.bg-glass { background-color: var(--color-bg-glass); }
+
+/* Border utilities */
+.border-default { border-color: var(--color-border-default); }
+.border-muted { border-color: var(--color-border-muted); }
+.border-emphasis { border-color: var(--color-border-emphasis); }

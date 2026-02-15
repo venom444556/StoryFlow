@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import BoardColumn from './BoardColumn';
 
 export default function SprintBoard({

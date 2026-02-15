@@ -97,15 +97,15 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
       initial={{ x: 20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
-      className="flex h-full w-72 flex-col border-l border-white/[0.08] backdrop-blur-2xl"
+      className="flex h-full w-72 flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
       style={{ backgroundColor: 'var(--th-panel)' }}
     >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
-          <h3 className="text-sm font-semibold text-white">Node Properties</h3>
+        <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
+          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Node Properties</h3>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
           >
             <X size={16} />
           </button>
@@ -124,7 +124,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
 
             {/* Type (read-only) */}
             <div>
-              <label className="mb-1.5 block text-sm text-slate-400">Type</label>
+              <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Type</label>
               <Badge
                 variant={
                   node.type === 'start'
@@ -149,7 +149,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
 
             {/* Status (read-only) */}
             <div>
-              <label className="mb-1.5 block text-sm text-slate-400">Status</label>
+              <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Status</label>
               <Badge
                 variant={STATUS_BADGE_VARIANT[node.status] || 'gray'}
                 dot
@@ -169,7 +169,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
             {/* Config section */}
             {configFields.length > 0 && (
               <div>
-                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
                   Configuration
                 </h4>
                 <div className="space-y-3">
@@ -204,7 +204,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
         </div>
 
         {/* Footer – delete button */}
-        <div className="border-t border-white/[0.08] p-4">
+        <div className="border-t border-[var(--color-border-default)] p-4">
           <button
             onClick={() => onDelete?.(node.id)}
             className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400 transition-all duration-200 hover:bg-red-600/30 hover:text-red-300"

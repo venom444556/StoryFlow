@@ -1,15 +1,15 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { Search, Upload, Download, Settings, Menu } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useProjects } from '../../hooks/useProjects'
+import { useRef, useState, useCallback, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { Search, Upload, Download, Settings, Menu } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useProjects } from '../../hooks/useProjects';
 import {
   exportProjectJSON,
   exportAllProjectsJSON,
   downloadJSON,
   readFileAsJSON,
   parseProjectJSON,
-} from '../../utils/exportImport'
+} from '../../utils/exportImport';
 
 // ---------------------------------------------------------------------------
 // Inline toast (simple temporary message)
@@ -17,14 +17,14 @@ import {
 
 function Toast({ message, type = 'success', onDone }) {
   useEffect(() => {
-    const t = setTimeout(onDone, 3000)
-    return () => clearTimeout(t)
-  }, [onDone])
+    const t = setTimeout(onDone, 3000);
+    return () => clearTimeout(t);
+  }, [onDone]);
 
-  const bg =
+  const colorClasses =
     type === 'success'
-      ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
-      : 'bg-red-500/20 border-red-500/30 text-red-300'
+      ? 'bg-[var(--status-success-subtle)] border-[var(--status-success)]/30 text-[var(--status-success)]'
+      : 'bg-[var(--status-error-subtle)] border-[var(--status-error)]/30 text-[var(--status-error)]';
 
   return (
     <motion.div
@@ -32,11 +32,18 @@ function Toast({ message, type = 'success', onDone }) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={`absolute right-6 top-full mt-2 z-50 rounded-lg border px-4 py-2 text-xs font-medium shadow-lg backdrop-blur-md ${bg}`}
+      className={[
+        'absolute right-[var(--space-6)] top-full mt-[var(--space-2)]',
+        'rounded-[var(--radius-lg)] border px-[var(--space-4)] py-[var(--space-2)]',
+        'text-[var(--text-xs)] font-[var(--font-medium)] shadow-lg backdrop-blur-md',
+        colorClasses,
+      ].join(' ')}
+      style={{ zIndex: 'var(--z-toast)' }}
+      role="alert"
     >
       {message}
     </motion.div>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -44,138 +51,165 @@ function Toast({ message, type = 'success', onDone }) {
 // ---------------------------------------------------------------------------
 
 export default function Header({ breadcrumbs = [], onSearchClick, onSettingsClick, onHamburgerClick }) {
-  const params = useParams()
-  const { projects, getProject, importProject } = useProjects()
-  const fileInputRef = useRef(null)
-  const [toast, setToast] = useState(null)
+  const params = useParams();
+  const { projects, getProject, importProject } = useProjects();
+  const fileInputRef = useRef(null);
+  const [toast, setToast] = useState(null);
 
   // --- Import handler ---
   const handleImportClick = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
+    fileInputRef.current?.click();
+  }, []);
 
   const handleFileChange = useCallback(
     async (e) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+      const file = e.target.files?.[0];
+      if (!file) return;
 
       // Reject files larger than 10 MB
       if (file.size > 10 * 1024 * 1024) {
-        setToast({ message: 'Import failed: file exceeds 10 MB limit', type: 'error' })
-        return
+        setToast({ message: 'Import failed: file exceeds 10 MB limit', type: 'error' });
+        return;
       }
 
       try {
-        const text = await readFileAsJSON(file)
-        const result = parseProjectJSON(text)
+        const text = await readFileAsJSON(file);
+        const result = parseProjectJSON(text);
 
         if (!result.success) {
-          setToast({ message: `Import failed: ${result.error}`, type: 'error' })
-          return
+          setToast({ message: `Import failed: ${result.error}`, type: 'error' });
+          return;
         }
 
         if (result.projects) {
           // Multi-project import
-          let count = 0
+          let count = 0;
           for (const proj of result.projects) {
-            importProject(proj)
-            count++
+            importProject(proj);
+            count++;
           }
           setToast({
             message: `Imported ${count} project${count !== 1 ? 's' : ''} successfully`,
             type: 'success',
-          })
+          });
         } else if (result.project) {
-          importProject(result.project)
+          importProject(result.project);
           setToast({
             message: `Imported "${result.project.name}" successfully`,
             type: 'success',
-          })
+          });
         }
       } catch {
-        setToast({ message: 'Failed to read file', type: 'error' })
+        setToast({ message: 'Failed to read file', type: 'error' });
       }
 
       // Reset the input so the same file can be re-imported
-      e.target.value = ''
+      e.target.value = '';
     },
     [importProject]
-  )
+  );
 
   // --- Export handler ---
   const handleExportClick = useCallback(() => {
     if (params.id) {
       // On a project page -- export current project
-      const project = getProject(params.id)
+      const project = getProject(params.id);
       if (project) {
-        const json = exportProjectJSON(project)
+        const json = exportProjectJSON(project);
         const safeName = project.name
           .replace(/[^a-zA-Z0-9-_ ]/g, '')
           .replace(/\s+/g, '-')
-          .toLowerCase()
-        downloadJSON(json, `${safeName}.storyflow.json`)
-        setToast({ message: `Exported "${project.name}"`, type: 'success' })
+          .toLowerCase();
+        downloadJSON(json, `${safeName}.storyflow.json`);
+        setToast({ message: `Exported "${project.name}"`, type: 'success' });
       }
     } else {
       // Dashboard -- export all projects
       if (projects.length === 0) {
-        setToast({ message: 'No projects to export', type: 'error' })
-        return
+        setToast({ message: 'No projects to export', type: 'error' });
+        return;
       }
-      const json = exportAllProjectsJSON(projects)
-      downloadJSON(json, 'storyflow-all-projects.json')
+      const json = exportAllProjectsJSON(projects);
+      downloadJSON(json, 'storyflow-all-projects.json');
       setToast({
         message: `Exported ${projects.length} project${projects.length !== 1 ? 's' : ''}`,
         type: 'success',
-      })
+      });
     }
-  }, [params.id, getProject, projects])
+  }, [params.id, getProject, projects]);
+
+  const iconButtonClasses = [
+    'rounded-[var(--radius-lg)] p-[var(--space-2)]',
+    'text-[var(--color-fg-muted)] transition-colors',
+    'hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+  ].join(' ');
 
   return (
-    <header className="glass relative z-10 flex h-14 shrink-0 items-center justify-between border-b border-white/5 px-6">
+    <header
+      className={[
+        'glass relative flex h-14 shrink-0 items-center justify-between',
+        'border-b border-[var(--color-border-default)] px-[var(--space-6)]',
+      ].join(' ')}
+      style={{ zIndex: 'var(--z-sticky)' }}
+    >
       {/* Hamburger (mobile only) + Breadcrumbs */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-[var(--space-2)]">
         <button
           onClick={onHamburgerClick}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white md:hidden"
+          className={`${iconButtonClasses} md:hidden`}
+          style={{ transitionDuration: 'var(--duration-fast)' }}
+          aria-label="Open menu"
         >
           <Menu size={18} />
         </button>
-      <nav className="flex items-center gap-1.5 text-sm">
-        {breadcrumbs.map((crumb, index) => {
-          const isLast = index === breadcrumbs.length - 1
-          return (
-            <span key={index} className="flex items-center gap-1.5">
-              {index > 0 && <span className="text-slate-600">/</span>}
-              <span
-                className={
-                  isLast
-                    ? 'font-medium text-white'
-                    : 'text-slate-500'
-                }
-              >
-                {crumb.label}
+        <nav className="flex items-center gap-[var(--space-2)] text-[var(--text-sm)]">
+          {breadcrumbs.map((crumb, index) => {
+            const isLast = index === breadcrumbs.length - 1;
+            return (
+              <span key={index} className="flex items-center gap-[var(--space-2)]">
+                {index > 0 && <span className="text-[var(--color-fg-faint)]">/</span>}
+                <span
+                  className={
+                    isLast
+                      ? 'font-[var(--font-medium)] text-[var(--color-fg-default)]'
+                      : 'text-[var(--color-fg-muted)]'
+                  }
+                >
+                  {crumb.label}
+                </span>
               </span>
-            </span>
-          )
-        })}
-        {breadcrumbs.length === 0 && (
-          <span className="font-medium text-white">Dashboard</span>
-        )}
-      </nav>
+            );
+          })}
+          {breadcrumbs.length === 0 && (
+            <span className="font-[var(--font-medium)] text-[var(--color-fg-default)]">Dashboard</span>
+          )}
+        </nav>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-[var(--space-1)]">
         {/* Search */}
         <button
           onClick={onSearchClick}
           title="Search (Ctrl+/)"
-          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+          className={[
+            'flex items-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
+            'px-[var(--space-3)] py-[var(--space-2)]',
+            'text-[var(--color-fg-muted)] transition-colors',
+            'hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
+          ].join(' ')}
+          style={{ transitionDuration: 'var(--duration-fast)' }}
         >
           <Search size={16} />
-          <span className="hidden text-xs sm:inline">Search</span>
-          <kbd className="hidden rounded border border-white/10 bg-white/5 px-1 py-0.5 text-[10px] font-medium text-slate-500 sm:inline-block">
+          <span className="hidden text-[var(--text-xs)] sm:inline">Search</span>
+          <kbd className={[
+            'hidden rounded-[var(--radius-sm)] border border-[var(--color-border-default)]',
+            'bg-[var(--color-bg-glass)] px-[var(--space-1)] py-0.5',
+            'text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]',
+            'sm:inline-block',
+          ].join(' ')}>
             /
           </kbd>
         </button>
@@ -184,7 +218,8 @@ export default function Header({ breadcrumbs = [], onSearchClick, onSettingsClic
         <button
           onClick={handleImportClick}
           title="Import project"
-          className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+          className={iconButtonClasses}
+          style={{ transitionDuration: 'var(--duration-fast)' }}
         >
           <Upload size={16} />
         </button>
@@ -193,7 +228,8 @@ export default function Header({ breadcrumbs = [], onSearchClick, onSettingsClic
         <button
           onClick={handleExportClick}
           title={params.id ? 'Export current project' : 'Export all projects'}
-          className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+          className={iconButtonClasses}
+          style={{ transitionDuration: 'var(--duration-fast)' }}
         >
           <Download size={16} />
         </button>
@@ -202,7 +238,8 @@ export default function Header({ breadcrumbs = [], onSearchClick, onSettingsClic
         <button
           onClick={onSettingsClick}
           title="Settings"
-          className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+          className={iconButtonClasses}
+          style={{ transitionDuration: 'var(--duration-fast)' }}
         >
           <Settings size={16} />
         </button>
@@ -229,5 +266,5 @@ export default function Header({ breadcrumbs = [], onSearchClick, onSettingsClic
         )}
       </AnimatePresence>
     </header>
-  )
+  );
 }

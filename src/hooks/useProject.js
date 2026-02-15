@@ -1,317 +1,185 @@
 import { useCallback, useMemo } from 'react'
-import { generateId } from '../utils/ids'
-import { useProjectsContext } from '../contexts/ProjectsContext'
+import { useProjectsStore } from '../stores/projectsStore'
 
+/**
+ * Hook for working with a single project
+ * Now powered by Zustand for optimized re-renders
+ */
 export function useProject(projectId) {
-  const { getProject, updateProject: ctxUpdateProject } = useProjectsContext()
+  // Use a stable selector to avoid infinite loops
+  const projectSelector = useCallback(
+    (state) => state.projects.find((p) => p.id === projectId),
+    [projectId]
+  )
+  const project = useProjectsStore(projectSelector)
 
-  const project = getProject(projectId)
+  // Get stable action references using getState() - these don't cause re-renders
+  const getStore = useProjectsStore.getState
 
   // ------ Generic project updater ------
 
   const updateProject = useCallback(
     (updates) => {
-      ctxUpdateProject(projectId, updates)
+      getStore().updateProject(projectId, updates)
     },
-    [projectId, ctxUpdateProject]
+    [projectId, getStore]
   )
 
   // ------ Overview ------
 
   const updateOverview = useCallback(
     (data) => {
-      if (!project) return
-      updateProject({
-        overview: { ...project.overview, ...data },
+      const currentProject = getStore().projects.find((p) => p.id === projectId)
+      if (!currentProject) return
+      getStore().updateProject(projectId, {
+        overview: { ...currentProject.overview, ...data },
       })
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Issues ------
 
   const addIssue = useCallback(
     (issue) => {
-      if (!project) return
-      const nextNumber = project.board.nextIssueNumber || 1
-      const newIssue = {
-        id: generateId(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        ...issue,
-      }
-      updateProject({
-        board: {
-          ...project.board,
-          issues: [...project.board.issues, newIssue],
-          nextIssueNumber: nextNumber + 1,
-        },
-      })
-      return newIssue
+      return getStore().addIssue(projectId, issue)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const updateIssue = useCallback(
     (issueId, updates) => {
-      if (!project) return
-      updateProject({
-        board: {
-          ...project.board,
-          issues: project.board.issues.map((issue) =>
-            issue.id === issueId
-              ? { ...issue, ...updates, updatedAt: new Date().toISOString() }
-              : issue
-          ),
-        },
-      })
+      getStore().updateIssue(projectId, issueId, updates)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const deleteIssue = useCallback(
     (issueId) => {
-      if (!project) return
-      updateProject({
-        board: {
-          ...project.board,
-          issues: project.board.issues.filter((issue) => issue.id !== issueId),
-        },
-      })
+      getStore().deleteIssue(projectId, issueId)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Pages ------
 
   const addPage = useCallback(
     (page) => {
-      if (!project) return
-      const newPage = {
-        id: generateId(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'draft',
-        parentId: null,
-        ...page,
-      }
-      updateProject({
-        pages: [...project.pages, newPage],
-      })
-      return newPage
+      return getStore().addPage(projectId, page)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const updatePage = useCallback(
     (pageId, updates) => {
-      if (!project) return
-      updateProject({
-        pages: project.pages.map((page) =>
-          page.id === pageId
-            ? { ...page, ...updates, updatedAt: new Date().toISOString() }
-            : page
-        ),
-      })
+      getStore().updatePage(projectId, pageId, updates)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const deletePage = useCallback(
     (pageId) => {
-      if (!project) return
-      // Also remove any child pages that reference this page as parent
-      updateProject({
-        pages: project.pages.filter(
-          (page) => page.id !== pageId && page.parentId !== pageId
-        ),
-      })
+      getStore().deletePage(projectId, pageId)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Decisions ------
 
   const addDecision = useCallback(
     (decision) => {
-      if (!project) return
-      const newDecision = {
-        id: generateId(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        status: 'proposed',
-        alternatives: [],
-        ...decision,
-      }
-      updateProject({
-        decisions: [...project.decisions, newDecision],
-      })
-      return newDecision
+      return getStore().addDecision(projectId, decision)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const updateDecision = useCallback(
     (decisionId, updates) => {
-      if (!project) return
-      updateProject({
-        decisions: project.decisions.map((d) =>
-          d.id === decisionId
-            ? { ...d, ...updates, updatedAt: new Date().toISOString() }
-            : d
-        ),
-      })
+      getStore().updateDecision(projectId, decisionId, updates)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Phases (timeline) ------
 
   const addPhase = useCallback(
     (phase) => {
-      if (!project) return
-      const newPhase = {
-        id: generateId(),
-        progress: 0,
-        ...phase,
-      }
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          phases: [...project.timeline.phases, newPhase],
-        },
-      })
-      return newPhase
+      return getStore().addPhase(projectId, phase)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const updatePhase = useCallback(
     (phaseId, updates) => {
-      if (!project) return
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          phases: project.timeline.phases.map((phase) =>
-            phase.id === phaseId ? { ...phase, ...updates } : phase
-          ),
-        },
-      })
+      getStore().updatePhase(projectId, phaseId, updates)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const deletePhase = useCallback(
     (phaseId) => {
-      if (!project) return
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          phases: project.timeline.phases.filter((phase) => phase.id !== phaseId),
-        },
-      })
+      getStore().deletePhase(projectId, phaseId)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Milestones (timeline) ------
 
   const addMilestone = useCallback(
     (milestone) => {
-      if (!project) return
-      const milestones = project.timeline?.milestones || []
-      const newMilestone = {
-        id: generateId(),
-        completed: false,
-        ...milestone,
-      }
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          milestones: [...milestones, newMilestone],
-        },
-      })
-      return newMilestone
+      return getStore().addMilestone(projectId, milestone)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const updateMilestone = useCallback(
     (milestoneId, updates) => {
-      if (!project) return
-      const milestones = project.timeline?.milestones || []
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          milestones: milestones.map((m) =>
-            m.id === milestoneId ? { ...m, ...updates } : m
-          ),
-        },
-      })
+      getStore().updateMilestone(projectId, milestoneId, updates)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   const deleteMilestone = useCallback(
     (milestoneId) => {
-      if (!project) return
-      const milestones = project.timeline?.milestones || []
-      updateProject({
-        timeline: {
-          ...project.timeline,
-          milestones: milestones.filter((m) => m.id !== milestoneId),
-        },
-      })
+      getStore().deleteMilestone(projectId, milestoneId)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Workflow ------
 
   const updateWorkflow = useCallback(
     (workflowData) => {
-      if (!project) return
-      updateProject({
-        workflow: { ...project.workflow, ...workflowData },
-      })
+      getStore().updateWorkflow(projectId, workflowData)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Architecture ------
 
   const updateArchitecture = useCallback(
     (architectureData) => {
-      if (!project) return
-      updateProject({
-        architecture: { ...project.architecture, ...architectureData },
-      })
+      getStore().updateArchitecture(projectId, architectureData)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Board settings ------
 
   const updateBoardSettings = useCallback(
     (settings) => {
-      if (!project) return
-      updateProject({
-        board: { ...project.board, ...settings },
-      })
+      getStore().updateBoardSettings(projectId, settings)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   // ------ Settings ------
 
   const updateSettings = useCallback(
     (settings) => {
-      if (!project) return
-      updateProject({
-        settings: { ...project.settings, ...settings },
-      })
+      getStore().updateSettings(projectId, settings)
     },
-    [project, updateProject]
+    [projectId, getStore]
   )
 
   return useMemo(

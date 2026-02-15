@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Plus, ChevronDown } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import IssueTypeIcon from './IssueTypeIcon';
@@ -71,8 +71,8 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
       className={[
         'flex items-center gap-1.5 rounded-lg border px-2 py-1 transition-all duration-200',
         isFocused
-          ? 'bg-white/[0.06]'
-          : 'border-white/[0.06] bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05]',
+          ? 'bg-[var(--color-bg-glass)]'
+          : 'border-[var(--color-border-default)] bg-[var(--color-bg-glass)] hover:border-[var(--color-bg-glass-hover)] hover:bg-[var(--color-bg-glass)]',
       ].join(' ')}
       style={isFocused ? {
         borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
@@ -83,7 +83,7 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
       <div ref={menuRef} className="relative">
         <button
           onClick={() => setShowTypeMenu((p) => !p)}
-          className="flex items-center gap-0.5 rounded p-0.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex items-center gap-0.5 rounded p-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
         >
           <IssueTypeIcon type={type} size={14} />
           <ChevronDown size={10} className="opacity-60" />
@@ -109,8 +109,8 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
                   className={[
                     'flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors',
                     opt.value === type
-                      ? 'bg-white/10 text-white'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white',
+                      ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                      : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
                   ].join(' ')}
                 >
                   <IssueTypeIcon type={opt.value} size={14} />
@@ -132,7 +132,7 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder="Create issue..."
-        className="min-w-0 flex-1 border-none bg-transparent py-0.5 text-sm text-white placeholder-slate-500 outline-none"
+        className="min-w-0 flex-1 border-none bg-transparent py-0.5 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none"
       />
 
       {/* Submit button */}

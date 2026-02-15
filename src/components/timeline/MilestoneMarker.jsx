@@ -69,14 +69,14 @@ export default function MilestoneMarker({
                   {completed ? (
                     <CheckCircle2 size={16} style={{ color }} />
                   ) : (
-                    <Circle size={16} className="text-slate-500" />
+                    <Circle size={16} className="text-[var(--color-fg-muted)]" />
                   )}
                 </button>
 
                 <h4
                   className={[
                     'text-sm font-semibold truncate',
-                    completed ? 'text-slate-400 line-through' : 'text-white',
+                    completed ? 'text-[var(--color-fg-muted)] line-through' : 'text-[var(--color-fg-default)]',
                   ].join(' ')}
                 >
                   {name}
@@ -93,7 +93,7 @@ export default function MilestoneMarker({
                           e.stopPropagation()
                           onEdit?.(milestone)
                         }}
-                        className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
                       >
                         <Edit3 size={14} />
                       </button>
@@ -106,7 +106,7 @@ export default function MilestoneMarker({
                           e.stopPropagation()
                           onDelete?.(milestone)
                         }}
-                        className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-red-500/20 hover:text-red-400"
+                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -118,7 +118,7 @@ export default function MilestoneMarker({
 
             {/* Date */}
             {date && (
-              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-500">
+              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)]">
                 <Calendar size={12} />
                 <span>{formatDate(date)}</span>
               </div>

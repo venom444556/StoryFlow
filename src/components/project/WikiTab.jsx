@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { BookOpen, PanelLeft } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import EmptyState from '../ui/EmptyState'
@@ -12,7 +12,7 @@ import PageEditor from '../wiki/PageEditor'
 import VersionHistory from '../wiki/VersionHistory'
 
 export default function WikiTab({ project, addPage, updatePage, deletePage }) {
-  const pages = project?.pages || []
+  const pages = useMemo(() => project?.pages || [], [project?.pages])
 
   // -- Local UI state --
   const [selectedPageId, setSelectedPageId] = useState(null)
@@ -61,7 +61,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
     (data) => {
       if (!selectedPageId) return
       const isAutoSave = data._autoSave
-      const { _autoSave, ...updates } = data
+      const { _autoSave: _autoSaveFlag, ...updates } = data
 
       // Build a version snapshot (only for explicit saves, not auto-saves)
       if (!isAutoSave && selectedPage) {
@@ -113,9 +113,9 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
     [pages, updatePage]
   )
 
-  // ----- Status toggle -----
-
-  const handlePublishToggle = useCallback(() => {
+  // ----- Status toggle (not currently used, but kept for future) -----
+  // eslint-disable-next-line no-unused-vars
+  const _handlePublishToggle = useCallback(() => {
     if (!selectedPage) return
     const nextStatus = selectedPage.status === 'published' ? 'draft' : 'published'
     updatePage(selectedPageId, { status: nextStatus })
@@ -171,10 +171,10 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
       {/* Main area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Mobile page-tree toggle + Breadcrumb */}
-        <div className="flex shrink-0 items-center gap-2 border-b border-white/[0.06] px-3 py-2 md:px-5">
+        <div className="flex shrink-0 items-center gap-2 border-b border-[var(--color-border-default)] px-3 py-2 md:px-5">
           <button
             onClick={() => setShowTree((prev) => !prev)}
-            className="rounded-md p-1 text-slate-400 hover:bg-white/10 hover:text-white md:hidden"
+            className="rounded-md p-1 text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)] md:hidden"
           >
             <PanelLeft size={16} />
           </button>

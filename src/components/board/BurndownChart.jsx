@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { TrendingDown } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import EmptyState from '../ui/EmptyState';
@@ -78,7 +78,7 @@ export default function BurndownChart({ data = [] }) {
       <GlassCard>
         <div className="mb-3 flex items-center gap-2">
           <TrendingDown size={16} className="text-blue-400" />
-          <h3 className="text-sm font-semibold text-slate-300">
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
             Burndown Chart
           </h3>
         </div>
@@ -95,7 +95,7 @@ export default function BurndownChart({ data = [] }) {
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
         <TrendingDown size={16} className="text-blue-400" />
-        <h3 className="text-sm font-semibold text-slate-300">
+        <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
           Burndown Chart
         </h3>
       </div>
@@ -103,12 +103,12 @@ export default function BurndownChart({ data = [] }) {
       {/* Legend */}
       <div className="mb-2 flex items-center gap-4 px-1">
         <div className="flex items-center gap-1.5">
-          <div className="h-0.5 w-4 rounded bg-slate-500" style={{ strokeDasharray: '4 2' }} />
-          <span className="text-[10px] text-slate-500">Ideal</span>
+          <div className="h-0.5 w-4 rounded bg-[var(--color-fg-muted)]" style={{ strokeDasharray: '4 2' }} />
+          <span className="text-[10px] text-[var(--color-fg-muted)]">Ideal</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-0.5 w-4 rounded bg-gradient-to-r from-blue-400 to-cyan-400" />
-          <span className="text-[10px] text-slate-500">Actual</span>
+          <span className="text-[10px] text-[var(--color-fg-muted)]">Actual</span>
         </div>
       </div>
 

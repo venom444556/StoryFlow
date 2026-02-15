@@ -109,7 +109,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
 
         {/* Progress slider */}
         <div>
-          <label className="mb-1.5 block text-sm text-slate-400">
+          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
             Progress
           </label>
           <div className="flex items-center gap-4">
@@ -120,7 +120,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
               step="1"
               value={form.progress}
               onChange={handleProgressChange}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--color-bg-glass)]
                          [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4
                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full
                          [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:shadow-lg
@@ -130,7 +130,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
                          [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0
                          [&::-moz-range-thumb]:bg-purple-500 [&::-moz-range-thumb]:shadow-lg"
             />
-            <span className="w-12 shrink-0 text-right text-sm font-medium text-white">
+            <span className="w-12 shrink-0 text-right text-sm font-medium text-[var(--color-fg-default)]">
               {form.progress}%
             </span>
           </div>
@@ -138,7 +138,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
 
         {/* Color picker */}
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Color</label>
+          <label className="mb-2 block text-sm text-[var(--color-fg-muted)]">Color</label>
           <div className="flex flex-wrap gap-2.5">
             {PRESET_COLORS.map((color) => (
               <button
@@ -148,7 +148,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
                 className={[
                   'h-7 w-7 rounded-full transition-all duration-150',
                   form.color === color
-                    ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900 scale-110'
+                    ? 'ring-2 ring-[var(--color-fg-default)] ring-offset-2 ring-offset-[var(--color-bg-emphasis)] scale-110'
                     : 'hover:scale-110 hover:brightness-110',
                 ].join(' ')}
                 style={{ backgroundColor: color }}
@@ -159,7 +159,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-2 border-t border-[var(--color-border-default)]">
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>

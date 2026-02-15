@@ -22,10 +22,10 @@ export default function TemplateSelector({ isOpen, onClose, onSelect }) {
             className="glass-card flex flex-col items-start rounded-xl p-4 text-left transition-all duration-200 hover:scale-[1.03] hover:brightness-110"
           >
             <span className="mb-2 text-2xl">{template.icon}</span>
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-[var(--color-fg-default)]">
               {template.name}
             </span>
-            <span className="mt-1 line-clamp-2 text-xs text-slate-500">
+            <span className="mt-1 line-clamp-2 text-xs text-[var(--color-fg-muted)]">
               {template.description}
             </span>
           </motion.button>

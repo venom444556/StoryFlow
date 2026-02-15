@@ -53,11 +53,11 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="h-full overflow-auto p-6">
       {/* Title section */}
       <div className="mb-6">
         <h1 className="gradient-text text-2xl font-bold">Projects</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
           {projects.length} project{projects.length !== 1 ? 's' : ''}
         </p>
       </div>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
                 <div className="p-5">
                   {/* Project name + delete */}
                   <div className="mb-2 flex items-start justify-between gap-2">
-                    <h3 className="truncate text-base font-semibold text-white">
+                    <h3 className="truncate text-base font-semibold text-[var(--color-fg-default)]">
                       {project.name}
                     </h3>
                     <button
@@ -113,7 +113,7 @@ export default function DashboardPage() {
                         e.stopPropagation()
                         setDeleteTarget(project)
                       }}
-                      className="shrink-0 rounded-md p-1 text-slate-600 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                      className="shrink-0 rounded-md p-1 text-[var(--color-fg-subtle)] transition-colors hover:bg-red-500/10 hover:text-red-400"
                       title="Delete project"
                     >
                       <Trash2 size={14} />
@@ -150,13 +150,13 @@ export default function DashboardPage() {
                   )}
 
                   {/* Issue summary */}
-                  <p className="mb-2 text-xs text-slate-500">
+                  <p className="mb-2 text-xs text-[var(--color-fg-muted)]">
                     {issues.length} issue{issues.length !== 1 ? 's' : ''}
                     {openCount > 0 && `, ${openCount} open`}
                   </p>
 
                   {/* Last updated */}
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-[var(--color-fg-subtle)]">
                     Updated {formatRelative(project.updatedAt)}
                   </p>
                 </div>

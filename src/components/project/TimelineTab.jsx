@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Plus, Flag, BarChart3, List } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Button from '../ui/Button'
@@ -113,7 +113,7 @@ export default function TimelineTab({
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="gradient-text text-xl font-semibold">Timeline</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
             Track project phases and milestones
           </p>
         </div>
@@ -145,8 +145,8 @@ export default function TimelineTab({
                 className={[
                   'rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                   timeScale === s.key
-                    ? 'bg-white/10 text-white'
-                    : 'text-slate-400 hover:text-slate-200',
+                    ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                    : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
                 ].join(' ')}
               >
                 {s.label}

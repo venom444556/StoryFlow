@@ -152,9 +152,6 @@ export default function CommandPalette({ isOpen, onClose }) {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
         setSelectedIndex((prev) => {
-          const currentPos = selectableIndices.indexOf(
-            selectableIndices.find((idx) => idx >= (flatResults[prev]?.type === 'result' ? prev : 0))
-          )
           // Find next selectable
           const curSelectable = selectableIndices.indexOf(prev)
           const next = curSelectable < selectableIndices.length - 1 ? curSelectable + 1 : 0
@@ -221,7 +218,7 @@ export default function CommandPalette({ isOpen, onClose }) {
 
           {/* Palette card */}
           <motion.div
-            className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-surface-secondary/80 shadow-2xl backdrop-blur-xl"
+            className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-subtle)]/80 shadow-2xl backdrop-blur-xl"
             initial={{ opacity: 0, y: -20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.97 }}
@@ -229,17 +226,17 @@ export default function CommandPalette({ isOpen, onClose }) {
             onKeyDown={handleKeyDown}
           >
             {/* Search input */}
-            <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-              <Search size={18} className="shrink-0 text-slate-400" />
+            <div className="flex items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-3">
+              <Search size={18} className="shrink-0 text-[var(--color-fg-muted)]" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search projects, issues, pages, decisions..."
-                className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 outline-none"
+                className="flex-1 bg-transparent text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-subtle)] outline-none"
               />
-              <kbd className="hidden rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 sm:inline-block">
+              <kbd className="hidden rounded-md border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--color-fg-subtle)] sm:inline-block">
                 ESC
               </kbd>
             </div>
@@ -255,7 +252,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                     return (
                       <div
                         key={`header-${entry.label}`}
-                        className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500"
+                        className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]"
                       >
                         {entry.label}
                       </div>
@@ -264,7 +261,7 @@ export default function CommandPalette({ isOpen, onClose }) {
 
                   const { item } = entry
                   const Icon = TYPE_ICONS[item.type] || FileText
-                  const colorClass = TYPE_COLORS[item.type] || 'text-slate-400'
+                  const colorClass = TYPE_COLORS[item.type] || 'text-[var(--color-fg-muted)]'
                   const isSelected = index === selectedIndex
 
                   return (
@@ -276,8 +273,8 @@ export default function CommandPalette({ isOpen, onClose }) {
                       className={[
                         'flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors',
                         isSelected
-                          ? 'bg-white/10 text-white'
-                          : 'text-slate-300 hover:bg-white/5',
+                          ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                          : 'text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass)]',
                       ].join(' ')}
                     >
                       <Icon size={16} className={`shrink-0 ${colorClass}`} />
@@ -286,18 +283,18 @@ export default function CommandPalette({ isOpen, onClose }) {
                           {item.title}
                         </div>
                         {item.preview && (
-                          <div className="truncate text-xs text-slate-500">
+                          <div className="truncate text-xs text-[var(--color-fg-subtle)]">
                             {item.preview}
                           </div>
                         )}
                       </div>
                       {item.projectName && item.type !== 'project' && (
-                        <span className="shrink-0 rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-500">
+                        <span className="shrink-0 rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-subtle)]">
                           {item.projectName}
                         </span>
                       )}
                       {isSelected && (
-                        <CornerDownLeft size={12} className="shrink-0 text-slate-500" />
+                        <CornerDownLeft size={12} className="shrink-0 text-[var(--color-fg-subtle)]" />
                       )}
                     </button>
                   )
@@ -306,9 +303,9 @@ export default function CommandPalette({ isOpen, onClose }) {
               {/* Empty state */}
               {emptySearch && (
                 <div className="px-4 py-10 text-center">
-                  <Search size={32} className="mx-auto mb-3 text-slate-600" />
-                  <p className="text-sm text-slate-500">No results found</p>
-                  <p className="mt-1 text-xs text-slate-600">
+                  <Search size={32} className="mx-auto mb-3 text-[var(--color-fg-faint)]" />
+                  <p className="text-sm text-[var(--color-fg-subtle)]">No results found</p>
+                  <p className="mt-1 text-xs text-[var(--color-fg-faint)]">
                     Try a different search term
                   </p>
                 </div>
@@ -317,9 +314,9 @@ export default function CommandPalette({ isOpen, onClose }) {
               {/* No projects at all */}
               {!query.trim() && projects.length === 0 && (
                 <div className="px-4 py-10 text-center">
-                  <FolderKanban size={32} className="mx-auto mb-3 text-slate-600" />
-                  <p className="text-sm text-slate-500">No projects yet</p>
-                  <p className="mt-1 text-xs text-slate-600">
+                  <FolderKanban size={32} className="mx-auto mb-3 text-[var(--color-fg-faint)]" />
+                  <p className="text-sm text-[var(--color-fg-subtle)]">No projects yet</p>
+                  <p className="mt-1 text-xs text-[var(--color-fg-faint)]">
                     Create a project to get started
                   </p>
                 </div>
@@ -327,17 +324,17 @@ export default function CommandPalette({ isOpen, onClose }) {
             </div>
 
             {/* Footer hints */}
-            <div className="flex items-center gap-4 border-t border-white/5 px-4 py-2">
-              <span className="flex items-center gap-1 text-[11px] text-slate-600">
+            <div className="flex items-center gap-4 border-t border-[var(--color-border-default)] px-4 py-2">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-fg-faint)]">
                 <ArrowUp size={10} />
                 <ArrowDown size={10} />
                 navigate
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-slate-600">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-fg-faint)]">
                 <CornerDownLeft size={10} />
                 open
               </span>
-              <span className="flex items-center gap-1 text-[11px] text-slate-600">
+              <span className="flex items-center gap-1 text-[11px] text-[var(--color-fg-faint)]">
                 <Command size={10} />
                 <span>/</span>
                 toggle

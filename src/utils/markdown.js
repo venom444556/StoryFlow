@@ -139,7 +139,7 @@ function inlineMarkdown(text) {
   // inline code  `code`
   out = out.replace(
     /`([^`]+)`/g,
-    '<code class="bg-slate-700/50 rounded px-1.5 py-0.5 text-sm font-mono text-purple-300">$1</code>'
+    '<code class="bg-[var(--color-bg-muted)] rounded px-1.5 py-0.5 text-sm font-mono text-[var(--badge-purple-fg)]">$1</code>'
   )
 
   return out
@@ -178,7 +178,7 @@ function parseTable(lines) {
   html += '<thead><tr>'
   headerCells.forEach((cell, i) => {
     const align = aligns[i] || 'left'
-    html += `<th class="border border-white/10 bg-white/5 px-3 py-2 text-left font-semibold text-slate-200" style="text-align:${align}">${inlineMarkdown(cell)}</th>`
+    html += `<th class="border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-3 py-2 text-left font-semibold text-[var(--color-fg-default)]" style="text-align:${align}">${inlineMarkdown(cell)}</th>`
   })
   html += '</tr></thead>'
 
@@ -187,10 +187,10 @@ function parseTable(lines) {
   for (let r = 2; r < lines.length; r++) {
     const cells = parseCells(lines[r])
     const isEven = (r - 2) % 2 === 0
-    html += `<tr class="${isEven ? '' : 'bg-white/[0.02]'}">`
+    html += `<tr class="${isEven ? '' : 'bg-[var(--color-bg-glass)]'}">`
     cells.forEach((cell, i) => {
       const align = aligns[i] || 'left'
-      html += `<td class="border border-white/10 px-3 py-2 text-slate-300" style="text-align:${align}">${inlineMarkdown(cell)}</td>`
+      html += `<td class="border border-[var(--color-border-default)] px-3 py-2 text-[var(--color-fg-muted)]" style="text-align:${align}">${inlineMarkdown(cell)}</td>`
     })
     html += '</tr>'
   }
@@ -231,14 +231,14 @@ export function renderMarkdown(markdown) {
       i++ // skip closing ```
       const langClass = lang ? ` class="language-${lang}"` : ''
       htmlParts.push(
-        `<pre class="bg-slate-800 rounded-lg p-4 my-3 overflow-x-auto text-sm"><code${langClass} class="font-mono text-slate-300">${escapeHtml(codeLines.join('\n'))}</code></pre>`
+        `<pre class="bg-[var(--color-bg-muted)] rounded-lg p-4 my-3 overflow-x-auto text-sm"><code${langClass} class="font-mono text-[var(--color-fg-muted)]">${escapeHtml(codeLines.join('\n'))}</code></pre>`
       )
       continue
     }
 
     // ---- Horizontal rule ----
     if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
-      htmlParts.push('<hr class="border-white/10 my-6" />')
+      htmlParts.push('<hr class="border-[var(--color-border-default)] my-6" />')
       i++
       continue
     }
@@ -253,15 +253,15 @@ export function renderMarkdown(markdown) {
         .replace(/[^\w\s-]/g, '')
         .replace(/\s+/g, '-')
       const sizeClasses = {
-        1: 'text-3xl font-bold mt-8 mb-4 pb-2 border-b border-white/10',
-        2: 'text-2xl font-bold mt-6 mb-3 pb-2 border-b border-white/10',
+        1: 'text-3xl font-bold mt-8 mb-4 pb-2 border-b border-[var(--color-border-default)]',
+        2: 'text-2xl font-bold mt-6 mb-3 pb-2 border-b border-[var(--color-border-default)]',
         3: 'text-xl font-semibold mt-5 mb-2',
         4: 'text-lg font-semibold mt-4 mb-2',
         5: 'text-base font-semibold mt-3 mb-1',
-        6: 'text-sm font-semibold mt-3 mb-1 uppercase tracking-wider text-slate-400',
+        6: 'text-sm font-semibold mt-3 mb-1 uppercase tracking-wider text-[var(--color-fg-subtle)]',
       }
       htmlParts.push(
-        `<h${level} id="${id}" class="${sizeClasses[level]} text-white">${inlineMarkdown(text)}</h${level}>`
+        `<h${level} id="${id}" class="${sizeClasses[level]} text-[var(--color-fg-default)]">${inlineMarkdown(text)}</h${level}>`
       )
       i++
       continue
@@ -275,7 +275,7 @@ export function renderMarkdown(markdown) {
         i++
       }
       htmlParts.push(
-        `<blockquote class="border-l-4 border-purple-500/50 pl-4 my-4 italic text-slate-400">${quoteLines
+        `<blockquote class="border-l-4 border-purple-500/50 pl-4 my-4 italic text-[var(--color-fg-subtle)]">${quoteLines
           .map(inlineMarkdown)
           .join('<br />')}</blockquote>`
       )
@@ -303,11 +303,11 @@ export function renderMarkdown(markdown) {
         if (taskMatch) {
           const checked = taskMatch[1].toLowerCase() === 'x'
           listItems.push(
-            `<li class="flex items-start gap-2 text-slate-300 my-1"><input type="checkbox" ${checked ? 'checked' : ''} disabled class="mt-1 accent-purple-500" /><span>${inlineMarkdown(taskMatch[2])}</span></li>`
+            `<li class="flex items-start gap-2 text-[var(--color-fg-muted)] my-1"><input type="checkbox" ${checked ? 'checked' : ''} disabled class="mt-1 accent-purple-500" /><span>${inlineMarkdown(taskMatch[2])}</span></li>`
           )
         } else {
           listItems.push(
-            `<li class="text-slate-300 my-1 ml-4 list-disc">${inlineMarkdown(content)}</li>`
+            `<li class="text-[var(--color-fg-muted)] my-1 ml-4 list-disc">${inlineMarkdown(content)}</li>`
           )
         }
         i++
@@ -322,7 +322,7 @@ export function renderMarkdown(markdown) {
       while (i < lines.length && /^\d+\.\s/.test(lines[i])) {
         const content = lines[i].replace(/^\d+\.\s/, '')
         listItems.push(
-          `<li class="text-slate-300 my-1 ml-4 list-decimal">${inlineMarkdown(content)}</li>`
+          `<li class="text-[var(--color-fg-muted)] my-1 ml-4 list-decimal">${inlineMarkdown(content)}</li>`
         )
         i++
       }
@@ -354,7 +354,7 @@ export function renderMarkdown(markdown) {
     }
     if (paraLines.length > 0) {
       htmlParts.push(
-        `<p class="text-slate-300 my-3 leading-relaxed">${paraLines.map(inlineMarkdown).join(' ')}</p>`
+        `<p class="text-[var(--color-fg-muted)] my-3 leading-relaxed">${paraLines.map(inlineMarkdown).join(' ')}</p>`
       )
     }
   }

@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { FileText, Cpu, Target } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import Input from '../ui/Input'
 import TagInput from '../ui/TagInput'
+import { ActivityPanel } from '../activity'
 
 const TECH_SUGGESTIONS = [
   'React',
@@ -33,7 +34,7 @@ function SectionTitle({ icon: Icon, children }) {
   return (
     <div className="mb-4 flex items-center gap-2">
       {Icon && <Icon size={16} style={{ color: 'var(--accent-active, #8b5cf6)' }} />}
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
         {children}
       </h3>
     </div>
@@ -51,14 +52,14 @@ function TextArea({
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
       {label && (
-        <label className="mb-1.5 block text-sm text-slate-400">{label}</label>
+        <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">{label}</label>
       )}
       <textarea
         value={value || ''}
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}
-        className="glass-input w-full resize-none px-3 py-2 text-sm text-white placeholder-slate-500"
+        className="glass-input w-full resize-none px-3 py-2 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
       />
     </div>
   )
@@ -154,6 +155,9 @@ export default function OverviewTab({ project, onUpdate }) {
           />
         </div>
       </GlassCard>
+
+      {/* Recent Activity */}
+      <ActivityPanel projectId={project.id} limit={10} />
     </div>
   )
 }

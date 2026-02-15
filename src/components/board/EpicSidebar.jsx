@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import IssueTypeIcon from './IssueTypeIcon';
@@ -33,17 +33,17 @@ export default function EpicSidebar({
           animate={{ width: 40, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex shrink-0 flex-col items-center border-r border-white/[0.06] pt-3"
+          className="flex shrink-0 flex-col items-center border-r border-[var(--color-border-default)] pt-3"
           style={{ backgroundColor: 'var(--th-panel-light)' }}
         >
           <button
             onClick={onToggleCollapse}
-            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             title="Expand epics"
           >
             <ChevronRight size={14} />
           </button>
-          <div className="mt-3 rotate-90 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest text-slate-600">
+          <div className="mt-3 rotate-90 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest text-[var(--color-fg-subtle)]">
             Epics
           </div>
         </motion.div>
@@ -54,21 +54,21 @@ export default function EpicSidebar({
           animate={{ width: 256, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex w-64 shrink-0 flex-col border-r border-white/[0.06] backdrop-blur-xl"
+          className="flex w-64 shrink-0 flex-col border-r border-[var(--color-border-default)] backdrop-blur-xl"
           style={{ backgroundColor: 'var(--th-panel-light)' }}
         >
           {/* Header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
             <div className="flex items-center gap-2">
               <Layers size={14} style={{ color: 'var(--accent-active, #8b5cf6)' }} />
-              <h3 className="text-sm font-semibold text-slate-300">Epics</h3>
+              <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Epics</h3>
               <Badge variant="purple" size="sm">
                 {epicData.length}
               </Badge>
             </div>
             <button
               onClick={onToggleCollapse}
-              className="rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-white"
+              className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             >
               <ChevronLeft size={14} />
             </button>
@@ -82,12 +82,12 @@ export default function EpicSidebar({
               className={[
                 'mb-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                 activeEpicId === null
-                  ? 'bg-white/10 text-white'
-                  : 'text-slate-400 hover:bg-white/[0.05] hover:text-slate-200',
+                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                  : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
               ].join(' ')}
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-slate-500/20">
-                <Layers size={11} className="text-slate-400" />
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--color-bg-muted)]">
+                <Layers size={11} className="text-[var(--color-fg-muted)]" />
               </span>
               All Issues
             </button>
@@ -102,7 +102,7 @@ export default function EpicSidebar({
                     'group w-full rounded-lg px-3 py-2.5 text-left transition-colors',
                     activeEpicId === epic.id
                       ? 'ring-1'
-                      : 'hover:bg-white/[0.05]',
+                      : 'hover:bg-[var(--color-bg-glass)]',
                   ].join(' ')}
                   style={activeEpicId === epic.id ? {
                     backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
@@ -117,7 +117,7 @@ export default function EpicSidebar({
                         'min-w-0 flex-1 truncate text-sm font-medium',
                         activeEpicId === epic.id
                           ? ''
-                          : 'text-slate-300 group-hover:text-white',
+                          : 'text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]',
                       ].join(' ')}
                       style={activeEpicId === epic.id ? { color: 'var(--accent-active, #8b5cf6)' } : undefined}
                     >
@@ -130,12 +130,12 @@ export default function EpicSidebar({
 
                   {/* Stats row */}
                   <div className="mt-1.5 flex items-center justify-between text-[10px]">
-                    <span className="text-slate-500">
+                    <span className="text-[var(--color-fg-muted)]">
                       {epic.doneCount}/{epic.childCount} done
                     </span>
                     <span
                       className={
-                        epic.progress === 100 ? 'text-green-400' : 'text-slate-500'
+                        epic.progress === 100 ? 'text-green-400' : 'text-[var(--color-fg-muted)]'
                       }
                     >
                       {epic.progress}%
@@ -146,7 +146,7 @@ export default function EpicSidebar({
             </div>
 
             {epicData.length === 0 && (
-              <div className="py-8 text-center text-xs text-slate-600">
+              <div className="py-8 text-center text-xs text-[var(--color-fg-subtle)]">
                 No epics yet. Create one to organize your issues.
               </div>
             )}

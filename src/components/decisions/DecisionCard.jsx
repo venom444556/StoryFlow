@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import { Edit3, Calendar } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
@@ -35,7 +34,7 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
             'h-0.5 w-full',
             decision.status === 'accepted' && 'bg-green-500',
             decision.status === 'proposed' && 'bg-yellow-500',
-            decision.status === 'superseded' && 'bg-slate-500',
+            decision.status === 'superseded' && 'bg-[var(--color-fg-subtle)]',
           ]
             .filter(Boolean)
             .join(' ')}
@@ -46,7 +45,7 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5">
-                <h4 className="truncate text-sm font-semibold text-white">
+                <h4 className="truncate text-sm font-semibold text-[var(--color-fg-default)]">
                   {decision.title}
                 </h4>
                 <Badge variant={statusCfg.variant} size="sm" dot>
@@ -61,7 +60,7 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
                 e.stopPropagation()
                 onEdit?.(decision)
               }}
-              className="shrink-0 rounded-md p-1.5 text-slate-400 opacity-0 transition-all hover:bg-white/10 hover:text-white group-hover:opacity-100"
+              className="shrink-0 rounded-md p-1.5 text-[var(--color-fg-muted)] opacity-0 transition-all hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)] group-hover:opacity-100"
             >
               <Edit3 size={14} />
             </button>
@@ -69,7 +68,7 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
 
           {/* Context preview */}
           {decision.context && (
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-400">
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--color-fg-muted)]">
               {decision.context}
             </p>
           )}
@@ -77,14 +76,14 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
           {/* Footer */}
           <div className="mt-3 flex items-center justify-between">
             {/* Tags */}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1">
               {tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="purple" size="sm">
+                <Badge key={tag} variant="purple" size="xs">
                   {tag}
                 </Badge>
               ))}
               {tags.length > 3 && (
-                <Badge variant="default" size="sm">
+                <Badge variant="default" size="xs">
                   +{tags.length - 3}
                 </Badge>
               )}
@@ -92,7 +91,7 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
 
             {/* Date */}
             {decision.createdAt && (
-              <span className="flex items-center gap-1.5 text-xs text-slate-500">
+              <span className="flex items-center gap-1.5 text-xs text-[var(--color-fg-muted)]">
                 <Calendar size={11} />
                 {formatRelative(decision.createdAt)}
               </span>

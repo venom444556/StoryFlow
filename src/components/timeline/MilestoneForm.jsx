@@ -99,7 +99,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
 
         {/* Completed toggle */}
         <div>
-          <label className="mb-1.5 block text-sm text-slate-400">Status</label>
+          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Status</label>
           <button
             type="button"
             onClick={() => setForm((prev) => ({ ...prev, completed: !prev.completed }))}
@@ -107,7 +107,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
               'inline-flex items-center gap-2.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
               form.completed
                 ? 'bg-green-500/15 text-green-400 ring-1 ring-green-500/30'
-                : 'bg-white/5 text-slate-400 ring-1 ring-white/10',
+                : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)] ring-1 ring-[var(--color-border-default)]',
             ].join(' ')}
           >
             <div
@@ -115,11 +115,11 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
                 'h-4 w-4 rounded border-2 transition-colors',
                 form.completed
                   ? 'border-green-400 bg-green-400'
-                  : 'border-slate-500 bg-transparent',
+                  : 'border-[var(--color-fg-muted)] bg-transparent',
               ].join(' ')}
             >
               {form.completed && (
-                <svg viewBox="0 0 16 16" className="h-full w-full text-white">
+                <svg viewBox="0 0 16 16" className="h-full w-full text-[var(--color-fg-default)]">
                   <path
                     d="M4 8l3 3 5-5"
                     stroke="currentColor"
@@ -137,7 +137,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
 
         {/* Color picker */}
         <div>
-          <label className="mb-2 block text-sm text-slate-400">Color</label>
+          <label className="mb-2 block text-sm text-[var(--color-fg-muted)]">Color</label>
           <div className="flex flex-wrap gap-2.5">
             {PRESET_COLORS.map((color) => (
               <button
@@ -147,7 +147,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
                 className={[
                   'h-7 w-7 rounded-full transition-all duration-150',
                   form.color === color
-                    ? 'ring-2 ring-white ring-offset-2 ring-offset-slate-900 scale-110'
+                    ? 'ring-2 ring-[var(--color-fg-default)] ring-offset-2 ring-offset-[var(--color-bg-emphasis)] scale-110'
                     : 'hover:scale-110 hover:brightness-110',
                 ].join(' ')}
                 style={{ backgroundColor: color }}
@@ -157,7 +157,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-2 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-2 border-t border-[var(--color-border-default)]">
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>

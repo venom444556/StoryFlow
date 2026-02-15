@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Plus, Scale, ArrowLeft } from 'lucide-react'
 import Button from '../ui/Button'
@@ -19,7 +19,7 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
 
-  const decisions = project?.decisions || []
+  const decisions = useMemo(() => project?.decisions || [], [project?.decisions])
 
   // Filter and sort
   const filtered = useMemo(() => {
@@ -78,7 +78,7 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
         <div className="mb-5 flex items-center justify-between">
           <div>
             <h2 className="gradient-text text-xl font-semibold">Decisions</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
               Record architectural decisions and rationale
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
         </div>
 
         {/* Filter tabs */}
-        <div className="mb-4 flex items-center gap-1 rounded-lg bg-white/5 p-1">
+        <div className="mb-4 flex items-center gap-1 rounded-lg bg-[var(--color-bg-glass)] p-1">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
@@ -96,8 +96,8 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
               className={[
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-150',
                 statusFilter === tab.value
-                  ? 'bg-white/10 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-300',
+                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)] shadow-sm'
+                  : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
               ].join(' ')}
             >
               {tab.label}
@@ -105,8 +105,8 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
                 className={[
                   'rounded-full px-1.5 py-0.5 text-[10px]',
                   statusFilter === tab.value
-                    ? 'bg-white/10 text-white'
-                    : 'bg-white/5 text-slate-500',
+                    ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
+                    : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)]',
                 ].join(' ')}
               >
                 {counts[tab.value]}
@@ -154,7 +154,7 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
         <div className="w-full shrink-0 overflow-hidden md:w-1/2">
           <button
             onClick={handleCloseDetail}
-            className="mb-2 flex items-center gap-1 text-sm text-slate-400 hover:text-white md:hidden"
+            className="mb-2 flex items-center gap-1 text-sm text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)] md:hidden"
           >
             <ArrowLeft size={14} />
             Back to decisions

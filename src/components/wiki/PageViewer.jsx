@@ -22,7 +22,7 @@ export default function PageViewer({
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="shrink-0 border-b border-white/[0.06] pb-4">
+      <div className="shrink-0 border-b border-[var(--color-border-default)] pb-4">
         <div className="flex items-start justify-between gap-4">
           {/* Title block */}
           <div className="min-w-0 flex-1">
@@ -30,7 +30,7 @@ export default function PageViewer({
               {page.icon && (
                 <span className="text-3xl leading-none">{page.icon}</span>
               )}
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
                 {page.title || 'Untitled'}
               </h1>
             </div>
@@ -42,12 +42,12 @@ export default function PageViewer({
               </Badge>
 
               {page.labels?.map((label) => (
-                <Badge key={label} variant="purple" size="sm">
+                <Badge key={label} variant="purple" size="xs">
                   {label}
                 </Badge>
               ))}
 
-              <span className="flex items-center gap-1 text-xs text-slate-600">
+              <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
                 <Clock size={12} />
                 Updated {formatRelative(page.updatedAt)}
               </span>

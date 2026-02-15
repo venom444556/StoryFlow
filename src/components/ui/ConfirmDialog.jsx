@@ -10,25 +10,31 @@ export default function ConfirmDialog({
   title = 'Are you sure?',
   message = 'This action cannot be undone.',
   confirmLabel = 'Delete',
+  cancelLabel = 'Cancel',
   variant = 'danger',
+  icon: Icon = AlertTriangle,
 }) {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
+    <Modal isOpen={isOpen} onClose={onClose} size="sm" showCloseButton={false}>
       <div className="flex flex-col items-center text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
-          <AlertTriangle size={24} className="text-red-400" />
+        <div className="mb-[var(--space-4)] flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-danger-subtle)]">
+          <Icon size={24} className="text-[var(--color-danger)]" aria-hidden="true" />
         </div>
 
-        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-        <p className="mb-6 text-sm text-slate-400">{message}</p>
+        <h3 className="mb-[var(--space-2)] text-[var(--text-lg)] font-[var(--font-semibold)] text-[var(--color-fg-default)]">
+          {title}
+        </h3>
+        <p className="mb-[var(--space-6)] text-[var(--text-sm)] text-[var(--color-fg-subtle)]">
+          {message}
+        </p>
 
-        <div className="flex w-full gap-3">
+        <div className="flex w-full gap-[var(--space-3)]">
           <Button
             variant="ghost"
             className="flex-1"
             onClick={onClose}
           >
-            Cancel
+            {cancelLabel}
           </Button>
           <Button
             variant={variant}

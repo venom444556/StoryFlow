@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import IssueCard from './IssueCard';
@@ -7,8 +7,8 @@ import Badge from '../ui/Badge';
 
 const STATUS_ACCENT = {
   'To Do': {
-    dot: 'bg-slate-400',
-    dropGlow: 'ring-slate-400/30 border-slate-400/40',
+    dot: 'bg-[var(--color-fg-faint)]',
+    dropGlow: 'ring-[var(--color-fg-faint)]/30 border-[var(--color-fg-faint)]/40',
   },
   'In Progress': {
     dot: 'bg-blue-400',
@@ -72,10 +72,10 @@ export default function BoardColumn({
       onDrop={handleDrop}
       className={[
         'flex min-w-[280px] flex-1 flex-col rounded-xl border transition-all duration-200',
-        'bg-white/[0.02] backdrop-blur-sm',
+        'bg-[var(--color-bg-glass)] backdrop-blur-sm',
         isDragOver
-          ? `border-2 ${accent.dropGlow} ring-2 bg-white/[0.04]`
-          : 'border-white/[0.05]',
+          ? `border-2 ${accent.dropGlow} ring-2 bg-[var(--color-bg-glass-hover)]`
+          : 'border-[var(--color-border-default)]',
       ].join(' ')}
     >
       {/* Column header */}
@@ -84,7 +84,7 @@ export default function BoardColumn({
           <span
             className={['h-2 w-2 rounded-full', accent.dot].join(' ')}
           />
-          <h3 className="text-sm font-semibold text-slate-300">{title}</h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">{title}</h3>
           <Badge variant="default" size="sm">
             {issues.length}
           </Badge>
@@ -107,7 +107,7 @@ export default function BoardColumn({
               dependencies: [],
             });
           }}
-          className="rounded-md p-1 text-slate-500 transition-colors hover:bg-white/10 hover:text-white"
+          className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
           title="Add issue"
         >
           <Plus size={16} />
@@ -132,7 +132,7 @@ export default function BoardColumn({
         {/* Empty state */}
         {issues.length === 0 && !isDragOver && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-xs text-slate-600">No issues</p>
+            <p className="text-xs text-[var(--color-fg-subtle)]">No issues</p>
           </div>
         )}
 
@@ -154,7 +154,7 @@ export default function BoardColumn({
       </div>
 
       {/* Quick create */}
-      <div className="shrink-0 border-t border-white/[0.04] px-3 py-2">
+      <div className="shrink-0 border-t border-[var(--color-border-default)] px-3 py-2">
         <QuickCreateBar
           onCreateIssue={handleCreateIssue}
           defaultStatus={status}

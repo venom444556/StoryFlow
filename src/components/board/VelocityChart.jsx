@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { BarChart3 } from 'lucide-react';
 import GlassCard from '../ui/GlassCard';
 import EmptyState from '../ui/EmptyState';
@@ -56,7 +56,7 @@ export default function VelocityChart({ sprints = [] }) {
       <GlassCard>
         <div className="mb-3 flex items-center gap-2">
           <BarChart3 size={16} className="text-green-400" />
-          <h3 className="text-sm font-semibold text-slate-300">
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
             Velocity Chart
           </h3>
         </div>
@@ -74,12 +74,12 @@ export default function VelocityChart({ sprints = [] }) {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BarChart3 size={16} className="text-green-400" />
-          <h3 className="text-sm font-semibold text-slate-300">
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
             Velocity Chart
           </h3>
         </div>
-        <span className="text-xs text-slate-500">
-          Avg: <span className="font-medium text-slate-400">{chart.avg} pts</span>
+        <span className="text-xs text-[var(--color-fg-muted)]">
+          Avg: <span className="font-medium text-[var(--color-fg-muted)]">{chart.avg} pts</span>
         </span>
       </div>
 
@@ -87,11 +87,11 @@ export default function VelocityChart({ sprints = [] }) {
       <div className="mb-2 flex items-center gap-4 px-1">
         <div className="flex items-center gap-1.5">
           <div className="h-3 w-3 rounded-sm" style={{ backgroundImage: 'linear-gradient(to top, var(--accent-active, #7c3aed), #3b82f6)' }} />
-          <span className="text-[10px] text-slate-500">Points Completed</span>
+          <span className="text-[10px] text-[var(--color-fg-muted)]">Points Completed</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-0.5 w-4 rounded bg-green-400" style={{ opacity: 0.6 }} />
-          <span className="text-[10px] text-slate-500">Average</span>
+          <span className="text-[10px] text-[var(--color-fg-muted)]">Average</span>
         </div>
       </div>
 

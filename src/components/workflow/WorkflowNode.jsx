@@ -46,7 +46,7 @@ function getStatusClasses(status) {
     case 'error':
       return 'border-red-500/80 shadow-[0_0_18px_rgba(239,68,68,0.25)]';
     default:
-      return 'border-white/[0.08]';
+      return 'border-[var(--color-border-default)]';
   }
 }
 
@@ -199,6 +199,7 @@ export default function WorkflowNode({
 
   return (
     <motion.div
+      data-workflow-node
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
@@ -231,12 +232,6 @@ export default function WorkflowNode({
         onContextMenu?.(e);
       }}
     >
-      {/* Colour bar */}
-      <div
-        className="h-1.5 rounded-t-[10px]"
-        style={{ backgroundColor: color }}
-      />
-
       <div className="px-3 py-2.5">
         {/* Header row */}
         <div className="mb-1.5 flex items-center gap-2">
@@ -248,7 +243,7 @@ export default function WorkflowNode({
               <TypeIcon size={13} style={{ color }} />
             </div>
           )}
-          <span className="flex-1 truncate text-sm font-semibold text-white">
+          <span className="flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]">
             {node.title}
           </span>
           <StatusIcon status={node.status} />
@@ -266,17 +261,17 @@ export default function WorkflowNode({
             {typeDef?.label || node.type}
           </span>
           {!isTerminal && configured && (
-            <Settings size={10} className="text-slate-500" />
+            <Settings size={10} className="text-[var(--color-fg-muted)]" />
           )}
           {!isTerminal && !configured && node.status === 'idle' && (
-            <span className="text-[9px] italic text-slate-600">not configured</span>
+            <span className="text-[9px] italic text-[var(--color-fg-subtle)]">not configured</span>
           )}
         </div>
 
         {/* Config preview */}
         {configPreview && (
-          <div className="mt-2 rounded-md bg-white/[0.04] px-2 py-1.5">
-            <code className="block truncate text-[10px] leading-tight text-slate-400">
+          <div className="mt-2 rounded-md bg-[var(--color-bg-glass)] px-2 py-1.5">
+            <code className="block truncate text-[10px] leading-tight text-[var(--color-fg-muted)]">
               {configPreview}
             </code>
           </div>
@@ -285,7 +280,7 @@ export default function WorkflowNode({
         {/* Description preview (only if no config preview) */}
         {node.description && !configPreview && (
           <div className="mt-2">
-            <p className="line-clamp-1 text-[10px] leading-tight text-slate-500">
+            <p className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]">
               {node.description}
             </p>
           </div>
@@ -303,7 +298,7 @@ export default function WorkflowNode({
         {hasChildren && childStats && (
           <div className="mt-2.5">
             {/* Progress bar */}
-            <div className="h-1 w-full overflow-hidden rounded-full bg-slate-700/60">
+            <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--color-bg-subtle)]">
               {/* Green (completed) segment */}
               {childStats.completed > 0 && (
                 <div
@@ -326,12 +321,12 @@ export default function WorkflowNode({
 
             {/* Step count + drill-down indicator */}
             <div className="mt-1 flex items-center justify-between">
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[10px] text-[var(--color-fg-muted)]">
                 {childStats.completed}/{childStats.total} steps
               </span>
               <button
                 type="button"
-                className="flex items-center gap-0.5 rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[9px] text-slate-400 transition-colors hover:bg-white/[0.12] hover:text-slate-200"
+                className="flex items-center gap-0.5 rounded-full bg-[var(--color-bg-glass)] px-1.5 py-0.5 text-[9px] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -356,9 +351,9 @@ export default function WorkflowNode({
           onEndConnect?.(e);
         }}
       >
-        <div className="h-3.5 w-3.5 rounded-full border-2 border-slate-800 bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
+        <div className="h-3.5 w-3.5 rounded-full border-2 border-[var(--color-bg-emphasis)] bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
         {inConnections > 1 && (
-          <span className="absolute -top-2.5 -left-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-slate-700 text-[8px] font-bold text-slate-300">
+          <span className="absolute -top-2.5 -left-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--color-bg-subtle)] text-[8px] font-bold text-[var(--color-fg-default)]">
             {inConnections}
           </span>
         )}
@@ -372,9 +367,9 @@ export default function WorkflowNode({
           onStartConnect?.(e);
         }}
       >
-        <div className="h-3.5 w-3.5 rounded-full border-2 border-slate-800 bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
+        <div className="h-3.5 w-3.5 rounded-full border-2 border-[var(--color-bg-emphasis)] bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
         {outConnections > 1 && (
-          <span className="absolute -top-2.5 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-slate-700 text-[8px] font-bold text-slate-300">
+          <span className="absolute -top-2.5 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--color-bg-subtle)] text-[8px] font-bold text-[var(--color-fg-default)]">
             {outConnections}
           </span>
         )}

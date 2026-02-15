@@ -74,10 +74,10 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="absolute left-0 top-full z-50 mt-2 w-[360px] rounded-xl border border-white/[0.08] p-3 shadow-2xl backdrop-blur-2xl"
+          className="absolute left-0 top-full z-50 mt-2 w-[360px] rounded-xl border border-[var(--color-border-default)] p-3 shadow-2xl backdrop-blur-2xl"
           style={{ backgroundColor: 'var(--th-panel-heavy)' }}
         >
-          <h4 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <h4 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
             Choose a Node Type
           </h4>
 
@@ -88,7 +88,7 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
                 <button
                   key={typeDef.type}
                   onClick={() => onSelect?.(typeDef)}
-                  className="group flex flex-col items-center gap-1.5 rounded-lg border border-transparent bg-white/[0.03] px-2 py-3 text-center transition-all duration-150 hover:border-white/[0.1] hover:bg-white/[0.07]"
+                  className="group flex flex-col items-center gap-1.5 rounded-lg border border-transparent bg-[var(--color-bg-glass)] px-2 py-3 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)]"
                 >
                   {Icon && (
                     <Icon
@@ -97,10 +97,10 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
                       className="transition-transform duration-150 group-hover:scale-110"
                     />
                   )}
-                  <span className="text-xs font-medium text-slate-200">
+                  <span className="text-xs font-medium text-[var(--color-fg-default)]">
                     {typeDef.label}
                   </span>
-                  <span className="line-clamp-2 text-[10px] leading-tight text-slate-500">
+                  <span className="line-clamp-2 text-[10px] leading-tight text-[var(--color-fg-muted)]">
                     {typeDef.description}
                   </span>
                 </button>

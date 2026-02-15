@@ -35,7 +35,7 @@ export default function BreadcrumbTrail({ pages = [], currentPageId, onNavigate 
       {/* Home / Wiki root */}
       <button
         onClick={() => onNavigate(null)}
-        className="flex items-center gap-1 rounded px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+        className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
       >
         <Home size={13} />
         <span>Wiki</span>
@@ -45,16 +45,16 @@ export default function BreadcrumbTrail({ pages = [], currentPageId, onNavigate 
         const isLast = idx === path.length - 1
         return (
           <span key={page.id} className="flex items-center gap-1">
-            <ChevronRight size={12} className="text-slate-600" />
+            <ChevronRight size={12} className="text-[var(--color-fg-subtle)]" />
             {isLast ? (
-              <span className="px-1.5 py-0.5 font-medium text-slate-200">
+              <span className="px-1.5 py-0.5 font-medium text-[var(--color-fg-default)]">
                 {page.icon ? `${page.icon} ` : ''}
                 {page.title || 'Untitled'}
               </span>
             ) : (
               <button
                 onClick={() => onNavigate(page.id)}
-                className="rounded px-1.5 py-0.5 text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+                className="rounded px-1.5 py-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
               >
                 {page.icon ? `${page.icon} ` : ''}
                 {page.title || 'Untitled'}
