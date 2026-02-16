@@ -1,0 +1,26 @@
+COPYRIGHT NOTICE
+
+StoryFlow - Visual Project Planning & Management Tool
+
+Copyright (c) 2026 Sheldon Spence. All rights reserved.
+
+This software and its associated documentation, design system, data models,
+and architectural patterns are the original work of Sheldon Spence.
+
+Earliest provable creation date: February 7, 2026 (first git commit: 1bf243f)
+Repository: https://github.com/venom444556/StoryFlow
+
+RIGHTS RESERVED
+
+All rights to the source code, visual design, user interface design,
+interaction patterns, data model architecture, and associated intellectual
+property are reserved by the copyright holder.
+
+No part of this software may be reproduced, distributed, or transmitted
+in any form or by any means without the prior written permission of the
+copyright holder, except as permitted by applicable copyright law.
+
+CONTACT
+
+Sheldon Spence
+GitHub: https://github.com/venom444556
