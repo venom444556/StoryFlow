@@ -246,6 +246,7 @@
   --color-bg-muted: #334155;
   --color-bg-emphasis: #475569;
   --color-bg-inverse: #f8fafc;
+  --color-dropdown-bg: #f8fafc;
 
   /* Glass/translucent backgrounds */
   --color-bg-glass: rgba(255, 255, 255, 0.05);
@@ -401,6 +402,7 @@
   --color-bg-muted: #ebe7e0; /* Linen */
   --color-bg-emphasis: #ddd8cf; /* Warm stone */
   --color-bg-inverse: #2c2825; /* Warm charcoal */
+  --color-dropdown-bg: #fffefa; /* Warm white for dropdown panels */
 
   /* Glass/card backgrounds - warm-tinted translucency */
   --color-bg-glass: rgba(249, 247, 244, 0.92);

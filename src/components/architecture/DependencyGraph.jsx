@@ -2,8 +2,11 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import WorkflowZoomControls from '../workflow/WorkflowZoomControls'
 import DependencyEdge from './DependencyEdge'
+import ConfirmDialog from '../ui/ConfirmDialog'
 import { autoLayout } from './archLayout'
 import { TYPE_HEX_COLORS, TYPE_ICONS } from './constants'
+import { sanitizeColor } from '../../utils/sanitize'
+import { NODE_WIDTH } from '../../utils/canvasConstants'
 
 // ---------------------------------------------------------------------------
 // DependencyGraph
@@ -12,8 +15,6 @@ import { TYPE_HEX_COLORS, TYPE_ICONS } from './constants'
 // Nodes rendered as HTML divs, edges as SVG bezier paths.
 // Supports zoom/pan/drag. No connection drawing or execution engine.
 // ---------------------------------------------------------------------------
-
-const NODE_WIDTH = 180
 const GRID_SIZE = 20
 
 const MIN_ZOOM = 0.25
@@ -55,14 +56,23 @@ export default function DependencyGraph({
   // ------ Auto-layout on first render when nodes lack positions ------
   const positionedComponents = useMemo(() => {
     const needsLayout = components.some((c) => c.x === undefined || c.y === undefined)
-    if (!needsLayout) return components
+    const laid = needsLayout
+      ? (() => {
+          const positions = autoLayout(components)
+          return components.map((c) => {
+            if (c.x !== undefined && c.y !== undefined) return c
+            const pos = positions.get(c.id)
+            return pos ? { ...c, x: pos.x, y: pos.y } : { ...c, x: 60, y: 60 }
+          })
+        })()
+      : components
 
-    const positions = autoLayout(components)
-    return components.map((c) => {
-      if (c.x !== undefined && c.y !== undefined) return c
-      const pos = positions.get(c.id)
-      return pos ? { ...c, x: pos.x, y: pos.y } : { ...c, x: 60, y: 60 }
-    })
+    // NaN/undefined coordinate guard (same pattern as WorkflowCanvas)
+    return laid.map((c) => ({
+      ...c,
+      x: Number.isFinite(c.x) ? c.x : 0,
+      y: Number.isFinite(c.y) ? c.y : 0,
+    }))
   }, [components])
 
   // Persist auto-layout positions on first render
@@ -115,8 +125,8 @@ export default function DependencyGraph({
     if (!container || positionedComponents.length === 0) return
 
     const rect = container.getBoundingClientRect()
-    const xs = positionedComponents.map((n) => n.x || 0)
-    const ys = positionedComponents.map((n) => n.y || 0)
+    const xs = positionedComponents.map((n) => n.x)
+    const ys = positionedComponents.map((n) => n.y)
     const minX = Math.min(...xs)
     const maxX = Math.max(...xs) + NODE_WIDTH
     const minY = Math.min(...ys)
@@ -323,17 +333,23 @@ export default function DependencyGraph({
   )
 
   // ------ Remove dependency edge ------
-  const handleDeleteEdge = useCallback(
-    (dependerId, dependencyId) => {
-      const updated = positionedComponents.map((c) =>
-        c.id === dependerId
-          ? { ...c, dependencies: (c.dependencies || []).filter((d) => d !== dependencyId) }
-          : c
-      )
-      onUpdateComponents(updated)
-    },
-    [positionedComponents, onUpdateComponents]
-  )
+  const [deleteEdgeTarget, setDeleteEdgeTarget] = useState(null)
+
+  const handleRequestDeleteEdge = useCallback((dependerId, dependencyId) => {
+    setDeleteEdgeTarget({ dependerId, dependencyId })
+  }, [])
+
+  const handleConfirmDeleteEdge = useCallback(() => {
+    if (!deleteEdgeTarget) return
+    const { dependerId, dependencyId } = deleteEdgeTarget
+    const updated = positionedComponents.map((c) =>
+      c.id === dependerId
+        ? { ...c, dependencies: (c.dependencies || []).filter((d) => d !== dependencyId) }
+        : c
+    )
+    onUpdateComponents(updated)
+    setDeleteEdgeTarget(null)
+  }, [deleteEdgeTarget, positionedComponents, onUpdateComponents])
 
   const canvasCursor = isPanning ? 'grabbing' : draggingId ? 'grabbing' : 'default'
 
@@ -343,11 +359,23 @@ export default function DependencyGraph({
     transformOrigin: '0 0',
   }
 
+  // Compute grid background offset so the dot grid moves with pan/zoom
+  // (same pattern as WorkflowCanvas — CSS radial-gradient instead of SVG pattern)
+  const gridSize = 20 * viewport.scale
+  const gridOffX = viewport.offsetX % (20 * viewport.scale)
+  const gridOffY = viewport.offsetY % (20 * viewport.scale)
+
   return (
     <div
       ref={canvasRef}
       className="relative flex-1 overflow-hidden bg-surface-primary rounded-xl"
-      style={{ cursor: canvasCursor, minHeight: 400 }}
+      style={{
+        cursor: canvasCursor,
+        minHeight: 400,
+        backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.8px, transparent 0.8px)`,
+        backgroundSize: `${gridSize}px ${gridSize}px`,
+        backgroundPosition: `${gridOffX}px ${gridOffY}px`,
+      }}
       onMouseDown={handlePanStart}
     >
       <div className="absolute inset-0" style={transformStyle}>
@@ -356,14 +384,6 @@ export default function DependencyGraph({
           style={{ left: 0, top: 0, width: '200%', height: '200%' }}
           onClick={handleCanvasClick}
         >
-          {/* Dot grid */}
-          <defs>
-            <pattern id="arch-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="0.8" style={{ fill: 'var(--th-border)' }} />
-            </pattern>
-          </defs>
-          <rect x="-5000" y="-5000" width="10000" height="10000" fill="url(#arch-grid)" />
-
           {/* Dependency edges */}
           {edges.map((edge) => (
             <DependencyEdge
@@ -371,7 +391,7 @@ export default function DependencyGraph({
               fromNode={edge.from}
               toNode={edge.to}
               sourceType={edge.sourceType}
-              onDelete={() => handleDeleteEdge(edge.dependerId, edge.dependencyId)}
+              onDelete={() => handleRequestDeleteEdge(edge.dependerId, edge.dependencyId)}
               edgeOpacity={
                 highlightIds
                   ? highlightIds.has(edge.from.id) || highlightIds.has(edge.to.id)
@@ -385,7 +405,7 @@ export default function DependencyGraph({
 
         {/* Component nodes (HTML over SVG) */}
         {positionedComponents.map((comp) => {
-          const hexColor = TYPE_HEX_COLORS[comp.type] || '#6b7280'
+          const hexColor = sanitizeColor(TYPE_HEX_COLORS[comp.type], '#6b7280')
           const TypeIcon = TYPE_ICONS[comp.type] || null
           const isSelected = selectedId === comp.id
           const depCount = (comp.dependencies || []).length
@@ -406,8 +426,8 @@ export default function DependencyGraph({
                 .filter(Boolean)
                 .join(' ')}
               style={{
-                left: comp.x || 0,
-                top: comp.y || 0,
+                left: comp.x,
+                top: comp.y,
                 width: NODE_WIDTH,
                 zIndex: isSelected ? 20 : 2,
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
@@ -473,6 +493,16 @@ export default function DependencyGraph({
         onReset={handleResetView}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
+      />
+
+      {/* Delete edge confirmation */}
+      <ConfirmDialog
+        isOpen={deleteEdgeTarget !== null}
+        onClose={() => setDeleteEdgeTarget(null)}
+        onConfirm={handleConfirmDeleteEdge}
+        title="Remove dependency?"
+        message="This dependency link will be removed. You can re-add it later if needed."
+        confirmLabel="Remove"
       />
     </div>
   )

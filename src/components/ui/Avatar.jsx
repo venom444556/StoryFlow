@@ -1,5 +1,3 @@
-import React from 'react'
-
 const GRADIENTS = [
   'from-purple-500 to-blue-500',
   'from-blue-500 to-cyan-500',

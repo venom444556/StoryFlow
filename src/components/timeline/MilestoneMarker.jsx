@@ -1,4 +1,3 @@
-import React from 'react'
 import { Edit3, Trash2, CheckCircle2, Circle, Calendar } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import Tooltip from '../ui/Tooltip'

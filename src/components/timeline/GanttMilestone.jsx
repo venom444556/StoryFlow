@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { sanitizeColor } from '../../utils/sanitize'
 
 const DIAMOND_SIZE = 8

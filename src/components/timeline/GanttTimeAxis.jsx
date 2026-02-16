@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   startOfWeek,
   addWeeks,
@@ -17,7 +17,6 @@ export default function GanttTimeAxis({
   timeScale = 'weeks',
   chartHeight,
   headerHeight,
-  labelWidth,
 }) {
   const ticks = useMemo(() => {
     const result = []

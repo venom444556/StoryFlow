@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { buildBezierPath, getConnectionColor } from '../../utils/workflow'
+import { NODE_WIDTH } from '../../utils/canvasConstants'
 
 // ---------------------------------------------------------------------------
 // WorkflowConnection
@@ -14,8 +15,6 @@ import { buildBezierPath, getConnectionColor } from '../../utils/workflow'
  * - connection {object}    { id, from, to }
  * - onDelete   {function}  callback to remove this connection
  */
-
-const NODE_WIDTH = 180
 // Handle Y offset from node top — matches the fixed `top-[34px]` in WorkflowNode
 // Handle center = 34px (top offset) + 7px (half of 14px handle height) = 41px
 const HANDLE_CENTER_Y = 41

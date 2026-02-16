@@ -7,7 +7,7 @@ import { ProjectsProvider } from '../../contexts/ProjectsContext'
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
-    aside: ({ children, animate, ...props }) => <aside {...props}>{children}</aside>,
+    aside: ({ children, animate: _animate, ...props }) => <aside {...props}>{children}</aside>,
     span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
 }))

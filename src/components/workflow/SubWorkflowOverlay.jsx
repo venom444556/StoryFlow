@@ -5,9 +5,11 @@ import { X, ChevronRight, Home } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import { getNodesAtLevel, setNodesAtLevel } from '../../utils/workflow'
 import { getNodeType } from '../../data/nodeTypes'
+import { sanitizeColor } from '../../utils/sanitize'
 import WorkflowToolbar from './WorkflowToolbar'
 import WorkflowCanvas from './WorkflowCanvas'
 import NodeDetailModal from './NodeDetailModal'
+import ConfirmDialog from '../ui/ConfirmDialog'
 
 // ---------------------------------------------------------------------------
 // SubWorkflowOverlay
@@ -153,16 +155,23 @@ export default function SubWorkflowOverlay({
     [nodes, saveNodes]
   )
 
-  const handleDeleteNode = useCallback(
-    (nodeId) => {
-      const updatedNodes = nodes.filter((n) => n.id !== nodeId)
-      const updatedConns = connections.filter((c) => c.from !== nodeId && c.to !== nodeId)
-      saveBoth(updatedNodes, updatedConns)
-      if (selectedNodeId === nodeId) setSelectedNodeId(null)
-      if (detailNodeId === nodeId) setDetailNodeId(null)
-    },
-    [nodes, connections, saveBoth, selectedNodeId, detailNodeId]
-  )
+  const [deleteConfirmNodeId, setDeleteConfirmNodeId] = useState(null)
+
+  const handleRequestDeleteNode = useCallback((nodeId) => {
+    setDeleteConfirmNodeId(nodeId)
+  }, [])
+
+  const handleConfirmDeleteNode = useCallback(() => {
+    if (!deleteConfirmNodeId) return
+    const updatedNodes = nodes.filter((n) => n.id !== deleteConfirmNodeId)
+    const updatedConns = connections.filter(
+      (c) => c.from !== deleteConfirmNodeId && c.to !== deleteConfirmNodeId
+    )
+    saveBoth(updatedNodes, updatedConns)
+    if (selectedNodeId === deleteConfirmNodeId) setSelectedNodeId(null)
+    if (detailNodeId === deleteConfirmNodeId) setDetailNodeId(null)
+    setDeleteConfirmNodeId(null)
+  }, [deleteConfirmNodeId, nodes, connections, saveBoth, selectedNodeId, detailNodeId])
 
   // ------ Add sub-workflow to a node ------
   const handleAddChildren = useCallback(
@@ -292,7 +301,7 @@ export default function SubWorkflowOverlay({
                 {parentType && (
                   <div
                     className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: parentType.color }}
+                    style={{ backgroundColor: sanitizeColor(parentType.color) }}
                   />
                 )}
                 <h2 className="text-base font-semibold text-[var(--color-fg-default)]">
@@ -349,7 +358,17 @@ export default function SubWorkflowOverlay({
               isOpen={!!detailNode}
               onClose={() => setDetailNodeId(null)}
               onUpdate={handleUpdateNode}
-              onDelete={handleDeleteNode}
+              onDelete={handleRequestDeleteNode}
+            />
+
+            {/* Delete node confirmation */}
+            <ConfirmDialog
+              isOpen={deleteConfirmNodeId !== null}
+              onClose={() => setDeleteConfirmNodeId(null)}
+              onConfirm={handleConfirmDeleteNode}
+              title="Delete node?"
+              message="This workflow node and all its connections will be permanently removed. This cannot be undone."
+              confirmLabel="Delete"
             />
           </motion.div>
         </motion.div>

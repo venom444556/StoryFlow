@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Edit3,
@@ -26,7 +26,6 @@ function getStatus(progress) {
 export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
   const [expanded, setExpanded] = useState(false)
   const status = getStatus(phase.progress || 0)
-  const StatusIcon = status.icon
 
   const hasDescription = phase.description && phase.description.trim().length > 0
   const hasDateRange = phase.startDate || phase.endDate

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Activity, Filter } from 'lucide-react'
+import { Activity } from 'lucide-react'
 import { useActivityStore } from '../../stores/activityStore'
 import GlassCard from '../ui/GlassCard'
 import EmptyState from '../ui/EmptyState'
@@ -16,10 +16,10 @@ export default function ActivityPanel({
   // Get activities using getState() to avoid subscription issues
   // Then use a simple selector for the activities object to trigger re-renders
   const activitiesMap = useActivityStore((state) => state.activities)
-  const allActivities = activitiesMap[projectId] || []
 
   // Filter activities based on props
   const activities = useMemo(() => {
+    const allActivities = activitiesMap[projectId] || []
     // Ensure we always have an array to work with
     if (!Array.isArray(allActivities)) return []
 
@@ -34,7 +34,7 @@ export default function ActivityPanel({
     }
 
     return filtered.slice(0, limit)
-  }, [allActivities, entityType, entityId, limit])
+  }, [activitiesMap, projectId, entityType, entityId, limit])
 
   if (activities.length === 0) {
     return (

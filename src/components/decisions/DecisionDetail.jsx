@@ -5,6 +5,7 @@ import GlassCard from '../ui/GlassCard'
 import Button from '../ui/Button'
 import Select from '../ui/Select'
 import TagInput from '../ui/TagInput'
+import ConfirmDialog from '../ui/ConfirmDialog'
 import { formatDate } from '../../utils/dates'
 import { generateId } from '../../utils/ids'
 
@@ -13,12 +14,6 @@ const STATUS_OPTIONS = [
   { value: 'accepted', label: 'Accepted' },
   { value: 'superseded', label: 'Superseded' },
 ]
-
-const STATUS_CONFIG = {
-  proposed: { variant: 'yellow' },
-  accepted: { variant: 'green' },
-  superseded: { variant: 'gray' },
-}
 
 function InlineTextArea({ value, onChange, placeholder, rows = 3, className = '' }) {
   return (
@@ -112,6 +107,8 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
 }
 
 export default function DecisionDetail({ decision, onUpdate, onClose }) {
+  const [removeAltIndex, setRemoveAltIndex] = useState(null)
+
   const handleFieldChange = useCallback(
     (field) => (e) => {
       onUpdate(decision.id, { [field]: e.target.value })
@@ -148,13 +145,16 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
     [decision.id, decision.alternatives, onUpdate]
   )
 
-  const handleRemoveAlternative = useCallback(
-    (index) => {
-      const alternatives = (decision.alternatives || []).filter((_, i) => i !== index)
-      onUpdate(decision.id, { alternatives })
-    },
-    [decision.id, decision.alternatives, onUpdate]
-  )
+  const handleRequestRemoveAlternative = useCallback((index) => {
+    setRemoveAltIndex(index)
+  }, [])
+
+  const handleConfirmRemoveAlternative = useCallback(() => {
+    if (removeAltIndex === null) return
+    const alternatives = (decision.alternatives || []).filter((_, i) => i !== removeAltIndex)
+    onUpdate(decision.id, { alternatives })
+    setRemoveAltIndex(null)
+  }, [removeAltIndex, decision.id, decision.alternatives, onUpdate])
 
   return (
     <motion.div
@@ -245,7 +245,7 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
                       alt={alt}
                       index={i}
                       onUpdate={(updated) => handleUpdateAlternative(i, updated)}
-                      onRemove={() => handleRemoveAlternative(i)}
+                      onRemove={() => handleRequestRemoveAlternative(i)}
                     />
                   ))}
                 </div>
@@ -313,6 +313,16 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
           </div>
         </div>
       </GlassCard>
+
+      {/* Remove alternative confirmation */}
+      <ConfirmDialog
+        isOpen={removeAltIndex !== null}
+        onClose={() => setRemoveAltIndex(null)}
+        onConfirm={handleConfirmRemoveAlternative}
+        title="Remove alternative?"
+        message="This alternative and its pros/cons will be removed. This cannot be undone."
+        confirmLabel="Remove"
+      />
     </motion.div>
   )
 }

@@ -1,8 +1,10 @@
 import { useCallback } from 'react'
 import { create } from 'zustand'
-import { persist, subscribeWithSelector } from 'zustand/middleware'
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { generateId } from '../utils/ids'
+import indexedDbStorage from '../db/indexedDbStorage'
+import { broadcastUpdate, onCrossTabUpdate } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
 import { createSeedProject, SEED_VERSION } from '../data/seedProject'
 import {
@@ -84,10 +86,45 @@ export const useProjectsStore = create(
           })
         },
 
-        deleteProject: (id) => {
+        // Soft-delete: moves project to trash (recoverable)
+        trashProject: (id) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === id)
+            if (project) {
+              project.deletedAt = new Date().toISOString()
+              project.updatedAt = new Date().toISOString()
+            }
+          })
+        },
+
+        // Restore a trashed project
+        restoreProject: (id) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === id)
+            if (project) {
+              delete project.deletedAt
+              project.updatedAt = new Date().toISOString()
+            }
+          })
+        },
+
+        // Permanently delete (no recovery)
+        permanentlyDeleteProject: (id) => {
           set((state) => {
             state.projects = state.projects.filter((p) => p.id !== id)
           })
+        },
+
+        // Empty all trashed projects
+        emptyTrash: () => {
+          set((state) => {
+            state.projects = state.projects.filter((p) => !p.deletedAt)
+          })
+        },
+
+        // Legacy alias — maps to soft delete for backward compatibility
+        deleteProject: (id) => {
+          get().trashProject(id)
         },
 
         importProject: (data) => {
@@ -554,6 +591,87 @@ export const useProjectsStore = create(
         },
 
         // ---------------------------------------------------------------------------
+        // Sprint Actions
+        // ---------------------------------------------------------------------------
+        addSprint: (projectId, sprintData) => {
+          const now = new Date().toISOString()
+          const newSprint = {
+            id: sprintData.id || crypto.randomUUID(),
+            name: sprintData.name || 'New Sprint',
+            goal: sprintData.goal || '',
+            startDate: sprintData.startDate || null,
+            endDate: sprintData.endDate || null,
+            status: sprintData.status || 'planning',
+            createdAt: now,
+            updatedAt: now,
+          }
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            if (!project.board.sprints) project.board.sprints = []
+            project.board.sprints.push(newSprint)
+            project.updatedAt = now
+          })
+          return newSprint
+        },
+
+        updateSprint: (projectId, sprintId, updates) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            const sprint = (project.board.sprints || []).find((s) => s.id === sprintId)
+            if (!sprint) return
+            Object.assign(sprint, updates, { updatedAt: new Date().toISOString() })
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        deleteSprint: (projectId, sprintId) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            project.board.sprints = (project.board.sprints || []).filter((s) => s.id !== sprintId)
+            // Unassign issues from deleted sprint
+            project.board.issues.forEach((issue) => {
+              if (issue.sprintId === sprintId) {
+                issue.sprintId = null
+              }
+            })
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        closeSprint: (projectId, sprintId, moveIncomplete = 'backlog') => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            const sprint = (project.board.sprints || []).find((s) => s.id === sprintId)
+            if (!sprint) return
+            sprint.status = 'completed'
+            sprint.updatedAt = new Date().toISOString()
+
+            // Handle incomplete issues
+            if (moveIncomplete === 'backlog') {
+              project.board.issues.forEach((issue) => {
+                if (issue.sprintId === sprintId && issue.status !== 'Done') {
+                  issue.sprintId = null
+                }
+              })
+            }
+            // If moveIncomplete is a sprint ID, move to that sprint
+            else if (moveIncomplete && moveIncomplete !== 'backlog') {
+              project.board.issues.forEach((issue) => {
+                if (issue.sprintId === sprintId && issue.status !== 'Done') {
+                  issue.sprintId = moveIncomplete
+                }
+              })
+            }
+
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        // ---------------------------------------------------------------------------
         // Board Settings
         // ---------------------------------------------------------------------------
         updateBoardSettings: (projectId, settings) => {
@@ -582,6 +700,7 @@ export const useProjectsStore = create(
       {
         name: STORAGE_KEY,
         version: 1,
+        storage: createJSONStorage(() => indexedDbStorage),
         onRehydrateStorage: () => (state) => {
           if (state) {
             // Migrate seed project on load
@@ -687,9 +806,15 @@ export const useProjectsStore = create(
 // ---------------------------------------------------------------------------
 // Selectors (for optimized component subscriptions)
 // ---------------------------------------------------------------------------
+// All projects (including trashed) — use selectActiveProjects for normal views
 export const selectProjects = (state) => state.projects
+// Active projects (excludes trashed)
+export const selectActiveProjects = (state) => state.projects.filter((p) => !p.deletedAt)
+// Trashed projects only
+export const selectTrashedProjects = (state) => state.projects.filter((p) => !!p.deletedAt)
 export const selectProject = (id) => (state) => state.projects.find((p) => p.id === id)
-export const selectProjectCount = (state) => state.projects.length
+export const selectProjectCount = (state) => state.projects.filter((p) => !p.deletedAt).length
+export const selectTrashCount = (state) => state.projects.filter((p) => !!p.deletedAt).length
 
 // Issue selectors
 export const selectIssues = (projectId) => (state) => {
@@ -752,3 +877,18 @@ export function useProjectStore(projectId) {
     updateSettings: (settings) => store.updateSettings(projectId, settings),
   }
 }
+
+// ---------------------------------------------------------------------------
+// Cross-Tab Sync: broadcast updates and re-hydrate on remote changes
+// ---------------------------------------------------------------------------
+useProjectsStore.subscribe(
+  (state) => state.projects,
+  () => broadcastUpdate('projects')
+)
+
+onCrossTabUpdate(({ store: storeName }) => {
+  if (storeName === 'projects') {
+    // Re-hydrate from IndexedDB by calling persist rehydrate
+    useProjectsStore.persist.rehydrate()
+  }
+})

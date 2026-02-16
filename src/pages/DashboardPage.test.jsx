@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import DashboardPage from './DashboardPage'
@@ -283,16 +283,17 @@ describe('DashboardPage', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id')
     })
 
-    it('creates project with default name when input is empty', async () => {
+    it('shows error and prevents creation when project name is empty', async () => {
       renderDashboard()
 
       await clickNewProject()
 
       const createBtn = screen.getByRole('button', { name: /create project/i })
-      await userEvent.click(createBtn)
+      // Button should be disabled when name is empty
+      expect(createBtn).toBeDisabled()
 
-      expect(mockAddProject).toHaveBeenCalledWith('Untitled Project')
-      expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id')
+      expect(mockAddProject).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it('creates project on Enter key press', async () => {

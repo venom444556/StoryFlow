@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
@@ -100,7 +100,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center p-[var(--space-4)]"
+          className="fixed inset-0 flex items-center justify-center p-[var(--space-4)] max-md:p-0"
           style={{ zIndex: 'var(--z-modal)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -126,7 +126,11 @@ export default function Modal({
             className={[
               'glass-card relative z-10 w-full overflow-hidden',
               SIZE_MAP[size] || SIZE_MAP.md,
-            ].join(' ')}
+              // Full-screen on mobile for md+ modals
+              size !== 'sm' ? 'max-md:max-w-none max-md:h-full max-md:rounded-none' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             style={{
               boxShadow: 'var(--shadow-xl)',
             }}

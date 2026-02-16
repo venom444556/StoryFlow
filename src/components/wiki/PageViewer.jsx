@@ -1,4 +1,3 @@
-import React from 'react'
 import { Edit3, Trash2, Clock, History, Pin, PinOff } from 'lucide-react'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'

@@ -51,7 +51,6 @@ describe('SettingsPanel', () => {
       const onClose = vi.fn()
       renderWithProvider(<SettingsPanel isOpen={true} onClose={onClose} />)
 
-      const closeButton = screen.getByRole('button', { name: '' }) // X button has no text
       // Find the button with X icon
       const buttons = screen.getAllByRole('button')
       const closeBtn = buttons.find(

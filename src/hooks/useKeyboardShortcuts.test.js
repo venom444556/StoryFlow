@@ -357,20 +357,19 @@ describe('useKeyboardShortcuts', () => {
     })
 
     it('only triggers first matching handler', () => {
-      const handler1 = vi.fn()
-      const handler2 = vi.fn()
+      const handler = vi.fn()
 
       // This shouldn't happen in practice, but tests the early return
       renderHook(() =>
         useKeyboardShortcuts({
-          'ctrl+s': handler2, // Tests that last handler wins
+          'ctrl+s': handler, // Tests that last handler wins
         })
       )
 
       simulateKeyDown('s', { ctrl: true })
 
-      // Only handler2 should be called (it overwrites handler1 in the object)
-      expect(handler2).toHaveBeenCalled()
+      // Only the registered handler should be called
+      expect(handler).toHaveBeenCalled()
     })
   })
 

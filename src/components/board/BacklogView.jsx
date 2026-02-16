@@ -1,5 +1,6 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import {
   ChevronDown,
   ChevronRight,
@@ -16,6 +17,9 @@ import Badge from '../ui/Badge'
 import Avatar from '../ui/Avatar'
 import DropdownMenu from '../ui/DropdownMenu'
 import { getLabel } from '../../utils/labelDefinitions'
+import { sanitizeColor } from '../../utils/sanitize'
+
+const VIRTUALIZE_THRESHOLD = 50
 
 const PRIORITY_BADGE = {
   critical: 'red',
@@ -72,7 +76,7 @@ function sortIssues(issues, sortKey, sortDir) {
   return sorted
 }
 
-function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
+export function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
   const labels = issue.labels || []
   const visibleLabels = labels.slice(0, 3)
   const overflowCount = labels.length - 3
@@ -132,7 +136,7 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
                     {def && (
                       <span
                         className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ backgroundColor: def.color }}
+                        style={{ backgroundColor: sanitizeColor(def.color) }}
                       />
                     )}
                     {label}
@@ -182,6 +186,48 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         </div>
       </div>
     </motion.div>
+  )
+}
+
+function VirtualizedIssueList({ issues, onIssueClick, onDeleteIssue }) {
+  const parentRef = useRef(null)
+  const virtualizer = useVirtualizer({
+    count: issues.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 64,
+    overscan: 5,
+  })
+
+  return (
+    <div ref={parentRef} className="max-h-[60vh] overflow-auto">
+      <div
+        style={{
+          height: `${virtualizer.getTotalSize()}px`,
+          width: '100%',
+          position: 'relative',
+        }}
+      >
+        {virtualizer.getVirtualItems().map((virtualItem) => {
+          const issue = issues[virtualItem.index]
+          return (
+            <div
+              key={issue.id}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+              }}
+              ref={virtualizer.measureElement}
+              data-index={virtualItem.index}
+            >
+              <BacklogRow issue={issue} onIssueClick={onIssueClick} onDeleteIssue={onDeleteIssue} />
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
@@ -247,7 +293,13 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
                   className="overflow-hidden border-t border-[var(--color-border-default)]"
                 >
                   <div className="px-1 pb-2">
-                    {groupIssues.length > 0 ? (
+                    {groupIssues.length > VIRTUALIZE_THRESHOLD ? (
+                      <VirtualizedIssueList
+                        issues={groupIssues}
+                        onIssueClick={onIssueClick}
+                        onDeleteIssue={onDeleteIssue}
+                      />
+                    ) : groupIssues.length > 0 ? (
                       groupIssues.map((issue) => (
                         <BacklogRow
                           key={issue.id}

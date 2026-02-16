@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ---------------------------------------------------------------------------
 // Full-text search across every project in the store.
@@ -26,11 +26,41 @@ function snippet(text, query, len = 120) {
 }
 
 /**
- * Returns true when any of the provided strings match `query` (case-insensitive).
+ * Simple fuzzy match: checks if all characters of `query` appear in order
+ * within `text`. Returns a score (lower = better match) or -1 if no match.
+ */
+function fuzzyScore(query, text) {
+  if (!text) return -1
+  const q = query.toLowerCase()
+  const t = text.toLowerCase()
+
+  // Exact substring match is highest priority
+  if (t.includes(q)) return 0
+
+  // Fuzzy: all chars of query appear in order
+  let qi = 0
+  let gaps = 0
+  let lastMatchIdx = -1
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) {
+      if (lastMatchIdx >= 0) gaps += ti - lastMatchIdx - 1
+      lastMatchIdx = ti
+      qi++
+    }
+  }
+  return qi === q.length ? 1 + gaps : -1
+}
+
+/**
+ * Returns true when any of the provided strings match `query`.
+ * Uses fuzzy matching: all characters of query must appear in order.
  */
 function matches(query, ...fields) {
   const q = query.toLowerCase()
-  return fields.some((f) => f && typeof f === 'string' && f.toLowerCase().includes(q))
+  return fields.some((f) => {
+    if (!f || typeof f !== 'string') return false
+    return fuzzyScore(q, f) >= 0
+  })
 }
 
 /**

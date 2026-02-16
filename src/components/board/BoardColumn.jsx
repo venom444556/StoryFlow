@@ -67,6 +67,8 @@ export default function BoardColumn({
 
   return (
     <div
+      role="listbox"
+      aria-label={`${title} column, ${issues.length} items`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -130,7 +132,10 @@ export default function BoardColumn({
         {/* Empty state */}
         {issues.length === 0 && !isDragOver && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-xs text-[var(--color-fg-subtle)]">No issues</p>
+            <p className="text-xs text-[var(--color-fg-muted)]">No issues in {status}</p>
+            <p className="mt-1 text-[10px] text-[var(--color-fg-subtle)]">
+              Drag issues here or create new ones
+            </p>
           </div>
         )}
 

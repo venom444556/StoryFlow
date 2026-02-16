@@ -1,20 +1,18 @@
 import { useState, useMemo, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { LayoutGrid, List, Layers, BarChart3 } from 'lucide-react'
+import { LayoutGrid, Layers, BarChart3 } from 'lucide-react'
 import SprintBoard from '../board/SprintBoard'
-import BacklogView from '../board/BacklogView'
+import EpicsView from '../board/EpicsView'
+import ChartsPanel from '../board/ChartsPanel'
 import FilterBar from '../board/FilterBar'
 import EpicSidebar from '../board/EpicSidebar'
 import IssueDetail from '../board/IssueDetail'
-import BurndownChart from '../board/BurndownChart'
-import VelocityChart from '../board/VelocityChart'
+import ConfirmDialog from '../ui/ConfirmDialog'
 import { canonicalizeLabel } from '../../utils/labelDefinitions'
 
-const SUB_TABS = [
+const VIEW_MODES = [
   { key: 'board', label: 'Board', icon: LayoutGrid },
-  { key: 'backlog', label: 'Backlog', icon: List },
   { key: 'epics', label: 'Epics', icon: Layers },
-  { key: 'charts', label: 'Charts', icon: BarChart3 },
 ]
 
 const EMPTY_FILTERS = {
@@ -72,12 +70,23 @@ function computeChartData(issues) {
   return { burndown, velocity }
 }
 
-export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }) {
+export default function BoardTab({
+  project,
+  addIssue,
+  updateIssue,
+  deleteIssue,
+  addSprint,
+  updateSprint,
+  deleteSprint,
+  closeSprint,
+}) {
   const [activeView, setActiveView] = useState('board')
   const [selectedIssue, setSelectedIssue] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [showEpicSidebar, setShowEpicSidebar] = useState(false)
+  const [showCharts, setShowCharts] = useState(false)
   const [activeEpicId, setActiveEpicId] = useState(null)
+  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
 
   const board = project?.board
   const allIssues = useMemo(() => board?.issues ?? [], [board?.issues])
@@ -176,15 +185,19 @@ export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }
     [addIssue, board?.nextIssueNumber]
   )
 
-  const handleDeleteIssue = useCallback(
-    (issueId) => {
-      deleteIssue?.(issueId)
-      if (selectedIssue?.id === issueId) {
+  const handleRequestDeleteIssue = useCallback((issueId) => {
+    setDeleteConfirmId(issueId)
+  }, [])
+
+  const handleConfirmDeleteIssue = useCallback(() => {
+    if (deleteConfirmId) {
+      deleteIssue?.(deleteConfirmId)
+      if (selectedIssue?.id === deleteConfirmId) {
         setSelectedIssue(null)
       }
-    },
-    [deleteIssue, selectedIssue?.id]
-  )
+      setDeleteConfirmId(null)
+    }
+  }, [deleteConfirmId, deleteIssue, selectedIssue?.id])
 
   const handleFilterByEpic = useCallback((epicId) => {
     setActiveEpicId(epicId)
@@ -194,82 +207,101 @@ export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }
 
   return (
     <div className="flex h-full flex-col">
-      {/* Sub-navigation tabs */}
-      <div className="mb-4 flex items-center gap-1 overflow-x-auto rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-1">
-        {SUB_TABS.map((tab) => {
-          const Icon = tab.icon
-          const isActive = activeView === tab.key
-          return (
-            <button
-              key={tab.key}
-              onClick={() => {
-                setActiveView(tab.key)
-                // Auto-show epic sidebar in epics view
-                if (tab.key === 'epics') {
-                  setShowEpicSidebar(true)
-                }
-              }}
-              className={[
-                'flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)] shadow-sm'
-                  : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
-              ].join(' ')}
-            >
-              <Icon size={15} />
-              {tab.label}
-            </button>
-          )
-        })}
+      {/* Toolbar: view-mode switcher + epic toggle + charts toggle */}
+      <div className="mb-4 flex items-center gap-3">
+        {/* Segmented view-mode control */}
+        <div className="inline-flex items-center gap-0.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-1">
+          {VIEW_MODES.map((mode) => {
+            const Icon = mode.icon
+            const isActive = activeView === mode.key
+            return (
+              <button
+                key={mode.key}
+                onClick={() => setActiveView(mode.key)}
+                className={[
+                  'relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200',
+                  isActive
+                    ? 'text-[var(--color-fg-default)]'
+                    : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
+                ].join(' ')}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="board-view-indicator"
+                    className="absolute inset-0 rounded-lg bg-[var(--color-bg-glass-hover)] shadow-sm"
+                    transition={{ type: 'spring', duration: 0.3, bounce: 0.15 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <Icon size={14} />
+                  {mode.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
 
         <div className="flex-1" />
 
-        {/* Epic sidebar toggle (for board view) */}
-        {(activeView === 'board' || activeView === 'epics') && (
-          <button
-            onClick={() => setShowEpicSidebar((v) => !v)}
-            className={[
-              'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-              showEpicSidebar
-                ? 'text-[var(--color-fg-default)]'
-                : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
-            ].join(' ')}
-            style={
-              showEpicSidebar
-                ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' }
-                : undefined
-            }
-          >
-            <Layers size={13} />
-            Epics
-          </button>
-        )}
+        {/* Epic sidebar toggle */}
+        <button
+          onClick={() => setShowEpicSidebar((v) => !v)}
+          className={[
+            'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
+            showEpicSidebar
+              ? 'text-[var(--color-fg-default)]'
+              : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+          ].join(' ')}
+          style={
+            showEpicSidebar
+              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' }
+              : undefined
+          }
+        >
+          <Layers size={13} />
+          Epics
+        </button>
+
+        {/* Charts toggle */}
+        <button
+          onClick={() => setShowCharts((v) => !v)}
+          className={[
+            'flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors',
+            showCharts
+              ? 'text-[var(--color-fg-default)]'
+              : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+          ].join(' ')}
+          style={
+            showCharts
+              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' }
+              : undefined
+          }
+          title="Toggle charts panel"
+        >
+          <BarChart3 size={14} />
+        </button>
       </div>
 
-      {/* Filter bar (visible for board and backlog views) */}
-      {(activeView === 'board' || activeView === 'backlog' || activeView === 'epics') && (
-        <div className="mb-4">
-          <FilterBar
-            filters={filters}
-            onFilterChange={setFilters}
-            labels={allLabels}
-            epics={allEpics}
-          />
-        </div>
-      )}
+      {/* Filter bar */}
+      <div className="mb-4">
+        <FilterBar
+          filters={filters}
+          onFilterChange={setFilters}
+          labels={allLabels}
+          epics={allEpics}
+        />
+      </div>
 
       {/* Main content area */}
-      <div className="flex min-h-0 flex-1 gap-0 overflow-hidden rounded-xl">
+      <div className="relative flex min-h-0 flex-1 gap-0 overflow-hidden rounded-xl">
         {/* Epic sidebar */}
-        {(activeView === 'board' || activeView === 'epics') && (
-          <EpicSidebar
-            issues={allIssues}
-            onFilterByEpic={handleFilterByEpic}
-            activeEpicId={activeEpicId}
-            isCollapsed={!showEpicSidebar}
-            onToggleCollapse={() => setShowEpicSidebar((v) => !v)}
-          />
-        )}
+        <EpicSidebar
+          issues={allIssues}
+          onFilterByEpic={handleFilterByEpic}
+          activeEpicId={activeEpicId}
+          isCollapsed={!showEpicSidebar}
+          onToggleCollapse={() => setShowEpicSidebar((v) => !v)}
+        />
 
         {/* Views */}
         <div className="min-w-0 flex-1 overflow-auto p-1">
@@ -285,28 +317,16 @@ export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }
               >
                 <SprintBoard
                   issues={filteredIssues}
+                  sprints={board?.sprints ?? []}
                   statusColumns={statusColumns}
                   onUpdateIssue={handleUpdateIssue}
                   onCreateIssue={handleCreateIssue}
                   onIssueClick={handleIssueClick}
-                />
-              </motion.div>
-            )}
-
-            {activeView === 'backlog' && (
-              <motion.div
-                key="backlog"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <BacklogView
-                  issues={filteredIssues}
-                  onUpdateIssue={handleUpdateIssue}
-                  onCreateIssue={handleCreateIssue}
-                  onDeleteIssue={handleDeleteIssue}
-                  onIssueClick={handleIssueClick}
+                  onAddSprint={addSprint}
+                  onUpdateSprint={updateSprint}
+                  onDeleteSprint={deleteSprint}
+                  onCloseSprint={closeSprint}
+                  epicFilterActive={activeEpicId !== null}
                 />
               </motion.div>
             )}
@@ -318,34 +338,27 @@ export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.2 }}
-                className="h-full"
               >
-                <SprintBoard
+                <EpicsView
                   issues={filteredIssues}
-                  statusColumns={statusColumns}
-                  onUpdateIssue={handleUpdateIssue}
-                  onCreateIssue={handleCreateIssue}
                   onIssueClick={handleIssueClick}
+                  onDeleteIssue={handleRequestDeleteIssue}
                 />
-              </motion.div>
-            )}
-
-            {activeView === 'charts' && (
-              <motion.div
-                key="charts"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <BurndownChart data={chartData.burndown} />
-                  <VelocityChart sprints={chartData.velocity} />
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {/* Charts slide-out panel */}
+        <AnimatePresence>
+          {showCharts && (
+            <ChartsPanel
+              onClose={() => setShowCharts(false)}
+              burndownData={chartData.burndown}
+              velocityData={chartData.velocity}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Issue detail slide-out panel */}
@@ -355,12 +368,22 @@ export default function BoardTab({ project, addIssue, updateIssue, deleteIssue }
             key={selectedIssue.id}
             issue={selectedIssue}
             onUpdate={handleUpdateIssue}
-            onDelete={handleDeleteIssue}
+            onDelete={handleRequestDeleteIssue}
             onClose={handleCloseDetail}
             allIssues={allIssues}
           />
         )}
       </AnimatePresence>
+
+      {/* Delete issue confirmation */}
+      <ConfirmDialog
+        isOpen={deleteConfirmId !== null}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleConfirmDeleteIssue}
+        title="Delete issue?"
+        message="This issue will be permanently deleted. This cannot be undone."
+        confirmLabel="Delete"
+      />
     </div>
   )
 }

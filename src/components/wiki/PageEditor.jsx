@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import {
   Bold,
   Italic,
@@ -82,11 +82,14 @@ export default function PageEditor({ page, onSave, onCancel }) {
   const debounceRef = useRef(null)
 
   // Sync local state when a new page is opened for editing
+  // We intentionally only depend on page?.id — re-syncing on content/title changes
+  // would create an infinite loop with auto-save (content changes → sync → auto-save → repeat)
   useEffect(() => {
     setTitle(page?.title || '')
     setContent(page?.content || '')
     setLabels(page?.labels || [])
     setIcon(page?.icon || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page?.id])
 
   // ---- Auto-save via debounce (calls parent but does NOT exit edit mode) ----
@@ -147,6 +150,7 @@ export default function PageEditor({ page, onSave, onCancel }) {
 
   // ---- Save (explicit save -- creates a version snapshot) ----
   const handleSave = () => {
+    if (!title.trim()) return
     if (debounceRef.current) clearTimeout(debounceRef.current)
     onSave?.({ title, content, labels, icon })
   }

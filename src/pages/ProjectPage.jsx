@@ -61,17 +61,6 @@ function TabFallback() {
   )
 }
 
-// Map route paths to tab keys
-const TAB_ROUTES = {
-  overview: 'overview',
-  plan: 'architecture',
-  'plan/workflow': 'workflow',
-  work: 'board',
-  docs: 'wiki',
-  'docs/decisions': 'decisions',
-  insights: 'timeline',
-}
-
 // Get active tab from pathname
 function getActiveTabFromPath(pathname, projectId) {
   const basePath = `/project/${projectId}/`
@@ -213,6 +202,10 @@ export default function ProjectPage() {
                       addIssue={hooks.addIssue}
                       updateIssue={hooks.updateIssue}
                       deleteIssue={hooks.deleteIssue}
+                      addSprint={hooks.addSprint}
+                      updateSprint={hooks.updateSprint}
+                      deleteSprint={hooks.deleteSprint}
+                      closeSprint={hooks.closeSprint}
                     />
                   }
                 />
@@ -224,6 +217,10 @@ export default function ProjectPage() {
                       addIssue={hooks.addIssue}
                       updateIssue={hooks.updateIssue}
                       deleteIssue={hooks.deleteIssue}
+                      addSprint={hooks.addSprint}
+                      updateSprint={hooks.updateSprint}
+                      deleteSprint={hooks.deleteSprint}
+                      closeSprint={hooks.closeSprint}
                     />
                   }
                 />
