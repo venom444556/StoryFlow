@@ -2,11 +2,16 @@ import { useCallback } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { generateId } from '../utils/ids'
+import { generateId, generateProjectId } from '../utils/ids'
 import indexedDbStorage from '../db/indexedDbStorage'
 import { broadcastUpdate, onCrossTabUpdate } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
-import { createSeedProject, SEED_VERSION } from '../data/seedProject'
+import {
+  createSeedProject,
+  SEED_VERSION,
+  SEED_PROJECT_ID,
+  LEGACY_SEED_PROJECT_ID,
+} from '../data/seedProject'
 import {
   useActivityStore,
   ACTIVITY_TYPES,
@@ -22,10 +27,21 @@ const STORAGE_KEY = 'storyflow-projects'
 // Migrate seed project if a new version is available
 // ---------------------------------------------------------------------------
 function migrateSeedProject(projects) {
-  const seedIndex = projects.findIndex((p) => p.isSeed === true)
+  // Find seed project by isSeed flag, new ID, or legacy ID
+  let seedIndex = projects.findIndex((p) => p.isSeed === true)
 
   if (seedIndex === -1) {
-    // Legacy: pre-versioning seed project has no isSeed flag
+    // Check for legacy ID (pre-slug naming convention)
+    seedIndex = projects.findIndex((p) => p.id === LEGACY_SEED_PROJECT_ID)
+  }
+
+  if (seedIndex === -1) {
+    // Check for new slug-based ID
+    seedIndex = projects.findIndex((p) => p.id === SEED_PROJECT_ID)
+  }
+
+  if (seedIndex === -1) {
+    // Oldest legacy: pre-versioning seed project matched by name
     const legacyIndex = projects.findIndex(
       (p) => p.name === 'StoryFlow Development' && p.isSeed === undefined
     )
@@ -37,7 +53,7 @@ function migrateSeedProject(projects) {
     return projects
   }
 
-  // Check version — replace if outdated
+  // Check version — replace if outdated (also handles ID migration from legacy → slug)
   if ((projects[seedIndex].seedVersion || 0) < SEED_VERSION) {
     const updated = [...projects]
     updated[seedIndex] = createSeedProject()
@@ -66,7 +82,9 @@ export const useProjectsStore = create(
         setProjects: (projects) => set({ projects }),
 
         addProject: (name) => {
-          const project = createDefaultProject(name)
+          const existingIds = get().projects.map((p) => p.id)
+          const id = generateProjectId(name, existingIds)
+          const project = createDefaultProject(name, id)
           set((state) => {
             state.projects.push(project)
           })
@@ -128,9 +146,10 @@ export const useProjectsStore = create(
         },
 
         importProject: (data) => {
+          const existingIds = get().projects.map((p) => p.id)
           const imported = {
             ...data,
-            id: generateId(),
+            id: generateProjectId(data.name || 'imported-project', existingIds),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           }

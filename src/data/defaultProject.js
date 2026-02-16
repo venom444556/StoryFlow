@@ -1,10 +1,8 @@
-import { generateId } from '../utils/ids'
-
-export function createDefaultProject(name) {
+export function createDefaultProject(name, id) {
   const now = new Date().toISOString()
 
   return {
-    id: generateId(),
+    id,
     name: name || 'Untitled Project',
     description: '',
     status: 'planning',

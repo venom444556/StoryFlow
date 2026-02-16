@@ -1,7 +1,9 @@
 import { generateId } from '../utils/ids'
 
-export const SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 60
+export const SEED_PROJECT_ID = 'storyflow'
+// Legacy ID used before slug-based naming convention (v61)
+export const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
+export const SEED_VERSION = 61
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -3344,11 +3346,28 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        // === SF-128: Slug-based project ID naming convention ===
+        {
+          id: generateId(),
+          type: 'story',
+          title: 'SF-128: Implement slug-based project ID naming convention',
+          description:
+            'Replace opaque UUID project IDs with human-readable slugs derived from the user\'s project name. "My Awesome App" → "my-awesome-app". Handles collision with numeric suffix ("my-app-2"). Makes URLs readable: /project/my-awesome-app instead of /project/f47ac10b-58cc-...',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['feature', 'ux', 'naming'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 128,
+      nextIssueNumber: 129,
     },
 
     pages: [
@@ -4139,6 +4158,7 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 |--------|---------|
 | Soft-delete uses \`deletedAt\` timestamp, not status field | \`deletedAt\` is orthogonal to project status (a project can be "in-progress" and trashed). Enables "deleted N ago" display. \`selectActiveProjects\` filters \`!p.deletedAt\`. Legacy \`deleteProject()\` now maps to \`trashProject()\` for backward compatibility. |
 | Zustand selectors filter at the store level, not the component | \`selectActiveProjects\` and \`selectTrashedProjects\` are store-level selectors. Components never see trashed projects unless they explicitly use \`selectTrashedProjects\`. This means Sidebar, search, etc. automatically exclude trashed items with zero code changes. |
+| Project IDs are slug-based, derived from name | \`generateProjectId("My Awesome App", existingIds)\` → \`"my-awesome-app"\`. Collision handling appends numeric suffix (\`-2\`, \`-3\`). URLs become readable: \`/project/my-awesome-app\`. Seed project ID is \`"storyflow"\` (was \`"storyflow-seed-00000000-0001"\`). Migration handles legacy ID lookup. |
 `,
         parentId: page1Id,
         status: 'published',
