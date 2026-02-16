@@ -7,10 +7,10 @@ export const generateId = () => crypto.randomUUID()
  * "My Awesome App"  → "my-awesome-app"
  * "  Hello World! " → "hello-world"
  * "café résumé"     → "cafe-resume"
- * ""                → "untitled"
  *
- * @param {string} name - The human-readable project name
+ * @param {string} name - The human-readable project name (required, non-empty)
  * @returns {string} A lowercase, hyphen-separated slug
+ * @throws {Error} If name is empty or produces an empty slug
  */
 export function generateSlug(name) {
   const slug = (name || '')
@@ -22,7 +22,11 @@ export function generateSlug(name) {
     .replace(/[\s-]+/g, '-') // Collapse whitespace/hyphens into single hyphen
     .replace(/^-+|-+$/g, '') // Trim leading/trailing hyphens
 
-  return slug || 'untitled'
+  if (!slug) {
+    throw new Error('Project name is required and must contain at least one alphanumeric character')
+  }
+
+  return slug
 }
 
 /**
