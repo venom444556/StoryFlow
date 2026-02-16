@@ -388,7 +388,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
             <div className="space-y-1">
               {childNodes.map((child) => {
                 const childType = getNodeType(child.type)
-                const childColor = childType?.color || '#6b7280'
+                const childColor = sanitizeColor(childType?.color, '#6b7280')
                 const childConfig = child.config || {}
                 const assignee = childConfig.assignee
                 const notes = childConfig.notes || childConfig.description

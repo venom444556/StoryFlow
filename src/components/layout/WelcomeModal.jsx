@@ -49,9 +49,15 @@ export default function WelcomeModal() {
   const [dontShowAgain, setDontShowAgain] = useState(false)
 
   useEffect(() => {
-    const welcomed = localStorage.getItem(STORAGE_KEY)
-    if (!welcomed) {
-      // Small delay so the app renders first
+    try {
+      const welcomed = localStorage.getItem(STORAGE_KEY)
+      if (!welcomed) {
+        // Small delay so the app renders first
+        const timer = setTimeout(() => setIsOpen(true), 600)
+        return () => clearTimeout(timer)
+      }
+    } catch {
+      // localStorage may be unavailable in private browsing — show modal anyway
       const timer = setTimeout(() => setIsOpen(true), 600)
       return () => clearTimeout(timer)
     }
@@ -86,7 +92,14 @@ export default function WelcomeModal() {
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={handleClose} />
+          <div
+            role="button"
+            tabIndex={-1}
+            aria-label="Close dialog"
+            onKeyDown={(e) => e.key === 'Escape' && handleClose()}
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={handleClose}
+          />
 
           {/* Modal */}
           <motion.div
@@ -98,6 +111,7 @@ export default function WelcomeModal() {
           >
             {/* Close button */}
             <button
+              type="button"
               onClick={handleClose}
               className="absolute right-3 top-3 rounded-lg p-1.5 text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             >

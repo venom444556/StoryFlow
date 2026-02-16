@@ -6,6 +6,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 // ---------------------------------------------------------------------------
 
 const DEBOUNCE_MS = 300
+const EMPTY_RESULTS = { projects: [], issues: [], pages: [], decisions: [] }
 
 /**
  * Generate a short preview snippet around the first occurrence of `query`
@@ -153,19 +154,14 @@ function searchProjects(projects, query) {
 
 export function useSearch(projects) {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState({
-    projects: [],
-    issues: [],
-    pages: [],
-    decisions: [],
-  })
+  const [results, setResults] = useState(EMPTY_RESULTS)
   const [isSearching, setIsSearching] = useState(false)
   const timerRef = useRef(null)
 
   // Debounced search
   useEffect(() => {
     if (!query.trim()) {
-      setResults({ projects: [], issues: [], pages: [], decisions: [] })
+      setResults(EMPTY_RESULTS)
       setIsSearching(false)
       return
     }
@@ -187,7 +183,7 @@ export function useSearch(projects) {
 
   const clearSearch = useCallback(() => {
     setQuery('')
-    setResults({ projects: [], issues: [], pages: [], decisions: [] })
+    setResults(EMPTY_RESULTS)
     setIsSearching(false)
   }, [])
 

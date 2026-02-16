@@ -48,8 +48,14 @@ export function generateProjectId(name, existingIds = []) {
   if (!idSet.has(base)) return base
 
   let counter = 2
+  const MAX_SUFFIX = 10000
   while (idSet.has(`${base}-${counter}`)) {
     counter++
+    if (counter > MAX_SUFFIX) {
+      throw new Error(
+        `Could not generate unique project ID for "${name}" after ${MAX_SUFFIX} attempts`
+      )
+    }
   }
   return `${base}-${counter}`
 }

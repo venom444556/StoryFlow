@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import {
   useProjectsStore,
   selectActiveProjects,
@@ -22,9 +23,10 @@ const deprecatedDispatch = () => {
  * - useProjectsStore() - direct Zustand access (preferred for new code)
  */
 export function ProjectsProvider({ children }) {
-  // Get state from Zustand store — active projects by default
-  const projects = useProjectsStore(selectActiveProjects)
-  const trashedProjects = useProjectsStore(selectTrashedProjects)
+  // Get state from Zustand store — useShallow prevents infinite re-renders
+  // because filter() creates new arrays on every call; shallow compares elements
+  const projects = useProjectsStore(useShallow(selectActiveProjects))
+  const trashedProjects = useProjectsStore(useShallow(selectTrashedProjects))
 
   // Get stable action references directly from store
   const addProject = useProjectsStore((state) => state.addProject)

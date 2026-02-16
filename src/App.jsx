@@ -18,15 +18,24 @@ export default function App() {
 
   // One-time migration from localStorage to IndexedDB
   useEffect(() => {
-    migrateFromLocalStorage().then((result) => {
-      if (result.error) {
+    migrateFromLocalStorage()
+      .then((result) => {
+        if (result.error) {
+          addToast({
+            type: 'error',
+            message: result.error,
+            duration: 10000,
+          })
+        }
+      })
+      .catch((err) => {
+        console.error('Migration failed:', err)
         addToast({
           type: 'error',
-          message: result.error,
+          message: 'Failed to migrate data from localStorage. Your data is safe — try refreshing.',
           duration: 10000,
         })
-      }
-    })
+      })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <ErrorBoundary>

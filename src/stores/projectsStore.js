@@ -4,14 +4,14 @@ import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middl
 import { immer } from 'zustand/middleware/immer'
 import { generateId, generateProjectId } from '../utils/ids'
 import indexedDbStorage from '../db/indexedDbStorage'
-import { broadcastUpdate, onCrossTabUpdate } from '../utils/crossTabSync'
+import { broadcastUpdate, onCrossTabUpdate, setRehydrating } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
 import {
   createSeedProject,
   SEED_VERSION,
   SEED_PROJECT_ID,
   LEGACY_SEED_PROJECT_ID,
-} from '../data/seedProject'
+} from '../data/storyflow'
 import {
   useActivityStore,
   ACTIVITY_TYPES,
@@ -74,7 +74,15 @@ export const useProjectsStore = create(
         projects: [],
 
         // Computed selectors (use these for memoized reads)
-        getProject: (id) => get().projects.find((p) => p.id === id) || null,
+        getProject: (id) => {
+          const project = get().projects.find((p) => p.id === id)
+          if (project) return project
+          // Fallback: handle legacy seed project ID
+          if (id === LEGACY_SEED_PROJECT_ID) {
+            return get().projects.find((p) => p.id === SEED_PROJECT_ID && p.isSeed) || null
+          }
+          return null
+        },
 
         getProjectsByStatus: (status) => get().projects.filter((p) => p.status === status),
 
@@ -123,14 +131,36 @@ export const useProjectsStore = create(
           })
         },
 
-        // Restore a trashed project
+        // Restore a trashed project (with unique-name check)
         restoreProject: (id) => {
-          set((state) => {
-            const project = state.projects.find((p) => p.id === id)
-            if (project) {
-              delete project.deletedAt
-              project.updatedAt = new Date().toISOString()
+          const state = get()
+          const project = state.projects.find((p) => p.id === id)
+          if (!project) return
+
+          // Check for name conflict with active projects
+          const active = state.projects.filter((p) => !p.deletedAt)
+          const nameConflict = active.some(
+            (p) => p.name.toLowerCase() === project.name.toLowerCase()
+          )
+
+          set((draft) => {
+            const target = draft.projects.find((p) => p.id === id)
+            if (!target) return
+            // If name conflicts, auto-suffix with "(restored)"
+            if (nameConflict) {
+              let suffix = '(restored)'
+              const allNames = new Set(active.map((p) => p.name.toLowerCase()))
+              if (allNames.has(`${target.name} ${suffix}`.toLowerCase())) {
+                let counter = 2
+                while (allNames.has(`${target.name} (restored ${counter})`.toLowerCase())) {
+                  counter++
+                }
+                suffix = `(restored ${counter})`
+              }
+              target.name = `${target.name} ${suffix}`
             }
+            delete target.deletedAt
+            target.updatedAt = new Date().toISOString()
           })
         },
 
@@ -930,7 +960,10 @@ useProjectsStore.subscribe(
 
 onCrossTabUpdate(({ store: storeName }) => {
   if (storeName === 'projects') {
-    // Re-hydrate from IndexedDB by calling persist rehydrate
-    useProjectsStore.persist.rehydrate()
+    // Suppress broadcasts during rehydration to prevent cross-tab ping-pong
+    setRehydrating(true)
+    useProjectsStore.persist.rehydrate().finally(() => {
+      setRehydrating(false)
+    })
   }
 })

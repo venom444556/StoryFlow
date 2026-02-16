@@ -74,6 +74,7 @@ function SprintHeader({
         {/* Actions menu */}
         <div className="relative">
           <button
+            type="button"
             onClick={() => setMenuOpen((v) => !v)}
             className="rounded-md p-1.5 text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)]"
           >
@@ -85,6 +86,7 @@ function SprintHeader({
               <div className="absolute right-0 top-full z-40 mt-1 w-44 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-overlay)] p-1 shadow-lg">
                 {sprint.status === 'planning' && (
                   <button
+                    type="button"
                     onClick={() => {
                       onStart?.()
                       setMenuOpen(false)
@@ -96,6 +98,7 @@ function SprintHeader({
                 )}
                 {sprint.status === 'active' && (
                   <button
+                    type="button"
                     onClick={() => {
                       onClose?.()
                       setMenuOpen(false)
@@ -106,6 +109,7 @@ function SprintHeader({
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={() => {
                     onEdit?.()
                     setMenuOpen(false)
@@ -115,6 +119,7 @@ function SprintHeader({
                   <Pencil size={12} /> Edit Sprint
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     onDelete?.()
                     setMenuOpen(false)
@@ -250,6 +255,7 @@ export default function SprintBoard({
         <div className="mb-3 flex items-center gap-2 overflow-x-auto">
           {/* "All" tab — shows every issue regardless of sprint */}
           <button
+            type="button"
             onClick={() => setActiveSprintId('all')}
             className={[
               'shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-all',
@@ -262,6 +268,7 @@ export default function SprintBoard({
           </button>
           {sprints.map((s) => (
             <button
+              type="button"
               key={s.id}
               onClick={() => setActiveSprintId(s.id)}
               className={[
@@ -277,6 +284,7 @@ export default function SprintBoard({
             </button>
           ))}
           <button
+            type="button"
             onClick={() => {
               setEditingSprint(null)
               setSprintModalOpen(true)
@@ -315,6 +323,7 @@ export default function SprintBoard({
             </p>
           </div>
           <button
+            type="button"
             onClick={() => {
               setEditingSprint(null)
               setSprintModalOpen(true)

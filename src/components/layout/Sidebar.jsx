@@ -73,6 +73,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Mobile close button */}
         {mobileMenuOpen && (
           <button
+            type="button"
             onClick={onMobileMenuClose}
             className={[
               'ml-auto rounded-[var(--radius-lg)] p-[var(--space-2)]',
@@ -143,6 +144,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
               return (
                 <Tooltip key={project.id} content={project.name} position="right">
                   <button
+                    type="button"
                     onClick={() => handleNavClick(`/project/${project.id}`)}
                     className={[
                       'flex w-full items-center justify-center rounded-[var(--radius-lg)]',
@@ -161,6 +163,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
             return (
               <button
+                type="button"
                 key={project.id}
                 onClick={() => handleNavClick(`/project/${project.id}`)}
                 className={[
@@ -186,6 +189,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="Help" position="right">
             <button
+              type="button"
               onClick={() => {
                 localStorage.removeItem('storyflow-welcomed')
                 window.dispatchEvent(new Event('storyflow-show-welcome'))
@@ -197,6 +201,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           </Tooltip>
         ) : (
           <button
+            type="button"
             onClick={() => {
               localStorage.removeItem('storyflow-welcomed')
               window.dispatchEvent(new Event('storyflow-show-welcome'))
@@ -212,6 +217,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="New Project" position="right">
             <button
+              type="button"
               onClick={handleNewProject}
               className={[
                 'flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)]',
@@ -229,6 +235,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           </Tooltip>
         ) : (
           <button
+            type="button"
             onClick={handleNewProject}
             className={[
               'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
@@ -249,6 +256,8 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
       {/* Collapse toggle (desktop only) */}
       <button
+        type="button"
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         onClick={onToggle}
         className={[
           'absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full',

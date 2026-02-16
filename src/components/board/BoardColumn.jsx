@@ -90,6 +90,7 @@ export default function BoardColumn({
           </Badge>
         </div>
         <button
+          type="button"
           onClick={() => {
             onCreateIssue?.({
               title: 'New Issue',

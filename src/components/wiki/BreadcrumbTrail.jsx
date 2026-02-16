@@ -14,8 +14,10 @@ function buildAncestorPath(pages, currentPageId) {
   })
 
   const path = []
+  const visited = new Set()
   let current = map[currentPageId]
-  while (current) {
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id)
     path.unshift(current)
     current = current.parentId ? map[current.parentId] : null
   }
@@ -31,6 +33,7 @@ export default function BreadcrumbTrail({ pages = [], currentPageId, onNavigate 
     <nav className="flex items-center gap-1 text-sm">
       {/* Home / Wiki root */}
       <button
+        type="button"
         onClick={() => onNavigate(null)}
         className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
       >
@@ -50,6 +53,7 @@ export default function BreadcrumbTrail({ pages = [], currentPageId, onNavigate 
               </span>
             ) : (
               <button
+                type="button"
                 onClick={() => onNavigate(page.id)}
                 className="rounded px-1.5 py-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
               >

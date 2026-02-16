@@ -111,7 +111,7 @@ describe('BoardColumn', () => {
   describe('Empty State', () => {
     it('shows empty state when no issues', () => {
       render(<BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />)
-      expect(screen.getByText('No issues')).toBeInTheDocument()
+      expect(screen.getByText('No issues in Done')).toBeInTheDocument()
     })
 
     it('shows zero in badge when no issues', () => {
@@ -340,7 +340,7 @@ describe('BoardColumn', () => {
   describe('Edge Cases', () => {
     it('handles empty issues array', () => {
       render(<BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />)
-      expect(screen.getByText('No issues')).toBeInTheDocument()
+      expect(screen.getByText('No issues in To Do')).toBeInTheDocument()
     })
 
     it('handles undefined issues prop', () => {

@@ -136,7 +136,7 @@ Write every entry as if someone else will audit it:
 
 ### Finding the Tracker File
 
-For StoryFlow: `src/data/seedProject.js`
+For StoryFlow: `src/data/storyflow.js`
 
 For other projects:
 1. Check project config/docs for tracker file path

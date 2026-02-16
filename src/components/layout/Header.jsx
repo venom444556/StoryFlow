@@ -9,6 +9,8 @@ import {
   downloadJSON,
   readFileAsJSON,
   parseProjectJSON,
+  estimateExportSize,
+  formatFileSize,
 } from '../../utils/exportImport'
 
 // ---------------------------------------------------------------------------
@@ -121,12 +123,13 @@ export default function Header({
       const project = getProject(params.id)
       if (project) {
         const json = exportProjectJSON(project)
+        const size = formatFileSize(new Blob([json]).size)
         const safeName = project.name
           .replace(/[^a-zA-Z0-9-_ ]/g, '')
           .replace(/\s+/g, '-')
           .toLowerCase()
         downloadJSON(json, `${safeName}.storyflow.json`)
-        setToast({ message: `Exported "${project.name}"`, type: 'success' })
+        setToast({ message: `Exported "${project.name}" (${size})`, type: 'success' })
       }
     } else {
       // Dashboard -- export all projects
@@ -135,13 +138,23 @@ export default function Header({
         return
       }
       const json = exportAllProjectsJSON(projects)
+      const size = formatFileSize(new Blob([json]).size)
       downloadJSON(json, 'storyflow-all-projects.json')
       setToast({
-        message: `Exported ${projects.length} project${projects.length !== 1 ? 's' : ''}`,
+        message: `Exported ${projects.length} project${projects.length !== 1 ? 's' : ''} (${size})`,
         type: 'success',
       })
     }
   }, [params.id, getProject, projects])
+
+  // --- Export size for tooltip ---
+  const exportSize = (() => {
+    if (params.id) {
+      const project = getProject(params.id)
+      return project ? formatFileSize(estimateExportSize(project)) : null
+    }
+    return projects.length > 0 ? formatFileSize(estimateExportSize(projects)) : null
+  })()
 
   const iconButtonClasses = [
     'rounded-[var(--radius-lg)] p-[var(--space-2)]',
@@ -236,7 +249,13 @@ export default function Header({
         {/* Export */}
         <button
           onClick={handleExportClick}
-          title={params.id ? 'Export current project' : 'Export all projects'}
+          title={
+            exportSize
+              ? `Export${params.id ? '' : ` all ${projects.length} projects`} (${exportSize})`
+              : params.id
+                ? 'Export current project'
+                : 'Export all projects'
+          }
           className={iconButtonClasses}
           style={{ transitionDuration: 'var(--duration-fast)' }}
         >
