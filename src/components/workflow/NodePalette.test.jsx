@@ -2,13 +2,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import NodePalette from './NodePalette'
 
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-  },
-  AnimatePresence: ({ children }) => <>{children}</>,
-}))
+// Mock framer-motion with ref forwarding so panelRef works
+vi.mock('framer-motion', async () => {
+  const React = await import('react')
+  const MotionDiv = React.forwardRef(({ children, ...props }, ref) => (
+    <div ref={ref} {...props}>
+      {children}
+    </div>
+  ))
+  MotionDiv.displayName = 'MotionDiv'
+  return {
+    motion: { div: MotionDiv },
+    AnimatePresence: ({ children }) => <>{children}</>,
+  }
+})
 
 describe('NodePalette', () => {
   const defaultProps = {
@@ -57,15 +64,29 @@ describe('NodePalette', () => {
     it('displays descriptions for each node type', () => {
       render(<NodePalette {...defaultProps} />)
 
-      expect(screen.getByText('Entry point for the workflow. Every workflow needs one.')).toBeInTheDocument()
-      expect(screen.getByText('Marks the successful completion of a workflow path.')).toBeInTheDocument()
-      expect(screen.getByText('A high-level phase grouping multiple tasks together.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Entry point for the workflow. Every workflow needs one.')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Marks the successful completion of a workflow path.')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('A high-level phase grouping multiple tasks together.')
+      ).toBeInTheDocument()
       expect(screen.getByText('An individual unit of work to be completed.')).toBeInTheDocument()
-      expect(screen.getByText('A key checkpoint or deliverable in the workflow.')).toBeInTheDocument()
-      expect(screen.getByText('Conditional branching point with if/else logic.')).toBeInTheDocument()
-      expect(screen.getByText('Execute an HTTP request to an external service.')).toBeInTheDocument()
+      expect(
+        screen.getByText('A key checkpoint or deliverable in the workflow.')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Conditional branching point with if/else logic.')
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Execute an HTTP request to an external service.')
+      ).toBeInTheDocument()
       expect(screen.getByText('Read or write data to a database.')).toBeInTheDocument()
-      expect(screen.getByText('Run custom data transformation or business logic.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Run custom data transformation or business logic.')
+      ).toBeInTheDocument()
     })
   })
 

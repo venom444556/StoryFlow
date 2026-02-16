@@ -10,13 +10,7 @@ const STATUS_VARIANT = {
   published: 'green',
 }
 
-export default function PageViewer({
-  page,
-  onEdit,
-  onDelete,
-  onTogglePin,
-  onShowVersions,
-}) {
+export default function PageViewer({ page, onEdit, onDelete, onTogglePin, onShowVersions }) {
   if (!page) return null
 
   return (
@@ -27,9 +21,7 @@ export default function PageViewer({
           {/* Title block */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              {page.icon && (
-                <span className="text-3xl leading-none">{page.icon}</span>
-              )}
+              {page.icon && <span className="text-3xl leading-none">{page.icon}</span>}
               <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
                 {page.title || 'Untitled'}
               </h1>
@@ -66,21 +58,11 @@ export default function PageViewer({
               />
             )}
             {onShowVersions && page.versions?.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={History}
-                onClick={onShowVersions}
-              >
+              <Button variant="ghost" size="sm" icon={History} onClick={onShowVersions}>
                 History ({page.versions.length})
               </Button>
             )}
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={Edit3}
-              onClick={onEdit}
-            >
+            <Button variant="secondary" size="sm" icon={Edit3} onClick={onEdit}>
               Edit
             </Button>
             <Button

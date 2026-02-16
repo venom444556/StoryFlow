@@ -195,7 +195,10 @@ describe('ComponentDetail', () => {
       const descTextarea = screen.getByPlaceholderText(/describe what this component does/i)
       fireEvent.change(descTextarea, { target: { value: 'Main header component updated' } })
 
-      expect(defaultProps.onUpdate).toHaveBeenCalledWith('description', 'Main header component updated')
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith(
+        'description',
+        'Main header component updated'
+      )
     })
   })
 
@@ -238,10 +241,7 @@ describe('ComponentDetail', () => {
         dependencies: [],
         parentId: null,
       }
-      const isolatedComponents = [
-        ...mockAllComponents,
-        isolatedComponent,
-      ]
+      const isolatedComponents = [...mockAllComponents, isolatedComponent]
       render(
         <ComponentDetail
           {...defaultProps}

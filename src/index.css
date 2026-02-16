@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "./styles/tokens.css";
+@import 'tailwindcss';
+@import './styles/tokens.css';
 
 /* =====================================================
    TAILWIND THEME EXTENSIONS
@@ -128,7 +128,7 @@
 
 .theme-light .glass-input:hover {
   background: var(--color-input-bg-hover);
-  border-color: #A39B91;
+  border-color: #a39b91;
 }
 
 .theme-light .glass-input:focus {
@@ -153,29 +153,62 @@
    ===================================================== */
 
 @keyframes float-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(30px, -50px) scale(1.1); }
-  50% { transform: translate(-20px, 20px) scale(0.95); }
-  75% { transform: translate(50px, 30px) scale(1.05); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+  75% {
+    transform: translate(50px, 30px) scale(1.05);
+  }
 }
 
 @keyframes float-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-40px, 30px) scale(1.05); }
-  50% { transform: translate(30px, -40px) scale(1.1); }
-  75% { transform: translate(-20px, -20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(-40px, 30px) scale(1.05);
+  }
+  50% {
+    transform: translate(30px, -40px) scale(1.1);
+  }
+  75% {
+    transform: translate(-20px, -20px) scale(0.95);
+  }
 }
 
 @keyframes float-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(20px, 40px) scale(0.95); }
-  50% { transform: translate(-50px, -20px) scale(1.05); }
-  75% { transform: translate(40px, -30px) scale(1.1); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, 40px) scale(0.95);
+  }
+  50% {
+    transform: translate(-50px, -20px) scale(1.05);
+  }
+  75% {
+    transform: translate(40px, -30px) scale(1.1);
+  }
 }
 
-.orb-1 { animation: float-1 20s ease-in-out infinite; }
-.orb-2 { animation: float-2 25s ease-in-out infinite; }
-.orb-3 { animation: float-3 30s ease-in-out infinite; }
+.orb-1 {
+  animation: float-1 20s ease-in-out infinite;
+}
+.orb-2 {
+  animation: float-2 25s ease-in-out infinite;
+}
+.orb-3 {
+  animation: float-3 30s ease-in-out infinite;
+}
 
 /* =====================================================
    SCROLLBAR STYLING
@@ -231,11 +264,14 @@
 }
 
 html {
-  transition: background-color var(--duration-slow) var(--ease-default),
-              color var(--duration-slow) var(--ease-default);
+  transition:
+    background-color var(--duration-slow) var(--ease-default),
+    color var(--duration-slow) var(--ease-default);
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;

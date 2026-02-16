@@ -1,5 +1,13 @@
 import { lazy, Suspense, useMemo } from 'react'
-import { useParams, Link, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import {
+  useParams,
+  Link,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Loader2, Box, Workflow, FileEdit, Scale } from 'lucide-react'
 import { useProject } from '../hooks/useProject'
@@ -183,26 +191,17 @@ export default function ProjectPage() {
                 {/* Overview */}
                 <Route
                   path="overview"
-                  element={
-                    <OverviewTab project={project} onUpdate={updateProject} />
-                  }
+                  element={<OverviewTab project={project} onUpdate={updateProject} />}
                 />
 
                 {/* Plan tab (Architecture) */}
                 <Route
                   path="plan"
-                  element={
-                    <ArchitectureTab project={project} onUpdate={updateProject} />
-                  }
+                  element={<ArchitectureTab project={project} onUpdate={updateProject} />}
                 />
                 <Route
                   path="plan/workflow"
-                  element={
-                    <WorkflowTab
-                      project={project}
-                      onUpdate={hooks.updateWorkflow}
-                    />
-                  }
+                  element={<WorkflowTab project={project} onUpdate={hooks.updateWorkflow} />}
                 />
 
                 {/* Work tab (Board) */}

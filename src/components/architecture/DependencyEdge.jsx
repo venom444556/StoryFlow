@@ -27,13 +27,7 @@ function getInputPoint(node) {
   }
 }
 
-export default function DependencyEdge({
-  fromNode,
-  toNode,
-  sourceType,
-  onDelete,
-  edgeOpacity,
-}) {
+export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete, edgeOpacity }) {
   const [hovered, setHovered] = useState(false)
 
   if (!fromNode || !toNode) return null
@@ -54,7 +48,9 @@ export default function DependencyEdge({
     <g
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={edgeOpacity !== undefined ? { opacity: edgeOpacity, transition: 'opacity 0.2s' } : undefined}
+      style={
+        edgeOpacity !== undefined ? { opacity: edgeOpacity, transition: 'opacity 0.2s' } : undefined
+      }
     >
       {/* Invisible wider hit area */}
       <path

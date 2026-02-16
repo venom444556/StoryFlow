@@ -55,7 +55,9 @@ export default function ShortcutsModal({ isOpen, onClose }) {
                   <div className="flex items-center gap-1">
                     {s.keys.map((k, i) => (
                       <React.Fragment key={i}>
-                        {i > 0 && <span className="text-[10px] text-[var(--color-fg-faint)]">+</span>}
+                        {i > 0 && (
+                          <span className="text-[10px] text-[var(--color-fg-faint)]">+</span>
+                        )}
                         <Kbd>{k}</Kbd>
                       </React.Fragment>
                     ))}

@@ -139,7 +139,9 @@ describe('ComponentForm', () => {
     })
 
     it('should exclude self from parent options when editing', () => {
-      const { container } = render(<ComponentForm {...defaultProps} component={mockComponents[0]} />)
+      const { container } = render(
+        <ComponentForm {...defaultProps} component={mockComponents[0]} />
+      )
       const parentSelect = getFieldByLabel(container, 'parent')
       // App (self) should not be in options
       const options = parentSelect.querySelectorAll('option')

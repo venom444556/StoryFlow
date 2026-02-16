@@ -41,9 +41,7 @@ export default function ActivityPanel({
       <GlassCard className={className}>
         <div className="mb-3 flex items-center gap-2">
           <Activity size={16} className="text-purple-400" />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-            Activity
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Activity</h3>
         </div>
         <EmptyState
           icon={Activity}
@@ -59,9 +57,7 @@ export default function ActivityPanel({
       <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
         <div className="flex items-center gap-2">
           <Activity size={16} className="text-purple-400" />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">
-            Activity
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Activity</h3>
           <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
             {activities.length}
           </span>

@@ -38,32 +38,34 @@ export default function ArchitectureTab({ project, onUpdate }) {
     let ids = new Set(components.map((c) => c.id))
 
     if (hasTypeFilter) {
-      ids = new Set([...ids].filter((id) => {
-        const comp = compMap.get(id)
-        return comp && types.includes(comp.type)
-      }))
+      ids = new Set(
+        [...ids].filter((id) => {
+          const comp = compMap.get(id)
+          return comp && types.includes(comp.type)
+        })
+      )
     }
 
     if (hasConnFilter) {
       const dependedUpon = new Set()
-      components.forEach((c) =>
-        (c.dependencies || []).forEach((d) => dependedUpon.add(d))
-      )
+      components.forEach((c) => (c.dependencies || []).forEach((d) => dependedUpon.add(d)))
 
-      ids = new Set([...ids].filter((id) => {
-        const comp = compMap.get(id)
-        if (!comp) return false
-        switch (connection) {
-          case 'has-deps':
-            return (comp.dependencies || []).length > 0
-          case 'has-dependents':
-            return dependedUpon.has(comp.id)
-          case 'orphans':
-            return (comp.dependencies || []).length === 0 && !dependedUpon.has(comp.id)
-          default:
-            return true
-        }
-      }))
+      ids = new Set(
+        [...ids].filter((id) => {
+          const comp = compMap.get(id)
+          if (!comp) return false
+          switch (connection) {
+            case 'has-deps':
+              return (comp.dependencies || []).length > 0
+            case 'has-dependents':
+              return dependedUpon.has(comp.id)
+            case 'orphans':
+              return (comp.dependencies || []).length === 0 && !dependedUpon.has(comp.id)
+            default:
+              return true
+          }
+        })
+      )
     }
 
     return ids
@@ -108,11 +110,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
   const handleUpdateSelected = useCallback(
     (field, value) => {
       if (!selectedId) return
-      updateComponents(
-        components.map((c) =>
-          c.id === selectedId ? { ...c, [field]: value } : c
-        )
-      )
+      updateComponents(components.map((c) => (c.id === selectedId ? { ...c, [field]: value } : c)))
     },
     [selectedId, components, updateComponents]
   )
@@ -135,9 +133,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
       .filter((c) => !idsToRemove.has(c.id))
       .map((c) => ({
         ...c,
-        dependencies: (c.dependencies || []).filter(
-          (depId) => !idsToRemove.has(depId)
-        ),
+        dependencies: (c.dependencies || []).filter((depId) => !idsToRemove.has(depId)),
       }))
 
     updateComponents(updated)
@@ -175,11 +171,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
       {/* Header row */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Tabs tabs={VIEW_TABS} activeTab={view} onTabChange={setView} />
-        <Button
-          size="sm"
-          icon={Plus}
-          onClick={() => setShowComponentForm(true)}
-        >
+        <Button size="sm" icon={Plus} onClick={() => setShowComponentForm(true)}>
           Add Component
         </Button>
       </div>

@@ -45,39 +45,39 @@ describe('ShortcutsModal', () => {
   })
 
   describe('Navigation shortcuts', () => {
-    it('shows Overview tab shortcut', () => {
+    it('shows Overview shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Overview tab')).toBeInTheDocument()
+      expect(screen.getByText('Overview')).toBeInTheDocument()
     })
 
-    it('shows Architecture tab shortcut', () => {
+    it('shows Architecture shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Architecture tab')).toBeInTheDocument()
+      expect(screen.getByText(/Plan → Architecture/)).toBeInTheDocument()
     })
 
-    it('shows Workflow tab shortcut', () => {
+    it('shows Workflow shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Workflow tab')).toBeInTheDocument()
+      expect(screen.getByText(/Plan → Workflow/)).toBeInTheDocument()
     })
 
-    it('shows Board tab shortcut', () => {
+    it('shows Board shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Board tab')).toBeInTheDocument()
+      expect(screen.getByText('Work (Board)')).toBeInTheDocument()
     })
 
-    it('shows Wiki tab shortcut', () => {
+    it('shows Wiki shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Wiki tab')).toBeInTheDocument()
+      expect(screen.getByText(/Docs → Wiki/)).toBeInTheDocument()
     })
 
-    it('shows Timeline tab shortcut', () => {
+    it('shows Timeline shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Timeline tab')).toBeInTheDocument()
+      expect(screen.getByText('Insights (Timeline)')).toBeInTheDocument()
     })
 
-    it('shows Decisions tab shortcut', () => {
+    it('shows Decisions shortcut', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      expect(screen.getByText('Decisions tab')).toBeInTheDocument()
+      expect(screen.getByText(/Docs → Decisions/)).toBeInTheDocument()
     })
   })
 
@@ -101,9 +101,10 @@ describe('ShortcutsModal', () => {
   describe('Keyboard hint elements (kbd)', () => {
     it('renders Alt or Option key for navigation shortcuts', () => {
       render(<ShortcutsModal {...defaultProps} />)
+      // kbd elements don't have an implicit ARIA role — query the DOM directly
+      const kbdElements = document.querySelectorAll('kbd')
+      expect(kbdElements.length).toBeGreaterThan(0)
       // Check for Alt (Windows) or Option symbol (Mac)
-      const kbdElements = screen.getAllByRole('presentation', { hidden: true })
-      // Kbd elements display the key combinations
       const textContent = document.body.textContent
       expect(textContent).toMatch(/Alt|⌥/)
     })
@@ -188,9 +189,10 @@ describe('ShortcutsModal', () => {
   })
 
   describe('Accessibility', () => {
-    it('shortcut rows are focusable on hover', () => {
+    it('shortcut rows have hover styling', () => {
       render(<ShortcutsModal {...defaultProps} />)
-      const shortcutRows = document.querySelectorAll('.hover\\:bg-white\\/5')
+      // The actual hover class is hover:bg-[var(--color-bg-glass)]
+      const shortcutRows = document.querySelectorAll('[class*="hover\\:bg-"]')
       expect(shortcutRows.length).toBeGreaterThan(0)
     })
   })

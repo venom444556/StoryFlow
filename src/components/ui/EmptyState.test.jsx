@@ -179,26 +179,14 @@ describe('EmptyState', () => {
     })
 
     it('handles null values gracefully', () => {
-      render(
-        <EmptyState
-          icon={null}
-          title={null}
-          description={null}
-          action={null}
-        />
-      )
+      render(<EmptyState icon={null} title={null} description={null} action={null} />)
       // Should render without crashing
       expect(document.body).toBeInTheDocument()
     })
 
     it('handles undefined values gracefully', () => {
       render(
-        <EmptyState
-          icon={undefined}
-          title={undefined}
-          description={undefined}
-          action={undefined}
-        />
+        <EmptyState icon={undefined} title={undefined} description={undefined} action={undefined} />
       )
       // Should render without crashing
       expect(document.body).toBeInTheDocument()

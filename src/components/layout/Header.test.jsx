@@ -400,11 +400,7 @@ describe('Header', () => {
   describe('Edge cases', () => {
     it('handles undefined breadcrumbs', () => {
       renderWithProviders(
-        <Header
-          onSearchClick={vi.fn()}
-          onSettingsClick={vi.fn()}
-          onHamburgerClick={vi.fn()}
-        />
+        <Header onSearchClick={vi.fn()} onSettingsClick={vi.fn()} onHamburgerClick={vi.fn()} />
       )
       expect(screen.getByText('Dashboard')).toBeInTheDocument()
     })

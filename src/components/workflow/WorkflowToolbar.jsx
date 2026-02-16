@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Play, RotateCcw, Plus, Loader2, GitBranch, Link } from 'lucide-react';
-import NodePalette from './NodePalette';
+import React, { useState } from 'react'
+import { Play, RotateCcw, Plus, Loader2, GitBranch, Link } from 'lucide-react'
+import NodePalette from './NodePalette'
 
 // ---------------------------------------------------------------------------
 // WorkflowToolbar
@@ -26,12 +26,12 @@ export default function WorkflowToolbar({
   connectionCount = 0,
   hideExecution = false,
 }) {
-  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false)
 
   const handleSelect = (typeDef) => {
-    onAddNode?.(typeDef);
-    setPaletteOpen(false);
-  };
+    onAddNode?.(typeDef)
+    setPaletteOpen(false)
+  }
 
   return (
     <div className="glass relative z-10 flex items-center justify-between gap-4 px-4 py-2.5">
@@ -119,5 +119,5 @@ export default function WorkflowToolbar({
         )}
       </div>
     </div>
-  );
+  )
 }

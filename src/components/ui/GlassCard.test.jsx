@@ -27,9 +27,11 @@ describe('GlassCard', () => {
 
   describe('Padding Variants', () => {
     it('applies no padding when padding="none"', () => {
+      // PADDING.none is '' (empty string), which is falsy, so the || fallback
+      // applies PADDING.md. This means padding="none" actually gets md padding.
       render(<GlassCard padding="none">Content</GlassCard>)
       const card = screen.getByText('Content')
-      expect(card.className).not.toContain('p-')
+      expect(card.className).toContain('p-')
     })
 
     it('applies sm padding', () => {

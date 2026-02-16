@@ -1,46 +1,41 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 
-export default function DropdownMenu({
-  trigger,
-  items = [],
-  className = '',
-  align = 'right',
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
-  const triggerRef = useRef(null);
+export default function DropdownMenu({ trigger, items = [], className = '', align = 'right' }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef(null)
+  const triggerRef = useRef(null)
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
-      setIsOpen(false);
-      triggerRef.current?.focus();
+      setIsOpen(false)
+      triggerRef.current?.focus()
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keydown', handleKeyDown)
     }
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handleKeyDown]);
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, handleKeyDown])
 
   const alignClasses = {
     left: 'left-0',
     right: 'right-0',
     center: 'left-1/2 -translate-x-1/2',
-  };
+  }
 
   return (
     <div ref={menuRef} className={['relative inline-block', className].filter(Boolean).join(' ')}>
@@ -50,8 +45,8 @@ export default function DropdownMenu({
         onClick={() => setIsOpen((prev) => !prev)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setIsOpen((prev) => !prev);
+            e.preventDefault()
+            setIsOpen((prev) => !prev)
           }
         }}
         role="button"
@@ -78,13 +73,13 @@ export default function DropdownMenu({
             role="menu"
           >
             {items.map((item, i) => {
-              const Icon = item.icon;
+              const Icon = item.icon
               return (
                 <button
                   key={i}
                   onClick={() => {
-                    item.onClick?.();
-                    setIsOpen(false);
+                    item.onClick?.()
+                    setIsOpen(false)
                   }}
                   role="menuitem"
                   className={[
@@ -101,11 +96,11 @@ export default function DropdownMenu({
                   {Icon && <Icon size={15} aria-hidden="true" />}
                   {item.label}
                 </button>
-              );
+              )
             })}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }

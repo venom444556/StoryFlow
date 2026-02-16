@@ -94,12 +94,8 @@ export default function ActivityItem({ activity }) {
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-[var(--color-fg-default)] leading-snug">
-          {description}
-        </p>
-        <p className="mt-0.5 text-xs text-[var(--color-fg-muted)]">
-          {timeAgo}
-        </p>
+        <p className="text-sm text-[var(--color-fg-default)] leading-snug">{description}</p>
+        <p className="mt-0.5 text-xs text-[var(--color-fg-muted)]">{timeAgo}</p>
       </div>
     </div>
   )

@@ -1,2 +1,2 @@
 // UUID generation wrapper
-export const generateId = () => crypto.randomUUID();
+export const generateId = () => crypto.randomUUID()

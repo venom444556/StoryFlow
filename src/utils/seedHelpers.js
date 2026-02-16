@@ -131,13 +131,7 @@ export function createWorkflowPhase({
 /**
  * Create a sprint with default values.
  */
-export function createSprint({
-  name,
-  goal,
-  startDate,
-  endDate,
-  status = 'planned',
-}) {
+export function createSprint({ name, goal, startDate, endDate, status = 'planned' }) {
   return {
     id: generateId(),
     name,

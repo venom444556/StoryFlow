@@ -95,14 +95,22 @@ describe('Button', () => {
     })
 
     it('renders with both icons', () => {
-      render(<Button icon={Plus} iconRight={ArrowRight}>Both Icons</Button>)
+      render(
+        <Button icon={Plus} iconRight={ArrowRight}>
+          Both Icons
+        </Button>
+      )
       const button = screen.getByRole('button')
       const svgs = button.querySelectorAll('svg')
       expect(svgs.length).toBe(2)
     })
 
     it('hides right icon when loading', () => {
-      render(<Button iconRight={ArrowRight} isLoading>Loading</Button>)
+      render(
+        <Button iconRight={ArrowRight} isLoading>
+          Loading
+        </Button>
+      )
       const button = screen.getByRole('button')
       const svgs = button.querySelectorAll('svg')
       // Only loading spinner should be visible
@@ -129,7 +137,11 @@ describe('Button', () => {
 
     it('does not call onClick when disabled', () => {
       const handleClick = vi.fn()
-      render(<Button disabled onClick={handleClick}>Disabled</Button>)
+      render(
+        <Button disabled onClick={handleClick}>
+          Disabled
+        </Button>
+      )
 
       fireEvent.click(screen.getByRole('button'))
       expect(handleClick).not.toHaveBeenCalled()
@@ -156,14 +168,22 @@ describe('Button', () => {
 
     it('does not call onClick when loading', () => {
       const handleClick = vi.fn()
-      render(<Button isLoading onClick={handleClick}>Loading</Button>)
+      render(
+        <Button isLoading onClick={handleClick}>
+          Loading
+        </Button>
+      )
 
       fireEvent.click(screen.getByRole('button'))
       expect(handleClick).not.toHaveBeenCalled()
     })
 
     it('replaces left icon with loading spinner', () => {
-      render(<Button icon={Plus} isLoading>Loading</Button>)
+      render(
+        <Button icon={Plus} isLoading>
+          Loading
+        </Button>
+      )
       const button = screen.getByRole('button')
       const spinners = button.querySelectorAll('.animate-spin')
       expect(spinners.length).toBe(1)
@@ -207,26 +227,42 @@ describe('Button', () => {
 
   describe('Custom Component (as prop)', () => {
     it('renders as a custom element', () => {
-      render(<Button as="a" href="/test">Link Button</Button>)
+      render(
+        <Button as="a" href="/test">
+          Link Button
+        </Button>
+      )
       const link = screen.getByText('Link Button')
       expect(link.tagName).toBe('A')
       expect(link).toHaveAttribute('href', '/test')
     })
 
     it('does not add type attribute to non-button elements', () => {
-      render(<Button as="a" href="/test">Link Button</Button>)
+      render(
+        <Button as="a" href="/test">
+          Link Button
+        </Button>
+      )
       const link = screen.getByText('Link Button')
       expect(link).not.toHaveAttribute('type')
     })
 
     it('does not add disabled attribute to non-button elements', () => {
-      render(<Button as="a" disabled href="/test">Link Button</Button>)
+      render(
+        <Button as="a" disabled href="/test">
+          Link Button
+        </Button>
+      )
       const link = screen.getByText('Link Button')
       expect(link).not.toHaveAttribute('disabled')
     })
 
     it('adds aria-disabled to non-button elements when disabled', () => {
-      render(<Button as="a" disabled href="/test">Link Button</Button>)
+      render(
+        <Button as="a" disabled href="/test">
+          Link Button
+        </Button>
+      )
       const link = screen.getByText('Link Button')
       expect(link).toHaveAttribute('aria-disabled', 'true')
     })

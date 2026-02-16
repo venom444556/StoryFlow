@@ -21,9 +21,7 @@ vi.mock('framer-motion', () => ({
 
 // Mock the lazy-loaded tab components to simplify testing
 vi.mock('../components/project/OverviewTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="overview-tab">Overview Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="overview-tab">Overview Tab - {project?.name}</div>,
 }))
 
 vi.mock('../components/project/ArchitectureTab', () => ({
@@ -33,33 +31,23 @@ vi.mock('../components/project/ArchitectureTab', () => ({
 }))
 
 vi.mock('../components/project/WorkflowTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="workflow-tab">Workflow Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="workflow-tab">Workflow Tab - {project?.name}</div>,
 }))
 
 vi.mock('../components/project/BoardTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="board-tab">Board Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="board-tab">Board Tab - {project?.name}</div>,
 }))
 
 vi.mock('../components/project/WikiTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="wiki-tab">Wiki Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="wiki-tab">Wiki Tab - {project?.name}</div>,
 }))
 
 vi.mock('../components/project/TimelineTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="timeline-tab">Timeline Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="timeline-tab">Timeline Tab - {project?.name}</div>,
 }))
 
 vi.mock('../components/project/DecisionsTab', () => ({
-  default: ({ project }) => (
-    <div data-testid="decisions-tab">Decisions Tab - {project?.name}</div>
-  ),
+  default: ({ project }) => <div data-testid="decisions-tab">Decisions Tab - {project?.name}</div>,
 }))
 
 // Mock useProject hook to bypass Zustand store
@@ -203,13 +191,11 @@ describe('ProjectPage', () => {
       const project = createMockProject({ name: 'My Custom Project' })
       renderProjectPage({ project })
 
-      // Debug: see what's in the DOM
-      await new Promise(r => setTimeout(r, 100))
-      screen.debug(undefined, 50000)
-
-      // The project name appears in the ProjectHeader as a button
-      const nameElement = await screen.findByText(/My Custom Project/, {}, { timeout: 3000 })
-      expect(nameElement).toBeInTheDocument()
+      // The project name appears in both the ProjectHeader and the mocked tab content
+      await waitFor(() => {
+        const nameElements = screen.getAllByText(/My Custom Project/)
+        expect(nameElements.length).toBeGreaterThanOrEqual(1)
+      })
     })
   })
 

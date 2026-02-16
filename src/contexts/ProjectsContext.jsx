@@ -8,9 +8,7 @@ const ProjectsContext = createContext(null)
 
 // Stable dispatch function
 const deprecatedDispatch = () => {
-  console.warn(
-    'dispatch() is deprecated. Use useProjectsStore() actions directly.'
-  )
+  console.warn('dispatch() is deprecated. Use useProjectsStore() actions directly.')
 }
 
 /**
@@ -31,21 +29,20 @@ export function ProjectsProvider({ children }) {
   const importProject = useProjectsStore((state) => state.importProject)
 
   // Memoize the context value to prevent unnecessary re-renders
-  const value = useMemo(() => ({
-    projects,
-    dispatch: deprecatedDispatch,
-    addProject,
-    updateProject,
-    deleteProject,
-    getProject,
-    importProject,
-  }), [projects, addProject, updateProject, deleteProject, getProject, importProject])
-
-  return (
-    <ProjectsContext.Provider value={value}>
-      {children}
-    </ProjectsContext.Provider>
+  const value = useMemo(
+    () => ({
+      projects,
+      dispatch: deprecatedDispatch,
+      addProject,
+      updateProject,
+      deleteProject,
+      getProject,
+      importProject,
+    }),
+    [projects, addProject, updateProject, deleteProject, getProject, importProject]
   )
+
+  return <ProjectsContext.Provider value={value}>{children}</ProjectsContext.Provider>
 }
 
 export function useProjectsContext() {

@@ -42,9 +42,7 @@ function DependencyList({ dependencies, allComponents, currentComponentId, onCha
                   variant={TYPE_COLORS[dep.type] || 'default'}
                   size="xs"
                   removable
-                  onRemove={() =>
-                    onChange(dependencies.filter((id) => id !== depId))
-                  }
+                  onRemove={() => onChange(dependencies.filter((id) => id !== depId))}
                 >
                   {dep.name}
                 </Badge>
@@ -91,9 +89,7 @@ function MiniDepGraph({ component, allComponents }) {
   const deps = (component.dependencies || [])
     .map((id) => allComponents.find((c) => c.id === id))
     .filter(Boolean)
-  const usedBy = allComponents.filter(
-    (c) => (c.dependencies || []).includes(component.id)
-  )
+  const usedBy = allComponents.filter((c) => (c.dependencies || []).includes(component.id))
 
   if (deps.length === 0 && usedBy.length === 0) return null
 
@@ -129,10 +125,7 @@ function MiniDepGraph({ component, allComponents }) {
     svgWidth = rightX + nodeW + pad
   }
 
-  const svgHeight = Math.max(
-    nodeH + 20,
-    Math.max(leftNodes.length, rightNodes.length) * gapY + 14
-  )
+  const svgHeight = Math.max(nodeH + 20, Math.max(leftNodes.length, rightNodes.length) * gapY + 14)
   const centerY = svgHeight / 2 - nodeH / 2
 
   const leftStartY = centerY - ((leftNodes.length - 1) * gapY) / 2
@@ -140,7 +133,12 @@ function MiniDepGraph({ component, allComponents }) {
 
   return (
     <div className="mb-3 overflow-hidden rounded-lg bg-[var(--color-bg-glass)] p-2">
-      <svg width="100%" height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">
+      <svg
+        width="100%"
+        height={svgHeight}
+        viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+        preserveAspectRatio="xMidYMid meet"
+      >
         {/* Edges from dependencies → center */}
         {leftNodes.map((dep, i) => {
           const y = leftStartY + i * gapY
@@ -272,9 +270,7 @@ export default function ComponentDetail({
   const usedBy = useMemo(
     () =>
       allComponents.filter(
-        (c) =>
-          c.id !== component.id &&
-          (c.dependencies || []).includes(component.id)
+        (c) => c.id !== component.id && (c.dependencies || []).includes(component.id)
       ),
     [allComponents, component.id]
   )
@@ -299,23 +295,14 @@ export default function ComponentDetail({
                 <TypeIcon size={13} style={{ color: hexColor }} />
               </div>
             )}
-            <Badge
-              variant={TYPE_COLORS[component.type] || 'default'}
-              size="xs"
-              dot
-            >
+            <Badge variant={TYPE_COLORS[component.type] || 'default'} size="xs" dot>
               {component.type}
             </Badge>
             <h3 className="truncate text-sm font-semibold text-[var(--color-fg-default)]">
               {component.name}
             </h3>
           </div>
-          <Button
-            variant="danger"
-            size="sm"
-            icon={Trash2}
-            onClick={onDelete}
-          >
+          <Button variant="danger" size="sm" icon={Trash2} onClick={onDelete}>
             Delete
           </Button>
         </div>
@@ -342,16 +329,12 @@ export default function ComponentDetail({
               label="Parent"
               value={component.parentId || ''}
               options={parentOptions}
-              onChange={(e) =>
-                onUpdate('parentId', e.target.value || null)
-              }
+              onChange={(e) => onUpdate('parentId', e.target.value || null)}
             />
           </div>
 
           <div className="w-full">
-            <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">
-              Description
-            </label>
+            <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">Description</label>
             <textarea
               value={component.description || ''}
               onChange={(e) => onUpdate('description', e.target.value)}
@@ -363,9 +346,7 @@ export default function ComponentDetail({
 
           <DependencyList
             dependencies={component.dependencies || []}
-            allComponents={allComponents.filter(
-              (c) => c.id !== component.id
-            )}
+            allComponents={allComponents.filter((c) => c.id !== component.id)}
             currentComponentId={component.id}
             onChange={(deps) => onUpdate('dependencies', deps)}
           />
@@ -373,16 +354,10 @@ export default function ComponentDetail({
           {/* Used by (incoming dependencies) */}
           {usedBy.length > 0 && (
             <div className="w-full">
-              <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">
-                Used by
-              </label>
+              <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">Used by</label>
               <div className="flex flex-wrap gap-1">
                 {usedBy.map((c) => (
-                  <Badge
-                    key={c.id}
-                    variant={TYPE_COLORS[c.type] || 'default'}
-                    size="xs"
-                  >
+                  <Badge key={c.id} variant={TYPE_COLORS[c.type] || 'default'} size="xs">
                     {c.name}
                   </Badge>
                 ))}

@@ -164,9 +164,7 @@ function fillDefaults(project) {
     const boardDefaults = FIELD_DEFAULTS.board
     for (const [key, defaultValue] of Object.entries(boardDefaults)) {
       if (filled.board[key] === undefined || filled.board[key] === null) {
-        filled.board[key] = Array.isArray(defaultValue)
-          ? [...defaultValue]
-          : defaultValue
+        filled.board[key] = Array.isArray(defaultValue) ? [...defaultValue] : defaultValue
       }
     }
   }

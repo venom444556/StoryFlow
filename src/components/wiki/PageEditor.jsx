@@ -129,17 +129,10 @@ export default function PageEditor({ page, onSave, onCancel }) {
       cursorOffset = start + item.wrap.before.length + inner.length + item.wrap.after.length
     } else if (item.prefix) {
       const inner = selected || item.placeholder || ''
-      newText =
-        content.substring(0, start) +
-        item.prefix +
-        inner +
-        content.substring(end)
+      newText = content.substring(0, start) + item.prefix + inner + content.substring(end)
       cursorOffset = start + item.prefix.length + inner.length
     } else if (item.insert) {
-      newText =
-        content.substring(0, start) +
-        item.insert +
-        content.substring(end)
+      newText = content.substring(0, start) + item.insert + content.substring(end)
       cursorOffset = start + item.insert.length
     }
 
@@ -231,11 +224,7 @@ export default function PageEditor({ page, onSave, onCancel }) {
       <div className="flex shrink-0 items-center gap-4 border-t border-[var(--color-border-default)] px-4 py-2.5">
         {/* Labels */}
         <div className="flex-1">
-          <TagInput
-            tags={labels}
-            onChange={setLabels}
-            placeholder="Add label..."
-          />
+          <TagInput tags={labels} onChange={setLabels} placeholder="Add label..." />
         </div>
 
         {/* Stats */}

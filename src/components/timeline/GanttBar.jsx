@@ -30,10 +30,7 @@ export default function GanttBar({
   const color = sanitizeColor(phase.color)
 
   return (
-    <g
-      className="cursor-pointer"
-      onClick={() => onPhaseClick?.(phase)}
-    >
+    <g className="cursor-pointer" onClick={() => onPhaseClick?.(phase)}>
       {/* Row background on hover */}
       <rect
         x={0}

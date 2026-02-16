@@ -32,9 +32,7 @@ describe('DropdownMenu', () => {
     })
 
     it('applies custom className', () => {
-      const { container } = render(
-        <DropdownMenu {...defaultProps} className="custom-class" />
-      )
+      const { container } = render(<DropdownMenu {...defaultProps} className="custom-class" />)
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
     })
   })
@@ -194,7 +192,7 @@ describe('DropdownMenu', () => {
 
       await waitFor(() => {
         const buttons = screen.getAllByRole('menuitem')
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
           const svg = button.querySelector('svg')
           expect(svg).toBeInTheDocument()
         })
@@ -338,9 +336,7 @@ describe('DropdownMenu', () => {
     })
 
     it('handles items without icons', async () => {
-      const items = [
-        { label: 'No Icon', onClick: vi.fn() },
-      ]
+      const items = [{ label: 'No Icon', onClick: vi.fn() }]
 
       render(<DropdownMenu trigger={<button>Menu</button>} items={items} />)
 

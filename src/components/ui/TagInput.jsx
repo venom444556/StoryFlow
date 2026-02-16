@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Badge from './Badge';
+import React, { useState, useRef, useEffect } from 'react'
+import Badge from './Badge'
 
 export default function TagInput({
   tags = [],
@@ -8,52 +8,52 @@ export default function TagInput({
   suggestions = [],
   className = '',
 }) {
-  const [inputValue, setInputValue] = useState('');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const inputRef = useRef(null);
-  const containerRef = useRef(null);
+  const [inputValue, setInputValue] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const inputRef = useRef(null)
+  const containerRef = useRef(null)
 
   const filteredSuggestions = suggestions.filter(
     (s) =>
       s.toLowerCase().includes(inputValue.toLowerCase()) &&
       !tags.includes(s) &&
       inputValue.length > 0
-  );
+  )
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setShowSuggestions(false);
+        setShowSuggestions(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const addTag = (tag) => {
-    const trimmed = tag.trim();
+    const trimmed = tag.trim()
     if (trimmed && !tags.includes(trimmed)) {
-      onChange([...tags, trimmed]);
+      onChange([...tags, trimmed])
     }
-    setInputValue('');
-    setShowSuggestions(false);
-    inputRef.current?.focus();
-  };
+    setInputValue('')
+    setShowSuggestions(false)
+    inputRef.current?.focus()
+  }
 
   const removeTag = (index) => {
-    const next = tags.filter((_, i) => i !== index);
-    onChange(next);
-  };
+    const next = tags.filter((_, i) => i !== index)
+    onChange(next)
+  }
 
   const handleKeyDown = (e) => {
     if ((e.key === 'Enter' || e.key === ',') && inputValue.trim()) {
-      e.preventDefault();
-      addTag(inputValue);
+      e.preventDefault()
+      addTag(inputValue)
     }
     if (e.key === 'Backspace' && !inputValue && tags.length > 0) {
-      removeTag(tags.length - 1);
+      removeTag(tags.length - 1)
     }
-  };
+  }
 
   return (
     <div ref={containerRef} className={['relative', className].filter(Boolean).join(' ')}>
@@ -80,8 +80,8 @@ export default function TagInput({
           type="text"
           value={inputValue}
           onChange={(e) => {
-            setInputValue(e.target.value);
-            setShowSuggestions(true);
+            setInputValue(e.target.value)
+            setShowSuggestions(true)
           }}
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(true)}
@@ -121,5 +121,5 @@ export default function TagInput({
         </div>
       )}
     </div>
-  );
+  )
 }

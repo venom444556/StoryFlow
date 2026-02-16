@@ -1,5 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { NavLink, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   LayoutDashboard,
   FolderKanban,
@@ -8,31 +8,31 @@ import {
   ChevronRight,
   X,
   Zap,
-} from 'lucide-react';
-import { useProjects } from '../../hooks/useProjects';
-import Tooltip from '../ui/Tooltip';
+} from 'lucide-react'
+import { useProjects } from '../../hooks/useProjects'
+import Tooltip from '../ui/Tooltip'
 
 const STATUS_DOT_COLORS = {
   planning: 'bg-[var(--status-info)]',
   'in-progress': 'bg-[var(--status-warning)]',
   completed: 'bg-[var(--status-success)]',
   archived: 'bg-[var(--color-fg-muted)]',
-};
+}
 
 export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileMenuClose }) {
-  const { projects, addProject } = useProjects();
-  const navigate = useNavigate();
+  const { projects, addProject } = useProjects()
+  const navigate = useNavigate()
 
   const handleNewProject = () => {
-    const project = addProject('New Project');
-    navigate(`/project/${project.id}`);
-    onMobileMenuClose?.();
-  };
+    const project = addProject('New Project')
+    navigate(`/project/${project.id}`)
+    onMobileMenuClose?.()
+  }
 
   const handleNavClick = (path) => {
-    navigate(path);
-    onMobileMenuClose?.();
-  };
+    navigate(path)
+    onMobileMenuClose?.()
+  }
 
   return (
     <motion.aside
@@ -44,14 +44,17 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         'md:relative md:flex md:h-full',
       ].join(' ')}
       style={{ zIndex: mobileMenuOpen ? 'var(--z-overlay)' : 'var(--z-sticky)' }}
-      animate={{ width: mobileMenuOpen ? 260 : (collapsed ? 64 : 260) }}
+      animate={{ width: mobileMenuOpen ? 260 : collapsed ? 64 : 260 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
     >
       {/* Brand */}
       <div className="flex h-14 items-center gap-[var(--space-3)] border-b border-[var(--color-border-default)] px-[var(--space-4)]">
         <div
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-lg)]"
-          style={{ backgroundImage: 'linear-gradient(to bottom right, var(--accent-active, #8b5cf6), #3b82f6)' }}
+          style={{
+            backgroundImage:
+              'linear-gradient(to bottom right, var(--accent-active, #8b5cf6), #3b82f6)',
+          }}
         >
           <Zap size={16} className="text-[var(--color-fg-default)]" />
         </div>
@@ -133,7 +136,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Project list */}
         <div className="space-y-0.5">
           {projects.map((project) => {
-            const dotColor = STATUS_DOT_COLORS[project.status] || 'bg-[var(--color-fg-muted)]';
+            const dotColor = STATUS_DOT_COLORS[project.status] || 'bg-[var(--color-fg-muted)]'
 
             if (collapsed && !mobileMenuOpen) {
               return (
@@ -152,7 +155,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                     <FolderKanban size={18} className="shrink-0" />
                   </button>
                 </Tooltip>
-              );
+              )
             }
 
             return (
@@ -171,7 +174,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`} />
                 <span className="truncate">{project.name}</span>
               </button>
-            );
+            )
           })}
         </div>
       </nav>
@@ -188,7 +191,8 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
               ].join(' ')}
               style={{
-                backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                backgroundImage:
+                  'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
                 transitionDuration: 'var(--duration-fast)',
               }}
             >
@@ -234,5 +238,5 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
     </motion.aside>
-  );
+  )
 }

@@ -21,9 +21,7 @@ describe('ExecutionLog', () => {
 
       expect(screen.getByText('Execution Log')).toBeInTheDocument()
       expect(screen.getByText('No execution logs yet.')).toBeInTheDocument()
-      expect(
-        screen.getByText('Click Execute to run the workflow.')
-      ).toBeInTheDocument()
+      expect(screen.getByText('Click Execute to run the workflow.')).toBeInTheDocument()
     })
 
     it('renders with default empty array when logs prop is undefined', () => {
@@ -88,54 +86,45 @@ describe('ExecutionLog', () => {
 
   describe('log level styling', () => {
     it('applies info styling', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Info message', level: 'info' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Info message', level: 'info' }]
       render(<ExecutionLog logs={logs} />)
 
-      const logEntry = screen.getByText('Info message').closest('div')
-      expect(logEntry).toHaveClass('bg-white/[0.03]')
+      // The message span is inside a wrapper div (min-w-0 flex-1), which is inside the log entry div
+      const logEntry = screen.getByText('Info message').closest('div').parentElement
+      expect(logEntry).toHaveClass('bg-[var(--color-bg-glass)]')
     })
 
     it('applies success styling', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Success message', level: 'success' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Success message', level: 'success' }]
       render(<ExecutionLog logs={logs} />)
 
-      const logEntry = screen.getByText('Success message').closest('div')
+      const logEntry = screen.getByText('Success message').closest('div').parentElement
       expect(logEntry).toHaveClass('bg-green-500/10')
     })
 
     it('applies warning styling', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Warning message', level: 'warning' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Warning message', level: 'warning' }]
       render(<ExecutionLog logs={logs} />)
 
-      const logEntry = screen.getByText('Warning message').closest('div')
+      const logEntry = screen.getByText('Warning message').closest('div').parentElement
       expect(logEntry).toHaveClass('bg-yellow-500/10')
     })
 
     it('applies error styling', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Error message', level: 'error' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Error message', level: 'error' }]
       render(<ExecutionLog logs={logs} />)
 
-      const logEntry = screen.getByText('Error message').closest('div')
+      const logEntry = screen.getByText('Error message').closest('div').parentElement
       expect(logEntry).toHaveClass('bg-red-500/10')
     })
 
     it('applies default styling for unknown level', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Unknown level', level: 'unknown' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Unknown level', level: 'unknown' }]
       render(<ExecutionLog logs={logs} />)
 
-      const logEntry = screen.getByText('Unknown level').closest('div')
+      const logEntry = screen.getByText('Unknown level').closest('div').parentElement
       // Falls back to info styling
-      expect(logEntry).toHaveClass('bg-white/[0.03]')
+      expect(logEntry).toHaveClass('bg-[var(--color-bg-glass)]')
     })
   })
 
@@ -145,9 +134,7 @@ describe('ExecutionLog', () => {
 
   describe('clear functionality', () => {
     it('shows clear button when logs exist', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'Test', level: 'info' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Test', level: 'info' }]
       render(<ExecutionLog logs={logs} onClear={vi.fn()} />)
 
       expect(screen.getByTitle('Clear log')).toBeInTheDocument()
@@ -161,9 +148,7 @@ describe('ExecutionLog', () => {
 
     it('calls onClear when clear button is clicked', () => {
       const onClear = vi.fn()
-      const logs = [
-        { timestamp: '10:00:00', message: 'Test', level: 'info' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'Test', level: 'info' }]
       render(<ExecutionLog logs={logs} onClear={onClear} />)
 
       fireEvent.click(screen.getByTitle('Clear log'))
@@ -177,15 +162,10 @@ describe('ExecutionLog', () => {
 
   describe('auto-scroll behavior', () => {
     it('scrolls to bottom when new logs are added', () => {
-      const logs = [
-        { timestamp: '10:00:00', message: 'First log', level: 'info' },
-      ]
+      const logs = [{ timestamp: '10:00:00', message: 'First log', level: 'info' }]
       const { rerender } = render(<ExecutionLog logs={logs} />)
 
-      const newLogs = [
-        ...logs,
-        { timestamp: '10:00:01', message: 'Second log', level: 'info' },
-      ]
+      const newLogs = [...logs, { timestamp: '10:00:01', message: 'Second log', level: 'info' }]
       rerender(<ExecutionLog logs={newLogs} />)
 
       // The component should have scrolled (the ref effect triggers on logs.length change)
@@ -217,9 +197,7 @@ describe('ExecutionLog', () => {
       render(<ExecutionLog logs={logs} />)
 
       // Should render as text, not execute
-      expect(
-        screen.getByText('<script>alert("xss")</script>')
-      ).toBeInTheDocument()
+      expect(screen.getByText('<script>alert("xss")</script>')).toBeInTheDocument()
     })
 
     it('handles very long messages', () => {

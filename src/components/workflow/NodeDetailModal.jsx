@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   Trash2,
   AlertCircle,
@@ -21,12 +21,12 @@ import {
   Info,
   Users,
   ListChecks,
-} from 'lucide-react';
-import { getNodeType } from '../../data/nodeTypes';
-import Modal from '../ui/Modal';
-import Input from '../ui/Input';
-import TextArea from '../ui/TextArea';
-import Badge from '../ui/Badge';
+} from 'lucide-react'
+import { getNodeType } from '../../data/nodeTypes'
+import Modal from '../ui/Modal'
+import Input from '../ui/Input'
+import TextArea from '../ui/TextArea'
+import Badge from '../ui/Badge'
 
 // ---------------------------------------------------------------------------
 // Icon lookup -- maps the string icon name from nodeTypes to the component
@@ -41,7 +41,7 @@ const ICON_MAP = {
   Globe,
   Database,
   Code,
-};
+}
 
 // ---------------------------------------------------------------------------
 // Status badge variant mapping
@@ -51,14 +51,14 @@ const STATUS_BADGE_VARIANT = {
   running: 'yellow',
   success: 'green',
   error: 'red',
-};
+}
 
 const STATUS_LABELS = {
   idle: 'Not Started',
   running: 'Running',
   success: 'Completed',
   error: 'Failed',
-};
+}
 
 // ---------------------------------------------------------------------------
 // Type to badge variant
@@ -66,24 +66,24 @@ const STATUS_LABELS = {
 function getTypeBadgeVariant(type) {
   switch (type) {
     case 'start':
-      return 'green';
+      return 'green'
     case 'end':
-      return 'red';
+      return 'red'
     case 'api':
-      return 'cyan';
+      return 'cyan'
     case 'database':
-      return 'green';
+      return 'green'
     case 'code':
     case 'decision':
-      return 'purple';
+      return 'purple'
     case 'phase':
-      return 'blue';
+      return 'blue'
     case 'task':
-      return 'blue';
+      return 'blue'
     case 'milestone':
-      return 'yellow';
+      return 'yellow'
     default:
-      return 'gray';
+      return 'gray'
   }
 }
 
@@ -97,37 +97,47 @@ function getConfigFields(nodeType) {
         { key: 'url', label: 'URL', type: 'input', placeholder: 'https://api.example.com/...' },
         { key: 'method', label: 'Method', type: 'input', placeholder: 'GET' },
         { key: 'timeout', label: 'Timeout (ms)', type: 'input', placeholder: '5000' },
-      ];
+      ]
     case 'database':
       return [
         { key: 'query', label: 'Query', type: 'textarea', placeholder: 'SELECT * FROM ...' },
         { key: 'connection', label: 'Connection', type: 'input', placeholder: 'postgres://...' },
         { key: 'retries', label: 'Retries', type: 'input', placeholder: '3' },
-      ];
+      ]
     case 'code':
       return [
         { key: 'script', label: 'Script', type: 'textarea', placeholder: 'data.map(x => ...)' },
-      ];
+      ]
     case 'decision':
       return [
         { key: 'condition', label: 'Condition', type: 'input', placeholder: 'data.count > 0' },
-      ];
+      ]
     case 'phase':
       return [
-        { key: 'description', label: 'Description', type: 'textarea', placeholder: 'Describe this phase...' },
-      ];
+        {
+          key: 'description',
+          label: 'Description',
+          type: 'textarea',
+          placeholder: 'Describe this phase...',
+        },
+      ]
     case 'task':
       return [
         { key: 'assignee', label: 'Assignee', type: 'input', placeholder: 'Name or email' },
         { key: 'notes', label: 'Notes', type: 'textarea', placeholder: 'Additional context...' },
-      ];
+      ]
     case 'milestone':
       return [
         { key: 'dueDate', label: 'Due Date', type: 'input', placeholder: 'YYYY-MM-DD' },
-        { key: 'criteria', label: 'Success Criteria', type: 'textarea', placeholder: 'What defines completion...' },
-      ];
+        {
+          key: 'criteria',
+          label: 'Success Criteria',
+          type: 'textarea',
+          placeholder: 'What defines completion...',
+        },
+      ]
     default:
-      return [];
+      return []
   }
 }
 
@@ -137,13 +147,13 @@ function getConfigFields(nodeType) {
 function ChildStatusIcon({ status }) {
   switch (status) {
     case 'running':
-      return <Clock size={13} className="animate-spin text-yellow-400" />;
+      return <Clock size={13} className="animate-spin text-yellow-400" />
     case 'success':
-      return <CheckCircle size={13} className="text-green-400" />;
+      return <CheckCircle size={13} className="text-green-400" />
     case 'error':
-      return <XCircle size={13} className="text-red-400" />;
+      return <XCircle size={13} className="text-red-400" />
     default:
-      return <CircleDot size={13} className="text-[var(--color-fg-subtle)]" />;
+      return <CircleDot size={13} className="text-[var(--color-fg-subtle)]" />
   }
 }
 
@@ -151,33 +161,33 @@ function ChildStatusIcon({ status }) {
 // Sub-workflow children summary
 // ---------------------------------------------------------------------------
 function getChildStats(children) {
-  const nodes = children?.nodes || [];
+  const nodes = children?.nodes || []
   // Exclude start/end from actionable counts
-  const actionable = nodes.filter((n) => n.type !== 'start' && n.type !== 'end');
-  const actionableTotal = actionable.length;
-  let completed = 0;
-  let failed = 0;
-  let running = 0;
-  let idle = 0;
+  const actionable = nodes.filter((n) => n.type !== 'start' && n.type !== 'end')
+  const actionableTotal = actionable.length
+  let completed = 0
+  let failed = 0
+  let running = 0
+  let idle = 0
 
   for (const node of actionable) {
     switch (node.status) {
       case 'success':
-        completed++;
-        break;
+        completed++
+        break
       case 'error':
-        failed++;
-        break;
+        failed++
+        break
       case 'running':
-        running++;
-        break;
+        running++
+        break
       default:
-        idle++;
-        break;
+        idle++
+        break
     }
   }
 
-  return { actionableTotal, completed, failed, running, idle };
+  return { actionableTotal, completed, failed, running, idle }
 }
 
 // ---------------------------------------------------------------------------
@@ -185,49 +195,49 @@ function getChildStats(children) {
 // ---------------------------------------------------------------------------
 
 export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDelete }) {
-  const typeDef = useMemo(() => (node ? getNodeType(node.type) : null), [node?.type]);
-  const configFields = useMemo(() => (node ? getConfigFields(node.type) : []), [node?.type]);
+  const typeDef = useMemo(() => (node ? getNodeType(node.type) : null), [node?.type])
+  const configFields = useMemo(() => (node ? getConfigFields(node.type) : []), [node?.type])
 
-  if (!node) return null;
+  if (!node) return null
 
-  const color = typeDef?.color || '#6b7280';
-  const iconName = typeDef?.icon;
-  const TypeIcon = iconName ? ICON_MAP[iconName] : null;
+  const color = typeDef?.color || '#6b7280'
+  const iconName = typeDef?.icon
+  const TypeIcon = iconName ? ICON_MAP[iconName] : null
 
-  const hasChildren = (node.children?.nodes?.length || 0) > 0;
-  const childStats = hasChildren ? getChildStats(node.children) : null;
+  const hasChildren = (node.children?.nodes?.length || 0) > 0
+  const childStats = hasChildren ? getChildStats(node.children) : null
   const childNodes = hasChildren
     ? node.children.nodes.filter((n) => n.type !== 'start' && n.type !== 'end')
-    : [];
+    : []
 
-  const isTerminal = node.type === 'start' || node.type === 'end';
+  const isTerminal = node.type === 'start' || node.type === 'end'
 
   // ---- Handlers ----
 
   const handleTitleChange = (e) => {
-    onUpdate?.(node.id, { title: e.target.value });
-  };
+    onUpdate?.(node.id, { title: e.target.value })
+  }
 
   const handleDescriptionChange = (e) => {
-    onUpdate?.(node.id, { description: e.target.value });
-  };
+    onUpdate?.(node.id, { description: e.target.value })
+  }
 
   const handleConfigChange = (key, value) => {
     onUpdate?.(node.id, {
       config: { ...node.config, [key]: value },
-    });
-  };
+    })
+  }
 
   const handleDelete = () => {
-    onDelete?.(node.id);
-    onClose?.();
-  };
+    onDelete?.(node.id)
+    onClose?.()
+  }
 
   // Progress percentage for children
   const progressPercent =
     childStats && childStats.actionableTotal > 0
       ? Math.round((childStats.completed / childStats.actionableTotal) * 100)
-      : 0;
+      : 0
 
   // ---- Render ----
 
@@ -238,10 +248,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
       {/* ================================================================== */}
       <div className="mb-6">
         {/* Color bar */}
-        <div
-          className="-mx-6 -mt-5 mb-5 h-1.5"
-          style={{ backgroundColor: color }}
-        />
+        <div className="-mx-6 -mt-5 mb-5 h-1.5" style={{ backgroundColor: color }} />
 
         {/* Icon + title row */}
         <div className="flex items-start gap-4">
@@ -379,11 +386,11 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
             {/* Individual child steps list */}
             <div className="space-y-1">
               {childNodes.map((child) => {
-                const childType = getNodeType(child.type);
-                const childColor = childType?.color || '#6b7280';
-                const childConfig = child.config || {};
-                const assignee = childConfig.assignee;
-                const notes = childConfig.notes || childConfig.description;
+                const childType = getNodeType(child.type)
+                const childColor = childType?.color || '#6b7280'
+                const childConfig = child.config || {}
+                const assignee = childConfig.assignee
+                const notes = childConfig.notes || childConfig.description
 
                 return (
                   <div
@@ -450,7 +457,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
                       </span>
                     )}
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -531,9 +538,7 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
               <CheckCircle size={18} className="flex-shrink-0 text-green-400" />
               <div>
                 <p className="text-sm font-medium text-green-300">Completed successfully</p>
-                <p className="mt-0.5 text-xs text-green-400/70">
-                  Node executed without errors.
-                </p>
+                <p className="mt-0.5 text-xs text-green-400/70">Node executed without errors.</p>
               </div>
             </div>
           )}
@@ -582,5 +587,5 @@ export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDel
         </button>
       </div>
     </Modal>
-  );
+  )
 }

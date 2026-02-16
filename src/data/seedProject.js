@@ -1,7 +1,7 @@
 import { generateId } from '../utils/ids'
 
 export const SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 48
+export const SEED_VERSION = 50
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -193,7 +193,8 @@ export function createSeedProject() {
   return {
     id: projectId,
     name: 'StoryFlow Development',
-    description: 'A comprehensive project planning and management tool built with React, featuring kanban boards, wiki pages, workflow visualization, and timeline tracking.',
+    description:
+      'A comprehensive project planning and management tool built with React, featuring kanban boards, wiki pages, workflow visualization, and timeline tracking.',
     status: 'in-progress',
     techStack: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion'],
     createdAt: now,
@@ -202,9 +203,12 @@ export function createSeedProject() {
     seedVersion: SEED_VERSION,
 
     overview: {
-      goals: 'Build a modern, all-in-one project planning tool that combines kanban boards, wiki documentation, workflow visualization, and timeline tracking into a single cohesive interface. The tool should be intuitive enough for solo developers while powerful enough for small teams.',
-      constraints: 'Must run entirely in the browser with no backend required for the initial version. Data persistence via localStorage. Bundle size should remain reasonable for fast load times.',
-      targetAudience: 'Solo developers and small development teams who need a lightweight project planning tool without the overhead of enterprise solutions like Jira or Azure DevOps.',
+      goals:
+        'Build a modern, all-in-one project planning tool that combines kanban boards, wiki documentation, workflow visualization, and timeline tracking into a single cohesive interface. The tool should be intuitive enough for solo developers while powerful enough for small teams.',
+      constraints:
+        'Must run entirely in the browser with no backend required for the initial version. Data persistence via localStorage. Bundle size should remain reasonable for fast load times.',
+      targetAudience:
+        'Solo developers and small development teams who need a lightweight project planning tool without the overhead of enterprise solutions like Jira or Azure DevOps.',
     },
 
     architecture: {
@@ -279,7 +283,8 @@ export function createSeedProject() {
         {
           id: archContextId,
           name: 'ProjectsContext',
-          description: 'Global state management for all projects using React Context and useReducer',
+          description:
+            'Global state management for all projects using React Context and useReducer',
           type: 'context',
           parentId: archGroupDataId,
           dependencies: [archStorageId],
@@ -386,7 +391,8 @@ export function createSeedProject() {
         {
           id: archGraphUtilsId,
           name: 'Graph Utilities',
-          description: 'Cycle detection, topological sort, dependency validation for architecture components',
+          description:
+            'Cycle detection, topological sort, dependency validation for architecture components',
           type: 'utility',
           parentId: archGroupTestingId,
           dependencies: [],
@@ -418,7 +424,8 @@ export function createSeedProject() {
         {
           id: archCanvasHooksId,
           name: 'Canvas Hooks',
-          description: 'Extracted hooks: useCanvasViewport, useCanvasDrag, useCanvasPan, useCanvasConnection',
+          description:
+            'Extracted hooks: useCanvasViewport, useCanvasDrag, useCanvasPan, useCanvasConnection',
           type: 'hook',
           parentId: archGroupDataId,
           dependencies: [],
@@ -445,16 +452,74 @@ export function createSeedProject() {
           x: 260,
           y: 250,
           status: 'success',
-          config: { description: 'Vite + React + Tailwind v4 setup, folder structure, routing, glassmorphism theme, core UI components' },
+          config: {
+            description:
+              'Vite + React + Tailwind v4 setup, folder structure, routing, glassmorphism theme, core UI components',
+          },
           children: (() => {
-            const sId = generateId(), e1 = generateId(), e2 = generateId(), e3 = generateId(), eEnd = generateId()
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              eEnd = generateId()
             return {
               nodes: [
-                { id: sId, type: 'start', title: 'Begin Setup', x: 100, y: 200, status: 'success', config: {} },
-                { id: e1, type: 'task', title: 'Initialize Vite + React', x: 350, y: 100, status: 'success', config: { assignee: 'claude', notes: 'Vite 6 with React 18 plugin, hot reload, port 3000' } },
-                { id: e2, type: 'task', title: 'Configure Tailwind CSS', x: 350, y: 300, status: 'success', config: { assignee: 'claude', notes: '@tailwindcss/vite plugin, @import "tailwindcss" in index.css, @theme for custom properties' } },
-                { id: e3, type: 'task', title: 'Build Component Library', x: 600, y: 200, status: 'success', config: { assignee: 'claude', notes: '16 UI components: GlassCard, Button, Modal, Input, Badge, Tabs, ProgressBar, Tooltip, etc.' } },
-                { id: eEnd, type: 'end', title: 'Scaffolding Complete', x: 850, y: 200, status: 'success', config: {} },
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Begin Setup',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Initialize Vite + React',
+                  x: 350,
+                  y: 100,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'Vite 6 with React 18 plugin, hot reload, port 3000',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Configure Tailwind CSS',
+                  x: 350,
+                  y: 300,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '@tailwindcss/vite plugin, @import "tailwindcss" in index.css, @theme for custom properties',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Build Component Library',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '16 UI components: GlassCard, Button, Modal, Input, Badge, Tabs, ProgressBar, Tooltip, etc.',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Scaffolding Complete',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
               ],
               connections: [
                 { id: generateId(), from: sId, to: e1 },
@@ -474,16 +539,73 @@ export function createSeedProject() {
           x: 460,
           y: 130,
           status: 'success',
-          config: { description: 'ProjectsContext with useReducer, useProject hooks, localStorage persistence, JSON export/import' },
+          config: {
+            description:
+              'ProjectsContext with useReducer, useProject hooks, localStorage persistence, JSON export/import',
+          },
           children: (() => {
-            const sId = generateId(), e1 = generateId(), e2 = generateId(), e3 = generateId(), eEnd = generateId()
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              eEnd = generateId()
             return {
               nodes: [
-                { id: sId, type: 'start', title: 'Start', x: 100, y: 200, status: 'success', config: {} },
-                { id: e1, type: 'task', title: 'ProjectsContext + Reducer', x: 350, y: 120, status: 'success', config: { assignee: 'claude', notes: 'useReducer with immutable state updates, CRUD actions for all 7 project sections' } },
-                { id: e2, type: 'task', title: 'useProject Hook', x: 350, y: 280, status: 'success', config: { assignee: 'claude', notes: 'Per-field updaters: updateOverview, addIssue, updatePage, etc.' } },
-                { id: e3, type: 'task', title: 'localStorage + Export/Import', x: 600, y: 200, status: 'success', config: { assignee: 'claude', notes: 'useAutoSave with 500ms debounce, schemaVersion 1, JSON CLI bridge' } },
-                { id: eEnd, type: 'end', title: 'Data Layer Done', x: 850, y: 200, status: 'success', config: {} },
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'ProjectsContext + Reducer',
+                  x: 350,
+                  y: 120,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'useReducer with immutable state updates, CRUD actions for all 7 project sections',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'useProject Hook',
+                  x: 350,
+                  y: 280,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'Per-field updaters: updateOverview, addIssue, updatePage, etc.',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'localStorage + Export/Import',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'useAutoSave with 500ms debounce, schemaVersion 1, JSON CLI bridge',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Data Layer Done',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
               ],
               connections: [
                 { id: generateId(), from: sId, to: e1 },
@@ -503,17 +625,86 @@ export function createSeedProject() {
           x: 460,
           y: 370,
           status: 'success',
-          config: { description: 'Kanban board with drag-and-drop, sprints, burndown/velocity charts. Wiki with page tree, markdown editor, templates.' },
+          config: {
+            description:
+              'Kanban board with drag-and-drop, sprints, burndown/velocity charts. Wiki with page tree, markdown editor, templates.',
+          },
           children: (() => {
-            const sId = generateId(), e1 = generateId(), e2 = generateId(), e3 = generateId(), e4 = generateId(), eEnd = generateId()
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
             return {
               nodes: [
-                { id: sId, type: 'start', title: 'Start', x: 100, y: 200, status: 'success', config: {} },
-                { id: e1, type: 'task', title: 'Sprint Board + Drag-Drop', x: 350, y: 80, status: 'success', config: { assignee: 'claude', notes: 'SprintBoard, BoardColumn, IssueCard with DnD, BacklogView' } },
-                { id: e2, type: 'task', title: 'Issue Detail + Charts', x: 350, y: 200, status: 'success', config: { assignee: 'claude', notes: 'IssueDetailModal, BurndownChart, VelocityChart (pure SVG)' } },
-                { id: e3, type: 'task', title: 'Wiki Page Tree + Editor', x: 350, y: 320, status: 'success', config: { assignee: 'claude', notes: 'PageTree with nested hierarchy, PageEditor with split markdown/preview' } },
-                { id: e4, type: 'task', title: 'Templates + Version History', x: 600, y: 200, status: 'success', config: { assignee: 'claude', notes: '6 page templates, version tracking, page status (draft/published/archived)' } },
-                { id: eEnd, type: 'end', title: 'Board & Wiki Done', x: 850, y: 200, status: 'success', config: {} },
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Sprint Board + Drag-Drop',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'SprintBoard, BoardColumn, IssueCard with DnD, BacklogView',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Issue Detail + Charts',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'IssueDetailModal, BurndownChart, VelocityChart (pure SVG)',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Wiki Page Tree + Editor',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'PageTree with nested hierarchy, PageEditor with split markdown/preview',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Templates + Version History',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '6 page templates, version tracking, page status (draft/published/archived)',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Board & Wiki Done',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
               ],
               connections: [
                 { id: generateId(), from: sId, to: e1 },
@@ -535,17 +726,87 @@ export function createSeedProject() {
           x: 710,
           y: 250,
           status: 'success',
-          config: { description: 'Visual workflow canvas with BFS engine, sub-workflow overlays. Gantt timeline with milestones and stats.' },
+          config: {
+            description:
+              'Visual workflow canvas with BFS engine, sub-workflow overlays. Gantt timeline with milestones and stats.',
+          },
           children: (() => {
-            const sId = generateId(), e1 = generateId(), e2 = generateId(), e3 = generateId(), e4 = generateId(), eEnd = generateId()
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
             return {
               nodes: [
-                { id: sId, type: 'start', title: 'Start', x: 100, y: 200, status: 'success', config: {} },
-                { id: e1, type: 'task', title: 'Workflow Canvas + Nodes', x: 350, y: 80, status: 'success', config: { assignee: 'claude', notes: 'WorkflowCanvas, WorkflowNode (180px, 6 types), drag-to-move, port connections' } },
-                { id: e2, type: 'task', title: 'BFS Engine + Sub-workflows', x: 350, y: 200, status: 'success', config: { assignee: 'claude', notes: 'Queue-based BFS, SubWorkflowOverlay, NodeDetailModal, context menu' } },
-                { id: e3, type: 'task', title: 'Gantt Chart (SVG)', x: 350, y: 320, status: 'success', config: { assignee: 'claude', notes: 'GanttChart, GanttBar, GanttTimeAxis, GanttMilestone — pure SVG, scrollable' } },
-                { id: e4, type: 'task', title: 'Milestones + Stats', x: 600, y: 200, status: 'success', config: { assignee: 'claude', notes: 'MilestoneForm, MilestoneMarker, TimelineStats, chart/list sub-tabs' } },
-                { id: eEnd, type: 'end', title: 'Features Complete', x: 850, y: 200, status: 'success', config: {} },
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Workflow Canvas + Nodes',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'WorkflowCanvas, WorkflowNode (180px, 6 types), drag-to-move, port connections',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'BFS Engine + Sub-workflows',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'Queue-based BFS, SubWorkflowOverlay, NodeDetailModal, context menu',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Gantt Chart (SVG)',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'GanttChart, GanttBar, GanttTimeAxis, GanttMilestone — pure SVG, scrollable',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Milestones + Stats',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes: 'MilestoneForm, MilestoneMarker, TimelineStats, chart/list sub-tabs',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Features Complete',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
               ],
               connections: [
                 { id: generateId(), from: sId, to: e1 },
@@ -567,20 +828,131 @@ export function createSeedProject() {
           x: 960,
           y: 250,
           status: 'success',
-          config: { description: 'Responsive design, keyboard shortcuts, performance, security hardening, zoom/pan, documentation.' },
+          config: {
+            description:
+              'Responsive design, keyboard shortcuts, performance, security hardening, zoom/pan, documentation.',
+          },
           children: (() => {
-            const sId = generateId(), e1 = generateId(), e1b = generateId(), e2 = generateId(), e3 = generateId(), e4 = generateId(), e4b = generateId(), e5 = generateId(), eEnd = generateId()
+            const sId = generateId(),
+              e1 = generateId(),
+              e1b = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              e4b = generateId(),
+              e5 = generateId(),
+              eEnd = generateId()
             return {
               nodes: [
-                { id: sId, type: 'start', title: 'Start', x: 100, y: 200, status: 'success', config: {} },
-                { id: e1, type: 'task', title: 'Keyboard Shortcuts', x: 350, y: 40, status: 'success', config: { assignee: 'claude', notes: 'Alt+1-7 tab switching, ? for shortcuts modal, input-safe plain-key detection, sidebar tooltip hints' } },
-                { id: e1b, type: 'task', title: 'Responsive Layout', x: 350, y: 140, status: 'success', config: { assignee: 'claude', notes: '12-file responsive overhaul: hamburger sidebar, bottom tab bar, wiki tree toggle, decisions stacking, md: breakpoint' } },
-                { id: e2, type: 'task', title: 'Security Hardening', x: 350, y: 240, status: 'success', config: { assignee: 'claude', notes: 'URL sanitization, color validation, import hardening, audit documentation' } },
-                { id: e3, type: 'task', title: 'Zoom & Centering', x: 350, y: 340, status: 'success', config: { assignee: 'claude', notes: 'Workflow canvas zoom/pan with CSS zoom for crisp text, auto-centering, WorkflowZoomControls component' } },
-                { id: e4, type: 'task', title: 'Sidebar Cleanup', x: 600, y: 340, status: 'success', config: { assignee: 'claude', notes: 'Removed gradient tab indicator bar and bg-white/10 active highlight — icon color only' } },
-                { id: e4b, type: 'task', title: 'Accent Color Expansion', x: 600, y: 140, status: 'success', config: { assignee: 'claude', notes: '~15 components updated: replaced hardcoded purple with var(--accent-active) and rgba(var(--accent-active-rgb)) patterns across tabs, filters, epics, board, cards, timeline, architecture, velocity chart' } },
-                { id: e5, type: 'task', title: 'Performance + Docs', x: 800, y: 200, status: 'success', config: { assignee: 'claude', notes: 'React.lazy + Suspense for 7 tabs. manualChunks vendor splitting. 625KB→165KB. 4 new wiki pages. Renamed sampleProject→seedProject with SEED_VERSION auto-migration.' } },
-                { id: eEnd, type: 'end', title: 'MVP Ready', x: 950, y: 200, status: 'success', config: {} },
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Keyboard Shortcuts',
+                  x: 350,
+                  y: 40,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Alt+1-7 tab switching, ? for shortcuts modal, input-safe plain-key detection, sidebar tooltip hints',
+                  },
+                },
+                {
+                  id: e1b,
+                  type: 'task',
+                  title: 'Responsive Layout',
+                  x: 350,
+                  y: 140,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '12-file responsive overhaul: hamburger sidebar, bottom tab bar, wiki tree toggle, decisions stacking, md: breakpoint',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Security Hardening',
+                  x: 350,
+                  y: 240,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'URL sanitization, color validation, import hardening, audit documentation',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Zoom & Centering',
+                  x: 350,
+                  y: 340,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Workflow canvas zoom/pan with CSS zoom for crisp text, auto-centering, WorkflowZoomControls component',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Sidebar Cleanup',
+                  x: 600,
+                  y: 340,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Removed gradient tab indicator bar and bg-white/10 active highlight — icon color only',
+                  },
+                },
+                {
+                  id: e4b,
+                  type: 'task',
+                  title: 'Accent Color Expansion',
+                  x: 600,
+                  y: 140,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '~15 components updated: replaced hardcoded purple with var(--accent-active) and rgba(var(--accent-active-rgb)) patterns across tabs, filters, epics, board, cards, timeline, architecture, velocity chart',
+                  },
+                },
+                {
+                  id: e5,
+                  type: 'task',
+                  title: 'Performance + Docs',
+                  x: 800,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'React.lazy + Suspense for 7 tabs. manualChunks vendor splitting. 625KB→165KB. 4 new wiki pages. Renamed sampleProject→seedProject with SEED_VERSION auto-migration.',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'MVP Ready',
+                  x: 950,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
               ],
               connections: [
                 { id: generateId(), from: sId, to: e1 },
@@ -669,7 +1041,8 @@ export function createSeedProject() {
           key: 'SF-1',
           type: 'epic',
           title: 'Project Management Core',
-          description: 'Implement the core project management features including project CRUD operations, context providers, and data persistence. Covers ProjectsContext with useReducer, useProject hooks for per-field CRUD, useAutoSave for debounced localStorage writes, and the default/sample project data seeds.',
+          description:
+            'Implement the core project management features including project CRUD operations, context providers, and data persistence. Covers ProjectsContext with useReducer, useProject hooks for per-field CRUD, useAutoSave for debounced localStorage writes, and the default/sample project data seeds.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 13,
@@ -684,7 +1057,8 @@ export function createSeedProject() {
           key: 'SF-2',
           type: 'story',
           title: 'As a user, I want to create and manage kanban boards',
-          description: 'Built SprintBoard with drag-and-drop columns, IssueCard with type/priority badges, BacklogView for unassigned issues, IssueDetailModal with all fields. Added sprint management (create/edit/complete), status column customization, and board-level filters for type/priority/assignee/labels.',
+          description:
+            'Built SprintBoard with drag-and-drop columns, IssueCard with type/priority badges, BacklogView for unassigned issues, IssueDetailModal with all fields. Added sprint management (create/edit/complete), status column customization, and board-level filters for type/priority/assignee/labels.',
           status: 'Done',
           priority: 'high',
           storyPoints: 8,
@@ -700,7 +1074,8 @@ export function createSeedProject() {
           key: 'SF-3',
           type: 'story',
           title: 'As a user, I want to write and organize wiki pages',
-          description: 'Built PageTree with nested parent/child hierarchy, PageEditor with split markdown/preview mode, MarkdownRenderer with syntax highlighting, and 6 page templates (blank, meeting notes, technical spec, API docs, retrospective, decision record). Added version history tracking and page status (draft/published/archived).',
+          description:
+            'Built PageTree with nested parent/child hierarchy, PageEditor with split markdown/preview mode, MarkdownRenderer with syntax highlighting, and 6 page templates (blank, meeting notes, technical spec, API docs, retrospective, decision record). Added version history tracking and page status (draft/published/archived).',
           status: 'Done',
           priority: 'high',
           storyPoints: 8,
@@ -716,7 +1091,8 @@ export function createSeedProject() {
           key: 'SF-4',
           type: 'task',
           title: 'Set up project scaffolding with Vite and Tailwind',
-          description: 'Initialized Vite 6 with React 18 plugin, configured Tailwind CSS v4 via @tailwindcss/vite (no postcss.config or tailwind.config needed), set up folder structure (components/ui, layout, project, hooks, contexts, utils, data), added react-router-dom routing with Dashboard and ProjectPage, built the glassmorphism theme in index.css with glass, glass-card, glass-sidebar, glass-input classes.',
+          description:
+            'Initialized Vite 6 with React 18 plugin, configured Tailwind CSS v4 via @tailwindcss/vite (no postcss.config or tailwind.config needed), set up folder structure (components/ui, layout, project, hooks, contexts, utils, data), added react-router-dom routing with Dashboard and ProjectPage, built the glassmorphism theme in index.css with glass, glass-card, glass-sidebar, glass-input classes.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -731,7 +1107,8 @@ export function createSeedProject() {
           key: 'SF-5',
           type: 'task',
           title: 'Implement localStorage persistence layer',
-          description: 'Built useAutoSave hook with 500ms debounce that serializes the full projects array to localStorage under `storyflow-projects`. Created JSON export format with schemaVersion, exportedAt, and project payload. Added import validation. The ProjectsContext reducer produces immutable state updates that trigger auto-save on every dispatch.',
+          description:
+            'Built useAutoSave hook with 500ms debounce that serializes the full projects array to localStorage under `storyflow-projects`. Created JSON export format with schemaVersion, exportedAt, and project payload. Added import validation. The ProjectsContext reducer produces immutable state updates that trigger auto-save on every dispatch.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -746,7 +1123,8 @@ export function createSeedProject() {
           key: 'SF-6',
           type: 'bug',
           title: 'Workflow connections not rendering on initial load',
-          description: 'When the workflow canvas first mounts, SVG connections between nodes are not drawn until the user interacts with the canvas. Root cause: node refs not measured yet during first render. Fixed by deferring connection measurement with useLayoutEffect and a requestAnimationFrame callback so DOM measurements happen after layout.',
+          description:
+            'When the workflow canvas first mounts, SVG connections between nodes are not drawn until the user interacts with the canvas. Root cause: node refs not measured yet during first render. Fixed by deferring connection measurement with useLayoutEffect and a requestAnimationFrame callback so DOM measurements happen after layout.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -762,7 +1140,8 @@ export function createSeedProject() {
           key: 'SF-7',
           type: 'epic',
           title: 'Workflow Engine',
-          description: 'Full workflow system: WorkflowCanvas with pan/zoom and grid snapping, WorkflowNode (180px wide, 6 types), WorkflowConnection with SVG bezier curves, NodeContextMenu with viewport bounds detection, NodeDetailModal for config editing. Sub-workflow overlay for phase nodes with breadcrumb navigation. BFS execution engine that traverses the DAG level-by-level.',
+          description:
+            'Full workflow system: WorkflowCanvas with pan/zoom and grid snapping, WorkflowNode (180px wide, 6 types), WorkflowConnection with SVG bezier curves, NodeContextMenu with viewport bounds detection, NodeDetailModal for config editing. Sub-workflow overlay for phase nodes with breadcrumb navigation. BFS execution engine that traverses the DAG level-by-level.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 21,
@@ -777,7 +1156,8 @@ export function createSeedProject() {
           key: 'SF-8',
           type: 'story',
           title: 'As a user, I want to build visual workflows with draggable nodes',
-          description: 'Built WorkflowCanvas with mouse-based panning, WorkflowNode with 6 types (start/end/task/phase/decision/parallel), drag-to-move with grid snapping, port-based connection creation by dragging between output→input ports, SVG bezier curve rendering for connections. Right-click context menu with edit/delete/duplicate actions. Node width is 180px — kept WorkflowConnection NODE_WIDTH in sync.',
+          description:
+            'Built WorkflowCanvas with mouse-based panning, WorkflowNode with 6 types (start/end/task/phase/decision/parallel), drag-to-move with grid snapping, port-based connection creation by dragging between output→input ports, SVG bezier curve rendering for connections. Right-click context menu with edit/delete/duplicate actions. Node width is 180px — kept WorkflowConnection NODE_WIDTH in sync.',
           status: 'Done',
           priority: 'high',
           storyPoints: 8,
@@ -793,7 +1173,8 @@ export function createSeedProject() {
           key: 'SF-9',
           type: 'task',
           title: 'Implement BFS execution engine for workflow traversal',
-          description: 'Built executeWorkflow() in utils/workflow.js. Uses a queue-based BFS that processes nodes level by level. Each node transitions idle→running→success/error. Parallel branches at the same depth execute together. Join nodes wait for all incoming edges to complete. Prevents cycles at connection-creation time to guarantee DAG property. Execution log tracks timestamps and status changes.',
+          description:
+            'Built executeWorkflow() in utils/workflow.js. Uses a queue-based BFS that processes nodes level by level. Each node transitions idle→running→success/error. Parallel branches at the same depth execute together. Join nodes wait for all incoming edges to complete. Prevents cycles at connection-creation time to guarantee DAG property. Execution log tracks timestamps and status changes.',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -809,7 +1190,8 @@ export function createSeedProject() {
           key: 'SF-10',
           type: 'task',
           title: 'Add sub-workflow overlay and node detail modals',
-          description: 'Phase nodes have a `children` object with their own nodes/connections arrays. Clicking "Expand" opens a SubWorkflowOverlay that renders the nested graph in a modal-like popup with breadcrumb navigation back to the parent. NodeDetailModal lets you edit title, description, assignee, notes, and status. Status badge shows step counts (e.g. "3/5 steps").',
+          description:
+            'Phase nodes have a `children` object with their own nodes/connections arrays. Clicking "Expand" opens a SubWorkflowOverlay that renders the nested graph in a modal-like popup with breadcrumb navigation back to the parent. NodeDetailModal lets you edit title, description, assignee, notes, and status. Status badge shows step counts (e.g. "3/5 steps").',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -826,7 +1208,8 @@ export function createSeedProject() {
           key: 'SF-11',
           type: 'epic',
           title: 'Timeline & Milestones',
-          description: 'Full Gantt chart implementation: GanttChart container with scrollable SVG, GanttBar for phase rows with progress fill, GanttMilestone as diamond markers, GanttTimeAxis with week/month grid lines and "Today" dashed red line. TimelineStats with 4 stat cards. MilestoneForm modal for CRUD. TimelineView list with chronologically interleaved phases and milestones. Chart/List sub-tab toggle.',
+          description:
+            'Full Gantt chart implementation: GanttChart container with scrollable SVG, GanttBar for phase rows with progress fill, GanttMilestone as diamond markers, GanttTimeAxis with week/month grid lines and "Today" dashed red line. TimelineStats with 4 stat cards. MilestoneForm modal for CRUD. TimelineView list with chronologically interleaved phases and milestones. Chart/List sub-tab toggle.',
           status: 'Done',
           priority: 'high',
           storyPoints: 13,
@@ -841,7 +1224,8 @@ export function createSeedProject() {
           key: 'SF-12',
           type: 'story',
           title: 'As a user, I want to see my project phases on a Gantt chart',
-          description: 'Built GanttChart.jsx as the main SVG container. Computes dateToX mapping from phase/milestone date ranges with ±7 day padding. LABEL_WIDTH=160, ROW_HEIGHT=44, HEADER_HEIGHT=36. Date labels centered in header, bars strictly below header border. GanttBar renders background rect at 18% opacity + progress fill at 65% opacity + percentage text. Dynamic chart width = max(800, totalDays*12). Wrapped in overflow-x-auto div for horizontal scrolling.',
+          description:
+            'Built GanttChart.jsx as the main SVG container. Computes dateToX mapping from phase/milestone date ranges with ±7 day padding. LABEL_WIDTH=160, ROW_HEIGHT=44, HEADER_HEIGHT=36. Date labels centered in header, bars strictly below header border. GanttBar renders background rect at 18% opacity + progress fill at 65% opacity + percentage text. Dynamic chart width = max(800, totalDays*12). Wrapped in overflow-x-auto div for horizontal scrolling.',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -857,7 +1241,8 @@ export function createSeedProject() {
           key: 'SF-13',
           type: 'story',
           title: 'As a user, I want to create and track milestones',
-          description: 'Added milestone data model: { id, name, date, completed, color, phaseId }. Built MilestoneForm modal with name, date picker, phase select dropdown, completed toggle, and color picker. GanttMilestone renders as a rotated diamond SVG polygon — filled when completed, hollow when pending. MilestoneMarker in list view shows diamond on timeline spine with GlassCard, hover edit/delete buttons, and click-to-toggle completed. Milestones interleaved chronologically with phases in TimelineView.',
+          description:
+            'Added milestone data model: { id, name, date, completed, color, phaseId }. Built MilestoneForm modal with name, date picker, phase select dropdown, completed toggle, and color picker. GanttMilestone renders as a rotated diamond SVG polygon — filled when completed, hollow when pending. MilestoneMarker in list view shows diamond on timeline spine with GlassCard, hover edit/delete buttons, and click-to-toggle completed. Milestones interleaved chronologically with phases in TimelineView.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -873,7 +1258,8 @@ export function createSeedProject() {
           key: 'SF-14',
           type: 'task',
           title: 'Build timeline stats dashboard with progress indicators',
-          description: 'Built TimelineStats.jsx with 4 GlassCard stat tiles: Overall Progress (weighted average across phases), Phase Count, Milestones Done (completed/total), Days Remaining (until last phase endDate). Each card has a Lucide icon, value, and label. Integrated into TimelineTab above the chart/list toggle. Uses date-fns differenceInDays for the countdown.',
+          description:
+            'Built TimelineStats.jsx with 4 GlassCard stat tiles: Overall Progress (weighted average across phases), Phase Count, Milestones Done (completed/total), Days Remaining (until last phase endDate). Each card has a Lucide icon, value, and label. Integrated into TimelineTab above the chart/list toggle. Uses date-fns differenceInDays for the countdown.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -890,7 +1276,8 @@ export function createSeedProject() {
           key: 'SF-15',
           type: 'epic',
           title: 'Polish & Ship',
-          description: 'Final sprint before MVP: responsive breakpoints for mobile/tablet, keyboard shortcut system (tab switching, new issue, search focus, save), global search improvements, dark/light theme toggle polish, Lighthouse performance audit, lazy-load heavy components (WorkflowCanvas, GanttChart), bundle size optimization, and documentation cleanup.',
+          description:
+            'Final sprint before MVP: responsive breakpoints for mobile/tablet, keyboard shortcut system (tab switching, new issue, search focus, save), global search improvements, dark/light theme toggle polish, Lighthouse performance audit, lazy-load heavy components (WorkflowCanvas, GanttChart), bundle size optimization, and documentation cleanup.',
           status: 'Done',
           priority: 'high',
           storyPoints: 13,
@@ -904,7 +1291,8 @@ export function createSeedProject() {
           key: 'SF-16',
           type: 'story',
           title: 'As a user, I want keyboard shortcuts for common actions',
-          description: 'Implemented keyboard shortcuts system. Alt+1-7 switches between the 7 project tabs. "?" opens a ShortcutsModal listing all bindings with platform-aware modifier keys (⌘ on Mac, Ctrl on Windows). Ctrl+/ opens the command palette. Esc closes modals. The useKeyboardShortcuts hook skips plain-key shortcuts when focus is in an input/textarea/contenteditable. Sidebar tooltips now show the shortcut hint alongside the tab name.',
+          description:
+            'Implemented keyboard shortcuts system. Alt+1-7 switches between the 7 project tabs. "?" opens a ShortcutsModal listing all bindings with platform-aware modifier keys (⌘ on Mac, Ctrl on Windows). Ctrl+/ opens the command palette. Esc closes modals. The useKeyboardShortcuts hook skips plain-key shortcuts when focus is in an input/textarea/contenteditable. Sidebar tooltips now show the shortcut hint alongside the tab name.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -920,7 +1308,8 @@ export function createSeedProject() {
           key: 'SF-17',
           type: 'task',
           title: 'Responsive layout and mobile breakpoints',
-          description: 'Implemented responsive layout across 12 files. Sidebar collapses to hamburger overlay on mobile, project tabs become bottom bar, wiki page tree toggles as overlay, decisions tab stacks vertically with back button, architecture tree stacks above detail, board sub-nav scrolls horizontally. All using md: (768px) breakpoint.',
+          description:
+            'Implemented responsive layout across 12 files. Sidebar collapses to hamburger overlay on mobile, project tabs become bottom bar, wiki page tree toggles as overlay, decisions tab stacks vertically with back button, architecture tree stacks above detail, board sub-nav scrolls horizontally. All using md: (768px) breakpoint.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -936,7 +1325,8 @@ export function createSeedProject() {
           key: 'SF-18',
           type: 'bug',
           title: 'AnimatePresence mode="wait" causes blank page on route transition',
-          description: 'Bug: Wrapping React Router Outlet with AnimatePresence mode="wait" causes exit animations to get stuck — the exiting route stays at opacity:0 and transform at the exit state, blocking the entering route from ever appearing. Result: blank white page. Root cause: Framer Motion\'s exit animation conflicts with React Router\'s unmount timing. Fix: removed mode="wait" from route-level AnimatePresence. Tab-level AnimatePresence (inside ProjectPage) still works fine with mode="wait".',
+          description:
+            'Bug: Wrapping React Router Outlet with AnimatePresence mode="wait" causes exit animations to get stuck — the exiting route stays at opacity:0 and transform at the exit state, blocking the entering route from ever appearing. Result: blank white page. Root cause: Framer Motion\'s exit animation conflicts with React Router\'s unmount timing. Fix: removed mode="wait" from route-level AnimatePresence. Tab-level AnimatePresence (inside ProjectPage) still works fine with mode="wait".',
           status: 'Done',
           priority: 'high',
           storyPoints: 2,
@@ -952,7 +1342,8 @@ export function createSeedProject() {
           key: 'SF-19',
           type: 'task',
           title: 'Security audit and hardening',
-          description: 'Full security review of the StoryFlow codebase. Found and fixed 3 classes of vulnerability:\n\n**Critical — XSS via markdown URLs (fixed):** The markdown renderer in src/utils/markdown.js injected user-provided URLs directly into href/src attributes via dangerouslySetInnerHTML in MarkdownRenderer.jsx. Markdown like [click](javascript:alert(1)) would execute arbitrary JS. Fixed by adding isSafeUrl() that whitelists http/https/mailto protocols and blocks javascript:/data:/vbscript: schemes.\n\n**Medium — CSS injection via color values (fixed):** User-editable phase.color and milestone.color strings were interpolated into style attributes and SVG fill/stroke props across PhaseCard, GanttBar, GanttMilestone, and MilestoneMarker. A crafted color string could inject arbitrary CSS. Fixed by adding sanitizeColor() in src/utils/sanitize.js that validates against hex/rgb/hsl patterns.\n\n**Medium — Import hardening (fixed):** JSON import had no file size limit and no prototype pollution guard. Added 10MB file size check in Header.jsx and stripDangerousKeys() in exportImport.js that recursively removes __proto__/constructor/prototype keys from imported objects.\n\nAlso created wiki pages documenting the full audit findings and a dependency inventory with all package versions for future CVE tracking.',
+          description:
+            'Full security review of the StoryFlow codebase. Found and fixed 3 classes of vulnerability:\n\n**Critical — XSS via markdown URLs (fixed):** The markdown renderer in src/utils/markdown.js injected user-provided URLs directly into href/src attributes via dangerouslySetInnerHTML in MarkdownRenderer.jsx. Markdown like [click](javascript:alert(1)) would execute arbitrary JS. Fixed by adding isSafeUrl() that whitelists http/https/mailto protocols and blocks javascript:/data:/vbscript: schemes.\n\n**Medium — CSS injection via color values (fixed):** User-editable phase.color and milestone.color strings were interpolated into style attributes and SVG fill/stroke props across PhaseCard, GanttBar, GanttMilestone, and MilestoneMarker. A crafted color string could inject arbitrary CSS. Fixed by adding sanitizeColor() in src/utils/sanitize.js that validates against hex/rgb/hsl patterns.\n\n**Medium — Import hardening (fixed):** JSON import had no file size limit and no prototype pollution guard. Added 10MB file size check in Header.jsx and stripDangerousKeys() in exportImport.js that recursively removes __proto__/constructor/prototype keys from imported objects.\n\nAlso created wiki pages documenting the full audit findings and a dependency inventory with all package versions for future CVE tracking.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 5,
@@ -969,7 +1360,8 @@ export function createSeedProject() {
           key: 'SF-20',
           type: 'task',
           title: 'Workflow canvas zoom, pan, and auto-centering',
-          description: 'Added viewport transform system to the workflow canvas:\n\n**Auto-centering:** Nodes are centered in the viewport on load by computing the bounding box and offsetting to viewport center. Each WorkflowCanvas instance (main + sub-workflow overlay) centers independently.\n\n**Zoom:** Controls in bottom-right corner with +/- buttons (10% increments, 25%-200% range), percentage display, and fit-to-view reset. Ctrl/Cmd+scroll zooms toward cursor position.\n\n**Pan:** Middle-mouse-button drag to pan the viewport.\n\n**Crisp rendering:** Uses CSS zoom instead of transform:scale for the scale factor, so text re-renders at native resolution at all zoom levels instead of getting blurry.\n\n**Coordinate transforms:** All mouse handlers (node drag, connection drawing, context menu) convert screen coords to canvas-space via inverse transform.\n\nFiles: WorkflowCanvas.jsx (viewport state, transform wrapper, handlers), WorkflowZoomControls.jsx (new component).',
+          description:
+            'Added viewport transform system to the workflow canvas:\n\n**Auto-centering:** Nodes are centered in the viewport on load by computing the bounding box and offsetting to viewport center. Each WorkflowCanvas instance (main + sub-workflow overlay) centers independently.\n\n**Zoom:** Controls in bottom-right corner with +/- buttons (10% increments, 25%-200% range), percentage display, and fit-to-view reset. Ctrl/Cmd+scroll zooms toward cursor position.\n\n**Pan:** Middle-mouse-button drag to pan the viewport.\n\n**Crisp rendering:** Uses CSS zoom instead of transform:scale for the scale factor, so text re-renders at native resolution at all zoom levels instead of getting blurry.\n\n**Coordinate transforms:** All mouse handlers (node drag, connection drawing, context menu) convert screen coords to canvas-space via inverse transform.\n\nFiles: WorkflowCanvas.jsx (viewport state, transform wrapper, handlers), WorkflowZoomControls.jsx (new component).',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -986,7 +1378,8 @@ export function createSeedProject() {
           key: 'SF-21',
           type: 'task',
           title: 'Sidebar tab indicator cleanup',
-          description: 'Simplified the project sidebar active tab indicator. Removed the purple-to-blue gradient bar (motion.div with layoutId) and the bg-white/10 background highlight. Active state is now icon turning white only — cleaner and less cluttered. Also removed the unused framer-motion import from ProjectSidebar.jsx.',
+          description:
+            'Simplified the project sidebar active tab indicator. Removed the purple-to-blue gradient bar (motion.div with layoutId) and the bg-white/10 background highlight. Active state is now icon turning white only — cleaner and less cluttered. Also removed the unused framer-motion import from ProjectSidebar.jsx.',
           status: 'Done',
           priority: 'low',
           storyPoints: 1,
@@ -1003,7 +1396,8 @@ export function createSeedProject() {
           key: 'SF-22',
           type: 'task',
           title: 'Keyboard shortcuts system',
-          description: 'Added keyboard shortcuts to the app:\n\n**Tab switching:** Alt+1-7 switches between the 7 project tabs (Overview, Architecture, Workflow, Board, Wiki, Timeline, Decisions). Registered in ProjectPage.jsx via useKeyboardShortcuts hook.\n\n**Shortcuts modal:** Press "?" to open a modal listing all available shortcuts. Built ShortcutsModal.jsx with sections for Navigation and General shortcuts, displaying platform-aware modifier keys (⌘ on Mac, Ctrl on Windows).\n\n**Sidebar hints:** Updated ProjectSidebar tooltips to show the keyboard shortcut alongside the tab name (e.g. "Overview (Alt+1)").\n\n**Input safety:** Enhanced useKeyboardShortcuts hook to skip plain-key shortcuts (like "?") when focus is in an input, textarea, or contenteditable element.\n\nFiles: useKeyboardShortcuts.js (SHORTCUTS enum + input guard), ShortcutsModal.jsx (new), ProjectPage.jsx (tab shortcuts), AppLayout.jsx (? shortcut + modal), ProjectSidebar.jsx (tooltip hints).',
+          description:
+            'Added keyboard shortcuts to the app:\n\n**Tab switching:** Alt+1-7 switches between the 7 project tabs (Overview, Architecture, Workflow, Board, Wiki, Timeline, Decisions). Registered in ProjectPage.jsx via useKeyboardShortcuts hook.\n\n**Shortcuts modal:** Press "?" to open a modal listing all available shortcuts. Built ShortcutsModal.jsx with sections for Navigation and General shortcuts, displaying platform-aware modifier keys (⌘ on Mac, Ctrl on Windows).\n\n**Sidebar hints:** Updated ProjectSidebar tooltips to show the keyboard shortcut alongside the tab name (e.g. "Overview (Alt+1)").\n\n**Input safety:** Enhanced useKeyboardShortcuts hook to skip plain-key shortcuts (like "?") when focus is in an input, textarea, or contenteditable element.\n\nFiles: useKeyboardShortcuts.js (SHORTCUTS enum + input guard), ShortcutsModal.jsx (new), ProjectPage.jsx (tab shortcuts), AppLayout.jsx (? shortcut + modal), ProjectSidebar.jsx (tooltip hints).',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1020,7 +1414,8 @@ export function createSeedProject() {
           key: 'SF-23',
           type: 'task',
           title: 'Responsive layout with mobile breakpoints',
-          description: 'Full responsive overhaul across 12 files using md: (768px) as the single mobile/desktop breakpoint.\n\n**Phase 1 — Core Shell:**\n- AppLayout: mobileMenuOpen state, backdrop overlay, hamburger prop to Header\n- Sidebar: fixed overlay on mobile (z-40), auto-close on nav, X close button, hidden collapse toggle\n- Header: hamburger Menu icon before breadcrumbs (md:hidden)\n\n**Phase 2 — Project Tab Bar:**\n- ProjectSidebar: vertical left sidebar on desktop → fixed bottom horizontal bar on mobile with evenly-spaced icons\n- ProjectPage: bottom padding (pb-20) to clear the fixed tab bar on mobile\n\n**Phase 3 — Tab-Specific:**\n- WikiTab: showTree toggle with overlay backdrop for mobile, auto-close on page select, PanelLeft toggle button\n- TableOfContents: hidden on mobile (hidden md:block)\n- DecisionsTab: flex-col stack on mobile, list hidden when detail selected, full-width detail with back button\n- ArchitectureTab: flex-col stack on mobile, tree panel max-h-64 cap\n- WorkflowTab: log panel defaults to closed\n- BoardTab: overflow-x-auto on sub-nav tab row\n- ProjectHeader: saved-ago text hidden on mobile (hidden sm:inline)',
+          description:
+            'Full responsive overhaul across 12 files using md: (768px) as the single mobile/desktop breakpoint.\n\n**Phase 1 — Core Shell:**\n- AppLayout: mobileMenuOpen state, backdrop overlay, hamburger prop to Header\n- Sidebar: fixed overlay on mobile (z-40), auto-close on nav, X close button, hidden collapse toggle\n- Header: hamburger Menu icon before breadcrumbs (md:hidden)\n\n**Phase 2 — Project Tab Bar:**\n- ProjectSidebar: vertical left sidebar on desktop → fixed bottom horizontal bar on mobile with evenly-spaced icons\n- ProjectPage: bottom padding (pb-20) to clear the fixed tab bar on mobile\n\n**Phase 3 — Tab-Specific:**\n- WikiTab: showTree toggle with overlay backdrop for mobile, auto-close on page select, PanelLeft toggle button\n- TableOfContents: hidden on mobile (hidden md:block)\n- DecisionsTab: flex-col stack on mobile, list hidden when detail selected, full-width detail with back button\n- ArchitectureTab: flex-col stack on mobile, tree panel max-h-64 cap\n- WorkflowTab: log panel defaults to closed\n- BoardTab: overflow-x-auto on sub-nav tab row\n- ProjectHeader: saved-ago text hidden on mobile (hidden sm:inline)',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -1037,7 +1432,8 @@ export function createSeedProject() {
           key: 'SF-24',
           type: 'bug',
           title: 'Accent color picker in Settings has no visual effect',
-          description: 'Bug: The accent color picker in Settings set a --accent-active CSS variable on document.documentElement, but nothing in the UI consumed it. Changing accent colors had zero visual effect.\n\nRoot cause: The feature was architecturally complete (SettingsContext, localStorage, picker UI) but functionally disconnected — no CSS rules or components read the variable.\n\nFix:\n- SettingsContext: Also sets --accent-active-rgb (R,G,B triplet) for rgba() usage in CSS\n- index.css: glass-input:focus border/shadow, gradient-text, focus-visible outline, and ::selection now use var(--accent-active) / rgba(var(--accent-active-rgb))\n- Button.jsx: Primary variant gradient uses var(--accent-active) as the start color\n- Sidebar.jsx: New Project button gradient uses var(--accent-active)\n- SettingsPanel.jsx: Toggle switch background uses var(--accent-active); fixed ring-color on picker swatches (ringColor → --tw-ring-color)',
+          description:
+            'Bug: The accent color picker in Settings set a --accent-active CSS variable on document.documentElement, but nothing in the UI consumed it. Changing accent colors had zero visual effect.\n\nRoot cause: The feature was architecturally complete (SettingsContext, localStorage, picker UI) but functionally disconnected — no CSS rules or components read the variable.\n\nFix:\n- SettingsContext: Also sets --accent-active-rgb (R,G,B triplet) for rgba() usage in CSS\n- index.css: glass-input:focus border/shadow, gradient-text, focus-visible outline, and ::selection now use var(--accent-active) / rgba(var(--accent-active-rgb))\n- Button.jsx: Primary variant gradient uses var(--accent-active) as the start color\n- Sidebar.jsx: New Project button gradient uses var(--accent-active)\n- SettingsPanel.jsx: Toggle switch background uses var(--accent-active); fixed ring-color on picker swatches (ringColor → --tw-ring-color)',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1055,7 +1451,8 @@ export function createSeedProject() {
           type: 'story',
           key: 'SF-25',
           title: 'Expand accent color to all UI surfaces',
-          description: 'Wire the accent color CSS variable into ~15 components: tabs, filters, epics sidebar, board columns, issue cards, quick create, backlog, velocity chart, phase cards, architecture dependency links, overview section icons, project header hover, and issue detail panel. Replace all hardcoded purple with var(--accent-active) and rgba(var(--accent-active-rgb)) patterns.',
+          description:
+            'Wire the accent color CSS variable into ~15 components: tabs, filters, epics sidebar, board columns, issue cards, quick create, backlog, velocity chart, phase cards, architecture dependency links, overview section icons, project header hover, and issue detail panel. Replace all hardcoded purple with var(--accent-active) and rgba(var(--accent-active-rgb)) patterns.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -1073,7 +1470,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-26',
           title: 'Lazy-load tabs and split vendor chunks',
-          description: 'React.lazy() + Suspense for all 7 project tab components and ProjectPage route. manualChunks in vite.config.js to split vendor-react, vendor-motion, vendor-utils. Reduced largest chunk from 625KB to 165KB, eliminated chunk size warning.',
+          description:
+            'React.lazy() + Suspense for all 7 project tab components and ProjectPage route. manualChunks in vite.config.js to split vendor-react, vendor-motion, vendor-utils. Reduced largest chunk from 625KB to 165KB, eliminated chunk size warning.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1091,7 +1489,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-27',
           title: 'Wiki documentation cleanup for MVP',
-          description: 'Add 4 new wiki pages (Keyboard Shortcuts, Responsive Layout, Theming & Accent Colors, Performance & Bundle Splitting). Update Architecture Overview with code splitting, responsive, and theming sections. Close out all tracker items for MVP release.',
+          description:
+            'Add 4 new wiki pages (Keyboard Shortcuts, Responsive Layout, Theming & Accent Colors, Performance & Bundle Splitting). Update Architecture Overview with code splitting, responsive, and theming sections. Close out all tracker items for MVP release.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1109,7 +1508,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-28',
           title: 'Seed project auto-update and rename',
-          description: 'Rename sampleProject.js to seedProject.js. Add fixed SEED_PROJECT_ID and SEED_VERSION constants. Add migrateSeedProject() to ProjectsContext that auto-updates the seed project when the version is bumped. Existing users get new wiki pages, board issues, workflow updates without clearing localStorage.',
+          description:
+            'Rename sampleProject.js to seedProject.js. Add fixed SEED_PROJECT_ID and SEED_VERSION constants. Add migrateSeedProject() to ProjectsContext that auto-updates the seed project when the version is bumped. Existing users get new wiki pages, board issues, workflow updates without clearing localStorage.',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -1127,7 +1527,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-29',
           title: 'Dead code cleanup for UAT',
-          description: 'Remove 5 orphaned files (PageTransition, useLocalStorage, useAutoSave, storage.js, issueKeys.js). Trim colors.js to only getPriorityColor. Security audit passed clean. Pre-UAT sweep.',
+          description:
+            'Remove 5 orphaned files (PageTransition, useLocalStorage, useAutoSave, storage.js, issueKeys.js). Trim colors.js to only getPriorityColor. Security audit passed clean. Pre-UAT sweep.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1145,7 +1546,8 @@ export function createSeedProject() {
           type: 'story',
           key: 'SF-30',
           title: 'Architecture tab upgrade — dependency graph + multi-view',
-          description: 'Major upgrade to Architecture tab: decomposed 471-line monolith into 7 sub-components. Added interactive dependency graph visualization (SVG canvas with zoom/pan/drag), Graph/Tree sub-tabs, ArchitectureStats (4 stat cards), ComponentForm modal, enhanced ComponentDetail with mini dep viz and "Used by" section. 8 files total.',
+          description:
+            'Major upgrade to Architecture tab: decomposed 471-line monolith into 7 sub-components. Added interactive dependency graph visualization (SVG canvas with zoom/pan/drag), Graph/Tree sub-tabs, ArchitectureStats (4 stat cards), ComponentForm modal, enhanced ComponentDetail with mini dep viz and "Used by" section. 8 files total.',
           status: 'Done',
           priority: 'high',
           storyPoints: 8,
@@ -1162,7 +1564,8 @@ export function createSeedProject() {
           type: 'bug',
           key: 'SF-31',
           title: 'Seed data audit — fix flat architecture tree and storyPoints field name',
-          description: 'Architecture tree was completely flat (all components at root level with no parentId). Added 4 group nodes (App Shell, UI Components, Data Layer, Services) with proper parent-child hierarchy. Also fixed field name inconsistency: 24 board issues used `points` instead of `storyPoints`, causing story point badges and velocity chart to show 0.',
+          description:
+            'Architecture tree was completely flat (all components at root level with no parentId). Added 4 group nodes (App Shell, UI Components, Data Layer, Services) with proper parent-child hierarchy. Also fixed field name inconsistency: 24 board issues used `points` instead of `storyPoints`, causing story point badges and velocity chart to show 0.',
           status: 'Done',
           priority: 'high',
           storyPoints: 2,
@@ -1179,7 +1582,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-32',
           title: 'Rewrite tracker workflow as generic global instructions',
-          description: 'Rewrote the Project Tracker Workflow section in MEMORY.md to be project-agnostic — removed all StoryFlow-specific literals (SF-##, seedProject.js, SEED_VERSION). Uses generic language ("the project\'s issue prefix", "the tracker/seed file", "the version constant") so the same instructions apply to any project tracked via StoryFlow. Added: explicit two-phase update pattern (before/after execution), audit trail standards for workflow notes, honest percentage guidance for timeline progress, mandatory wiki updates when new dirs/components created, strawman-free decision alternatives requirement, cross-tab consistency rules. Portability note marks section for future move to ~/.claude/CLAUDE.md on macOS. Also added 2 new lessons learned entries (storyPoints field name, architecture parentId/dependencies requirement). File: ~/.claude/projects/.../memory/MEMORY.md, ~145 lines.',
+          description:
+            'Rewrote the Project Tracker Workflow section in MEMORY.md to be project-agnostic — removed all StoryFlow-specific literals (SF-##, seedProject.js, SEED_VERSION). Uses generic language ("the project\'s issue prefix", "the tracker/seed file", "the version constant") so the same instructions apply to any project tracked via StoryFlow. Added: explicit two-phase update pattern (before/after execution), audit trail standards for workflow notes, honest percentage guidance for timeline progress, mandatory wiki updates when new dirs/components created, strawman-free decision alternatives requirement, cross-tab consistency rules. Portability note marks section for future move to ~/.claude/CLAUDE.md on macOS. Also added 2 new lessons learned entries (storyPoints field name, architecture parentId/dependencies requirement). File: ~/.claude/projects/.../memory/MEMORY.md, ~145 lines.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -1196,7 +1600,8 @@ export function createSeedProject() {
           type: 'story',
           key: 'SF-33',
           title: 'Create Claude Code skill for global tracker workflow persistence',
-          description: 'Created a Claude Code skill for global tracker workflow persistence. Initially placed at ~/.claude/skills/storyflow-tracker/ (user-level), then moved into the StoryFlow project repo at skills/storyflow-tracker/ so the skill travels with the codebase and will be accessible when StoryFlow runs as a persistent service post-migration. See SF-34 for the relocation.',
+          description:
+            'Created a Claude Code skill for global tracker workflow persistence. Initially placed at ~/.claude/skills/storyflow-tracker/ (user-level), then moved into the StoryFlow project repo at skills/storyflow-tracker/ so the skill travels with the codebase and will be accessible when StoryFlow runs as a persistent service post-migration. See SF-34 for the relocation.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1213,7 +1618,8 @@ export function createSeedProject() {
           type: 'task',
           key: 'SF-34',
           title: 'Relocate tracker skill from user-level to project repo',
-          description: 'Moved 3 skill/command files from ~/.claude/skills/storyflow-tracker/ and ~/.claude/commands/ into the StoryFlow project at skills/storyflow-tracker/ and skills/commands/. Reason: user-level skills are machine-local and would not be accessible to Claude on other environments (e.g. macOS unified server). By storing them in the project repo, the skill definition travels with the codebase via git. Post-migration TODO: when StoryFlow runs as a persistent service with a real URL, Claude will need to be configured to access that service endpoint. Files moved: SKILL.md (~72 lines), references/update-areas.md (~114 lines), commands/update-tracker.md (~27 lines). Deleted: ~/.claude/skills/storyflow-tracker/ directory and ~/.claude/commands/update-tracker.md.',
+          description:
+            'Moved 3 skill/command files from ~/.claude/skills/storyflow-tracker/ and ~/.claude/commands/ into the StoryFlow project at skills/storyflow-tracker/ and skills/commands/. Reason: user-level skills are machine-local and would not be accessible to Claude on other environments (e.g. macOS unified server). By storing them in the project repo, the skill definition travels with the codebase via git. Post-migration TODO: when StoryFlow runs as a persistent service with a real URL, Claude will need to be configured to access that service endpoint. Files moved: SKILL.md (~72 lines), references/update-areas.md (~114 lines), commands/update-tracker.md (~27 lines). Deleted: ~/.claude/skills/storyflow-tracker/ directory and ~/.claude/commands/update-tracker.md.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -1231,7 +1637,8 @@ export function createSeedProject() {
           key: 'SF-35',
           type: 'epic',
           title: 'Quality & Testing Infrastructure',
-          description: 'Comprehensive quality infrastructure: ErrorBoundary for crash recovery, Vitest testing framework with 54 tests (graph utilities + useProject + ProjectsContext), ESLint/Prettier/Husky for code quality, TypeScript config for incremental adoption, Modal accessibility improvements (ARIA, focus trap), LoadingState/ErrorState UI feedback components, Suspense fallback fix, cycle detection UI integration, WorkflowCanvas refactoring into 4 extracted hooks, VirtualList for large lists, and reference validation in useProject.',
+          description:
+            'Comprehensive quality infrastructure: ErrorBoundary for crash recovery, Vitest testing framework with 54 tests (graph utilities + useProject + ProjectsContext), ESLint/Prettier/Husky for code quality, TypeScript config for incremental adoption, Modal accessibility improvements (ARIA, focus trap), LoadingState/ErrorState UI feedback components, Suspense fallback fix, cycle detection UI integration, WorkflowCanvas refactoring into 4 extracted hooks, VirtualList for large lists, and reference validation in useProject.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 27,
@@ -1246,7 +1653,8 @@ export function createSeedProject() {
           key: 'SF-36',
           type: 'story',
           title: 'As a user, I want the app to recover gracefully from errors',
-          description: 'Created ErrorBoundary component (src/components/layout/ErrorBoundary.jsx) that catches React render errors and displays a friendly fallback UI with error details, "Try Again" and "Go to Dashboard" buttons, and expandable technical details. Wraps entire app in App.jsx. Prevents full app crashes from component errors.',
+          description:
+            'Created ErrorBoundary component (src/components/layout/ErrorBoundary.jsx) that catches React render errors and displays a friendly fallback UI with error details, "Try Again" and "Go to Dashboard" buttons, and expandable technical details. Wraps entire app in App.jsx. Prevents full app crashes from component errors.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 3,
@@ -1262,7 +1670,8 @@ export function createSeedProject() {
           key: 'SF-37',
           type: 'story',
           title: 'As a developer, I want cycle detection in architecture dependencies',
-          description: 'Created src/utils/graph.js with 6 functions: wouldCreateCycle() for pre-validation, findCycles() using Tarjan\'s algorithm, findMissingDependencies() and findOrphanedComponents() for reference validation, topologicalSort() for dependency ordering, and cleanupInvalidReferences() for repair. Added 15 unit tests in graph.test.js covering all functions.',
+          description:
+            "Created src/utils/graph.js with 6 functions: wouldCreateCycle() for pre-validation, findCycles() using Tarjan's algorithm, findMissingDependencies() and findOrphanedComponents() for reference validation, topologicalSort() for dependency ordering, and cleanupInvalidReferences() for repair. Added 15 unit tests in graph.test.js covering all functions.",
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -1278,7 +1687,8 @@ export function createSeedProject() {
           key: 'SF-38',
           type: 'task',
           title: 'Fix milestone cleanup on phase deletion',
-          description: 'Updated useProject.js deletePhase() to also remove milestones that reference the deleted phase via phaseId. Prevents orphaned milestone data. Single-line change: filter milestones where m.phaseId !== phaseId.',
+          description:
+            'Updated useProject.js deletePhase() to also remove milestones that reference the deleted phase via phaseId. Prevents orphaned milestone data. Single-line change: filter milestones where m.phaseId !== phaseId.',
           status: 'Done',
           priority: 'high',
           storyPoints: 1,
@@ -1294,7 +1704,8 @@ export function createSeedProject() {
           key: 'SF-39',
           type: 'task',
           title: 'Add epic/dependency cleanup on issue deletion',
-          description: 'Updated useProject.js deleteIssue() to: (1) clear epicId from child issues when deleting an epic, (2) remove deleted issue from dependencies arrays of other issues. Prevents orphaned references that could cause UI bugs.',
+          description:
+            'Updated useProject.js deleteIssue() to: (1) clear epicId from child issues when deleting an epic, (2) remove deleted issue from dependencies arrays of other issues. Prevents orphaned references that could cause UI bugs.',
           status: 'Done',
           priority: 'high',
           storyPoints: 2,
@@ -1310,7 +1721,8 @@ export function createSeedProject() {
           key: 'SF-40',
           type: 'task',
           title: 'Fix Modal accessibility (ARIA, focus trap)',
-          description: 'Rewrote Modal.jsx with full accessibility: role="dialog", aria-modal="true", aria-labelledby with dynamic ID, focus trap (Tab cycles through focusable elements), Escape key closes, focus restoration on close, body scroll lock when open. Close button has aria-label.',
+          description:
+            'Rewrote Modal.jsx with full accessibility: role="dialog", aria-modal="true", aria-labelledby with dynamic ID, focus trap (Tab cycles through focusable elements), Escape key closes, focus restoration on close, body scroll lock when open. Close button has aria-label.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1326,7 +1738,8 @@ export function createSeedProject() {
           key: 'SF-41',
           type: 'task',
           title: 'Setup Vitest testing infrastructure',
-          description: 'Added Vitest test framework: vitest.config.js with jsdom environment, src/test/setup.js with @testing-library/jest-dom and mocks for localStorage and crypto.randomUUID. Added 15 tests for graph utilities. All tests pass. Updated package.json with test/test:run/test:coverage scripts.',
+          description:
+            'Added Vitest test framework: vitest.config.js with jsdom environment, src/test/setup.js with @testing-library/jest-dom and mocks for localStorage and crypto.randomUUID. Added 15 tests for graph utilities. All tests pass. Updated package.json with test/test:run/test:coverage scripts.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1342,7 +1755,8 @@ export function createSeedProject() {
           key: 'SF-42',
           type: 'task',
           title: 'Setup ESLint, Prettier, and TypeScript config',
-          description: 'Added code quality tooling: eslint.config.js with react-hooks and react-refresh plugins, .prettierrc with project style settings, tsconfig.json for incremental TypeScript adoption (allowJs, checkJs off, strict off). Added husky and lint-staged for pre-commit hooks. Updated package.json with lint/format/typecheck scripts.',
+          description:
+            'Added code quality tooling: eslint.config.js with react-hooks and react-refresh plugins, .prettierrc with project style settings, tsconfig.json for incremental TypeScript adoption (allowJs, checkJs off, strict off). Added husky and lint-staged for pre-commit hooks. Updated package.json with lint/format/typecheck scripts.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1358,7 +1772,8 @@ export function createSeedProject() {
           key: 'SF-43',
           type: 'task',
           title: 'Refactor WorkflowCanvas into extracted hooks',
-          description: 'Decomposed 625-line WorkflowCanvas.jsx into main component (393 lines) plus 4 extracted hooks: useCanvasViewport.js (zoom/pan/centering, 130 lines), useCanvasDrag.js (node dragging with threshold, 95 lines), useCanvasPan.js (middle-mouse panning, 50 lines), useCanvasConnection.js (connection drawing, 80 lines). Also added LoadingState.jsx, ErrorState.jsx, and VirtualList.jsx UI components.',
+          description:
+            'Decomposed 625-line WorkflowCanvas.jsx into main component (393 lines) plus 4 extracted hooks: useCanvasViewport.js (zoom/pan/centering, 130 lines), useCanvasDrag.js (node dragging with threshold, 95 lines), useCanvasPan.js (middle-mouse panning, 50 lines), useCanvasConnection.js (connection drawing, 80 lines). Also added LoadingState.jsx, ErrorState.jsx, and VirtualList.jsx UI components.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -1375,7 +1790,8 @@ export function createSeedProject() {
           key: 'SF-44',
           type: 'task',
           title: 'Fix Suspense fallback in App.jsx',
-          description: 'Fixed <Suspense fallback={null}> in App.jsx line 23. Previously showed nothing during lazy load of ProjectPage route. Now uses LoadingState component with "Loading project..." message. Proper user feedback during code splitting.',
+          description:
+            'Fixed <Suspense fallback={null}> in App.jsx line 23. Previously showed nothing during lazy load of ProjectPage route. Now uses LoadingState component with "Loading project..." message. Proper user feedback during code splitting.',
           status: 'Done',
           priority: 'high',
           storyPoints: 1,
@@ -1391,7 +1807,8 @@ export function createSeedProject() {
           key: 'SF-45',
           type: 'task',
           title: 'Integrate cycle detection in ComponentDetail.jsx',
-          description: 'Integrated wouldCreateCycle() from utils/graph.js into ComponentDetail.jsx DependencyList component. Available dependencies are now filtered to exclude those that would create circular dependencies. Uses useMemo for efficiency. Prevents users from adding dependencies that would create cycles in the architecture graph.',
+          description:
+            'Integrated wouldCreateCycle() from utils/graph.js into ComponentDetail.jsx DependencyList component. Available dependencies are now filtered to exclude those that would create circular dependencies. Uses useMemo for efficiency. Prevents users from adding dependencies that would create cycles in the architecture graph.',
           status: 'Done',
           priority: 'high',
           storyPoints: 2,
@@ -1407,7 +1824,8 @@ export function createSeedProject() {
           key: 'SF-46',
           type: 'task',
           title: 'Add useProject and ProjectsContext unit tests',
-          description: 'Created two test files: src/hooks/useProject.test.jsx (19 tests covering hook API, null project guards for all CRUD operations) and src/contexts/ProjectsContext.test.jsx (20 tests covering context provider, addProject, getProject, updateProject, deleteProject, importProject, localStorage persistence, reducer actions). Total: 54 passing tests across 3 test files. All tests pass with npm run test:run.',
+          description:
+            'Created two test files: src/hooks/useProject.test.jsx (19 tests covering hook API, null project guards for all CRUD operations) and src/contexts/ProjectsContext.test.jsx (20 tests covering context provider, addProject, getProject, updateProject, deleteProject, importProject, localStorage persistence, reducer actions). Total: 54 passing tests across 3 test files. All tests pass with npm run test:run.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1423,7 +1841,8 @@ export function createSeedProject() {
           key: 'SF-47',
           type: 'story',
           title: 'Fix light mode theme — comprehensive component audit',
-          description: 'Light mode is visually broken despite theming infrastructure being in place. The issue: ~104 instances of hardcoded `text-white` across 48 files, plus `bg-slate-800`, `bg-slate-700`, and other dark-mode-specific Tailwind classes that override the CSS variable-based theme system.\n\n**Root cause:** Components use hardcoded Tailwind color classes instead of CSS variables. The `index.css` has ~80 light mode overrides but they don\'t cover all cases, and specificity issues prevent some overrides from working.\n\n**Fix approach:**\n1. Audit all components using dark-mode hardcoded classes\n2. Replace with CSS variable equivalents (e.g., `text-white` → `text-[var(--text-primary)]`)\n3. Or extend index.css overrides with higher specificity selectors\n4. Test each component in both themes\n\n**Files to audit:** Header, Sidebar, all Board components (12), Wiki components (8), Workflow components (7), Timeline components (4), Decisions components (3), Architecture components (7), UI components (16).',
+          description:
+            "Light mode is visually broken despite theming infrastructure being in place. The issue: ~104 instances of hardcoded `text-white` across 48 files, plus `bg-slate-800`, `bg-slate-700`, and other dark-mode-specific Tailwind classes that override the CSS variable-based theme system.\n\n**Root cause:** Components use hardcoded Tailwind color classes instead of CSS variables. The `index.css` has ~80 light mode overrides but they don't cover all cases, and specificity issues prevent some overrides from working.\n\n**Fix approach:**\n1. Audit all components using dark-mode hardcoded classes\n2. Replace with CSS variable equivalents (e.g., `text-white` → `text-[var(--text-primary)]`)\n3. Or extend index.css overrides with higher specificity selectors\n4. Test each component in both themes\n\n**Files to audit:** Header, Sidebar, all Board components (12), Wiki components (8), Workflow components (7), Timeline components (4), Decisions components (3), Architecture components (7), UI components (16).",
           status: 'Done',
           priority: 'medium',
           storyPoints: 5,
@@ -1440,7 +1859,8 @@ export function createSeedProject() {
           key: 'SF-48',
           type: 'epic',
           title: 'StoryFlow 2.0 Overhaul',
-          description: 'Major architectural overhaul to transform StoryFlow from a 75% production-quality MVP into a tier-1 project planning tool. Includes: unified design token system, Zustand state migration, URL routing with deep linking, tab consolidation (7→5), activity feed, and comprehensive semantic token adoption across all components.',
+          description:
+            'Major architectural overhaul to transform StoryFlow from a 75% production-quality MVP into a tier-1 project planning tool. Includes: unified design token system, Zustand state migration, URL routing with deep linking, tab consolidation (7→5), activity feed, and comprehensive semantic token adoption across all components.',
           status: 'In Progress',
           priority: 'critical',
           storyPoints: 34,
@@ -1455,7 +1875,8 @@ export function createSeedProject() {
           key: 'SF-49',
           type: 'story',
           title: 'Design Token Consolidation',
-          description: 'Consolidated 3 competing token systems + 200 lines of light mode hacks into a single unified semantic token system. New structure: `--color-bg-*`, `--color-fg-*`, `--color-border-*`, `--color-accent-*`. Updated all 60+ components to use semantic tokens.',
+          description:
+            'Consolidated 3 competing token systems + 200 lines of light mode hacks into a single unified semantic token system. New structure: `--color-bg-*`, `--color-fg-*`, `--color-border-*`, `--color-accent-*`. Updated all 60+ components to use semantic tokens.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 8,
@@ -1471,7 +1892,8 @@ export function createSeedProject() {
           key: 'SF-50',
           type: 'story',
           title: 'Zustand State Management Migration',
-          description: 'Migrated from React Context + useReducer to Zustand with sliced stores. Created projectsStore.js with immer middleware for immutable updates, persist middleware for localStorage. Added activityStore.js for audit logging. Fixed selector patterns to prevent infinite re-render loops.',
+          description:
+            'Migrated from React Context + useReducer to Zustand with sliced stores. Created projectsStore.js with immer middleware for immutable updates, persist middleware for localStorage. Added activityStore.js for audit logging. Fixed selector patterns to prevent infinite re-render loops.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 8,
@@ -1487,7 +1909,8 @@ export function createSeedProject() {
           key: 'SF-51',
           type: 'story',
           title: 'Tab Consolidation (7 → 5)',
-          description: 'Consolidated 7 tabs into 5 tabs with sub-navigation: Overview, Plan (Architecture + Workflow), Work (Board), Docs (Wiki + Decisions), Insights (Timeline). Updated ProjectSidebar with new tab structure and mobile "More" menu. Fixed tab key mapping for navigation.',
+          description:
+            'Consolidated 7 tabs into 5 tabs with sub-navigation: Overview, Plan (Architecture + Workflow), Work (Board), Docs (Wiki + Decisions), Insights (Timeline). Updated ProjectSidebar with new tab structure and mobile "More" menu. Fixed tab key mapping for navigation.',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -1503,7 +1926,8 @@ export function createSeedProject() {
           key: 'SF-52',
           type: 'task',
           title: 'URL Routing & Deep Linking',
-          description: 'Added full URL structure with react-router-dom: /project/:id/overview, /project/:id/plan, /project/:id/plan/workflow, /project/:id/work, /project/:id/work/issue/:issueId, /project/:id/docs, /project/:id/docs/page/:pageId, /project/:id/docs/decisions, /project/:id/insights. Routes are shareable and bookmarkable.',
+          description:
+            'Added full URL structure with react-router-dom: /project/:id/overview, /project/:id/plan, /project/:id/plan/workflow, /project/:id/work, /project/:id/work/issue/:issueId, /project/:id/docs, /project/:id/docs/page/:pageId, /project/:id/docs/decisions, /project/:id/insights. Routes are shareable and bookmarkable.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1519,7 +1943,8 @@ export function createSeedProject() {
           key: 'SF-53',
           type: 'task',
           title: 'Activity Feed / Audit Log',
-          description: 'Created activityStore.js with activity logging for all mutations. Added ActivityPanel and ActivityItem components. Activity shows on Overview tab. Tracks issue, page, and decision CRUD with timestamps and change details.',
+          description:
+            'Created activityStore.js with activity logging for all mutations. Added ActivityPanel and ActivityItem components. Activity shows on Overview tab. Tracks issue, page, and decision CRUD with timestamps and change details.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1535,7 +1960,8 @@ export function createSeedProject() {
           key: 'SF-54',
           type: 'task',
           title: 'Update all UI components to semantic tokens',
-          description: 'Batch updated 16 UI components (Button, Badge, Input, Modal, GlassCard, Select, TextArea, TagInput, Tabs, ProgressBar, Tooltip, ConfirmDialog, DropdownMenu, EmptyState, SearchBar, Avatar) to use semantic CSS variable tokens instead of hardcoded colors.',
+          description:
+            'Batch updated 16 UI components (Button, Badge, Input, Modal, GlassCard, Select, TextArea, TagInput, Tabs, ProgressBar, Tooltip, ConfirmDialog, DropdownMenu, EmptyState, SearchBar, Avatar) to use semantic CSS variable tokens instead of hardcoded colors.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1551,7 +1977,8 @@ export function createSeedProject() {
           key: 'SF-55',
           type: 'task',
           title: 'Update board/layout/project components to semantic tokens',
-          description: 'Batch updated all board components (12), layout components (5), and project tab components (9) to use semantic CSS variable tokens. Components now properly support both dark and light themes.',
+          description:
+            'Batch updated all board components (12), layout components (5), and project tab components (9) to use semantic CSS variable tokens. Components now properly support both dark and light themes.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1567,7 +1994,8 @@ export function createSeedProject() {
           key: 'SF-56',
           type: 'task',
           title: 'Update wiki/workflow/timeline/decisions components',
-          description: 'Batch updated wiki components (8), workflow components (7), timeline components (4), and decisions components (3) to use semantic CSS variable tokens.',
+          description:
+            'Batch updated wiki components (8), workflow components (7), timeline components (4), and decisions components (3) to use semantic CSS variable tokens.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1583,7 +2011,8 @@ export function createSeedProject() {
           key: 'SF-57',
           type: 'bug',
           title: 'Fix infinite re-render loop in ActivityPanel',
-          description: 'Maximum update depth exceeded error caused by Zustand selector factory pattern creating new function references each render. Fixed by subscribing to parent `state.activities` object instead of using dynamic `selectProjectActivities(projectId)` selector. Also fixed similar issues in useProject.js and ProjectsContext.jsx.',
+          description:
+            'Maximum update depth exceeded error caused by Zustand selector factory pattern creating new function references each render. Fixed by subscribing to parent `state.activities` object instead of using dynamic `selectProjectActivities(projectId)` selector. Also fixed similar issues in useProject.js and ProjectsContext.jsx.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 2,
@@ -1600,7 +2029,8 @@ export function createSeedProject() {
           key: 'SF-58',
           type: 'bug',
           title: 'Fix project sidebar tab icon spacing — icons visually merge',
-          description: 'The vertical tab icon strip in ProjectSidebar.jsx renders the 5 main tab icons (Overview/FileText, Plan/Network, Work/Columns3, Docs/BookOpen, Insights/BarChart3) with only 4px gap (Tailwind md:gap-1). This is too tight for 18px icons inside aspect-square buttons. The Overview (FileText) and Plan (Network) icons are so close they appear as a single compound icon — a document with a network diagram hanging beneath it. Fix: increase gap from gap-1 (4px) to gap-2 (8px) in the desktop sidebar container class on line 115 of ProjectSidebar.jsx. One-line change, purely visual spacing fix. No functional impact.',
+          description:
+            'The vertical tab icon strip in ProjectSidebar.jsx renders the 5 main tab icons (Overview/FileText, Plan/Network, Work/Columns3, Docs/BookOpen, Insights/BarChart3) with only 4px gap (Tailwind md:gap-1). This is too tight for 18px icons inside aspect-square buttons. The Overview (FileText) and Plan (Network) icons are so close they appear as a single compound icon — a document with a network diagram hanging beneath it. Fix: increase gap from gap-1 (4px) to gap-2 (8px) in the desktop sidebar container class on line 115 of ProjectSidebar.jsx. One-line change, purely visual spacing fix. No functional impact.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -1616,8 +2046,10 @@ export function createSeedProject() {
           id: bug6Id,
           key: 'SF-59',
           type: 'bug',
-          title: 'Fix project sidebar icon mismatches — wrong icons for Plan, Work, and Workflow tabs',
-          description: 'The 2.0 tab consolidation introduced semantically wrong icons in ProjectSidebar.jsx for 3 of the 5 main/sub tabs. (1) Work tab uses Columns3 (three vertical bars) which suggests a generic column layout, not a Kanban board — the BoardTab component itself uses LayoutGrid internally, creating inconsistency. (2) Plan tab uses Network which means "networking" not "planning" — and the Architecture sub-tab also uses a network-like icon (Box), causing visual confusion between parent and child. (3) Workflow sub-tab uses GitBranch which means "git branches" not "workflow execution". Fix: swap 3 icon imports in ProjectSidebar.jsx — Network→Compass for Plan, Columns3→LayoutGrid for Work, GitBranch→Workflow for Workflow sub-tab. Purely import + reference changes in MAIN_TABS array. Files affected: src/components/project/ProjectSidebar.jsx (~3 import swaps, ~3 icon references). User impact: sidebar icons now semantically match their tab content, improving navigation clarity.',
+          title:
+            'Fix project sidebar icon mismatches — wrong icons for Plan, Work, and Workflow tabs',
+          description:
+            'The 2.0 tab consolidation introduced semantically wrong icons in ProjectSidebar.jsx for 3 of the 5 main/sub tabs. (1) Work tab uses Columns3 (three vertical bars) which suggests a generic column layout, not a Kanban board — the BoardTab component itself uses LayoutGrid internally, creating inconsistency. (2) Plan tab uses Network which means "networking" not "planning" — and the Architecture sub-tab also uses a network-like icon (Box), causing visual confusion between parent and child. (3) Workflow sub-tab uses GitBranch which means "git branches" not "workflow execution". Fix: swap 3 icon imports in ProjectSidebar.jsx — Network→Compass for Plan, Columns3→LayoutGrid for Work, GitBranch→Workflow for Workflow sub-tab. Purely import + reference changes in MAIN_TABS array. Files affected: src/components/project/ProjectSidebar.jsx (~3 import swaps, ~3 icon references). User impact: sidebar icons now semantically match their tab content, improving navigation clarity.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -1634,7 +2066,8 @@ export function createSeedProject() {
           key: 'SF-60',
           type: 'story',
           title: 'Move sub-tab navigation from sidebar icons to inline content-area tabs',
-          description: 'The ProjectSidebar renders sub-tab icons (Architecture/Workflow under Plan, Wiki/Decisions under Docs) below a divider line at the bottom of the icon strip. This looks unprofessional — tiny unlabeled icons dangling below a hairline, disconnected from the main navigation. Professional tools like Linear, Notion, and Figma keep the sidebar clean with only top-level icons and handle sub-navigation inside the content area. Fix: (1) Add a sub-navigation bar using the existing Tabs component in ProjectPage.jsx, rendered between the ProjectHeader and the route content when the active tab has sub-views (Plan or Docs). (2) Remove the entire sub-tab section from ProjectSidebar.jsx — the divider, the sub-tab icon buttons, the hasSubTabs logic, and the mobile More menu sub-tab entries. (3) Clean up unused imports (Box, FileEdit, Scale, isPathActive). Files affected: src/pages/ProjectPage.jsx (+25 lines for SUB_NAV config and Tabs rendering), src/components/project/ProjectSidebar.jsx (-60 lines removing sub-tab blocks). User impact: sidebar is now a clean 5-icon strip; sub-navigation appears as labeled pill tabs in the content header, matching industry-standard patterns.',
+          description:
+            'The ProjectSidebar renders sub-tab icons (Architecture/Workflow under Plan, Wiki/Decisions under Docs) below a divider line at the bottom of the icon strip. This looks unprofessional — tiny unlabeled icons dangling below a hairline, disconnected from the main navigation. Professional tools like Linear, Notion, and Figma keep the sidebar clean with only top-level icons and handle sub-navigation inside the content area. Fix: (1) Add a sub-navigation bar using the existing Tabs component in ProjectPage.jsx, rendered between the ProjectHeader and the route content when the active tab has sub-views (Plan or Docs). (2) Remove the entire sub-tab section from ProjectSidebar.jsx — the divider, the sub-tab icon buttons, the hasSubTabs logic, and the mobile More menu sub-tab entries. (3) Clean up unused imports (Box, FileEdit, Scale, isPathActive). Files affected: src/pages/ProjectPage.jsx (+25 lines for SUB_NAV config and Tabs rendering), src/components/project/ProjectSidebar.jsx (-60 lines removing sub-tab blocks). User impact: sidebar is now a clean 5-icon strip; sub-navigation appears as labeled pill tabs in the content header, matching industry-standard patterns.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1650,8 +2083,10 @@ export function createSeedProject() {
           id: bug7Id,
           key: 'SF-61',
           type: 'bug',
-          title: 'Fix tab navigation unreliable after second click — AnimatePresence + pushState race condition',
-          description: 'Two bugs cause tab navigation to go blank or get stuck on repeated clicks. (1) AnimatePresence mode="wait" with React Router causes exit animations to block new content from mounting. (2) All navigation uses manual pushState/popstate instead of React Router useNavigate(). Fix applied in two passes: First pass replaced all pushState/popstate with useNavigate() and removed mode="wait". Second pass removed AnimatePresence entirely — even without mode="wait", exit animations cause dual-render overlap/jank. Final solution: enter-only motion.div with opacity fade (0.12s), no exit animation, no AnimatePresence wrapper. Single file: src/pages/ProjectPage.jsx.',
+          title:
+            'Fix tab navigation unreliable after second click — AnimatePresence + pushState race condition',
+          description:
+            'Two bugs cause tab navigation to go blank or get stuck on repeated clicks. (1) AnimatePresence mode="wait" with React Router causes exit animations to block new content from mounting. (2) All navigation uses manual pushState/popstate instead of React Router useNavigate(). Fix applied in two passes: First pass replaced all pushState/popstate with useNavigate() and removed mode="wait". Second pass removed AnimatePresence entirely — even without mode="wait", exit animations cause dual-render overlap/jank. Final solution: enter-only motion.div with opacity fade (0.12s), no exit animation, no AnimatePresence wrapper. Single file: src/pages/ProjectPage.jsx.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 2,
@@ -1669,7 +2104,8 @@ export function createSeedProject() {
           key: 'SF-62',
           type: 'bug',
           title: 'Fix epic progress showing 0/0 — seed data uses parentId instead of epicId',
-          description: 'Epic sidebar showed "0/0 done 0%" for epics 1-4 and 6 because seed data linked child issues via parentId (an architecture concept) instead of epicId (the board concept). EpicSidebar.jsx filters on i.epicId === epic.id. Only epic 5 (Quality & Testing) was correct. Fix: replaced all parentId: epicXId with epicId: epicXId for board issues across all 6 epics (51 total occurrences). Single file: src/data/seedProject.js.',
+          description:
+            'Epic sidebar showed "0/0 done 0%" for epics 1-4 and 6 because seed data linked child issues via parentId (an architecture concept) instead of epicId (the board concept). EpicSidebar.jsx filters on i.epicId === epic.id. Only epic 5 (Quality & Testing) was correct. Fix: replaced all parentId: epicXId with epicId: epicXId for board issues across all 6 epics (51 total occurrences). Single file: src/data/seedProject.js.',
           status: 'Done',
           priority: 'high',
           storyPoints: 1,
@@ -1687,7 +2123,8 @@ export function createSeedProject() {
           key: 'SF-63',
           type: 'bug',
           title: 'Fix mini dependency graph too small and unreadable in architecture detail panel',
-          description: 'MiniDepGraph in ComponentDetail.jsx rendered with 100x28px nodes and 9px font in a 360px SVG viewBox — illegibly small in the 320px detail panel. Fix: enlarged nodes to 120x32, fonts to 11-12px, viewBox to 420px, increased gapY to 40, stroke widths to 1-2px, edge opacity to 0.65. Both Graph and Tree views now show readable dependency previews.',
+          description:
+            'MiniDepGraph in ComponentDetail.jsx rendered with 100x28px nodes and 9px font in a 360px SVG viewBox — illegibly small in the 320px detail panel. Fix: enlarged nodes to 120x32, fonts to 11-12px, viewBox to 420px, increased gapY to 40, stroke widths to 1-2px, edge opacity to 0.65. Both Graph and Tree views now show readable dependency previews.',
           status: 'Done',
           priority: 'high',
           storyPoints: 2,
@@ -1705,7 +2142,8 @@ export function createSeedProject() {
           key: 'SF-64',
           type: 'bug',
           title: 'Fix board filter dropdown text unreadable — glass-card blur washes out text',
-          description: 'MultiSelectDropdown used glass-card class (backdrop-filter:blur(24px) + 5% opacity bg) making text invisible. Root cause: kanban columns painted on top of dropdown due to DOM order. Fix: (1) replaced glass-card with opaque #0f172a bg + isolation:isolate, (2) added relative z-40 to FilterBar container so dropdown stacks above columns, (3) upgraded text to --color-fg-default for contrast, (4) upgraded checkbox border to --color-fg-muted.',
+          description:
+            'MultiSelectDropdown used glass-card class (backdrop-filter:blur(24px) + 5% opacity bg) making text invisible. Root cause: kanban columns painted on top of dropdown due to DOM order. Fix: (1) replaced glass-card with opaque #0f172a bg + isolation:isolate, (2) added relative z-40 to FilterBar container so dropdown stacks above columns, (3) upgraded text to --color-fg-default for contrast, (4) upgraded checkbox border to --color-fg-muted.',
           status: 'Done',
           priority: 'high',
           storyPoints: 1,
@@ -1723,7 +2161,8 @@ export function createSeedProject() {
           key: 'SF-65',
           type: 'bug',
           title: 'Fix sub-workflow overlay — nodes off-center with large blank area on left',
-          description: 'Sub-workflow overlay had nodes clustered to the right with a huge blank area on the left. Three root causes: (1) centerOnNodes() fired before overlay scale-in animation finished so container had wrong dimensions — fixed with 280ms delay + dimension guard. (2) No auto-fit scaling — small sub-workflows (5 nodes, ~930px content) stayed at scale 1.0 in a ~2100px overlay — added FIT_MAX=1.5 so content scales up. (3) Static canvasId="sub-workflow" meant re-opening different sub-workflows kept stale viewport — switched to dynamic ID based on parentNode.id + viewStack.',
+          description:
+            'Sub-workflow overlay had nodes clustered to the right with a huge blank area on the left. Three root causes: (1) centerOnNodes() fired before overlay scale-in animation finished so container had wrong dimensions — fixed with 280ms delay + dimension guard. (2) No auto-fit scaling — small sub-workflows (5 nodes, ~930px content) stayed at scale 1.0 in a ~2100px overlay — added FIT_MAX=1.5 so content scales up. (3) Static canvasId="sub-workflow" meant re-opening different sub-workflows kept stale viewport — switched to dynamic ID based on parentNode.id + viewStack.',
           status: 'Done',
           priority: 'high',
           storyPoints: 3,
@@ -1741,7 +2180,8 @@ export function createSeedProject() {
           key: 'SF-66',
           type: 'task',
           title: 'Move workflow canvas dot grid from SVG pattern to CSS radial-gradient',
-          description: 'The dot grid was an SVG <pattern> inside the transform wrapper div. When the wrapper translated right/down to center content, the left/top area of the container had no grid — just empty dark space. Fix: moved to CSS radial-gradient background on the container div itself. Grid offset and size computed from viewport.offsetX/offsetY/scale so dots track correctly with pan/zoom. Fills 100% of visible area regardless of transform state. Removed old SVG pattern defs and rect. Also rewrote handleCanvasClick to use data-workflow-node closest check instead of tagName matching.',
+          description:
+            'The dot grid was an SVG <pattern> inside the transform wrapper div. When the wrapper translated right/down to center content, the left/top area of the container had no grid — just empty dark space. Fix: moved to CSS radial-gradient background on the container div itself. Grid offset and size computed from viewport.offsetX/offsetY/scale so dots track correctly with pan/zoom. Fills 100% of visible area regardless of transform state. Removed old SVG pattern defs and rect. Also rewrote handleCanvasClick to use data-workflow-node closest check instead of tagName matching.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1759,7 +2199,8 @@ export function createSeedProject() {
           key: 'SF-67',
           type: 'task',
           title: 'Redesign architecture ComponentDetail panel for density',
-          description: 'ComponentDetail panel looked cramped with oversized elements in a narrow w-80 panel. Redesigned: card padding to !p-3, collapsed header to single inline row (h-6 w-6 icon, xs type badge, text-sm truncated name), always grid-cols-2 with gap-3, description reduced to 2 rows text-xs, all dependency/used-by badges to size xs with gap-1, section labels to text-xs. MiniDepGraph rewritten with dynamic column positioning (leftX/centerX/rightX computed based on which sides have nodes) to prevent right-side clipping.',
+          description:
+            'ComponentDetail panel looked cramped with oversized elements in a narrow w-80 panel. Redesigned: card padding to !p-3, collapsed header to single inline row (h-6 w-6 icon, xs type badge, text-sm truncated name), always grid-cols-2 with gap-3, description reduced to 2 rows text-xs, all dependency/used-by badges to size xs with gap-1, section labels to text-xs. MiniDepGraph rewritten with dynamic column positioning (leftX/centerX/rightX computed based on which sides have nodes) to prevent right-side clipping.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1777,7 +2218,8 @@ export function createSeedProject() {
           key: 'SF-68',
           type: 'task',
           title: 'Standardize Badge sizing across entire app — xs/sm two-tier system',
-          description: 'Badges were inconsistently sized across views (some sm, some md, some using old CSS variable spacing). Added xs size tier (px-1.5 py-px text-[10px]). Tightened sm (px-2 py-0.5 text-[11px]) and md (px-2.5 py-1 text-xs). Applied uniform rules: xs for dense/inline contexts (backlog rows, kanban cards, filter chips, tree nodes, decision tags, wiki labels, tag inputs, component detail), sm for standard card contexts (dashboard, column headers, epic sidebar, phase cards, decision status, node modal/properties, project header). Eliminated all md usages. Updated 13+ component files. Also tightened TagInput container from CSS variable spacing to direct Tailwind (px-2 py-1.5 gap-1.5).',
+          description:
+            'Badges were inconsistently sized across views (some sm, some md, some using old CSS variable spacing). Added xs size tier (px-1.5 py-px text-[10px]). Tightened sm (px-2 py-0.5 text-[11px]) and md (px-2.5 py-1 text-xs). Applied uniform rules: xs for dense/inline contexts (backlog rows, kanban cards, filter chips, tree nodes, decision tags, wiki labels, tag inputs, component detail), sm for standard card contexts (dashboard, column headers, epic sidebar, phase cards, decision status, node modal/properties, project header). Eliminated all md usages. Updated 13+ component files. Also tightened TagInput container from CSS variable spacing to direct Tailwind (px-2 py-1.5 gap-1.5).',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1798,8 +2240,10 @@ export function createSeedProject() {
           id: task34Id,
           key: 'SF-69',
           type: 'task',
-          title: 'Test sub-workflow overlay — verify auto-fit zoom, dot grid coverage, and pan/zoom',
-          description: 'Open each sub-workflow in the seed project. Verify: (1) nodes fill the overlay space (auto-fit up to 1.5x), (2) dot grid covers the entire background with no blank areas, (3) pan and zoom work correctly, (4) re-opening different sub-workflows re-centers properly. Test on both small (5-node) and larger sub-workflows.',
+          title:
+            'Test sub-workflow overlay — verify auto-fit zoom, dot grid coverage, and pan/zoom',
+          description:
+            'Open each sub-workflow in the seed project. Verify: (1) nodes fill the overlay space (auto-fit up to 1.5x), (2) dot grid covers the entire background with no blank areas, (3) pan and zoom work correctly, (4) re-opening different sub-workflows re-centers properly. Test on both small (5-node) and larger sub-workflows.',
           status: 'In Progress',
           priority: 'high',
           storyPoints: 2,
@@ -1817,7 +2261,8 @@ export function createSeedProject() {
           key: 'SF-70',
           type: 'task',
           title: 'Test main workflow canvas — CSS grid background, click-to-deselect, pan/zoom',
-          description: 'The main workflow canvas was changed: (1) dot grid moved from SVG pattern to CSS radial-gradient on container, (2) click handler rewritten to use data-workflow-node closest check instead of tagName. Verify: grid fills entire canvas during pan/zoom, clicking empty space deselects nodes, clicking nodes does not deselect, connections still render correctly at all zoom levels.',
+          description:
+            'The main workflow canvas was changed: (1) dot grid moved from SVG pattern to CSS radial-gradient on container, (2) click handler rewritten to use data-workflow-node closest check instead of tagName. Verify: grid fills entire canvas during pan/zoom, clicking empty space deselects nodes, clicking nodes does not deselect, connections still render correctly at all zoom levels.',
           status: 'To Do',
           priority: 'high',
           storyPoints: 2,
@@ -1835,7 +2280,8 @@ export function createSeedProject() {
           key: 'SF-71',
           type: 'task',
           title: 'Visual audit — verify badge sizes look correct across all 7 tabs',
-          description: 'Quick visual pass through every tab to confirm the xs/sm badge sizing looks uniform and not too small: Board (kanban cards + backlog rows + filter chips), Architecture (tree + detail panel), Decisions (card tags + status), Timeline (phase status), Wiki (page labels + status), Dashboard (project cards). Also verify TagInput padding in IssueDetail and DecisionDetail forms.',
+          description:
+            'Quick visual pass through every tab to confirm the xs/sm badge sizing looks uniform and not too small: Board (kanban cards + backlog rows + filter chips), Architecture (tree + detail panel), Decisions (card tags + status), Timeline (phase status), Wiki (page labels + status), Dashboard (project cards). Also verify TagInput padding in IssueDetail and DecisionDetail forms.',
           status: 'To Do',
           priority: 'high',
           storyPoints: 1,
@@ -1853,7 +2299,8 @@ export function createSeedProject() {
           key: 'SF-72',
           type: 'task',
           title: 'Commit all changes — 79+ modified files across multiple sessions',
-          description: 'Large batch of uncommitted work since last commit (1bf243f). 79 modified files + 100+ new files. Either break into logical commits by feature area or do one well-documented commit. Includes: sub-workflow overlay fixes, canvas grid refactor, ComponentDetail redesign, badge uniformity, skills system, test files, linting config, and seed data updates through v31.',
+          description:
+            'Large batch of uncommitted work since last commit (1bf243f). 79 modified files + 100+ new files. Either break into logical commits by feature area or do one well-documented commit. Includes: sub-workflow overlay fixes, canvas grid refactor, ComponentDetail redesign, badge uniformity, skills system, test files, linting config, and seed data updates through v31.',
           status: 'To Do',
           priority: 'high',
           storyPoints: 2,
@@ -1871,7 +2318,8 @@ export function createSeedProject() {
           key: 'SF-73',
           type: 'task',
           title: 'Run vitest suite — fix any failures from recent canvas and badge changes',
-          description: '30+ test files exist but have not been run since the canvas grid refactor (SVG to CSS), click handler rewrite (data-workflow-node), and badge size changes (xs/sm tiers). Run vitest, review failures, fix broken tests. Particularly check Badge.test.jsx for size tier changes and any workflow canvas tests.',
+          description:
+            '30+ test files exist but have not been run since the canvas grid refactor (SVG to CSS), click handler rewrite (data-workflow-node), and badge size changes (xs/sm tiers). Run vitest, review failures, fix broken tests. Particularly check Badge.test.jsx for size tier changes and any workflow canvas tests.',
           status: 'To Do',
           priority: 'medium',
           storyPoints: 3,
@@ -1889,7 +2337,8 @@ export function createSeedProject() {
           key: 'SF-74',
           type: 'task',
           title: 'Add categorized Lessons Learned wiki page to tracker',
-          description: 'Created a structured wiki page under Getting Started with 6 categories: CSS & Styling (4 entries), Architecture & Components (5 entries), Data Model (5 entries), Security (2 entries), Process & Workflow (4 entries), Performance (2 entries). Each lesson is in a table with Lesson + Context columns. Replaces the flat bullet list in MEMORY.md as the canonical source visible in the StoryFlow UI. Added as page14Id, child of page1Id (Getting Started).',
+          description:
+            'Created a structured wiki page under Getting Started with 6 categories: CSS & Styling (4 entries), Architecture & Components (5 entries), Data Model (5 entries), Security (2 entries), Process & Workflow (4 entries), Performance (2 entries). Each lesson is in a table with Lesson + Context columns. Replaces the flat bullet list in MEMORY.md as the canonical source visible in the StoryFlow UI. Added as page14Id, child of page1Id (Getting Started).',
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -1907,7 +2356,8 @@ export function createSeedProject() {
           key: 'SF-75',
           type: 'task',
           title: 'Backlog view — organize into status-grouped glass card sections',
-          description: 'Redesigned the BacklogView from a flat list into collapsible glass-card sections grouped by status (To Do, In Progress, Done). Each section has a header with status dot, title, issue count badge, and collapse chevron. Mirrors the BoardColumn visual language in a vertical stacked layout. Also upgraded EpicGroupedList with the same card treatment. Added STATUS_ACCENT and STATUS_NAMES constants. Handles unknown statuses with an "Other" fallback section.',
+          description:
+            'Redesigned the BacklogView from a flat list into collapsible glass-card sections grouped by status (To Do, In Progress, Done). Each section has a header with status dot, title, issue count badge, and collapse chevron. Mirrors the BoardColumn visual language in a vertical stacked layout. Also upgraded EpicGroupedList with the same card treatment. Added STATUS_ACCENT and STATUS_NAMES constants. Handles unknown statuses with an "Other" fallback section.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -1925,7 +2375,8 @@ export function createSeedProject() {
           key: 'SF-76',
           type: 'task',
           title: 'Verify backlog sections — collapse/expand, sort, epic grouping, create',
-          description: 'Test the new backlog status-grouped sections end-to-end: (1) Three sections visible with correct status dots and counts, (2) Collapse/expand each section, (3) Sort within sections works, (4) Group by Epic toggle shows epic cards with same card treatment, (5) Quick create adds to To Do section, (6) Issue click opens detail panel, (7) Delete from dropdown updates counts.',
+          description:
+            'Test the new backlog status-grouped sections end-to-end: (1) Three sections visible with correct status dots and counts, (2) Collapse/expand each section, (3) Sort within sections works, (4) Group by Epic toggle shows epic cards with same card treatment, (5) Quick create adds to To Do section, (6) Issue click opens detail panel, (7) Delete from dropdown updates counts.',
           status: 'To Do',
           priority: 'medium',
           storyPoints: 1,
@@ -1943,7 +2394,8 @@ export function createSeedProject() {
           key: 'SF-77',
           type: 'bug',
           title: 'Fix workflow canvas content bleeding under sidebar',
-          description: 'Sub-workflow overlay header/toolbar were visually bleeding behind the sidebar. Root cause: SubWorkflowOverlay used createPortal to document.body with z-40, but sidebar had z-index 200 (--z-sticky). Since #root has no z-index, the sidebar at z-200 painted above the z-40 overlay backdrop but the overlay panel content still showed through. Fix: bumped overlay z-index to var(--z-drawer, 400) so it properly layers above the sidebar. Also changed <main> overflow-auto to overflow-hidden and added overflow-auto to DashboardPage root as defense-in-depth.',
+          description:
+            'Sub-workflow overlay header/toolbar were visually bleeding behind the sidebar. Root cause: SubWorkflowOverlay used createPortal to document.body with z-40, but sidebar had z-index 200 (--z-sticky). Since #root has no z-index, the sidebar at z-200 painted above the z-40 overlay backdrop but the overlay panel content still showed through. Fix: bumped overlay z-index to var(--z-drawer, 400) so it properly layers above the sidebar. Also changed <main> overflow-auto to overflow-hidden and added overflow-auto to DashboardPage root as defense-in-depth.',
           status: 'Done',
           priority: 'high',
           storyPoints: 1,
@@ -1960,7 +2412,8 @@ export function createSeedProject() {
           key: 'SF-78',
           type: 'bug',
           title: 'Fix invisible dot grid + remove gaudy node color bars',
-          description: 'Workflow canvas dot grid was invisible because radial-gradient used var(--th-border) — a CSS variable that was NEVER DEFINED in any stylesheet. Fix: replaced with var(--color-border-emphasis) (rgba(255,255,255,0.12)). Also removed the node top color bar entirely — it was a gaudy racing stripe adding visual noise. Type color is already communicated through the icon background and type label badge. Verified in both main canvas and sub-workflow overlay.',
+          description:
+            'Workflow canvas dot grid was invisible because radial-gradient used var(--th-border) — a CSS variable that was NEVER DEFINED in any stylesheet. Fix: replaced with var(--color-border-emphasis) (rgba(255,255,255,0.12)). Also removed the node top color bar entirely — it was a gaudy racing stripe adding visual noise. Type color is already communicated through the icon background and type label badge. Verified in both main canvas and sub-workflow overlay.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -1977,7 +2430,8 @@ export function createSeedProject() {
           key: 'SF-79',
           type: 'bug',
           title: 'Fix workflow execution broken by read-only state mutation',
-          description: 'BFS workflow execution was crashing with "Cannot assign to read only property status" because onNodeStart/onNodeComplete/onNodeError callbacks directly mutated objects that had been committed to React state via saveNodes(). Once in the reducer, objects are frozen. Fix: create a separate mutable working copy via resetNodes.map(n => ({...n})) that is never passed to React state directly — only spread copies are saved.',
+          description:
+            'BFS workflow execution was crashing with "Cannot assign to read only property status" because onNodeStart/onNodeComplete/onNodeError callbacks directly mutated objects that had been committed to React state via saveNodes(). Once in the reducer, objects are frozen. Fix: create a separate mutable working copy via resetNodes.map(n => ({...n})) that is never passed to React state directly — only spread copies are saved.',
           status: 'Done',
           priority: 'critical',
           storyPoints: 1,
@@ -1994,7 +2448,8 @@ export function createSeedProject() {
           key: 'SF-80',
           type: 'task',
           title: 'Replace Architecture stats bar with proper filter bar',
-          description: 'The ArchitectureStats component showed 4 vanity metric cards (Components, Types Used, Dependencies, Orphans) that were secretly clickable filters with zero discoverability. Replaced with ArchitectureFilterBar — an explicit filter bar matching Board tab\'s FilterBar pattern: Filter icon, Type multi-select dropdown (with colored icons, only types present in data), Connections single-select dropdown (Has dependencies / Has dependents / Orphans), active filter badges with remove buttons, and Clear all. Deleted ArchitectureStats.jsx and its test.',
+          description:
+            "The ArchitectureStats component showed 4 vanity metric cards (Components, Types Used, Dependencies, Orphans) that were secretly clickable filters with zero discoverability. Replaced with ArchitectureFilterBar — an explicit filter bar matching Board tab's FilterBar pattern: Filter icon, Type multi-select dropdown (with colored icons, only types present in data), Connections single-select dropdown (Has dependencies / Has dependents / Orphans), active filter badges with remove buttons, and Clear all. Deleted ArchitectureStats.jsx and its test.",
           status: 'Done',
           priority: 'medium',
           storyPoints: 2,
@@ -2011,7 +2466,8 @@ export function createSeedProject() {
           key: 'SF-81',
           type: 'task',
           title: 'Redesign light mode with "Warm Linen" color scheme',
-          description: 'Complete light mode redesign replacing cold Slate blue-grays with warm Stone/Bone palette. Base: #F9F7F4 (bone), subtle: #F3F0EB (eggshell), muted: #EBE7E0 (linen), emphasis: #DDD8CF (warm stone). Text shifted from cold #1e293b to warm #2C2825 charcoal scale. Glass effects warm-tinted. Gradient orbs shifted to amber/rose/gold. Shadows warm-tinted. Hardcoded bg-[#0f172a] in dropdown panels replaced with theme-aware var(--color-bg-inverse). Files: tokens.css (.theme-light block), index.css (glass overrides), ArchitectureFilterBar.jsx, FilterBar.jsx.',
+          description:
+            'Complete light mode redesign replacing cold Slate blue-grays with warm Stone/Bone palette. Base: #F9F7F4 (bone), subtle: #F3F0EB (eggshell), muted: #EBE7E0 (linen), emphasis: #DDD8CF (warm stone). Text shifted from cold #1e293b to warm #2C2825 charcoal scale. Glass effects warm-tinted. Gradient orbs shifted to amber/rose/gold. Shadows warm-tinted. Hardcoded bg-[#0f172a] in dropdown panels replaced with theme-aware var(--color-bg-inverse). Files: tokens.css (.theme-light block), index.css (glass overrides), ArchitectureFilterBar.jsx, FilterBar.jsx.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,
@@ -2026,8 +2482,10 @@ export function createSeedProject() {
           id: task44Id,
           number: 82,
           type: 'bug',
-          title: 'SF-82: Fix light mode visual issues — undefined --th-* vars, hardcoded colors, poor contrast',
-          description: 'The Warm Linen token redesign (SF-81) only updated tokens.css and index.css, but dozens of components use --th-* CSS variables that are NEVER DEFINED in any stylesheet. These silently fall back to dark-mode hardcoded values (#1e293b, rgba(255,255,255,0.06)) which look terrible in light mode. Also: Dashboard uses hardcoded text-white/text-slate-*, Badge component uses -300 color variants designed for dark backgrounds, DependencyGraph nodes use var(--th-panel) for backgroundColor. Fix: define all --th-* variables in both theme blocks mapping to semantic tokens, replace all hardcoded Slate/white colors with theme-aware equivalents.',
+          title:
+            'SF-82: Fix light mode visual issues — undefined --th-* vars, hardcoded colors, poor contrast',
+          description:
+            'The Warm Linen token redesign (SF-81) only updated tokens.css and index.css, but dozens of components use --th-* CSS variables that are NEVER DEFINED in any stylesheet. These silently fall back to dark-mode hardcoded values (#1e293b, rgba(255,255,255,0.06)) which look terrible in light mode. Also: Dashboard uses hardcoded text-white/text-slate-*, Badge component uses -300 color variants designed for dark backgrounds, DependencyGraph nodes use var(--th-panel) for backgroundColor. Fix: define all --th-* variables in both theme blocks mapping to semantic tokens, replace all hardcoded Slate/white colors with theme-aware equivalents.',
           status: 'Done',
           priority: 'high',
           storyPoints: 5,
@@ -2043,7 +2501,8 @@ export function createSeedProject() {
           number: 83,
           type: 'task',
           title: 'SF-83: Compact Backlog header — merge QuickCreateBar into toolbar row',
-          description: 'The Backlog view had two separate glass panels stacked vertically: a QuickCreateBar wrapper and a sort/group toolbar. This wasted significant vertical space for just a create input. Fix: remove the QuickCreateBar wrapper panel and place the create bar inline within the toolbar row between sort buttons and the Group by Epic toggle.',
+          description:
+            'The Backlog view had two separate glass panels stacked vertically: a QuickCreateBar wrapper and a sort/group toolbar. This wasted significant vertical space for just a create input. Fix: remove the QuickCreateBar wrapper panel and place the create bar inline within the toolbar row between sort buttons and the Group by Epic toggle.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 1,
@@ -2059,7 +2518,8 @@ export function createSeedProject() {
           key: 'SF-84',
           type: 'task',
           title: 'SF-84: Archive unused modules to _archived/',
-          description: 'Identified 33 unused source files across ai, comments, customfields, presence, 11 UI components, 2 hooks, 2 utils, stores barrel, and skills directory. Moved all to _archived/ to declutter the repo. Build output is identical (same chunk hashes). Transitively unused files (Switch, DatePicker only imported by unused customfields) also archived.',
+          description:
+            'Identified 33 unused source files across ai, comments, customfields, presence, 11 UI components, 2 hooks, 2 utils, stores barrel, and skills directory. Moved all to _archived/ to declutter the repo. Build output is identical (same chunk hashes). Transitively unused files (Switch, DatePicker only imported by unused customfields) also archived.',
           status: 'Done',
           priority: 'low',
           storyPoints: 1,
@@ -2074,7 +2534,8 @@ export function createSeedProject() {
           id: generateId(),
           type: 'task',
           title: 'SF-85: Convert TRACKER_WORKFLOW.md to Claude skill',
-          description: 'Moved TRACKER_WORKFLOW.md from repo root into skills/storyflow-tracker/SKILL.md as a proper Claude Code skill. Added YAML frontmatter (name, description), structured with When to use / Instructions / Examples sections following the established skill format. Updated CLAUDE.md skills section to reflect only active skills (other 7 skills remain in _archived/). Updated MEMORY.md reference. Removed old file via git rm.',
+          description:
+            'Moved TRACKER_WORKFLOW.md from repo root into skills/storyflow-tracker/SKILL.md as a proper Claude Code skill. Added YAML frontmatter (name, description), structured with When to use / Instructions / Examples sections following the established skill format. Updated CLAUDE.md skills section to reflect only active skills (other 7 skills remain in _archived/). Updated MEMORY.md reference. Removed old file via git rm.',
           status: 'Done',
           priority: 'low',
           storyPoints: 1,
@@ -2085,11 +2546,62 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        // === Production Hardening (SF-86) ===
+        {
+          id: generateId(),
+          type: 'story',
+          title: 'SF-86: Production hardening — CI gate, repo hygiene, pre-commit hooks',
+          description:
+            'Full production hardening workflow: (1) Fix all quality gate failures — Prettier format ~40 files, ESLint 12 errors + 120 warnings, TypeScript parse error in MarkdownRenderer.test.jsx line 126, 15 failing test files (46 tests). (2) Add unified npm run ci script chaining format:check → lint → typecheck → test:run → build. (3) Create .github/workflows/ci.yml — push+PR trigger, Node 20, npm cache. (4) Add SECURITY.md and CONTRIBUTING.md. (5) Fix broken Husky pre-commit hook — .husky/pre-commit missing, lint-staged never runs. (6) Release candidate simulation from clean state. License: All Rights Reserved (no MIT), COPYRIGHT.txt stays as-is.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['dx', 'ci', 'production'],
+          epicId: epic6Id,
+          sprintId: sprint5Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Follow-up: Lint Warnings Cleanup (SF-87) ===
+        {
+          id: generateId(),
+          type: 'task',
+          title: 'SF-87: Clean up 119 ESLint warnings (unused vars/imports)',
+          description:
+            'The CI gate passes with 119 warnings (exit code 0). Most are no-unused-vars in source files (unused React imports, unused variables in tests, unused function params). Clean these up to reach a zero-warning baseline. Consider adding eslint --max-warnings 0 to the CI script after cleanup.',
+          status: 'To Do',
+          priority: 'low',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['dx', 'cleanup'],
+          epicId: epic6Id,
+          sprintId: null,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Follow-up: npm audit vulnerabilities (SF-88) ===
+        {
+          id: generateId(),
+          type: 'task',
+          title: 'SF-88: Investigate 6 moderate npm audit vulnerabilities',
+          description:
+            'npm ci reports 6 moderate severity vulnerabilities. Investigate whether these are in devDependencies only (test tooling) or affect production. If dev-only, document and accept. If production, fix or pin.',
+          status: 'To Do',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['security', 'dx'],
+          epicId: epic6Id,
+          sprintId: null,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 86,
+      nextIssueNumber: 89,
     },
 
     pages: [
@@ -2844,6 +3356,7 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 | Tracker update was last todo item, only started after user asked "did you update the tracker?" (v40) | HARD GATE checklist exists but was sequenced as final step in todo list rather than integrated into execution flow. User had to prompt. | The tracker update must happen inline — immediately after the code change, before moving to the next task. Never defer it to "the last step." |
 | Light mode redesign (v42) only updated token files, not the ~20 components with hardcoded colors | Treated the theme system as "just change the tokens" without auditing all consumers. 11 undefined \`--th-*\` vars, hardcoded Tailwind shades (\`-300\` for dark), \`fill="#94a3b8"\`, \`text-white\`, \`bg-slate-*\` in Badge, Dashboard, markdown.js, charts, graph, workflow — all silently broke in light mode. User called it a "dumpster fire." | Gate: any theme change requires a full grep audit of ALL color references: (1) \`--th-*\` and custom CSS vars, (2) Tailwind shade classes (\`-300\`, \`-400\`), (3) hardcoded hex in JSX (\`fill=\`, \`bg-[#\`), (4) \`text-white\`/\`text-black\` outside accent backgrounds. Fix every hit before claiming done. |
 | Backlog compact fix (v45): coded the change before creating tracker issue | Jumped straight to editing BacklogView.jsx without first adding an "In Progress" issue to seedProject.js. Tracker was only updated after the code was done — violating the mandatory 6-step workflow (step 3: update tracker BEFORE execution). | The tracker issue must be the FIRST thing created — before touching any component file. Sequence: (1) add issue as "In Progress" + bump SEED_VERSION, (2) write code, (3) mark issue "Done" + bump again. Never code-first-track-later. |
+| Parallel test agents introduced \\\`react/display-name\\\` lint errors (v49) | 3 agents independently added \\\`React.forwardRef()\\\` mocks for framer-motion without \\\`displayName\\\`. Lint passed in agent scope but failed in CI gate (eslint \\\`react/display-name\\\` rule). | When mocking with \\\`React.forwardRef()\\\`, always assign \\\`displayName\\\`: \\\`const MotionDiv = React.forwardRef(...); MotionDiv.displayName = 'MotionDiv'\\\`. Add to parallel-agent post-merge checklist: run full lint before declaring done. |
 
 ---
 
@@ -2867,7 +3380,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase1Id,
           name: 'Scaffolding',
-          description: 'Vite + React + Tailwind v4 setup, folder structure, routing, glassmorphism theme, core UI components (Button, Modal, GlassCard, Badge, Input, etc.)',
+          description:
+            'Vite + React + Tailwind v4 setup, folder structure, routing, glassmorphism theme, core UI components (Button, Modal, GlassCard, Badge, Input, etc.)',
           startDate: '2026-01-27',
           endDate: '2026-01-30',
           progress: 100,
@@ -2876,7 +3390,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase2Id,
           name: 'State & Data Layer',
-          description: 'ProjectsContext with useReducer, useProject hooks, localStorage persistence with useAutoSave, default/sample project data, JSON export/import',
+          description:
+            'ProjectsContext with useReducer, useProject hooks, localStorage persistence with useAutoSave, default/sample project data, JSON export/import',
           startDate: '2026-01-30',
           endDate: '2026-02-01',
           progress: 100,
@@ -2885,7 +3400,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase3Id,
           name: 'Board & Wiki',
-          description: 'Kanban board with drag-and-drop, issue cards, sprint management, backlog view, burndown/velocity charts. Wiki system with page tree, markdown editor, live preview, templates, version history.',
+          description:
+            'Kanban board with drag-and-drop, issue cards, sprint management, backlog view, burndown/velocity charts. Wiki system with page tree, markdown editor, live preview, templates, version history.',
           startDate: '2026-02-01',
           endDate: '2026-02-03',
           progress: 100,
@@ -2894,7 +3410,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase4Id,
           name: 'Workflow & Timeline',
-          description: 'Visual workflow canvas with node graph, BFS execution engine, sub-workflow overlays, node detail modals. Gantt timeline with milestones, stats dashboard, chart/list views.',
+          description:
+            'Visual workflow canvas with node graph, BFS execution engine, sub-workflow overlays, node detail modals. Gantt timeline with milestones, stats dashboard, chart/list views.',
           startDate: '2026-02-03',
           endDate: '2026-02-07',
           progress: 100,
@@ -2903,7 +3420,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase5Id,
           name: 'Polish & Ship',
-          description: 'Security hardening, workflow zoom/pan/centering, sidebar cleanup, keyboard shortcuts, responsive design, accent color theming, performance optimizations, documentation.',
+          description:
+            'Security hardening, workflow zoom/pan/centering, sidebar cleanup, keyboard shortcuts, responsive design, accent color theming, performance optimizations, documentation.',
           startDate: '2026-02-07',
           endDate: '2026-02-14',
           progress: 100,
@@ -2912,7 +3430,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase6Id,
           name: 'UAT & Production',
-          description: 'User acceptance testing on macOS environment (02/18-02/20). Validate all 7 tabs, responsive layout, data persistence, export/import, keyboard shortcuts. Persistent path to production deployment.',
+          description:
+            'User acceptance testing on macOS environment (02/18-02/20). Validate all 7 tabs, responsive layout, data persistence, export/import, keyboard shortcuts. Persistent path to production deployment.',
           startDate: '2026-02-18',
           endDate: '2026-02-20',
           progress: 0,
@@ -2921,7 +3440,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase7Id,
           name: 'Quality Infrastructure',
-          description: 'Comprehensive quality improvements: ErrorBoundary for crash recovery, Vitest testing with 54 tests (graph utils + useProject + ProjectsContext), ESLint/Prettier/Husky tooling, TypeScript config, Modal accessibility (ARIA/focus trap), Suspense fallback fix, cycle detection UI integration, reference validation (milestone/epic cleanup), WorkflowCanvas refactoring into 4 hooks, LoadingState/ErrorState/VirtualList components.',
+          description:
+            'Comprehensive quality improvements: ErrorBoundary for crash recovery, Vitest testing with 54 tests (graph utils + useProject + ProjectsContext), ESLint/Prettier/Husky tooling, TypeScript config, Modal accessibility (ARIA/focus trap), Suspense fallback fix, cycle detection UI integration, reference validation (milestone/epic cleanup), WorkflowCanvas refactoring into 4 hooks, LoadingState/ErrorState/VirtualList components.',
           startDate: '2026-02-12',
           endDate: '2026-02-14',
           progress: 100,
@@ -2930,7 +3450,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         {
           id: phase8Id,
           name: 'StoryFlow 2.0 Overhaul',
-          description: 'Major architectural upgrade: unified semantic token system replacing 3 competing systems + 200 light mode hacks, Zustand migration for optimized state management, URL routing with deep linking, tab consolidation (7→5 tabs with sub-navigation), activity feed/audit log, comprehensive component updates to semantic tokens.',
+          description:
+            'Major architectural upgrade: unified semantic token system replacing 3 competing systems + 200 light mode hacks, Zustand migration for optimized state management, URL routing with deep linking, tab consolidation (7→5 tabs with sub-navigation), activity feed/audit log, comprehensive component updates to semantic tokens.',
           startDate: '2026-02-13',
           endDate: '2026-02-15',
           progress: 85,
@@ -3018,8 +3539,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decisionId,
         title: 'State Management Approach',
         status: 'superseded',
-        context: 'We need a state management solution that handles complex nested project data, supports undo-friendly immutable updates, and does not add significant bundle size.',
-        decision: '[SUPERSEDED by SF-50] Originally used React Context with useReducer. Migrated to Zustand in StoryFlow 2.0 due to re-render performance issues and need for optimized selectors.',
+        context:
+          'We need a state management solution that handles complex nested project data, supports undo-friendly immutable updates, and does not add significant bundle size.',
+        decision:
+          '[SUPERSEDED by SF-50] Originally used React Context with useReducer. Migrated to Zustand in StoryFlow 2.0 due to re-render performance issues and need for optimized selectors.',
         alternatives: [
           {
             name: 'Redux Toolkit',
@@ -3037,7 +3560,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'No DevTools, full re-renders on state change without careful memoization, selector factories can cause infinite loops',
           },
         ],
-        consequences: 'Zustand with immer middleware provides immutable updates with minimal boilerplate. Persist middleware handles localStorage. Selector patterns require careful attention to avoid creating new function references that trigger re-renders.',
+        consequences:
+          'Zustand with immer middleware provides immutable updates with minimal boilerplate. Persist middleware handles localStorage. Selector patterns require careful attention to avoid creating new function references that trigger re-renders.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3045,8 +3569,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision2Id,
         title: 'Styling Approach',
         status: 'accepted',
-        context: 'We need a styling solution that supports rapid UI development, works well with a dark glassmorphism theme, and avoids complex configuration. The app has many components with consistent visual patterns.',
-        decision: 'Use Tailwind CSS v4 with the @tailwindcss/vite plugin and a custom glassmorphism theme defined in index.css, rather than CSS Modules, Styled Components, or vanilla CSS.',
+        context:
+          'We need a styling solution that supports rapid UI development, works well with a dark glassmorphism theme, and avoids complex configuration. The app has many components with consistent visual patterns.',
+        decision:
+          'Use Tailwind CSS v4 with the @tailwindcss/vite plugin and a custom glassmorphism theme defined in index.css, rather than CSS Modules, Styled Components, or vanilla CSS.',
         alternatives: [
           {
             name: 'CSS Modules',
@@ -3069,7 +3595,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Long class strings in JSX, learning curve for utility-first approach',
           },
         ],
-        consequences: 'Class strings in JSX can get lengthy, but the tradeoff is worth it for development speed. The glassmorphism theme is centralized in index.css with custom glass, glass-card, glass-sidebar, and glass-input classes. Tailwind v4 eliminates the need for tailwind.config.js and postcss.config.js entirely.',
+        consequences:
+          'Class strings in JSX can get lengthy, but the tradeoff is worth it for development speed. The glassmorphism theme is centralized in index.css with custom glass, glass-card, glass-sidebar, and glass-input classes. Tailwind v4 eliminates the need for tailwind.config.js and postcss.config.js entirely.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3077,8 +3604,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision3Id,
         title: 'SVG-based Charts over Charting Libraries',
         status: 'accepted',
-        context: 'The app needs Gantt charts, burndown charts, and velocity charts for the board and timeline views. We need to decide whether to use a charting library or build custom SVG visualizations.',
-        decision: 'Build all charts as pure SVG components rendered directly in React, rather than using Chart.js, Recharts, or D3.',
+        context:
+          'The app needs Gantt charts, burndown charts, and velocity charts for the board and timeline views. We need to decide whether to use a charting library or build custom SVG visualizations.',
+        decision:
+          'Build all charts as pure SVG components rendered directly in React, rather than using Chart.js, Recharts, or D3.',
         alternatives: [
           {
             name: 'Chart.js',
@@ -3101,7 +3630,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'More code to write from scratch, no built-in animations or interactions',
           },
         ],
-        consequences: 'We write more chart code ourselves, but gain full control over styling and theming. SVG elements can use currentColor and CSS variables from the glassmorphism theme. No additional bundle size. Charts are just React components returning SVG markup, making them easy to maintain and test.',
+        consequences:
+          'We write more chart code ourselves, but gain full control over styling and theming. SVG elements can use currentColor and CSS variables from the glassmorphism theme. No additional bundle size. Charts are just React components returning SVG markup, making them easy to maintain and test.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3109,8 +3639,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision4Id,
         title: 'Flat Data Model for Projects',
         status: 'accepted',
-        context: 'Each project contains many related entities — issues, wiki pages, workflow nodes, timeline phases, decisions. We need to decide how to structure this data for localStorage persistence and JSON export.',
-        decision: 'Store all project data in a single flat object with arrays for each entity type, rather than using normalized or relational data structures.',
+        context:
+          'Each project contains many related entities — issues, wiki pages, workflow nodes, timeline phases, decisions. We need to decide how to structure this data for localStorage persistence and JSON export.',
+        decision:
+          'Store all project data in a single flat object with arrays for each entity type, rather than using normalized or relational data structures.',
         alternatives: [
           {
             name: 'Normalized (Redux-style)',
@@ -3128,7 +3660,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Lookups require array scanning, potential data duplication, no referential integrity guarantees',
           },
         ],
-        consequences: 'Array lookups use .find() and .filter() which is fine for the expected data sizes (tens to low hundreds of items per project). JSON export/import is trivial since the data model matches the storage format exactly. The useProject hook provides per-field updaters that abstract over the flat structure.',
+        consequences:
+          'Array lookups use .find() and .filter() which is fine for the expected data sizes (tens to low hundreds of items per project). JSON export/import is trivial since the data model matches the storage format exactly. The useProject hook provides per-field updaters that abstract over the flat structure.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3136,8 +3669,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision5Id,
         title: 'BFS Workflow Execution Engine',
         status: 'accepted',
-        context: 'The workflow canvas allows users to build directed acyclic graphs of tasks, phases, and decision points. We need an execution strategy that can traverse the graph, respect dependencies, and handle parallel branches with fork/join patterns.',
-        decision: 'Use a BFS (breadth-first search) traversal algorithm to execute workflow nodes level by level, rather than event-driven or sequential pipeline approaches.',
+        context:
+          'The workflow canvas allows users to build directed acyclic graphs of tasks, phases, and decision points. We need an execution strategy that can traverse the graph, respect dependencies, and handle parallel branches with fork/join patterns.',
+        decision:
+          'Use a BFS (breadth-first search) traversal algorithm to execute workflow nodes level by level, rather than event-driven or sequential pipeline approaches.',
         alternatives: [
           {
             name: 'Event-driven execution',
@@ -3155,7 +3690,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Requires the graph to be acyclic, all nodes at a level must complete before advancing',
           },
         ],
-        consequences: 'The BFS engine processes the workflow graph layer by layer, which visually maps to left-to-right execution on the canvas. Parallel branches at the same depth run together, and join nodes naturally wait for all incoming edges. The graph must remain a DAG — cycles are prevented at the connection creation level.',
+        consequences:
+          'The BFS engine processes the workflow graph layer by layer, which visually maps to left-to-right execution on the canvas. Parallel branches at the same depth run together, and join nodes naturally wait for all incoming edges. The graph must remain a DAG — cycles are prevented at the connection creation level.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3163,8 +3699,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision6Id,
         title: 'Input Sanitization Strategy',
         status: 'accepted',
-        context: 'Security audit revealed that user-provided content (markdown URLs, color values, imported JSON) was rendered without validation, creating XSS and injection risks. We need a sanitization approach that is practical for a client-side app without adding heavy dependencies.',
-        decision: 'Use targeted validation functions (isSafeUrl, sanitizeColor, stripDangerousKeys) at the point of use rather than a global sanitization library like DOMPurify.',
+        context:
+          'Security audit revealed that user-provided content (markdown URLs, color values, imported JSON) was rendered without validation, creating XSS and injection risks. We need a sanitization approach that is practical for a client-side app without adding heavy dependencies.',
+        decision:
+          'Use targeted validation functions (isSafeUrl, sanitizeColor, stripDangerousKeys) at the point of use rather than a global sanitization library like DOMPurify.',
         alternatives: [
           {
             name: 'DOMPurify',
@@ -3182,7 +3720,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Must remember to apply at every injection point, no catch-all safety net, custom code to maintain',
           },
         ],
-        consequences: 'We maintain our own sanitization utilities in src/utils/sanitize.js. Each utility is focused: isSafeUrl validates URL protocols, sanitizeColor validates color format, stripDangerousKeys prevents prototype pollution. The tradeoff is manual coverage — any new user-content rendering point must apply the appropriate sanitizer. If the attack surface grows significantly, migrating to DOMPurify or react-markdown should be reconsidered.',
+        consequences:
+          'We maintain our own sanitization utilities in src/utils/sanitize.js. Each utility is focused: isSafeUrl validates URL protocols, sanitizeColor validates color format, stripDangerousKeys prevents prototype pollution. The tradeoff is manual coverage — any new user-content rendering point must apply the appropriate sanitizer. If the attack surface grows significantly, migrating to DOMPurify or react-markdown should be reconsidered.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3190,8 +3729,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision7Id,
         title: 'Seed Project Auto-Update Strategy',
         status: 'accepted',
-        context: 'The StoryFlow development tracker (seedProject.js) is updated continuously as features are built — new board issues, workflow nodes, wiki pages, timeline progress. But existing users with localStorage data never see these updates because the seed only runs on empty localStorage.',
-        decision: 'Add a SEED_VERSION integer constant and isSeed flag to the seed project. On load, migrateSeedProject() in ProjectsContext compares versions and replaces the seed project wholesale if outdated. A fixed SEED_PROJECT_ID prevents URL breakage across regenerations.',
+        context:
+          'The StoryFlow development tracker (seedProject.js) is updated continuously as features are built — new board issues, workflow nodes, wiki pages, timeline progress. But existing users with localStorage data never see these updates because the seed only runs on empty localStorage.',
+        decision:
+          'Add a SEED_VERSION integer constant and isSeed flag to the seed project. On load, migrateSeedProject() in ProjectsContext compares versions and replaces the seed project wholesale if outdated. A fixed SEED_PROJECT_ID prevents URL breakage across regenerations.',
         alternatives: [
           {
             name: 'Field-by-field merge',
@@ -3206,10 +3747,11 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
           {
             name: 'Wholesale replacement with version stamp',
             pros: 'Simple — one integer comparison, one function, idempotent. Always produces correct latest state. Fixed ID prevents URL breakage.',
-            cons: 'User edits to the seed project are lost on version bump. Acceptable since this is a meta-project tracking Claude\'s own work.',
+            cons: "User edits to the seed project are lost on version bump. Acceptable since this is a meta-project tracking Claude's own work.",
           },
         ],
-        consequences: 'Bumping SEED_VERSION after any seedProject.js edit is now a required step. The legacy migration path (finding "StoryFlow Development" by name) handles the one-time upgrade for pre-versioning users. User-created projects are never touched.',
+        consequences:
+          'Bumping SEED_VERSION after any seedProject.js edit is now a required step. The legacy migration path (finding "StoryFlow Development" by name) handles the one-time upgrade for pre-versioning users. User-created projects are never touched.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3217,8 +3759,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision8Id,
         title: 'Architecture Graph Visualization',
         status: 'accepted',
-        context: 'The Architecture tab was the weakest of StoryFlow\'s 7 tabs — a 471-line monolith with zero sub-components, no visualization, and no sub-views. Other tabs have 3-11 sub-components, rich visualizations (kanban, Gantt, workflow canvas), and multiple views. Architecture needed a major upgrade to reach parity.',
-        decision: 'Decompose into 7 sub-components in src/components/architecture/. Add an interactive SVG dependency graph (adapted from WorkflowCanvas patterns — CSS zoom, dot grid, drag/pan/zoom). Use HTML-over-SVG hybrid for nodes (consistent with workflow). Add Graph/Tree sub-tabs, stat cards, enhanced detail panel with mini dep viz and "Used by" section.',
+        context:
+          "The Architecture tab was the weakest of StoryFlow's 7 tabs — a 471-line monolith with zero sub-components, no visualization, and no sub-views. Other tabs have 3-11 sub-components, rich visualizations (kanban, Gantt, workflow canvas), and multiple views. Architecture needed a major upgrade to reach parity.",
+        decision:
+          'Decompose into 7 sub-components in src/components/architecture/. Add an interactive SVG dependency graph (adapted from WorkflowCanvas patterns — CSS zoom, dot grid, drag/pan/zoom). Use HTML-over-SVG hybrid for nodes (consistent with workflow). Add Graph/Tree sub-tabs, stat cards, enhanced detail panel with mini dep viz and "Used by" section.',
         alternatives: [
           {
             name: 'Pure SVG nodes',
@@ -3236,7 +3780,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'More complex than pure SVG, but the pattern is already proven in WorkflowCanvas.',
           },
         ],
-        consequences: 'Architecture tab now has 7 sub-components (ComponentTree, ComponentDetail, DependencyGraph, DependencyEdge, ArchitectureStats, ComponentForm, archLayout.js) plus constants.js. Components gain optional x/y fields for graph positioning. The auto-layout uses a layered topological sort algorithm.',
+        consequences:
+          'Architecture tab now has 7 sub-components (ComponentTree, ComponentDetail, DependencyGraph, DependencyEdge, ArchitectureStats, ComponentForm, archLayout.js) plus constants.js. Components gain optional x/y fields for graph positioning. The auto-layout uses a layered topological sort algorithm.',
         createdAt: now,
         updatedAt: now,
       },
@@ -3244,8 +3789,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision9Id,
         title: 'Extracted Canvas Hooks over Monolith Component',
         status: 'accepted',
-        context: 'WorkflowCanvas.jsx had grown to 625 lines with multiple concerns: viewport state, zoom/pan, node dragging, connection drawing, context menus. Analysis recommended refactoring to reduce complexity and improve testability.',
-        decision: 'Extract 4 custom hooks (useCanvasViewport, useCanvasDrag, useCanvasPan, useCanvasConnection) that each own a single concern, keeping WorkflowCanvas as a thin orchestration layer.',
+        context:
+          'WorkflowCanvas.jsx had grown to 625 lines with multiple concerns: viewport state, zoom/pan, node dragging, connection drawing, context menus. Analysis recommended refactoring to reduce complexity and improve testability.',
+        decision:
+          'Extract 4 custom hooks (useCanvasViewport, useCanvasDrag, useCanvasPan, useCanvasConnection) that each own a single concern, keeping WorkflowCanvas as a thin orchestration layer.',
         alternatives: [
           {
             name: 'Keep monolith, add comments',
@@ -3263,7 +3810,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Requires careful hook dependency management, slightly more files',
           },
         ],
-        consequences: 'WorkflowCanvas reduced to 393 lines. Four hooks total ~355 lines. Each hook can be unit tested or reused. Pattern established for future canvas components. The same hooks could power ArchitectureTab\'s DependencyGraph.',
+        consequences:
+          "WorkflowCanvas reduced to 393 lines. Four hooks total ~355 lines. Each hook can be unit tested or reused. Pattern established for future canvas components. The same hooks could power ArchitectureTab's DependencyGraph.",
         createdAt: now,
         updatedAt: now,
       },
@@ -3271,8 +3819,10 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         id: decision10Id,
         title: 'Zustand Migration for StoryFlow 2.0',
         status: 'accepted',
-        context: 'StoryFlow 2.0 overhaul revealed performance issues with React Context: full component tree re-renders on every state change, complex memoization required, selector factory patterns causing infinite loops. The Activity Feed feature required cross-cutting state that did not fit cleanly into the single ProjectsContext.',
-        decision: 'Migrate from React Context + useReducer to Zustand with sliced stores (projectsStore, activityStore, uiStore). Use immer middleware for immutable updates and persist middleware for localStorage.',
+        context:
+          'StoryFlow 2.0 overhaul revealed performance issues with React Context: full component tree re-renders on every state change, complex memoization required, selector factory patterns causing infinite loops. The Activity Feed feature required cross-cutting state that did not fit cleanly into the single ProjectsContext.',
+        decision:
+          'Migrate from React Context + useReducer to Zustand with sliced stores (projectsStore, activityStore, uiStore). Use immer middleware for immutable updates and persist middleware for localStorage.',
         alternatives: [
           {
             name: 'Keep React Context with optimization',
@@ -3290,7 +3840,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
             cons: 'Less prescriptive structure, requires discipline for selector patterns',
           },
         ],
-        consequences: 'State management is now split across focused stores. Components subscribe to specific slices via selectors, eliminating cascading re-renders. The old ProjectsContext is kept as a thin wrapper for backwards compatibility. Critical lesson learned: never create selector functions inside render — use stable references with useCallback or subscribe to parent objects.',
+        consequences:
+          'State management is now split across focused stores. Components subscribe to specific slices via selectors, eliminating cascading re-renders. The old ProjectsContext is kept as a thin wrapper for backwards compatibility. Critical lesson learned: never create selector functions inside render — use stable references with useCallback or subscribe to parent objects.',
         createdAt: now,
         updatedAt: now,
       },

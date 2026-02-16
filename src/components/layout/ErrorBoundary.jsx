@@ -67,15 +67,14 @@ export default class ErrorBoundary extends Component {
 
             {/* Description */}
             <p className="mb-6 text-center text-sm text-[var(--color-fg-muted)]">
-              An unexpected error occurred. Your data is safe — try refreshing the page or going back to the dashboard.
+              An unexpected error occurred. Your data is safe — try refreshing the page or going
+              back to the dashboard.
             </p>
 
             {/* Error message preview */}
             {error && (
               <div className="mb-6 rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-                <p className="font-mono text-xs text-red-300 break-all">
-                  {error.toString()}
-                </p>
+                <p className="font-mono text-xs text-red-300 break-all">{error.toString()}</p>
               </div>
             )}
 

@@ -46,12 +46,7 @@ export default function DecisionForm({ isOpen, onClose, onSave }) {
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="New Decision"
-      size="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="New Decision" size="md">
       <div className="space-y-5">
         {/* Title */}
         <Input
@@ -97,10 +92,7 @@ export default function DecisionForm({ isOpen, onClose, onSave }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!form.title.trim()}
-          >
+          <Button onClick={handleSave} disabled={!form.title.trim()}>
             Create Decision
           </Button>
         </div>

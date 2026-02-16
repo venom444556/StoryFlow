@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const GRADIENTS = [
   'from-purple-500 to-blue-500',
@@ -9,23 +9,23 @@ const GRADIENTS = [
   'from-orange-500 to-red-500',
   'from-red-500 to-pink-500',
   'from-pink-500 to-purple-500',
-];
+]
 
 function hashName(name) {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
   }
-  return Math.abs(hash);
+  return Math.abs(hash)
 }
 
 function getInitials(name) {
-  if (!name) return '?';
-  const words = name.trim().split(/\s+/);
+  if (!name) return '?'
+  const words = name.trim().split(/\s+/)
   if (words.length >= 2) {
-    return (words[0][0] + words[1][0]).toUpperCase();
+    return (words[0][0] + words[1][0]).toUpperCase()
   }
-  return words[0][0].toUpperCase();
+  return words[0][0].toUpperCase()
 }
 
 const SIZES = {
@@ -33,17 +33,12 @@ const SIZES = {
   md: { container: 'h-8 w-8', text: 'text-[var(--text-xs)]' },
   lg: { container: 'h-10 w-10', text: 'text-[var(--text-sm)]' },
   xl: { container: 'h-12 w-12', text: 'text-[var(--text-base)]' },
-};
+}
 
-export default function Avatar({
-  name = '',
-  size = 'md',
-  className = '',
-  src,
-}) {
-  const gradient = GRADIENTS[hashName(name) % GRADIENTS.length];
-  const initials = getInitials(name);
-  const sizeClasses = SIZES[size] || SIZES.md;
+export default function Avatar({ name = '', size = 'md', className = '', src }) {
+  const gradient = GRADIENTS[hashName(name) % GRADIENTS.length]
+  const initials = getInitials(name)
+  const sizeClasses = SIZES[size] || SIZES.md
 
   if (src) {
     return (
@@ -56,7 +51,7 @@ export default function Avatar({
           className,
         ].join(' ')}
       />
-    );
+    )
   }
 
   return (
@@ -74,5 +69,5 @@ export default function Avatar({
     >
       {initials}
     </div>
-  );
+  )
 }

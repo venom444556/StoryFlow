@@ -137,9 +137,7 @@ export const useActivityStore = create(
       // Get activities for a specific entity (issue, page, etc.)
       getEntityActivities: (projectId, entityType, entityId) => {
         const activities = get().activities[projectId] || []
-        return activities.filter(
-          (a) => a.entityType === entityType && a.entityId === entityId
-        )
+        return activities.filter((a) => a.entityType === entityType && a.entityId === entityId)
       },
 
       // Clear activities for a project
@@ -165,11 +163,12 @@ export const useActivityStore = create(
 // ---------------------------------------------------------------------------
 // Selectors
 // ---------------------------------------------------------------------------
-export const selectProjectActivities = (projectId) => (state) =>
-  state.activities[projectId] || []
+export const selectProjectActivities = (projectId) => (state) => state.activities[projectId] || []
 
-export const selectRecentActivities = (projectId, limit = 10) => (state) =>
-  (state.activities[projectId] || []).slice(0, limit)
+export const selectRecentActivities =
+  (projectId, limit = 10) =>
+  (state) =>
+    (state.activities[projectId] || []).slice(0, limit)
 
 // ---------------------------------------------------------------------------
 // Activity Helpers

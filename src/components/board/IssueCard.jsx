@@ -1,34 +1,28 @@
-import { motion } from 'framer-motion';
-import { Tag } from 'lucide-react';
-import IssueTypeIcon from './IssueTypeIcon';
-import Avatar from '../ui/Avatar';
-import Badge from '../ui/Badge';
+import { motion } from 'framer-motion'
+import { Tag } from 'lucide-react'
+import IssueTypeIcon from './IssueTypeIcon'
+import Avatar from '../ui/Avatar'
+import Badge from '../ui/Badge'
 
 const PRIORITY_BADGE_VARIANT = {
   critical: 'red',
   high: 'yellow',
   medium: 'blue',
   low: 'gray',
-};
+}
 
-export default function IssueCard({
-  issue,
-  onClick,
-  onDragStart,
-  onDragEnd,
-  isDragging = false,
-}) {
-  const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default';
+export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDragging = false }) {
+  const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData('text/plain', issue.id);
-    e.dataTransfer.effectAllowed = 'move';
-    onDragStart?.(issue);
-  };
+    e.dataTransfer.setData('text/plain', issue.id)
+    e.dataTransfer.effectAllowed = 'move'
+    onDragStart?.(issue)
+  }
 
   const handleDragEnd = () => {
-    onDragEnd?.(issue);
-  };
+    onDragEnd?.(issue)
+  }
 
   return (
     <motion.div
@@ -49,10 +43,14 @@ export default function IssueCard({
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
       ].join(' ')}
-      style={isDragging ? {
-        borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
-        '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-      } : undefined}
+      style={
+        isDragging
+          ? {
+              borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
+              '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+            }
+          : undefined
+      }
     >
       {/* Top row: type icon + key */}
       <div className="mb-2 flex items-center gap-2">
@@ -99,10 +97,8 @@ export default function IssueCard({
         )}
 
         {/* Assignee avatar */}
-        {issue.assignee && (
-          <Avatar name={issue.assignee} size="sm" />
-        )}
+        {issue.assignee && <Avatar name={issue.assignee} size="sm" />}
       </div>
     </motion.div>
-  );
+  )
 }

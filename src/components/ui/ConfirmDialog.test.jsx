@@ -204,13 +204,7 @@ describe('ConfirmDialog', () => {
       const longTitle = 'A'.repeat(200)
       const longMessage = 'B'.repeat(500)
 
-      render(
-        <ConfirmDialog
-          {...defaultProps}
-          title={longTitle}
-          message={longMessage}
-        />
-      )
+      render(<ConfirmDialog {...defaultProps} title={longTitle} message={longMessage} />)
 
       expect(screen.getByText(longTitle)).toBeInTheDocument()
       expect(screen.getByText(longMessage)).toBeInTheDocument()

@@ -70,9 +70,9 @@ const NODE_TYPES = [
     color: '#a855f7',
     description: 'Run custom data transformation or business logic.',
   },
-];
+]
 
-export default NODE_TYPES;
+export default NODE_TYPES
 
 /**
  * Look up a single node type definition by its `type` key.
@@ -80,5 +80,5 @@ export default NODE_TYPES;
  * @returns {object|undefined}
  */
 export function getNodeType(type) {
-  return NODE_TYPES.find((nt) => nt.type === type);
+  return NODE_TYPES.find((nt) => nt.type === type)
 }

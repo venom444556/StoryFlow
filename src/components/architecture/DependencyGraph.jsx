@@ -335,11 +335,7 @@ export default function DependencyGraph({
     [positionedComponents, onUpdateComponents]
   )
 
-  const canvasCursor = isPanning
-    ? 'grabbing'
-    : draggingId
-      ? 'grabbing'
-      : 'default'
+  const canvasCursor = isPanning ? 'grabbing' : draggingId ? 'grabbing' : 'default'
 
   const transformStyle = {
     zoom: viewport.scale,
@@ -362,12 +358,7 @@ export default function DependencyGraph({
         >
           {/* Dot grid */}
           <defs>
-            <pattern
-              id="arch-grid"
-              width="20"
-              height="20"
-              patternUnits="userSpaceOnUse"
-            >
+            <pattern id="arch-grid" width="20" height="20" patternUnits="userSpaceOnUse">
               <circle cx="1" cy="1" r="0.8" style={{ fill: 'var(--th-border)' }} />
             </pattern>
           </defs>
@@ -427,10 +418,7 @@ export default function DependencyGraph({
               onMouseDown={(e) => handleNodeMouseDown(comp.id, e)}
             >
               {/* Color bar */}
-              <div
-                className="h-1 rounded-t-[10px]"
-                style={{ backgroundColor: hexColor }}
-              />
+              <div className="h-1 rounded-t-[10px]" style={{ backgroundColor: hexColor }} />
 
               <div className="px-3 py-2.5">
                 {/* Header */}

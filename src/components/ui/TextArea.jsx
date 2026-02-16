@@ -1,29 +1,33 @@
-import React, { forwardRef } from 'react';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import React, { forwardRef } from 'react'
+import { AlertCircle, CheckCircle } from 'lucide-react'
 
-const TextArea = forwardRef(function TextArea({
-  label,
-  value,
-  onChange,
-  placeholder,
-  disabled = false,
-  rows = 4,
-  className = '',
-  error,
-  success,
-  helperText,
-  resize = 'vertical',
-  ...rest
-}, ref) {
-  const hasError = Boolean(error);
-  const hasSuccess = Boolean(success) && !hasError;
+const TextArea = forwardRef(function TextArea(
+  {
+    label,
+    value,
+    onChange,
+    placeholder,
+    disabled = false,
+    rows = 4,
+    className = '',
+    error,
+    success,
+    helperText,
+    resize = 'vertical',
+    ...rest
+  },
+  ref
+) {
+  const hasError = Boolean(error)
+  const hasSuccess = Boolean(success) && !hasError
 
-  const resizeClass = {
-    none: 'resize-none',
-    vertical: 'resize-y',
-    horizontal: 'resize-x',
-    both: 'resize',
-  }[resize] || 'resize-y';
+  const resizeClass =
+    {
+      none: 'resize-none',
+      vertical: 'resize-y',
+      horizontal: 'resize-x',
+      both: 'resize',
+    }[resize] || 'resize-y'
 
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
@@ -79,7 +83,7 @@ const TextArea = forwardRef(function TextArea({
         </p>
       )}
     </div>
-  );
-});
+  )
+})
 
-export default TextArea;
+export default TextArea

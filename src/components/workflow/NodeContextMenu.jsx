@@ -1,12 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Edit3, Copy, Play, Trash2, ChevronRight, Plus } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Edit3, Copy, Play, Trash2, ChevronRight, Plus } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
 // Menu item definitions
 // ---------------------------------------------------------------------------
 
-function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddChildren, onDrillDown, isExecuting }) {
+function buildMenuItems({
+  onEdit,
+  onDuplicate,
+  onExecuteSingle,
+  onDelete,
+  onAddChildren,
+  onDrillDown,
+  isExecuting,
+}) {
   const items = [
     {
       id: 'edit',
@@ -24,7 +32,7 @@ function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddC
       disabled: false,
       variant: 'default',
     },
-  ];
+  ]
 
   // Drill-down / Add sub-workflow options
   if (onDrillDown) {
@@ -35,7 +43,7 @@ function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddC
       onClick: onDrillDown,
       disabled: false,
       variant: 'default',
-    });
+    })
   }
   if (onAddChildren) {
     items.push({
@@ -45,10 +53,10 @@ function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddC
       onClick: onAddChildren,
       disabled: false,
       variant: 'default',
-    });
+    })
   }
 
-  items.push({ id: 'sep-1', separator: true });
+  items.push({ id: 'sep-1', separator: true })
   items.push({
     id: 'execute',
     label: 'Execute This Node',
@@ -56,8 +64,8 @@ function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddC
     onClick: onExecuteSingle,
     disabled: isExecuting,
     variant: 'default',
-  });
-  items.push({ id: 'sep-2', separator: true });
+  })
+  items.push({ id: 'sep-2', separator: true })
   items.push({
     id: 'delete',
     label: 'Delete',
@@ -65,17 +73,17 @@ function buildMenuItems({ onEdit, onDuplicate, onExecuteSingle, onDelete, onAddC
     onClick: onDelete,
     disabled: isExecuting,
     variant: 'danger',
-  });
+  })
 
-  return items;
+  return items
 }
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const MENU_WIDTH = 192;
-const MENU_HEIGHT_ESTIMATE = 220;
+const MENU_WIDTH = 192
+const MENU_HEIGHT_ESTIMATE = 220
 
 // ---------------------------------------------------------------------------
 // NodeContextMenu
@@ -108,66 +116,66 @@ export default function NodeContextMenu({
   onDrillDown,
   isExecuting = false,
 }) {
-  const menuRef = useRef(null);
-  const [position, setPosition] = useState({ left: x, top: y });
+  const menuRef = useRef(null)
+  const [position, setPosition] = useState({ left: x, top: y })
 
   // Adjust position so the menu doesn't overflow the viewport
   useEffect(() => {
-    if (!menuRef.current) return;
+    if (!menuRef.current) return
 
-    const rect = menuRef.current.getBoundingClientRect();
-    const viewportW = window.innerWidth;
-    const viewportH = window.innerHeight;
+    const rect = menuRef.current.getBoundingClientRect()
+    const viewportW = window.innerWidth
+    const viewportH = window.innerHeight
 
-    let adjustedX = x;
-    let adjustedY = y;
+    let adjustedX = x
+    let adjustedY = y
 
     if (rect.right > viewportW) {
-      adjustedX = x - MENU_WIDTH;
+      adjustedX = x - MENU_WIDTH
     }
     if (rect.bottom > viewportH) {
-      adjustedY = y - rect.height;
+      adjustedY = y - rect.height
     }
 
     // Clamp to keep on screen
-    adjustedX = Math.max(4, adjustedX);
-    adjustedY = Math.max(4, adjustedY);
+    adjustedX = Math.max(4, adjustedX)
+    adjustedY = Math.max(4, adjustedY)
 
     if (adjustedX !== position.left || adjustedY !== position.top) {
-      setPosition({ left: adjustedX, top: adjustedY });
+      setPosition({ left: adjustedX, top: adjustedY })
     }
-  }, [x, y]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [x, y]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close on click outside
   useEffect(() => {
     const handleMouseDown = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        onClose?.();
+        onClose?.()
       }
-    };
+    }
 
     // Defer so the opening right-click doesn't immediately close
     const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleMouseDown);
-    }, 0);
+      document.addEventListener('mousedown', handleMouseDown)
+    }, 0)
 
     return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, [onClose]);
+      clearTimeout(timer)
+      document.removeEventListener('mousedown', handleMouseDown)
+    }
+  }, [onClose])
 
   // Close on Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        onClose?.();
+        onClose?.()
       }
-    };
+    }
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
 
   const items = buildMenuItems({
     onEdit,
@@ -177,7 +185,7 @@ export default function NodeContextMenu({
     onAddChildren,
     onDrillDown,
     isExecuting,
-  });
+  })
 
   return (
     <AnimatePresence>
@@ -198,25 +206,20 @@ export default function NodeContextMenu({
       >
         {items.map((item) => {
           if (item.separator) {
-            return (
-              <div
-                key={item.id}
-                className="mx-1 my-1 h-px bg-[var(--color-bg-glass)]"
-              />
-            );
+            return <div key={item.id} className="mx-1 my-1 h-px bg-[var(--color-bg-glass)]" />
           }
 
-          const Icon = item.icon;
-          const isDanger = item.variant === 'danger';
-          const isDisabled = item.disabled;
+          const Icon = item.icon
+          const isDanger = item.variant === 'danger'
+          const isDisabled = item.disabled
 
           return (
             <button
               key={item.id}
               onClick={() => {
-                if (isDisabled) return;
-                item.onClick?.(node);
-                onClose?.();
+                if (isDisabled) return
+                item.onClick?.(node)
+                onClose?.()
               }}
               disabled={isDisabled}
               className={[
@@ -242,9 +245,9 @@ export default function NodeContextMenu({
               />
               <span>{item.label}</span>
             </button>
-          );
+          )
         })}
       </motion.div>
     </AnimatePresence>
-  );
+  )
 }

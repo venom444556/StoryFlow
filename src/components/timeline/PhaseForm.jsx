@@ -109,9 +109,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
 
         {/* Progress slider */}
         <div>
-          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
-            Progress
-          </label>
+          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Progress</label>
           <div className="flex items-center gap-4">
             <input
               type="range"
@@ -163,10 +161,7 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!form.name.trim()}
-          >
+          <Button onClick={handleSave} disabled={!form.name.trim()}>
             {isEditing ? 'Save Changes' : 'Create Phase'}
           </Button>
         </div>

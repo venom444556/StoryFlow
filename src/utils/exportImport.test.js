@@ -38,7 +38,7 @@ describe('exportImport utilities', () => {
       const project = { name: 'Test' }
       const result = exportProjectJSON(project)
       expect(result).toContain('\n')
-      expect(result).toMatch(/  "schemaVersion"/)
+      expect(result).toMatch(/ {2}"schemaVersion"/)
     })
 
     it('handles complex nested objects', () => {
@@ -80,11 +80,7 @@ describe('exportImport utilities', () => {
     })
 
     it('includes all projects', () => {
-      const projects = [
-        { name: 'Project 1' },
-        { name: 'Project 2' },
-        { name: 'Project 3' },
-      ]
+      const projects = [{ name: 'Project 1' }, { name: 'Project 2' }, { name: 'Project 3' }]
       const result = JSON.parse(exportAllProjectsJSON(projects))
       expect(result.projects).toHaveLength(3)
       expect(result.projects[0].name).toBe('Project 1')
@@ -277,11 +273,11 @@ describe('exportImport utilities', () => {
         click: mockClick,
       }
 
-      global.URL.createObjectURL = mockCreateObjectURL
-      global.URL.revokeObjectURL = mockRevokeObjectURL
-      global.document.createElement = vi.fn(() => mockAnchor)
-      global.document.body.appendChild = mockAppendChild
-      global.document.body.removeChild = mockRemoveChild
+      globalThis.URL.createObjectURL = mockCreateObjectURL
+      globalThis.URL.revokeObjectURL = mockRevokeObjectURL
+      globalThis.document.createElement = vi.fn(() => mockAnchor)
+      globalThis.document.body.appendChild = mockAppendChild
+      globalThis.document.body.removeChild = mockRemoveChild
     })
 
     afterEach(() => {
@@ -328,8 +324,8 @@ describe('exportImport utilities', () => {
       }
 
       // Mock FileReader to simulate error
-      const originalFileReader = global.FileReader
-      global.FileReader = class {
+      const originalFileReader = globalThis.FileReader
+      globalThis.FileReader = class {
         constructor() {
           this.onerror = null
           this.onload = null
@@ -341,7 +337,7 @@ describe('exportImport utilities', () => {
 
       await expect(readFileAsJSON(mockFile)).rejects.toThrow('Failed to read file')
 
-      global.FileReader = originalFileReader
+      globalThis.FileReader = originalFileReader
     })
 
     it('handles empty file', async () => {

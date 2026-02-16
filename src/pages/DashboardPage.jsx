@@ -36,9 +36,7 @@ export default function DashboardPage() {
   const [newProjectName, setNewProjectName] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
 
-  const filtered = projects.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = projects.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
 
   const handleCreate = () => {
     const name = newProjectName.trim() || 'Untitled Project'
@@ -70,11 +68,7 @@ export default function DashboardPage() {
           placeholder="Search projects..."
           className="max-w-xs"
         />
-        <Button
-          variant="primary"
-          icon={Plus}
-          onClick={() => setShowNewModal(true)}
-        >
+        <Button variant="primary" icon={Plus} onClick={() => setShowNewModal(true)}>
           New Project
         </Button>
       </div>
@@ -83,14 +77,10 @@ export default function DashboardPage() {
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((project) => {
-            const statusVariant =
-              STATUS_BADGE_VARIANT[project.status] || 'default'
-            const accentColor =
-              STATUS_ACCENT_COLOR[project.status] || 'bg-gray-500'
+            const statusVariant = STATUS_BADGE_VARIANT[project.status] || 'default'
+            const accentColor = STATUS_ACCENT_COLOR[project.status] || 'bg-gray-500'
             const issues = project.board?.issues || []
-            const openCount = issues.filter(
-              (i) => i.status !== 'Done'
-            ).length
+            const openCount = issues.filter((i) => i.status !== 'Done').length
 
             return (
               <GlassCard
@@ -133,9 +123,7 @@ export default function DashboardPage() {
                       {project.techStack.slice(0, 3).map((tech, i) => (
                         <Badge
                           key={tech}
-                          variant={
-                            TECH_BADGE_VARIANTS[i % TECH_BADGE_VARIANTS.length]
-                          }
+                          variant={TECH_BADGE_VARIANTS[i % TECH_BADGE_VARIANTS.length]}
                           size="sm"
                         >
                           {tech}

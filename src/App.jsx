@@ -31,10 +31,7 @@ export default function App() {
               />
 
               {/* Legacy route redirect */}
-              <Route
-                path="project/:id"
-                element={<Navigate to="overview" replace />}
-              />
+              <Route path="project/:id" element={<Navigate to="overview" replace />} />
 
               {/* 404 */}
               <Route path="*" element={<NotFoundPage />} />

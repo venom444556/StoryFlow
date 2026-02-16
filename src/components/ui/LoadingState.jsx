@@ -1,6 +1,6 @@
-import React from 'react';
-import { Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React from 'react'
+import { Loader2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 /**
  * Loading state component with animated spinner and optional message.
@@ -16,16 +16,15 @@ export default function LoadingState({
     sm: { spinner: 16, text: 'text-[var(--text-xs)]' },
     md: { spinner: 24, text: 'text-[var(--text-sm)]' },
     lg: { spinner: 32, text: 'text-[var(--text-base)]' },
-  };
+  }
 
-  const { spinner, text } = sizeClasses[size] || sizeClasses.md;
+  const { spinner, text } = sizeClasses[size] || sizeClasses.md
 
   const content = (
     <motion.div
-      className={[
-        'flex flex-col items-center justify-center gap-[var(--space-3)]',
-        className,
-      ].filter(Boolean).join(' ')}
+      className={['flex flex-col items-center justify-center gap-[var(--space-3)]', className]
+        .filter(Boolean)
+        .join(' ')}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -41,7 +40,7 @@ export default function LoadingState({
         </p>
       )}
     </motion.div>
-  );
+  )
 
   if (fullScreen) {
     return (
@@ -51,8 +50,8 @@ export default function LoadingState({
       >
         {content}
       </div>
-    );
+    )
   }
 
-  return content;
+  return content
 }

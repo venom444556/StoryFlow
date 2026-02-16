@@ -58,8 +58,7 @@ export const useProjectsStore = create(
         // Computed selectors (use these for memoized reads)
         getProject: (id) => get().projects.find((p) => p.id === id) || null,
 
-        getProjectsByStatus: (status) =>
-          get().projects.filter((p) => p.status === status),
+        getProjectsByStatus: (status) => get().projects.filter((p) => p.status === status),
 
         // Actions
         setProjects: (projects) => set({ projects }),
@@ -127,10 +126,9 @@ export const useProjectsStore = create(
 
           // Log activity
           if (newIssue) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, newIssue)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(projectId, createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, newIssue))
           }
 
           return newIssue
@@ -181,10 +179,12 @@ export const useProjectsStore = create(
                 })
               )
             } else {
-              useActivityStore.getState().logActivity(
-                projectId,
-                createIssueActivity(ACTIVITY_TYPES.ISSUE_UPDATED, updatedIssue)
-              )
+              useActivityStore
+                .getState()
+                .logActivity(
+                  projectId,
+                  createIssueActivity(ACTIVITY_TYPES.ISSUE_UPDATED, updatedIssue)
+                )
             }
           }
         },
@@ -217,10 +217,12 @@ export const useProjectsStore = create(
 
           // Log activity
           if (deletedIssue) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createIssueActivity(ACTIVITY_TYPES.ISSUE_DELETED, deletedIssue)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(
+                projectId,
+                createIssueActivity(ACTIVITY_TYPES.ISSUE_DELETED, deletedIssue)
+              )
           }
         },
 
@@ -247,10 +249,9 @@ export const useProjectsStore = create(
 
           // Log activity
           if (newPage) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createPageActivity(ACTIVITY_TYPES.PAGE_CREATED, newPage)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(projectId, createPageActivity(ACTIVITY_TYPES.PAGE_CREATED, newPage))
           }
 
           return newPage
@@ -278,15 +279,19 @@ export const useProjectsStore = create(
           if (oldPage) {
             const updatedPage = { ...oldPage, ...updates }
             if (updates.status === 'published' && oldPage.status !== 'published') {
-              useActivityStore.getState().logActivity(
-                projectId,
-                createPageActivity(ACTIVITY_TYPES.PAGE_PUBLISHED, updatedPage)
-              )
+              useActivityStore
+                .getState()
+                .logActivity(
+                  projectId,
+                  createPageActivity(ACTIVITY_TYPES.PAGE_PUBLISHED, updatedPage)
+                )
             } else {
-              useActivityStore.getState().logActivity(
-                projectId,
-                createPageActivity(ACTIVITY_TYPES.PAGE_UPDATED, updatedPage)
-              )
+              useActivityStore
+                .getState()
+                .logActivity(
+                  projectId,
+                  createPageActivity(ACTIVITY_TYPES.PAGE_UPDATED, updatedPage)
+                )
             }
           }
         },
@@ -306,10 +311,9 @@ export const useProjectsStore = create(
 
           // Log activity
           if (deletedPage) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createPageActivity(ACTIVITY_TYPES.PAGE_DELETED, deletedPage)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(projectId, createPageActivity(ACTIVITY_TYPES.PAGE_DELETED, deletedPage))
           }
         },
 
@@ -336,10 +340,12 @@ export const useProjectsStore = create(
 
           // Log activity
           if (newDecision) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createDecisionActivity(ACTIVITY_TYPES.DECISION_CREATED, newDecision)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(
+                projectId,
+                createDecisionActivity(ACTIVITY_TYPES.DECISION_CREATED, newDecision)
+              )
           }
 
           return newDecision
@@ -374,10 +380,12 @@ export const useProjectsStore = create(
                 })
               )
             } else {
-              useActivityStore.getState().logActivity(
-                projectId,
-                createDecisionActivity(ACTIVITY_TYPES.DECISION_UPDATED, updatedDecision)
-              )
+              useActivityStore
+                .getState()
+                .logActivity(
+                  projectId,
+                  createDecisionActivity(ACTIVITY_TYPES.DECISION_UPDATED, updatedDecision)
+                )
             }
           }
         },
@@ -402,10 +410,9 @@ export const useProjectsStore = create(
 
           // Log activity
           if (newPhase) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createPhaseActivity(ACTIVITY_TYPES.PHASE_CREATED, newPhase)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(projectId, createPhaseActivity(ACTIVITY_TYPES.PHASE_CREATED, newPhase))
           }
 
           return newPhase
@@ -430,10 +437,12 @@ export const useProjectsStore = create(
 
           // Log activity
           if (oldPhase) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createPhaseActivity(ACTIVITY_TYPES.PHASE_UPDATED, { ...oldPhase, ...updates })
-            )
+            useActivityStore
+              .getState()
+              .logActivity(
+                projectId,
+                createPhaseActivity(ACTIVITY_TYPES.PHASE_UPDATED, { ...oldPhase, ...updates })
+              )
           }
         },
 
@@ -455,10 +464,12 @@ export const useProjectsStore = create(
 
           // Log activity
           if (deletedPhase) {
-            useActivityStore.getState().logActivity(
-              projectId,
-              createPhaseActivity(ACTIVITY_TYPES.PHASE_DELETED, deletedPhase)
-            )
+            useActivityStore
+              .getState()
+              .logActivity(
+                projectId,
+                createPhaseActivity(ACTIVITY_TYPES.PHASE_DELETED, deletedPhase)
+              )
           }
         },
 
@@ -614,23 +625,17 @@ export const useProjectsStore = create(
 
                 // 2. First epic created
                 if (epics[0]) {
-                  activities.push(
-                    createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, epics[0])
-                  )
+                  activities.push(createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, epics[0]))
                 }
 
                 // 3. A page created
                 if (pages[0]) {
-                  activities.push(
-                    createPageActivity(ACTIVITY_TYPES.PAGE_CREATED, pages[0])
-                  )
+                  activities.push(createPageActivity(ACTIVITY_TYPES.PAGE_CREATED, pages[0]))
                 }
 
                 // 4. Second epic created
                 if (epics[1]) {
-                  activities.push(
-                    createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, epics[1])
-                  )
+                  activities.push(createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, epics[1]))
                 }
 
                 // 5. A decision created
@@ -642,16 +647,12 @@ export const useProjectsStore = create(
 
                 // 6. A phase created
                 if (phases[0]) {
-                  activities.push(
-                    createPhaseActivity(ACTIVITY_TYPES.PHASE_CREATED, phases[0])
-                  )
+                  activities.push(createPhaseActivity(ACTIVITY_TYPES.PHASE_CREATED, phases[0]))
                 }
 
                 // 7. A story created
                 if (stories[0]) {
-                  activities.push(
-                    createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, stories[0])
-                  )
+                  activities.push(createIssueActivity(ACTIVITY_TYPES.ISSUE_CREATED, stories[0]))
                 }
 
                 // 8. A story status changed to in-progress
@@ -742,7 +743,8 @@ export function useProjectStore(projectId) {
     updatePhase: (phaseId, updates) => store.updatePhase(projectId, phaseId, updates),
     deletePhase: (phaseId) => store.deletePhase(projectId, phaseId),
     addMilestone: (milestone) => store.addMilestone(projectId, milestone),
-    updateMilestone: (milestoneId, updates) => store.updateMilestone(projectId, milestoneId, updates),
+    updateMilestone: (milestoneId, updates) =>
+      store.updateMilestone(projectId, milestoneId, updates),
     deleteMilestone: (milestoneId) => store.deleteMilestone(projectId, milestoneId),
     updateWorkflow: (data) => store.updateWorkflow(projectId, data),
     updateArchitecture: (data) => store.updateArchitecture(projectId, data),

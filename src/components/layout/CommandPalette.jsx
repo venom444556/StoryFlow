@@ -164,8 +164,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         e.preventDefault()
         setSelectedIndex((prev) => {
           const curSelectable = selectableIndices.indexOf(prev)
-          const next =
-            curSelectable > 0 ? curSelectable - 1 : selectableIndices.length - 1
+          const next = curSelectable > 0 ? curSelectable - 1 : selectableIndices.length - 1
           return selectableIndices[next] ?? prev
         })
         return
@@ -242,10 +241,7 @@ export default function CommandPalette({ isOpen, onClose }) {
             </div>
 
             {/* Results list */}
-            <div
-              ref={listRef}
-              className="max-h-[50vh] overflow-y-auto py-2"
-            >
+            <div ref={listRef} className="max-h-[50vh] overflow-y-auto py-2">
               {flatResults.length > 0 &&
                 flatResults.map((entry, index) => {
                   if (entry.type === 'header') {
@@ -279,9 +275,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                     >
                       <Icon size={16} className={`shrink-0 ${colorClass}`} />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          {item.title}
-                        </div>
+                        <div className="truncate text-sm font-medium">{item.title}</div>
                         {item.preview && (
                           <div className="truncate text-xs text-[var(--color-fg-subtle)]">
                             {item.preview}
@@ -294,7 +288,10 @@ export default function CommandPalette({ isOpen, onClose }) {
                         </span>
                       )}
                       {isSelected && (
-                        <CornerDownLeft size={12} className="shrink-0 text-[var(--color-fg-subtle)]" />
+                        <CornerDownLeft
+                          size={12}
+                          className="shrink-0 text-[var(--color-fg-subtle)]"
+                        />
                       )}
                     </button>
                   )

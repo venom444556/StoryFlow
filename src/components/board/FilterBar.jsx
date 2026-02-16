@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Filter, X, ChevronDown, Search } from 'lucide-react';
-import Badge from '../ui/Badge';
-import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants';
-import { getLabelsByCategory, getLabel } from '../../utils/labelDefinitions';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Filter, X, ChevronDown, Search } from 'lucide-react'
+import Badge from '../ui/Badge'
+import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
+import { getLabelsByCategory, getLabel } from '../../utils/labelDefinitions'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.EPIC, label: 'Epic', variant: 'purple' },
@@ -11,20 +11,20 @@ const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.TASK, label: 'Task', variant: 'blue' },
   { value: ISSUE_TYPES.BUG, label: 'Bug', variant: 'red' },
   { value: ISSUE_TYPES.SUBTASK, label: 'Subtask', variant: 'gray' },
-];
+]
 
 const PRIORITY_OPTIONS = [
   { value: PRIORITIES.CRITICAL, label: 'Critical', variant: 'red' },
   { value: PRIORITIES.HIGH, label: 'High', variant: 'yellow' },
   { value: PRIORITIES.MEDIUM, label: 'Medium', variant: 'blue' },
   { value: PRIORITIES.LOW, label: 'Low', variant: 'gray' },
-];
+]
 
 const ASSIGNEE_OPTIONS = [
   { value: 'Claude', label: 'Claude' },
   { value: 'User', label: 'User' },
   { value: '__none__', label: 'Unassigned' },
-];
+]
 
 // Checkbox item used in both flat and grouped dropdowns
 function CheckboxItem({ value, label, isSelected, onToggle }) {
@@ -41,46 +41,48 @@ function CheckboxItem({ value, label, isSelected, onToggle }) {
       <span
         className={[
           'flex h-3.5 w-3.5 items-center justify-center rounded border text-[9px]',
-          isSelected
-            ? 'text-[var(--color-fg-default)]'
-            : 'border-[var(--color-fg-muted)]',
+          isSelected ? 'text-[var(--color-fg-default)]' : 'border-[var(--color-fg-muted)]',
         ].join(' ')}
-        style={isSelected ? {
-          borderColor: 'var(--accent-active, #8b5cf6)',
-          backgroundColor: 'var(--accent-active, #8b5cf6)',
-        } : undefined}
+        style={
+          isSelected
+            ? {
+                borderColor: 'var(--accent-active, #8b5cf6)',
+                backgroundColor: 'var(--accent-active, #8b5cf6)',
+              }
+            : undefined
+        }
       >
         {isSelected && '\u2713'}
       </span>
       {label}
     </button>
-  );
+  )
 }
 
 // Reusable multi-select dropdown (flat list)
 function MultiSelectDropdown({ label, options, selected = [], onChange }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef(null)
 
   useEffect(() => {
     function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const toggle = (value) => {
     if (selected.includes(value)) {
-      onChange(selected.filter((v) => v !== value));
+      onChange(selected.filter((v) => v !== value))
     } else {
-      onChange([...selected, value]);
+      onChange([...selected, value])
     }
-  };
+  }
 
-  const hasSelection = selected.length > 0;
+  const hasSelection = selected.length > 0
 
   return (
     <div ref={ref} className="relative">
@@ -92,10 +94,14 @@ function MultiSelectDropdown({ label, options, selected = [], onChange }) {
             ? 'text-[var(--color-fg-default)] ring-1'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
-        style={hasSelection ? {
-          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-        } : undefined}
+        style={
+          hasSelection
+            ? {
+                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+              }
+            : undefined
+        }
       >
         {label}
         {hasSelection && (
@@ -132,33 +138,33 @@ function MultiSelectDropdown({ label, options, selected = [], onChange }) {
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }
 
 // Grouped multi-select dropdown (for labels with category headers)
 function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef(null)
 
   useEffect(() => {
     function handleClick(e) {
       if (ref.current && !ref.current.contains(e.target)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const toggle = (value) => {
     if (selected.includes(value)) {
-      onChange(selected.filter((v) => v !== value));
+      onChange(selected.filter((v) => v !== value))
     } else {
-      onChange([...selected, value]);
+      onChange([...selected, value])
     }
-  };
+  }
 
-  const hasSelection = selected.length > 0;
+  const hasSelection = selected.length > 0
 
   return (
     <div ref={ref} className="relative">
@@ -170,10 +176,14 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
             ? 'text-[var(--color-fg-default)] ring-1'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
-        style={hasSelection ? {
-          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-        } : undefined}
+        style={
+          hasSelection
+            ? {
+                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+              }
+            : undefined
+        }
       >
         {label}
         {hasSelection && (
@@ -199,9 +209,7 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
           >
             {groups.map((group, gi) => (
               <div key={group.categoryKey}>
-                {gi > 0 && (
-                  <div className="mx-2 my-1 h-px bg-[var(--color-border-default)]" />
-                )}
+                {gi > 0 && <div className="mx-2 my-1 h-px bg-[var(--color-border-default)]" />}
                 <div
                   className="px-2.5 pb-0.5 pt-1.5 text-[10px] font-semibold uppercase tracking-wider"
                   style={{ color: group.color }}
@@ -223,7 +231,7 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
         )}
       </AnimatePresence>
     </div>
-  );
+  )
 }
 
 export default function FilterBar({
@@ -233,17 +241,17 @@ export default function FilterBar({
   labels = [],
   epics: _epics = [],
 }) {
-  const { types = [], priorities = [], assignees = [], labelFilter = [], search = '' } = filters;
+  const { types = [], priorities = [], assignees = [], labelFilter = [], search = '' } = filters
 
   const handleChange = useCallback(
     (key, value) => {
-      onFilterChange?.({ ...filters, [key]: value });
+      onFilterChange?.({ ...filters, [key]: value })
     },
     [filters, onFilterChange]
-  );
+  )
 
   const activeCount =
-    types.length + priorities.length + assignees.length + labelFilter.length + (search ? 1 : 0);
+    types.length + priorities.length + assignees.length + labelFilter.length + (search ? 1 : 0)
 
   const clearAll = () => {
     onFilterChange?.({
@@ -252,21 +260,21 @@ export default function FilterBar({
       assignees: [],
       labelFilter: [],
       search: '',
-    });
-  };
+    })
+  }
 
   // Build grouped label options from registry, filtered to only labels that exist in data
   const labelGroups = useMemo(() => {
-    const dataLabels = new Set(labels);
+    const dataLabels = new Set(labels)
     return getLabelsByCategory()
       .map((group) => ({
         ...group,
         labels: group.labels.filter((l) => dataLabels.has(l)),
       }))
-      .filter((group) => group.labels.length > 0);
-  }, [labels]);
+      .filter((group) => group.labels.length > 0)
+  }, [labels])
 
-  const hasLabels = labelGroups.some((g) => g.labels.length > 0);
+  const hasLabels = labelGroups.some((g) => g.labels.length > 0)
 
   return (
     <div className="relative z-40 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-3 py-2 backdrop-blur-sm">
@@ -350,7 +358,12 @@ export default function FilterBar({
                 variant="purple"
                 size="xs"
                 removable
-                onRemove={() => handleChange('types', types.filter((v) => v !== t))}
+                onRemove={() =>
+                  handleChange(
+                    'types',
+                    types.filter((v) => v !== t)
+                  )
+                }
               >
                 {t}
               </Badge>
@@ -362,7 +375,10 @@ export default function FilterBar({
                 size="xs"
                 removable
                 onRemove={() =>
-                  handleChange('priorities', priorities.filter((v) => v !== p))
+                  handleChange(
+                    'priorities',
+                    priorities.filter((v) => v !== p)
+                  )
                 }
               >
                 {p}
@@ -375,14 +391,17 @@ export default function FilterBar({
                 size="xs"
                 removable
                 onRemove={() =>
-                  handleChange('assignees', assignees.filter((v) => v !== a))
+                  handleChange(
+                    'assignees',
+                    assignees.filter((v) => v !== a)
+                  )
                 }
               >
                 {a === '__none__' ? 'Unassigned' : a}
               </Badge>
             ))}
             {labelFilter.map((l) => {
-              const def = getLabel(l);
+              const def = getLabel(l)
               return (
                 <Badge
                   key={`lbl-${l}`}
@@ -390,7 +409,10 @@ export default function FilterBar({
                   size="xs"
                   removable
                   onRemove={() =>
-                    handleChange('labelFilter', labelFilter.filter((v) => v !== l))
+                    handleChange(
+                      'labelFilter',
+                      labelFilter.filter((v) => v !== l)
+                    )
                   }
                 >
                   {def && (
@@ -401,7 +423,7 @@ export default function FilterBar({
                   )}
                   {l}
                 </Badge>
-              );
+              )
             })}
           </div>
 
@@ -416,5 +438,5 @@ export default function FilterBar({
         </>
       )}
     </div>
-  );
+  )
 }

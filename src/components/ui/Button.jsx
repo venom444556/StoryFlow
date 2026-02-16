@@ -1,5 +1,5 @@
-import React from 'react';
-import { Loader2 } from 'lucide-react';
+import React from 'react'
+import { Loader2 } from 'lucide-react'
 
 const VARIANTS = {
   primary: [
@@ -28,19 +28,19 @@ const VARIANTS = {
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--interactive-default)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
   ].join(' '),
-};
+}
 
 const SIZES = {
   sm: 'h-[var(--size-input-sm)] px-[var(--space-3)] text-[var(--text-xs)] gap-[var(--space-2)]',
   md: 'h-[var(--size-input-md)] px-[var(--space-4)] text-[var(--text-sm)] gap-[var(--space-2)]',
   lg: 'h-[var(--size-input-lg)] px-[var(--space-6)] text-[var(--text-base)] gap-[var(--space-3)]',
-};
+}
 
 const ICON_SIZES = {
   sm: 14,
   md: 16,
   lg: 18,
-};
+}
 
 export default function Button({
   children,
@@ -56,10 +56,10 @@ export default function Button({
   as: Component,
   ...rest
 }) {
-  const Tag = Component || 'button';
-  const isButton = Tag === 'button';
-  const isPrimary = (variant || 'primary') === 'primary';
-  const isDisabled = disabled || isLoading;
+  const Tag = Component || 'button'
+  const isButton = Tag === 'button'
+  const isPrimary = (variant || 'primary') === 'primary'
+  const isDisabled = disabled || isLoading
 
   return (
     <Tag
@@ -77,10 +77,12 @@ export default function Button({
       style={{
         transitionDuration: 'var(--duration-normal)',
         transitionTimingFunction: 'var(--ease-default)',
-        ...(isPrimary ? {
-          backgroundImage: `linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)`,
-          boxShadow: `0 10px 15px -3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)`,
-        } : {}),
+        ...(isPrimary
+          ? {
+              backgroundImage: `linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)`,
+              boxShadow: `0 10px 15px -3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)`,
+            }
+          : {}),
       }}
       onClick={isDisabled ? undefined : onClick}
       disabled={isButton ? isDisabled : undefined}
@@ -95,5 +97,5 @@ export default function Button({
       {children}
       {!isLoading && IconRight && <IconRight size={ICON_SIZES[size] || 16} />}
     </Tag>
-  );
+  )
 }

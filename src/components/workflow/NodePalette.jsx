@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Play,
   Square,
@@ -10,8 +10,8 @@ import {
   Globe,
   Database,
   Code,
-} from 'lucide-react';
-import NODE_TYPES from '../../data/nodeTypes';
+} from 'lucide-react'
+import NODE_TYPES from '../../data/nodeTypes'
 
 // ---------------------------------------------------------------------------
 // Icon lookup (mirrors WorkflowNode)
@@ -26,7 +26,7 @@ const ICON_MAP = {
   Globe,
   Database,
   Code,
-};
+}
 
 // ---------------------------------------------------------------------------
 // NodePalette
@@ -42,28 +42,28 @@ const ICON_MAP = {
  * - onClose   {function}  callback to close the palette
  */
 export default function NodePalette({ onSelect, isOpen, onClose }) {
-  const panelRef = useRef(null);
+  const panelRef = useRef(null)
 
   // Close on click outside
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     const handleClickOutside = (e) => {
       if (panelRef.current && !panelRef.current.contains(e.target)) {
-        onClose?.();
+        onClose?.()
       }
-    };
+    }
 
     // Use a timeout so the opening click doesn't immediately close it
     const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 0);
+      document.addEventListener('mousedown', handleClickOutside)
+    }, 0)
 
     return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
+      clearTimeout(timer)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
 
   return (
     <AnimatePresence>
@@ -83,7 +83,7 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
 
           <div className="grid grid-cols-3 gap-2">
             {NODE_TYPES.map((typeDef) => {
-              const Icon = ICON_MAP[typeDef.icon];
+              const Icon = ICON_MAP[typeDef.icon]
               return (
                 <button
                   key={typeDef.type}
@@ -104,11 +104,11 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
                     {typeDef.description}
                   </span>
                 </button>
-              );
+              )
             })}
           </div>
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

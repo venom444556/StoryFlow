@@ -8,8 +8,7 @@ import { formatDateTime } from '../../utils/dates'
 
 function VersionItem({ version, onRestore }) {
   const [expanded, setExpanded] = useState(false)
-  const preview =
-    version.content?.substring(0, 120)?.replace(/\n/g, ' ') || '(empty)'
+  const preview = version.content?.substring(0, 120)?.replace(/\n/g, ' ') || '(empty)'
 
   return (
     <div className="glass-card overflow-hidden rounded-lg">
@@ -71,16 +70,9 @@ function VersionItem({ version, onRestore }) {
   )
 }
 
-export default function VersionHistory({
-  isOpen,
-  onClose,
-  versions = [],
-  onRestore,
-}) {
+export default function VersionHistory({ isOpen, onClose, versions = [], onRestore }) {
   // Sort newest first
-  const sorted = [...versions].sort(
-    (a, b) => new Date(b.editedAt) - new Date(a.editedAt)
-  )
+  const sorted = [...versions].sort((a, b) => new Date(b.editedAt) - new Date(a.editedAt))
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Version History" size="lg">

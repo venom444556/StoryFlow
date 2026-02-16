@@ -1,5 +1,5 @@
-import { useMemo, useCallback } from 'react';
-import BoardColumn from './BoardColumn';
+import { useMemo, useCallback } from 'react'
+import BoardColumn from './BoardColumn'
 
 export default function SprintBoard({
   issues = [],
@@ -10,27 +10,25 @@ export default function SprintBoard({
 }) {
   // Group issues by status
   const issuesByStatus = useMemo(() => {
-    const grouped = {};
+    const grouped = {}
     statusColumns.forEach((col) => {
-      grouped[col] = [];
-    });
+      grouped[col] = []
+    })
     issues.forEach((issue) => {
-      const col = statusColumns.includes(issue.status)
-        ? issue.status
-        : statusColumns[0];
-      if (!grouped[col]) grouped[col] = [];
-      grouped[col].push(issue);
-    });
-    return grouped;
-  }, [issues, statusColumns]);
+      const col = statusColumns.includes(issue.status) ? issue.status : statusColumns[0]
+      if (!grouped[col]) grouped[col] = []
+      grouped[col].push(issue)
+    })
+    return grouped
+  }, [issues, statusColumns])
 
   // Handle drop: move issue to new status
   const handleDrop = useCallback(
     (issueId, newStatus) => {
-      onUpdateIssue?.(issueId, { status: newStatus });
+      onUpdateIssue?.(issueId, { status: newStatus })
     },
     [onUpdateIssue]
-  );
+  )
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-4">
@@ -46,5 +44,5 @@ export default function SprintBoard({
         />
       ))}
     </div>
-  );
+  )
 }

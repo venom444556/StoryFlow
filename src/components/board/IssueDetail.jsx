@@ -1,24 +1,15 @@
-import { useState, useCallback, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import {
-  X,
-  Trash2,
-  Plus,
-  Check,
-  MessageSquare,
-  Clock,
-  ListChecks,
-  Send,
-} from 'lucide-react';
-import IssueTypeIcon from './IssueTypeIcon';
-import Select from '../ui/Select';
-import TextArea from '../ui/TextArea';
-import TagInput from '../ui/TagInput';
-import Avatar from '../ui/Avatar';
-import ConfirmDialog from '../ui/ConfirmDialog';
-import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants';
-import { generateId } from '../../utils/ids';
-import { getSuggestions } from '../../utils/labelDefinitions';
+import { useState, useCallback, useMemo } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { X, Trash2, Plus, Check, MessageSquare, Clock, ListChecks, Send } from 'lucide-react'
+import IssueTypeIcon from './IssueTypeIcon'
+import Select from '../ui/Select'
+import TextArea from '../ui/TextArea'
+import TagInput from '../ui/TagInput'
+import Avatar from '../ui/Avatar'
+import ConfirmDialog from '../ui/ConfirmDialog'
+import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
+import { generateId } from '../../utils/ids'
+import { getSuggestions } from '../../utils/labelDefinitions'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.EPIC, label: 'Epic' },
@@ -26,26 +17,26 @@ const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.TASK, label: 'Task' },
   { value: ISSUE_TYPES.BUG, label: 'Bug' },
   { value: ISSUE_TYPES.SUBTASK, label: 'Subtask' },
-];
+]
 
 const PRIORITY_OPTIONS = [
   { value: PRIORITIES.CRITICAL, label: 'Critical' },
   { value: PRIORITIES.HIGH, label: 'High' },
   { value: PRIORITIES.MEDIUM, label: 'Medium' },
   { value: PRIORITIES.LOW, label: 'Low' },
-];
+]
 
 const STATUS_OPTIONS = [
   { value: 'To Do', label: 'To Do' },
   { value: 'In Progress', label: 'In Progress' },
   { value: 'Done', label: 'Done' },
-];
+]
 
 const ASSIGNEE_OPTIONS = [
   { value: '', label: 'Unassigned' },
   { value: 'Claude', label: 'Claude' },
   { value: 'User', label: 'User' },
-];
+]
 
 function SectionHeader({ icon: Icon, children }) {
   return (
@@ -55,33 +46,27 @@ function SectionHeader({ icon: Icon, children }) {
         {children}
       </h4>
     </div>
-  );
+  )
 }
 
 function formatDate(isoString) {
-  if (!isoString) return '';
-  const d = new Date(isoString);
+  if (!isoString) return ''
+  const d = new Date(isoString)
   return d.toLocaleDateString(undefined, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  });
+  })
 }
 
-export default function IssueDetail({
-  issue,
-  onUpdate,
-  onDelete,
-  onClose,
-  allIssues = [],
-}) {
-  const [editingTitle, setEditingTitle] = useState(false);
-  const [titleDraft, setTitleDraft] = useState('');
-  const [newSubtask, setNewSubtask] = useState('');
-  const [newComment, setNewComment] = useState('');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIssues = [] }) {
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleDraft, setTitleDraft] = useState('')
+  const [newSubtask, setNewSubtask] = useState('')
+  const [newComment, setNewComment] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const epics = useMemo(
     () =>
@@ -89,83 +74,80 @@ export default function IssueDetail({
         .filter((i) => i.type === 'epic' && i.id !== issue?.id)
         .map((i) => ({ value: i.id, label: `${i.key} - ${i.title}` })),
     [allIssues, issue?.id]
-  );
+  )
 
-  const epicOptions = useMemo(
-    () => [{ value: '', label: 'No Epic' }, ...epics],
-    [epics]
-  );
+  const epicOptions = useMemo(() => [{ value: '', label: 'No Epic' }, ...epics], [epics])
 
   const handleUpdate = useCallback(
     (updates) => {
-      onUpdate?.(issue.id, updates);
+      onUpdate?.(issue.id, updates)
     },
     [issue?.id, onUpdate]
-  );
+  )
 
   const handleTitleSave = () => {
-    const trimmed = titleDraft.trim();
+    const trimmed = titleDraft.trim()
     if (trimmed && trimmed !== issue.title) {
-      handleUpdate({ title: trimmed });
+      handleUpdate({ title: trimmed })
     }
-    setEditingTitle(false);
-  };
+    setEditingTitle(false)
+  }
 
   const handleTitleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      handleTitleSave();
+      e.preventDefault()
+      handleTitleSave()
     }
     if (e.key === 'Escape') {
-      setEditingTitle(false);
+      setEditingTitle(false)
     }
-  };
+  }
 
   const handleAddSubtask = () => {
-    const trimmed = newSubtask.trim();
-    if (!trimmed) return;
-    const subtask = { id: generateId(), title: trimmed, completed: false };
-    handleUpdate({ subtasks: [...(issue.subtasks || []), subtask] });
-    setNewSubtask('');
-  };
+    const trimmed = newSubtask.trim()
+    if (!trimmed) return
+    const subtask = { id: generateId(), title: trimmed, completed: false }
+    handleUpdate({ subtasks: [...(issue.subtasks || []), subtask] })
+    setNewSubtask('')
+  }
 
   const handleToggleSubtask = (subtaskId) => {
     const updated = (issue.subtasks || []).map((st) =>
       st.id === subtaskId ? { ...st, completed: !st.completed } : st
-    );
-    handleUpdate({ subtasks: updated });
-  };
+    )
+    handleUpdate({ subtasks: updated })
+  }
 
   const handleDeleteSubtask = (subtaskId) => {
     handleUpdate({
       subtasks: (issue.subtasks || []).filter((st) => st.id !== subtaskId),
-    });
-  };
+    })
+  }
 
   const handleAddComment = () => {
-    const trimmed = newComment.trim();
-    if (!trimmed) return;
+    const trimmed = newComment.trim()
+    if (!trimmed) return
     const comment = {
       id: generateId(),
       text: trimmed,
       author: 'User',
       createdAt: new Date().toISOString(),
-    };
-    handleUpdate({ comments: [...(issue.comments || []), comment] });
-    setNewComment('');
-  };
+    }
+    handleUpdate({ comments: [...(issue.comments || []), comment] })
+    setNewComment('')
+  }
 
   const handleCommentKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleAddComment();
+      e.preventDefault()
+      handleAddComment()
     }
-  };
+  }
 
-  if (!issue) return null;
+  if (!issue) return null
 
-  const subtasksTotal = (issue.subtasks || []).length;
-  const subtasksDone = (issue.subtasks || []).filter((s) => s.completed).length;
+  const subtasksTotal = (issue.subtasks || []).length
+  const subtasksDone = (issue.subtasks || []).filter((s) => s.completed).length
 
   return (
     <>
@@ -199,11 +181,13 @@ export default function IssueDetail({
               ) : (
                 <h2
                   className="cursor-pointer truncate text-base font-semibold text-[var(--color-fg-default)] transition-colors"
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)')
+                  }
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                   onClick={() => {
-                    setTitleDraft(issue.title);
-                    setEditingTitle(true);
+                    setTitleDraft(issue.title)
+                    setEditingTitle(true)
                   }}
                 >
                   {issue.title}
@@ -267,8 +251,7 @@ export default function IssueDetail({
                     value={issue.storyPoints ?? ''}
                     onChange={(e) =>
                       handleUpdate({
-                        storyPoints:
-                          e.target.value === '' ? null : Number(e.target.value),
+                        storyPoints: e.target.value === '' ? null : Number(e.target.value),
                       })
                     }
                     placeholder="--"
@@ -299,9 +282,7 @@ export default function IssueDetail({
 
               {/* Labels */}
               <div>
-                <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
-                  Labels
-                </label>
+                <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Labels</label>
                 <TagInput
                   tags={issue.labels || []}
                   onChange={(labels) => handleUpdate({ labels })}
@@ -328,7 +309,8 @@ export default function IssueDetail({
                       className="h-full rounded-full transition-all duration-300"
                       style={{
                         width: `${(subtasksDone / subtasksTotal) * 100}%`,
-                        backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                        backgroundImage:
+                          'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
                       }}
                     />
                   </div>
@@ -380,8 +362,8 @@ export default function IssueDetail({
                     onChange={(e) => setNewSubtask(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddSubtask();
+                        e.preventDefault()
+                        handleAddSubtask()
                       }
                     }}
                     placeholder="Add subtask..."
@@ -446,8 +428,15 @@ export default function IssueDetail({
                     onClick={handleAddComment}
                     disabled={!newComment.trim()}
                     className="rounded-lg p-2 text-[var(--color-fg-muted)] transition-colors disabled:pointer-events-none disabled:opacity-30"
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)'; e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.color = ''; }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        'rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)'
+                      e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = ''
+                      e.currentTarget.style.color = ''
+                    }}
                   >
                     <Send size={14} />
                   </button>
@@ -502,13 +491,13 @@ export default function IssueDetail({
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={() => {
-          onDelete?.(issue.id);
-          onClose?.();
+          onDelete?.(issue.id)
+          onClose?.()
         }}
         title="Delete Issue"
         message={`Are you sure you want to delete "${issue.key} - ${issue.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
       />
     </>
-  );
+  )
 }

@@ -1,31 +1,30 @@
-import { useMemo } from 'react';
-import { BarChart3 } from 'lucide-react';
-import GlassCard from '../ui/GlassCard';
-import EmptyState from '../ui/EmptyState';
+import { useMemo } from 'react'
+import { BarChart3 } from 'lucide-react'
+import GlassCard from '../ui/GlassCard'
+import EmptyState from '../ui/EmptyState'
 
-const PADDING = { top: 24, right: 20, bottom: 40, left: 44 };
-const VIEW_WIDTH = 600;
-const VIEW_HEIGHT = 300;
-const CHART_W = VIEW_WIDTH - PADDING.left - PADDING.right;
-const CHART_H = VIEW_HEIGHT - PADDING.top - PADDING.bottom;
-const BAR_GAP_RATIO = 0.35; // gap as fraction of slot width
+const PADDING = { top: 24, right: 20, bottom: 40, left: 44 }
+const VIEW_WIDTH = 600
+const VIEW_HEIGHT = 300
+const CHART_W = VIEW_WIDTH - PADDING.left - PADDING.right
+const CHART_H = VIEW_HEIGHT - PADDING.top - PADDING.bottom
+const BAR_GAP_RATIO = 0.35 // gap as fraction of slot width
 
 export default function VelocityChart({ sprints = [] }) {
   const chart = useMemo(() => {
-    if (sprints.length === 0) return null;
+    if (sprints.length === 0) return null
 
-    const maxPoints = Math.max(...sprints.map((s) => s.points ?? 0), 1);
-    const avg =
-      sprints.reduce((sum, s) => sum + (s.points ?? 0), 0) / sprints.length;
+    const maxPoints = Math.max(...sprints.map((s) => s.points ?? 0), 1)
+    const avg = sprints.reduce((sum, s) => sum + (s.points ?? 0), 0) / sprints.length
 
-    const slotWidth = CHART_W / sprints.length;
-    const gap = slotWidth * BAR_GAP_RATIO;
-    const barWidth = slotWidth - gap;
+    const slotWidth = CHART_W / sprints.length
+    const gap = slotWidth * BAR_GAP_RATIO
+    const barWidth = slotWidth - gap
 
     const bars = sprints.map((sprint, i) => {
-      const x = PADDING.left + i * slotWidth + gap / 2;
-      const barHeight = ((sprint.points ?? 0) / maxPoints) * CHART_H;
-      const y = PADDING.top + CHART_H - barHeight;
+      const x = PADDING.left + i * slotWidth + gap / 2
+      const barHeight = ((sprint.points ?? 0) / maxPoints) * CHART_H
+      const y = PADDING.top + CHART_H - barHeight
       return {
         x,
         y,
@@ -33,32 +32,30 @@ export default function VelocityChart({ sprints = [] }) {
         height: barHeight,
         points: sprint.points ?? 0,
         name: sprint.name || `Sprint ${i + 1}`,
-      };
-    });
+      }
+    })
 
     // Grid lines
-    const gridLineCount = 5;
-    const gridLines = [];
+    const gridLineCount = 5
+    const gridLines = []
     for (let i = 0; i <= gridLineCount; i++) {
-      const y = PADDING.top + (CHART_H / gridLineCount) * i;
-      const label = Math.round(maxPoints - (maxPoints / gridLineCount) * i);
-      gridLines.push({ y, label });
+      const y = PADDING.top + (CHART_H / gridLineCount) * i
+      const label = Math.round(maxPoints - (maxPoints / gridLineCount) * i)
+      gridLines.push({ y, label })
     }
 
     // Average line
-    const avgY = PADDING.top + CHART_H - (avg / maxPoints) * CHART_H;
+    const avgY = PADDING.top + CHART_H - (avg / maxPoints) * CHART_H
 
-    return { bars, gridLines, avgY, avg: Math.round(avg * 10) / 10 };
-  }, [sprints]);
+    return { bars, gridLines, avgY, avg: Math.round(avg * 10) / 10 }
+  }, [sprints])
 
   if (!chart) {
     return (
       <GlassCard>
         <div className="mb-3 flex items-center gap-2">
           <BarChart3 size={16} className="text-green-400" />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-            Velocity Chart
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Velocity Chart</h3>
         </div>
         <EmptyState
           icon={BarChart3}
@@ -66,7 +63,7 @@ export default function VelocityChart({ sprints = [] }) {
           description="Complete sprints to track team velocity over time."
         />
       </GlassCard>
-    );
+    )
   }
 
   return (
@@ -74,9 +71,7 @@ export default function VelocityChart({ sprints = [] }) {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BarChart3 size={16} className="text-green-400" />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-            Velocity Chart
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Velocity Chart</h3>
         </div>
         <span className="text-xs text-[var(--color-fg-muted)]">
           Avg: <span className="font-medium text-[var(--color-fg-muted)]">{chart.avg} pts</span>
@@ -86,7 +81,12 @@ export default function VelocityChart({ sprints = [] }) {
       {/* Legend */}
       <div className="mb-2 flex items-center gap-4 px-1">
         <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-sm" style={{ backgroundImage: 'linear-gradient(to top, var(--accent-active, #7c3aed), #3b82f6)' }} />
+          <div
+            className="h-3 w-3 rounded-sm"
+            style={{
+              backgroundImage: 'linear-gradient(to top, var(--accent-active, #7c3aed), #3b82f6)',
+            }}
+          />
           <span className="text-[10px] text-[var(--color-fg-muted)]">Points Completed</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -233,5 +233,5 @@ export default function VelocityChart({ sprints = [] }) {
         />
       </svg>
     </GlassCard>
-  );
+  )
 }

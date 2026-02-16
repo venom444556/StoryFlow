@@ -1,13 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ChevronRight,
-  ChevronDown,
-  FileText,
-  Plus,
-  Trash2,
-  Pin,
-} from 'lucide-react'
+import { ChevronRight, ChevronDown, FileText, Plus, Trash2, Pin } from 'lucide-react'
 import SearchBar from '../ui/SearchBar'
 import Button from '../ui/Button'
 
@@ -86,7 +79,9 @@ function TreeNode({
         ].join(' ')}
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          ...(isSelected ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' } : {}),
+          ...(isSelected
+            ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' }
+            : {}),
         }}
         onClick={() => onSelectPage(node.id)}
       >
@@ -99,11 +94,7 @@ function TreeNode({
             }}
             className="shrink-0 rounded p-0.5 hover:bg-[var(--color-bg-glass-hover)]"
           >
-            {isExpanded ? (
-              <ChevronDown size={14} />
-            ) : (
-              <ChevronRight size={14} />
-            )}
+            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </button>
         ) : (
           <span className="w-[18px] shrink-0" />
@@ -120,9 +111,7 @@ function TreeNode({
         <span className="flex-1 truncate">{node.title || 'Untitled'}</span>
 
         {/* Pin indicator */}
-        {node.pinned && (
-          <Pin size={12} className="shrink-0 text-yellow-500/70" />
-        )}
+        {node.pinned && <Pin size={12} className="shrink-0 text-yellow-500/70" />}
 
         {/* Hover actions */}
         <span className="hidden shrink-0 items-center gap-0.5 group-hover:flex">
@@ -221,12 +210,7 @@ export default function PageTree({
           <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
             Pages
           </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={Plus}
-            onClick={() => onAddPage(null)}
-          >
+          <Button variant="ghost" size="sm" icon={Plus} onClick={() => onAddPage(null)}>
             New
           </Button>
         </div>

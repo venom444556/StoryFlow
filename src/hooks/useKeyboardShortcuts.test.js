@@ -51,10 +51,9 @@ describe('useKeyboardShortcuts', () => {
     })
 
     it('only adds listener once regardless of handler updates', () => {
-      const { rerender } = renderHook(
-        ({ handlers }) => useKeyboardShortcuts(handlers),
-        { initialProps: { handlers: { 'ctrl+s': vi.fn() } } }
-      )
+      const { rerender } = renderHook(({ handlers }) => useKeyboardShortcuts(handlers), {
+        initialProps: { handlers: { 'ctrl+s': vi.fn() } },
+      })
 
       // Initial render
       expect(addEventListenerSpy).toHaveBeenCalledTimes(1)
@@ -132,7 +131,7 @@ describe('useKeyboardShortcuts', () => {
 
     it('calls handler for plain key shortcut', () => {
       const handler = vi.fn()
-      renderHook(() => useKeyboardShortcuts({ 'Escape': handler }))
+      renderHook(() => useKeyboardShortcuts({ Escape: handler }))
 
       simulateKeyDown('Escape')
 
@@ -222,7 +221,7 @@ describe('useKeyboardShortcuts', () => {
 
     it('does not trigger plain key shortcuts in INPUT fields', () => {
       const handler = vi.fn()
-      renderHook(() => useKeyboardShortcuts({ 'Escape': handler }))
+      renderHook(() => useKeyboardShortcuts({ Escape: handler }))
 
       simulateKeyDownInField('Escape', {}, 'INPUT')
 
@@ -231,7 +230,7 @@ describe('useKeyboardShortcuts', () => {
 
     it('does not trigger plain key shortcuts in TEXTAREA fields', () => {
       const handler = vi.fn()
-      renderHook(() => useKeyboardShortcuts({ 'Delete': handler }))
+      renderHook(() => useKeyboardShortcuts({ Delete: handler }))
 
       simulateKeyDownInField('Delete', {}, 'TEXTAREA')
 
@@ -280,10 +279,9 @@ describe('useKeyboardShortcuts', () => {
       const handler1 = vi.fn()
       const handler2 = vi.fn()
 
-      const { rerender } = renderHook(
-        ({ handlers }) => useKeyboardShortcuts(handlers),
-        { initialProps: { handlers: { 'ctrl+s': handler1 } } }
-      )
+      const { rerender } = renderHook(({ handlers }) => useKeyboardShortcuts(handlers), {
+        initialProps: { handlers: { 'ctrl+s': handler1 } },
+      })
 
       // Dispatch event with first handler
       const event1 = new KeyboardEvent('keydown', {
@@ -365,8 +363,7 @@ describe('useKeyboardShortcuts', () => {
       // This shouldn't happen in practice, but tests the early return
       renderHook(() =>
         useKeyboardShortcuts({
-          'ctrl+s': handler1,
-          'ctrl+s': handler2, // Duplicate key - last wins in object
+          'ctrl+s': handler2, // Tests that last handler wins
         })
       )
 
@@ -424,7 +421,9 @@ describe('useKeyboardShortcuts', () => {
       renderHook(() => useKeyboardShortcuts({ '?': handler }))
 
       const event = new KeyboardEvent('keydown', { key: '?', bubbles: true })
-      Object.defineProperty(event, 'target', { value: { tagName: 'DIV', isContentEditable: false } })
+      Object.defineProperty(event, 'target', {
+        value: { tagName: 'DIV', isContentEditable: false },
+      })
       event.preventDefault = vi.fn()
       event.stopPropagation = vi.fn()
       window.dispatchEvent(event)

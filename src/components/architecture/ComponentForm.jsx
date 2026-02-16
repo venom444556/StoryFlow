@@ -59,11 +59,7 @@ export default function ComponentForm({
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEdit ? 'Edit Component' : 'Add Component'}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title={isEdit ? 'Edit Component' : 'Add Component'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
           label="Name"
@@ -89,9 +85,7 @@ export default function ComponentForm({
         </div>
 
         <div className="w-full">
-          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
-            Description
-          </label>
+          <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}

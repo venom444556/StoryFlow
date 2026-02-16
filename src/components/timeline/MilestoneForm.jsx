@@ -81,12 +81,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
         />
 
         {/* Date */}
-        <Input
-          label="Target Date"
-          type="date"
-          value={form.date}
-          onChange={handleChange('date')}
-        />
+        <Input label="Target Date" type="date" value={form.date} onChange={handleChange('date')} />
 
         {/* Phase association */}
         <Select
@@ -161,10 +156,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
           <Button variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!form.name.trim()}
-          >
+          <Button onClick={handleSave} disabled={!form.name.trim()}>
             {isEditing ? 'Save Changes' : 'Create Milestone'}
           </Button>
         </div>

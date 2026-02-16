@@ -66,8 +66,10 @@ export default function WorkflowCanvas({
   })
 
   // ------ Pan handling ------
-  const { isPanning, handlePanStart, handlePanMove, handlePanEnd } =
-    useCanvasPan(viewport, setViewport)
+  const { isPanning, handlePanStart, handlePanMove, handlePanEnd } = useCanvasPan(
+    viewport,
+    setViewport
+  )
 
   // ------ Connection drawing ------
   const {
@@ -103,17 +105,13 @@ export default function WorkflowCanvas({
     return counts
   }, [connections])
 
-  const contextMenuNode = contextMenu
-    ? nodes.find((n) => n.id === contextMenu.nodeId)
-    : null
+  const contextMenuNode = contextMenu ? nodes.find((n) => n.id === contextMenu.nodeId) : null
 
   // ------ Node CRUD ------
 
   const handleUpdateNode = useCallback(
     (nodeId, updates) => {
-      const updatedNodes = nodes.map((n) =>
-        n.id === nodeId ? { ...n, ...updates } : n
-      )
+      const updatedNodes = nodes.map((n) => (n.id === nodeId ? { ...n, ...updates } : n))
       onSaveNodes(updatedNodes)
     },
     [nodes, onSaveNodes]
@@ -122,9 +120,7 @@ export default function WorkflowCanvas({
   const handleDeleteNode = useCallback(
     (nodeId) => {
       const updatedNodes = nodes.filter((n) => n.id !== nodeId)
-      const updatedConns = connections.filter(
-        (c) => c.from !== nodeId && c.to !== nodeId
-      )
+      const updatedConns = connections.filter((c) => c.from !== nodeId && c.to !== nodeId)
       onSaveBoth(updatedNodes, updatedConns)
       if (selectedNodeId === nodeId) onSelectNode?.(null)
       setContextMenu(null)
@@ -275,8 +271,8 @@ export default function WorkflowCanvas({
   // Compute grid background offset so the dot grid moves with pan/zoom
   // The grid lives on the container (not the transform wrapper) to fill the entire area
   const gridSize = 20 * viewport.scale
-  const gridOffX = (viewport.offsetX % (20 * viewport.scale))
-  const gridOffY = (viewport.offsetY % (20 * viewport.scale))
+  const gridOffX = viewport.offsetX % (20 * viewport.scale)
+  const gridOffY = viewport.offsetY % (20 * viewport.scale)
 
   return (
     <div
@@ -297,7 +293,6 @@ export default function WorkflowCanvas({
           className="absolute h-full w-full"
           style={{ left: 0, top: 0, width: '200%', height: '200%' }}
         >
-
           {/* Connections */}
           {connections.map((conn) => {
             const fromNode = nodes.find((n) => n.id === conn.from)
