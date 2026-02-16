@@ -82,9 +82,17 @@ export const useProjectsStore = create(
         setProjects: (projects) => set({ projects }),
 
         addProject: (name) => {
+          const trimmed = (name || '').trim()
+          if (!trimmed) {
+            throw new Error('Project name is required')
+          }
+          const active = get().projects.filter((p) => !p.deletedAt)
+          if (active.some((p) => p.name.toLowerCase() === trimmed.toLowerCase())) {
+            throw new Error(`A project named "${trimmed}" already exists`)
+          }
           const existingIds = get().projects.map((p) => p.id)
-          const id = generateProjectId(name, existingIds)
-          const project = createDefaultProject(name, id)
+          const id = generateProjectId(trimmed, existingIds)
+          const project = createDefaultProject(trimmed, id)
           set((state) => {
             state.projects.push(project)
           })
@@ -146,10 +154,25 @@ export const useProjectsStore = create(
         },
 
         importProject: (data) => {
+          let name = (data.name || '').trim()
+          if (!name) {
+            throw new Error('Imported project must have a name')
+          }
+          // Auto-suffix if name already exists (imports are copies, not rejects)
+          const active = get().projects.filter((p) => !p.deletedAt)
+          const lowerNames = new Set(active.map((p) => p.name.toLowerCase()))
+          if (lowerNames.has(name.toLowerCase())) {
+            let counter = 2
+            while (lowerNames.has(`${name} (${counter})`.toLowerCase())) {
+              counter++
+            }
+            name = `${name} (${counter})`
+          }
           const existingIds = get().projects.map((p) => p.id)
           const imported = {
             ...data,
-            id: generateProjectId(data.name || 'imported-project', existingIds),
+            name,
+            id: generateProjectId(name, existingIds),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           }

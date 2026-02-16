@@ -3352,7 +3352,7 @@ export function createSeedProject() {
           type: 'story',
           title: 'SF-128: Implement slug-based project ID naming convention',
           description:
-            'Replace opaque UUID project IDs with human-readable slugs derived from the user\'s project name. "My Awesome App" → "my-awesome-app". Handles collision with numeric suffix ("my-app-2"). Makes URLs readable: /project/my-awesome-app instead of /project/f47ac10b-58cc-...',
+            'Replace opaque UUID project IDs with human-readable slugs derived from the user\'s project name. "My Awesome App" → "my-awesome-app". Enforces unique names at the store level — empty names throw, duplicate names throw on create, auto-suffix on import ("My App (2)"). generateSlug() throws on empty/non-alphanumeric input. URLs become readable: /project/my-awesome-app.',
           status: 'Done',
           priority: 'medium',
           storyPoints: 3,

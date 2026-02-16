@@ -3,7 +3,7 @@ export function createDefaultProject(name, id) {
 
   return {
     id,
-    name: name || 'Untitled Project',
+    name,
     description: '',
     status: 'planning',
     techStack: [],
