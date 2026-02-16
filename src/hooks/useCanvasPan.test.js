@@ -286,10 +286,9 @@ describe('useCanvasPan', () => {
         }
       })
 
-      const { result, rerender } = renderHook(
-        ({ vp }) => useCanvasPan(vp, customSetViewport),
-        { initialProps: { vp: currentViewport } }
-      )
+      const { result, rerender } = renderHook(({ vp }) => useCanvasPan(vp, customSetViewport), {
+        initialProps: { vp: currentViewport },
+      })
 
       const startEvent = {
         button: 1,

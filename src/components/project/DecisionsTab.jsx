@@ -70,10 +70,12 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
   return (
     <div className="flex h-full flex-col gap-4 md:flex-row">
       {/* Main list */}
-      <div className={[
-        'flex flex-col transition-all duration-300',
-        activeDecision ? 'hidden md:flex md:w-1/2' : 'w-full max-w-3xl mx-auto',
-      ].join(' ')}>
+      <div
+        className={[
+          'flex flex-col transition-all duration-300',
+          activeDecision ? 'hidden md:flex md:w-1/2' : 'w-full max-w-3xl mx-auto',
+        ].join(' ')}
+      >
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <div>

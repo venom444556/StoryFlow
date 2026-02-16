@@ -13,12 +13,7 @@ vi.mock('framer-motion', () => ({
 // Mock child components
 vi.mock('../ui/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
-    <input
-      data-testid="search-bar"
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-    />
+    <input data-testid="search-bar" value={value} onChange={onChange} placeholder={placeholder} />
   ),
 }))
 
@@ -119,12 +114,7 @@ describe('PageTree', () => {
 
   describe('page selection', () => {
     it('calls onSelectPage when a page is clicked', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onSelectPage={mockOnSelectPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onSelectPage={mockOnSelectPage} />)
 
       fireEvent.click(screen.getByText('Alpha Page'))
 
@@ -132,13 +122,7 @@ describe('PageTree', () => {
     })
 
     it('highlights selected page', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          selectedPageId="page-2"
-          onSelectPage={mockOnSelectPage}
-        />
-      )
+      render(<PageTree pages={mockPages} selectedPageId="page-2" onSelectPage={mockOnSelectPage} />)
 
       const selectedPage = screen.getByText('Beta Page').closest('[class*="group"]')
       expect(selectedPage).toHaveClass('text-[var(--color-fg-default)]')
@@ -147,12 +131,7 @@ describe('PageTree', () => {
 
   describe('page expansion', () => {
     it('expands page when chevron is clicked', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onSelectPage={mockOnSelectPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onSelectPage={mockOnSelectPage} />)
 
       // Child page should not be visible initially
       expect(screen.queryByText('Child Page')).not.toBeInTheDocument()
@@ -167,12 +146,7 @@ describe('PageTree', () => {
     })
 
     it('collapses page when chevron is clicked again', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onSelectPage={mockOnSelectPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onSelectPage={mockOnSelectPage} />)
 
       const alphaPageRow = screen.getByText('Alpha Page').closest('[class*="group flex"]')
       const expandButton = alphaPageRow.querySelector('button')
@@ -187,12 +161,7 @@ describe('PageTree', () => {
     })
 
     it('does not trigger page selection when expanding', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onSelectPage={mockOnSelectPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onSelectPage={mockOnSelectPage} />)
 
       const alphaPageRow = screen.getByText('Alpha Page').closest('[class*="group flex"]')
       const expandButton = alphaPageRow.querySelector('button')
@@ -205,12 +174,7 @@ describe('PageTree', () => {
 
   describe('adding pages', () => {
     it('calls onAddPage with null when New button is clicked', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onAddPage={mockOnAddPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onAddPage={mockOnAddPage} />)
 
       fireEvent.click(screen.getByTestId('button-new'))
 
@@ -218,12 +182,7 @@ describe('PageTree', () => {
     })
 
     it('calls onAddPage with parent ID when add child button is clicked', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onAddPage={mockOnAddPage}
-        />
-      )
+      render(<PageTree pages={mockPages} onAddPage={mockOnAddPage} />)
 
       // Hover actions are visible on group-hover, but we can still click them
       const alphaPageRow = screen.getByText('Alpha Page').closest('[class*="group flex"]')
@@ -236,12 +195,7 @@ describe('PageTree', () => {
 
   describe('deleting pages', () => {
     it('calls onDeletePage when delete button is clicked', () => {
-      render(
-        <PageTree
-          pages={mockPages}
-          onDeletePage={mockOnDeletePage}
-        />
-      )
+      render(<PageTree pages={mockPages} onDeletePage={mockOnDeletePage} />)
 
       const alphaPageRow = screen.getByText('Alpha Page').closest('[class*="group flex"]')
       const deleteButton = within(alphaPageRow).getByTitle('Delete page')
@@ -325,7 +279,7 @@ describe('PageTree', () => {
 
       // Beta Page is pinned and should appear first
       const pageNodes = screen.getAllByText(/Page$/)
-      const pageTexts = pageNodes.map(node => node.textContent)
+      const pageTexts = pageNodes.map((node) => node.textContent)
 
       // Beta (pinned) should come before Alpha
       const betaIndex = pageTexts.indexOf('Beta Page')
@@ -353,7 +307,7 @@ describe('PageTree', () => {
       render(<PageTree pages={unsortedPages} />)
 
       const pageNodes = screen.getAllByText(/^(Zebra|Apple|Mango)$/)
-      const pageTexts = pageNodes.map(node => node.textContent)
+      const pageTexts = pageNodes.map((node) => node.textContent)
 
       expect(pageTexts).toEqual(['Apple', 'Mango', 'Zebra'])
     })
@@ -361,9 +315,7 @@ describe('PageTree', () => {
 
   describe('untitled pages', () => {
     it('shows "Untitled" for pages without title', () => {
-      const pagesWithUntitled = [
-        { id: '1', title: '', parentId: null },
-      ]
+      const pagesWithUntitled = [{ id: '1', title: '', parentId: null }]
 
       render(<PageTree pages={pagesWithUntitled} />)
 
@@ -378,9 +330,7 @@ describe('PageTree', () => {
     })
 
     it('handles orphaned child pages', () => {
-      const orphanedPages = [
-        { id: '1', title: 'Orphan', parentId: 'non-existent' },
-      ]
+      const orphanedPages = [{ id: '1', title: 'Orphan', parentId: 'non-existent' }]
 
       render(<PageTree pages={orphanedPages} />)
 

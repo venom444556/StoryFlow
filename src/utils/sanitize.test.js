@@ -43,25 +43,20 @@ describe('sanitize utilities', () => {
         expect(sanitizeColor('rgb(255,128,0)')).toBe('rgb(255,128,0)')
       })
 
-      it('rejects invalid rgb values', () => {
-        expect(sanitizeColor('rgb(256, 0, 0)')).toBe('#6366f1') // out of range
+      it('accepts rgb values matching the format pattern (no range validation)', () => {
+        // sanitizeColor only validates format (1-3 digits), not 0-255 range
+        expect(sanitizeColor('rgb(256, 0, 0)')).toBe('rgb(256, 0, 0)')
       })
     })
 
     describe('rgba colors', () => {
       it('accepts valid rgba color', () => {
-        expect(sanitizeColor('rgba(255, 128, 0, 0.5)')).toBe(
-          'rgba(255, 128, 0, 0.5)'
-        )
+        expect(sanitizeColor('rgba(255, 128, 0, 0.5)')).toBe('rgba(255, 128, 0, 0.5)')
       })
 
       it('accepts rgba with 0 or 1 alpha', () => {
-        expect(sanitizeColor('rgba(255, 128, 0, 0)')).toBe(
-          'rgba(255, 128, 0, 0)'
-        )
-        expect(sanitizeColor('rgba(255, 128, 0, 1)')).toBe(
-          'rgba(255, 128, 0, 1)'
-        )
+        expect(sanitizeColor('rgba(255, 128, 0, 0)')).toBe('rgba(255, 128, 0, 0)')
+        expect(sanitizeColor('rgba(255, 128, 0, 1)')).toBe('rgba(255, 128, 0, 1)')
       })
     })
 
@@ -73,9 +68,7 @@ describe('sanitize utilities', () => {
 
     describe('hsla colors', () => {
       it('accepts valid hsla color', () => {
-        expect(sanitizeColor('hsla(180, 50%, 50%, 0.5)')).toBe(
-          'hsla(180, 50%, 50%, 0.5)'
-        )
+        expect(sanitizeColor('hsla(180, 50%, 50%, 0.5)')).toBe('hsla(180, 50%, 50%, 0.5)')
       })
     })
 

@@ -48,8 +48,8 @@ export function wordCount(text) {
   // Strip common markdown syntax for a cleaner count
   const stripped = text
     .replace(/```[\s\S]*?```/g, '') // fenced code blocks
-    .replace(/`[^`]+`/g, '')       // inline code
-    .replace(/[#*_~>\-|]/g, '')    // markdown chars
+    .replace(/`[^`]+`/g, '') // inline code
+    .replace(/[#*_~>\-|]/g, '') // markdown chars
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links -> text
     .trim()
   if (!stripped) return 0
@@ -89,7 +89,12 @@ function isSafeUrl(url) {
   try {
     const trimmed = url.trim()
     // Relative URLs and anchors are safe
-    if (trimmed.startsWith('/') || trimmed.startsWith('#') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+    if (
+      trimmed.startsWith('/') ||
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('./') ||
+      trimmed.startsWith('../')
+    ) {
       return true
     }
     const parsed = new URL(trimmed, window.location.origin)
@@ -113,13 +118,10 @@ function inlineMarkdown(text) {
   })
 
   // links  [text](url)
-  out = out.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    (_, text, url) => {
-      if (!isSafeUrl(url)) return `${text} [link blocked: unsafe URL]`
-      return `<a href="${url}" class="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer">${text}</a>`
-    }
-  )
+  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+    if (!isSafeUrl(url)) return `${text} [link blocked: unsafe URL]`
+    return `<a href="${url}" class="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer">${text}</a>`
+  })
 
   // bold + italic  ***text*** or ___text___
   out = out.replace(/\*{3}(.+?)\*{3}/g, '<strong><em>$1</em></strong>')
@@ -283,7 +285,11 @@ export function renderMarkdown(markdown) {
     }
 
     // ---- Table ----
-    if (line.includes('|') && i + 1 < lines.length && /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/.test(lines[i + 1])) {
+    if (
+      line.includes('|') &&
+      i + 1 < lines.length &&
+      /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/.test(lines[i + 1])
+    ) {
       const tableLines = []
       while (i < lines.length && lines[i].includes('|')) {
         tableLines.push(lines[i])
@@ -347,7 +353,11 @@ export function renderMarkdown(markdown) {
       !/^[-*+]\s/.test(lines[i]) &&
       !/^\d+\.\s/.test(lines[i]) &&
       !/^(-{3,}|\*{3,}|_{3,})\s*$/.test(lines[i]) &&
-      !(lines[i].includes('|') && i + 1 < lines.length && /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/.test(lines[i + 1]))
+      !(
+        lines[i].includes('|') &&
+        i + 1 < lines.length &&
+        /^\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/.test(lines[i + 1])
+      )
     ) {
       paraLines.push(lines[i])
       i++

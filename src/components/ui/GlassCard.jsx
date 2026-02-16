@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 const PADDING = {
   none: '',
   sm: 'p-[var(--space-3)]',
   md: 'p-[var(--space-5)]',
   lg: 'p-[var(--space-8)]',
-};
+}
 
 export default function GlassCard({
   children,
@@ -36,5 +36,5 @@ export default function GlassCard({
     >
       {children}
     </Component>
-  );
+  )
 }

@@ -14,7 +14,9 @@ function StatCard({ icon: Icon, value, label, color }) {
           <Icon size={18} style={{ color }} />
         </div>
         <div className="min-w-0">
-          <div className="text-lg font-bold text-[var(--color-fg-default)] leading-tight">{value}</div>
+          <div className="text-lg font-bold text-[var(--color-fg-default)] leading-tight">
+            {value}
+          </div>
           <div className="text-[11px] text-[var(--color-fg-muted)] truncate">{label}</div>
         </div>
       </div>
@@ -27,9 +29,7 @@ export default function TimelineStats({ phases = [], milestones = [] }) {
     // Overall progress
     const progress =
       phases.length > 0
-        ? Math.round(
-            phases.reduce((sum, p) => sum + (p.progress || 0), 0) / phases.length
-          )
+        ? Math.round(phases.reduce((sum, p) => sum + (p.progress || 0), 0) / phases.length)
         : 0
 
     // Milestone counts
@@ -74,7 +74,13 @@ export default function TimelineStats({ phases = [], milestones = [] }) {
       <StatCard
         icon={Calendar}
         value={stats.daysRemaining !== null ? stats.daysRemaining : '—'}
-        label={stats.daysRemaining !== null && stats.daysRemaining >= 0 ? 'Days Remaining' : stats.daysRemaining !== null ? 'Days Overdue' : 'No End Date'}
+        label={
+          stats.daysRemaining !== null && stats.daysRemaining >= 0
+            ? 'Days Remaining'
+            : stats.daysRemaining !== null
+              ? 'Days Overdue'
+              : 'No End Date'
+        }
         color={stats.daysRemaining !== null && stats.daysRemaining < 0 ? '#ef4444' : '#f59e0b'}
       />
     </div>

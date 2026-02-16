@@ -23,10 +23,7 @@ function buildAncestorPath(pages, currentPageId) {
 }
 
 export default function BreadcrumbTrail({ pages = [], currentPageId, onNavigate }) {
-  const path = useMemo(
-    () => buildAncestorPath(pages, currentPageId),
-    [pages, currentPageId]
-  )
+  const path = useMemo(() => buildAncestorPath(pages, currentPageId), [pages, currentPageId])
 
   if (path.length === 0) return null
 

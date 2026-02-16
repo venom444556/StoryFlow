@@ -140,7 +140,7 @@ describe('PageViewer', () => {
       render(<PageViewer page={mockPage} onDelete={mockOnDelete} />)
       // Find the delete button (ghost variant with red text)
       const buttons = screen.getAllByRole('button')
-      const deleteButton = buttons.find(btn => btn.className.includes('text-red'))
+      const deleteButton = buttons.find((btn) => btn.className.includes('text-red'))
       fireEvent.click(deleteButton)
       expect(mockOnDelete).toHaveBeenCalled()
     })

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 /**
  * Reusable drag-and-drop hook for positioned elements on an SVG / canvas.
@@ -25,12 +25,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
  * }}
  */
 export function useDragAndDrop(canvasRef) {
-  const [draggingId, setDraggingId] = useState(null);
-  const [dragPosition, setDragPosition] = useState(null);
+  const [draggingId, setDraggingId] = useState(null)
+  const [dragPosition, setDragPosition] = useState(null)
 
   // Store offset in a ref so the mousemove handler always has the latest value
   // without needing it in the dependency array.
-  const offsetRef = useRef({ x: 0, y: 0 });
+  const offsetRef = useRef({ x: 0, y: 0 })
 
   /**
    * Initiate a drag operation.
@@ -42,65 +42,65 @@ export function useDragAndDrop(canvasRef) {
    */
   const startDrag = useCallback(
     (id, event, currentX, currentY) => {
-      if (event.button !== 0) return; // only primary mouse button
-      event.preventDefault();
+      if (event.button !== 0) return // only primary mouse button
+      event.preventDefault()
 
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      const rect = canvasRef.current?.getBoundingClientRect()
+      if (!rect) return
 
       offsetRef.current = {
         x: event.clientX - rect.left - currentX,
         y: event.clientY - rect.top - currentY,
-      };
+      }
 
-      setDraggingId(id);
-      setDragPosition({ x: currentX, y: currentY });
+      setDraggingId(id)
+      setDragPosition({ x: currentX, y: currentY })
     },
     [canvasRef]
-  );
+  )
 
   /**
    * Handle mouse movement while dragging.
    */
   const onMouseMove = useCallback(
     (event) => {
-      if (!draggingId) return;
+      if (!draggingId) return
 
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
+      const rect = canvasRef.current?.getBoundingClientRect()
+      if (!rect) return
 
-      const newX = event.clientX - rect.left - offsetRef.current.x;
-      const newY = event.clientY - rect.top - offsetRef.current.y;
+      const newX = event.clientX - rect.left - offsetRef.current.x
+      const newY = event.clientY - rect.top - offsetRef.current.y
 
-      setDragPosition({ x: newX, y: newY });
+      setDragPosition({ x: newX, y: newY })
     },
     [draggingId, canvasRef]
-  );
+  )
 
   /**
    * End the current drag operation.
    */
   const onMouseUp = useCallback(() => {
-    setDraggingId(null);
-    setDragPosition(null);
-  }, []);
+    setDraggingId(null)
+    setDragPosition(null)
+  }, [])
 
   // Attach window-level listeners so dragging works even when the cursor
   // leaves the canvas.
   useEffect(() => {
-    if (!draggingId) return;
+    if (!draggingId) return
 
-    const handleMove = (e) => onMouseMove(e);
-    const handleUp = () => onMouseUp();
+    const handleMove = (e) => onMouseMove(e)
+    const handleUp = () => onMouseUp()
 
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('mousemove', handleMove)
+    window.addEventListener('mouseup', handleUp)
 
     return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
-    };
-  }, [draggingId, onMouseMove, onMouseUp]);
+      window.removeEventListener('mousemove', handleMove)
+      window.removeEventListener('mouseup', handleUp)
+    }
+  }, [draggingId, onMouseMove, onMouseUp])
 
-  return { draggingId, dragPosition, startDrag, onMouseMove, onMouseUp };
+  return { draggingId, dragPosition, startDrag, onMouseMove, onMouseUp }
 }

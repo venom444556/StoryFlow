@@ -1,4 +1,4 @@
-import { Zap, BookOpen, CheckSquare, Bug, GitCommitHorizontal } from 'lucide-react';
+import { Zap, BookOpen, CheckSquare, Bug, GitCommitHorizontal } from 'lucide-react'
 
 const TYPE_CONFIG = {
   epic: {
@@ -31,7 +31,7 @@ const TYPE_CONFIG = {
     text: 'text-gray-400',
     ring: 'ring-gray-500/30',
   },
-};
+}
 
 const CONTAINER_SIZES = {
   12: 'h-5 w-5',
@@ -39,12 +39,12 @@ const CONTAINER_SIZES = {
   16: 'h-6 w-6',
   20: 'h-7 w-7',
   24: 'h-8 w-8',
-};
+}
 
 export default function IssueTypeIcon({ type, size = 16, className = '' }) {
-  const config = TYPE_CONFIG[type] || TYPE_CONFIG.task;
-  const IconComponent = config.icon;
-  const containerSize = CONTAINER_SIZES[size] || 'h-6 w-6';
+  const config = TYPE_CONFIG[type] || TYPE_CONFIG.task
+  const IconComponent = config.icon
+  const containerSize = CONTAINER_SIZES[size] || 'h-6 w-6'
 
   return (
     <div
@@ -59,5 +59,5 @@ export default function IssueTypeIcon({ type, size = 16, className = '' }) {
     >
       <IconComponent size={size * 0.65} className={config.text} />
     </div>
-  );
+  )
 }

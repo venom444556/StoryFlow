@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useMemo, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDown,
   ChevronRight,
@@ -9,76 +9,73 @@ import {
   Trash2,
   Layers,
   Tag,
-} from 'lucide-react';
-import IssueTypeIcon from './IssueTypeIcon';
-import QuickCreateBar from './QuickCreateBar';
-import Badge from '../ui/Badge';
-import Avatar from '../ui/Avatar';
-import DropdownMenu from '../ui/DropdownMenu';
-import { getLabel } from '../../utils/labelDefinitions';
+} from 'lucide-react'
+import IssueTypeIcon from './IssueTypeIcon'
+import QuickCreateBar from './QuickCreateBar'
+import Badge from '../ui/Badge'
+import Avatar from '../ui/Avatar'
+import DropdownMenu from '../ui/DropdownMenu'
+import { getLabel } from '../../utils/labelDefinitions'
 
 const PRIORITY_BADGE = {
   critical: 'red',
   high: 'yellow',
   medium: 'blue',
   low: 'gray',
-};
+}
 
 const STATUS_BADGE = {
   'To Do': 'default',
   'In Progress': 'blue',
   Done: 'green',
-};
+}
 
 const SORT_OPTIONS = [
   { key: 'priority', label: 'Priority' },
   { key: 'storyPoints', label: 'Story Points' },
   { key: 'status', label: 'Status' },
   { key: 'createdAt', label: 'Created Date' },
-];
+]
 
-const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
-const STATUS_ORDER = { 'To Do': 0, 'In Progress': 1, Done: 2 };
+const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 }
+const STATUS_ORDER = { 'To Do': 0, 'In Progress': 1, Done: 2 }
 
 const STATUS_ACCENT = {
   'To Do': 'bg-[var(--color-fg-faint)]',
   'In Progress': 'bg-blue-400',
   Done: 'bg-green-400',
-};
-const STATUS_NAMES = ['To Do', 'In Progress', 'Done'];
+}
+const STATUS_NAMES = ['To Do', 'In Progress', 'Done']
 
 function sortIssues(issues, sortKey, sortDir) {
-  const sorted = [...issues];
+  const sorted = [...issues]
   sorted.sort((a, b) => {
-    let cmp = 0;
+    let cmp = 0
     switch (sortKey) {
       case 'priority':
-        cmp =
-          (PRIORITY_ORDER[a.priority] ?? 99) -
-          (PRIORITY_ORDER[b.priority] ?? 99);
-        break;
+        cmp = (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99)
+        break
       case 'storyPoints':
-        cmp = (a.storyPoints ?? 0) - (b.storyPoints ?? 0);
-        break;
+        cmp = (a.storyPoints ?? 0) - (b.storyPoints ?? 0)
+        break
       case 'status':
-        cmp =
-          (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99);
-        break;
+        cmp = (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99)
+        break
       case 'createdAt':
-        cmp = new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-        break;
+        cmp = new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+        break
       default:
-        cmp = 0;
+        cmp = 0
     }
-    return sortDir === 'asc' ? cmp : -cmp;
-  });
-  return sorted;
+    return sortDir === 'asc' ? cmp : -cmp
+  })
+  return sorted
 }
 
 function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
-  const labels = issue.labels || [];
-  const visibleLabels = labels.slice(0, 3);
-  const overflowCount = labels.length - 3;
+  const labels = issue.labels || []
+  const visibleLabels = labels.slice(0, 3)
+  const overflowCount = labels.length - 3
 
   return (
     <motion.div
@@ -98,9 +95,7 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         <span className="min-w-0 flex-1 truncate text-sm text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]">
           {issue.title}
         </span>
-        {issue.assignee && (
-          <Avatar name={issue.assignee} size="sm" />
-        )}
+        {issue.assignee && <Avatar name={issue.assignee} size="sm" />}
       </div>
 
       {/* Row 2: Priority + Points + Status + Labels + Actions */}
@@ -111,7 +106,7 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         </Badge>
 
         {/* Story points */}
-        {issue.storyPoints != null && (
+        {issue.storyPoints !== null && issue.storyPoints !== undefined && (
           <span
             className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[10px] font-bold text-[var(--color-fg-muted)]"
             title={`${issue.storyPoints} story points`}
@@ -131,7 +126,7 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
             <div className="h-3 w-px bg-[var(--color-border-default)]" />
             <div className="flex items-center gap-1">
               {visibleLabels.map((label) => {
-                const def = getLabel(label);
+                const def = getLabel(label)
                 return (
                   <Badge key={label} variant="purple" size="xs">
                     {def && (
@@ -142,15 +137,14 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
                     )}
                     {label}
                   </Badge>
-                );
+                )
               })}
               {overflowCount > 0 && (
                 <span
                   className="flex items-center gap-0.5 text-[10px] text-[var(--color-fg-subtle)]"
                   title={labels.slice(3).join(', ')}
                 >
-                  <Tag size={9} />
-                  +{overflowCount}
+                  <Tag size={9} />+{overflowCount}
                 </span>
               )}
             </div>
@@ -188,34 +182,33 @@ function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         </div>
       </div>
     </motion.div>
-  );
+  )
 }
 
 function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
-  const [collapsed, setCollapsed] = useState({});
+  const [collapsed, setCollapsed] = useState({})
 
-  const toggle = (status) =>
-    setCollapsed((prev) => ({ ...prev, [status]: !prev[status] }));
+  const toggle = (status) => setCollapsed((prev) => ({ ...prev, [status]: !prev[status] }))
 
   // Group issues by status
-  const grouped = {};
+  const grouped = {}
   STATUS_NAMES.forEach((s) => {
-    grouped[s] = [];
-  });
-  const other = [];
+    grouped[s] = []
+  })
+  const other = []
   sortedIssues.forEach((issue) => {
     if (grouped[issue.status]) {
-      grouped[issue.status].push(issue);
+      grouped[issue.status].push(issue)
     } else {
-      other.push(issue);
+      other.push(issue)
     }
-  });
+  })
 
   return (
     <div className="space-y-3">
       {STATUS_NAMES.map((statusName) => {
-        const groupIssues = grouped[statusName];
-        const isCollapsed = collapsed[statusName];
+        const groupIssues = grouped[statusName]
+        const isCollapsed = collapsed[statusName]
         return (
           <div
             key={statusName}
@@ -237,9 +230,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
                   STATUS_ACCENT[statusName] || 'bg-[var(--color-fg-faint)]',
                 ].join(' ')}
               />
-              <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-                {statusName}
-              </h3>
+              <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">{statusName}</h3>
               <Badge variant={STATUS_BADGE[statusName] || 'default'} size="sm">
                 {groupIssues.length}
               </Badge>
@@ -275,7 +266,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
               )}
             </AnimatePresence>
           </div>
-        );
+        )
       })}
 
       {/* Catch-all for unknown statuses */}
@@ -291,9 +282,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
               <ChevronDown size={14} className="text-[var(--color-fg-muted)]" />
             )}
             <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-fg-faint)]" />
-            <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-              Other
-            </h3>
+            <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Other</h3>
             <Badge variant="default" size="sm">
               {other.length}
             </Badge>
@@ -323,7 +312,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 export default function BacklogView({
@@ -333,50 +322,50 @@ export default function BacklogView({
   onDeleteIssue,
   onIssueClick,
 }) {
-  const [sortKey, setSortKey] = useState('priority');
-  const [sortDir, setSortDir] = useState('asc');
-  const [groupByEpic, setGroupByEpic] = useState(false);
+  const [sortKey, setSortKey] = useState('priority')
+  const [sortDir, setSortDir] = useState('asc')
+  const [groupByEpic, setGroupByEpic] = useState(false)
 
   const toggleSort = useCallback(
     (key) => {
       if (sortKey === key) {
-        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+        setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
       } else {
-        setSortKey(key);
-        setSortDir('asc');
+        setSortKey(key)
+        setSortDir('asc')
       }
     },
     [sortKey]
-  );
+  )
 
   const sortedIssues = useMemo(
     () => sortIssues(issues, sortKey, sortDir),
     [issues, sortKey, sortDir]
-  );
+  )
 
   // Group by epic
   const epicGroups = useMemo(() => {
-    if (!groupByEpic) return null;
+    if (!groupByEpic) return null
 
-    const epics = issues.filter((i) => i.type === 'epic');
-    const epicMap = {};
+    const epics = issues.filter((i) => i.type === 'epic')
+    const epicMap = {}
     epics.forEach((epic) => {
-      epicMap[epic.id] = { epic, children: [] };
-    });
+      epicMap[epic.id] = { epic, children: [] }
+    })
 
-    const noEpic = [];
-    const nonEpicIssues = sortedIssues.filter((i) => i.type !== 'epic');
+    const noEpic = []
+    const nonEpicIssues = sortedIssues.filter((i) => i.type !== 'epic')
 
     nonEpicIssues.forEach((issue) => {
       if (issue.epicId && epicMap[issue.epicId]) {
-        epicMap[issue.epicId].children.push(issue);
+        epicMap[issue.epicId].children.push(issue)
       } else {
-        noEpic.push(issue);
+        noEpic.push(issue)
       }
-    });
+    })
 
-    return { epicMap, noEpic, epicIds: Object.keys(epicMap) };
-  }, [groupByEpic, issues, sortedIssues]);
+    return { epicMap, noEpic, epicIds: Object.keys(epicMap) }
+  }, [groupByEpic, issues, sortedIssues])
 
   return (
     <div className="space-y-3">
@@ -398,10 +387,7 @@ export default function BacklogView({
             >
               {opt.label}
               {sortKey === opt.key && (
-                <ArrowUpDown
-                  size={10}
-                  className={sortDir === 'desc' ? 'rotate-180' : ''}
-                />
+                <ArrowUpDown size={10} className={sortDir === 'desc' ? 'rotate-180' : ''} />
               )}
             </button>
           ))}
@@ -421,7 +407,11 @@ export default function BacklogView({
               ? 'text-[var(--color-fg-default)]'
               : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-muted)]',
           ].join(' ')}
-          style={groupByEpic ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' } : undefined}
+          style={
+            groupByEpic
+              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' }
+              : undefined
+          }
         >
           <Layers size={12} />
           Group by Epic
@@ -443,22 +433,21 @@ export default function BacklogView({
         />
       )}
     </div>
-  );
+  )
 }
 
 function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
-  const [collapsed, setCollapsed] = useState({});
+  const [collapsed, setCollapsed] = useState({})
 
-  if (!epicGroups) return null;
+  if (!epicGroups) return null
 
-  const toggle = (id) =>
-    setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggle = (id) => setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }))
 
   return (
     <div className="space-y-3">
       {epicGroups.epicIds.map((epicId) => {
-        const { epic, children } = epicGroups.epicMap[epicId];
-        const isCollapsed = collapsed[epicId];
+        const { epic, children } = epicGroups.epicMap[epicId]
+        const isCollapsed = collapsed[epicId]
         return (
           <div
             key={epicId}
@@ -475,10 +464,11 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
                 <ChevronDown size={14} className="text-[var(--color-fg-muted)]" />
               )}
               <IssueTypeIcon type="epic" size={14} />
-              <span className="text-xs font-medium text-[var(--color-fg-muted)]">
-                {epic.key}
-              </span>
-              <span className="flex-1 text-sm font-medium" style={{ color: 'var(--accent-active, #8b5cf6)' }}>
+              <span className="text-xs font-medium text-[var(--color-fg-muted)]">{epic.key}</span>
+              <span
+                className="flex-1 text-sm font-medium"
+                style={{ color: 'var(--accent-active, #8b5cf6)' }}
+              >
                 {epic.title}
               </span>
               <Badge variant="purple" size="sm">
@@ -515,7 +505,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
               )}
             </AnimatePresence>
           </div>
-        );
+        )
       })}
 
       {/* Orphan issues (no epic) */}
@@ -531,9 +521,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
               <ChevronDown size={14} className="text-[var(--color-fg-muted)]" />
             )}
             <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--color-fg-faint)]" />
-            <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-              No Epic
-            </h3>
+            <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">No Epic</h3>
             <Badge variant="default" size="sm">
               {epicGroups.noEpic.length}
             </Badge>
@@ -563,5 +551,5 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
         </div>
       )}
     </div>
-  );
+  )
 }

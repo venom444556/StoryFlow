@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, X } from 'lucide-react';
+import React from 'react'
+import { Search, X } from 'lucide-react'
 
 export default function SearchBar({
   value,
@@ -9,16 +9,16 @@ export default function SearchBar({
   size = 'md',
 }) {
   const handleClear = () => {
-    onChange({ target: { value: '' } });
-  };
+    onChange({ target: { value: '' } })
+  }
 
   const sizeClasses = {
     sm: 'py-[var(--space-1)] pl-[var(--space-8)] pr-[var(--space-8)] text-[var(--text-xs)]',
     md: 'py-[var(--space-2)] pl-[var(--space-10)] pr-[var(--space-10)] text-[var(--text-sm)]',
     lg: 'py-[var(--space-3)] pl-[var(--space-12)] pr-[var(--space-12)] text-[var(--text-base)]',
-  };
+  }
 
-  const iconSizes = { sm: 14, md: 16, lg: 18 };
+  const iconSizes = { sm: 14, md: 16, lg: 18 }
 
   return (
     <div className={['relative w-full', className].filter(Boolean).join(' ')}>
@@ -54,5 +54,5 @@ export default function SearchBar({
         </button>
       )}
     </div>
-  );
+  )
 }

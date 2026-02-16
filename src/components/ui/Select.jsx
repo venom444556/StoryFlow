@@ -1,26 +1,29 @@
-import React, { forwardRef } from 'react';
-import { ChevronDown, AlertCircle } from 'lucide-react';
+import React, { forwardRef } from 'react'
+import { ChevronDown, AlertCircle } from 'lucide-react'
 
 const SIZES = {
   sm: 'h-[var(--size-input-sm)] px-[var(--space-3)] pr-[var(--space-8)] text-[var(--text-xs)]',
   md: 'h-[var(--size-input-md)] px-[var(--space-3)] pr-[var(--space-10)] text-[var(--text-sm)]',
   lg: 'h-[var(--size-input-lg)] px-[var(--space-4)] pr-[var(--space-12)] text-[var(--text-base)]',
-};
+}
 
-const Select = forwardRef(function Select({
-  label,
-  value,
-  onChange,
-  options = [],
-  placeholder,
-  disabled = false,
-  className = '',
-  size = 'md',
-  error,
-  helperText,
-  ...rest
-}, ref) {
-  const hasError = Boolean(error);
+const Select = forwardRef(function Select(
+  {
+    label,
+    value,
+    onChange,
+    options = [],
+    placeholder,
+    disabled = false,
+    className = '',
+    size = 'md',
+    error,
+    helperText,
+    ...rest
+  },
+  ref
+) {
+  const hasError = Boolean(error)
 
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
@@ -78,9 +81,7 @@ const Select = forwardRef(function Select({
 
         {/* Icons */}
         <div className="pointer-events-none absolute right-[var(--space-3)] top-1/2 -translate-y-1/2 flex items-center gap-[var(--space-2)]">
-          {hasError && (
-            <AlertCircle size={16} className="text-[var(--color-danger)]" />
-          )}
+          {hasError && <AlertCircle size={16} className="text-[var(--color-danger)]" />}
           <ChevronDown size={16} className="text-[var(--color-fg-subtle)]" />
         </div>
       </div>
@@ -97,7 +98,7 @@ const Select = forwardRef(function Select({
         </p>
       )}
     </div>
-  );
-});
+  )
+})
 
-export default Select;
+export default Select

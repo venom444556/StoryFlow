@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from 'react'
+import { motion } from 'framer-motion'
 import {
   Clock,
   CheckCircle,
@@ -16,8 +16,8 @@ import {
   Code,
   Settings,
   ChevronRight,
-} from 'lucide-react';
-import { getNodeType } from '../../data/nodeTypes';
+} from 'lucide-react'
+import { getNodeType } from '../../data/nodeTypes'
 
 // ---------------------------------------------------------------------------
 // Icon lookup – maps the string icon name from nodeTypes to the component
@@ -32,7 +32,7 @@ const ICON_MAP = {
   Globe,
   Database,
   Code,
-};
+}
 
 // ---------------------------------------------------------------------------
 // Status helpers
@@ -40,26 +40,26 @@ const ICON_MAP = {
 function getStatusClasses(status) {
   switch (status) {
     case 'running':
-      return 'border-yellow-500/80 shadow-[0_0_18px_rgba(234,179,8,0.25)]';
+      return 'border-yellow-500/80 shadow-[0_0_18px_rgba(234,179,8,0.25)]'
     case 'success':
-      return 'border-green-500/80 shadow-[0_0_18px_rgba(34,197,94,0.25)]';
+      return 'border-green-500/80 shadow-[0_0_18px_rgba(34,197,94,0.25)]'
     case 'error':
-      return 'border-red-500/80 shadow-[0_0_18px_rgba(239,68,68,0.25)]';
+      return 'border-red-500/80 shadow-[0_0_18px_rgba(239,68,68,0.25)]'
     default:
-      return 'border-[var(--color-border-default)]';
+      return 'border-[var(--color-border-default)]'
   }
 }
 
 function StatusIcon({ status }) {
   switch (status) {
     case 'running':
-      return <Clock size={14} className="animate-spin text-yellow-400" />;
+      return <Clock size={14} className="animate-spin text-yellow-400" />
     case 'success':
-      return <CheckCircle size={14} className="text-green-400" />;
+      return <CheckCircle size={14} className="text-green-400" />
     case 'error':
-      return <XCircle size={14} className="text-red-400" />;
+      return <XCircle size={14} className="text-red-400" />
     default:
-      return null;
+      return null
   }
 }
 
@@ -67,91 +67,91 @@ function StatusIcon({ status }) {
 // Child stats helper – calculates sub-node status summary
 // ---------------------------------------------------------------------------
 function getChildStats(node) {
-  const children = node.children?.nodes || [];
-  const total = children.length;
-  let completed = 0;
-  let failed = 0;
-  let running = 0;
+  const children = node.children?.nodes || []
+  const total = children.length
+  let completed = 0
+  let failed = 0
+  let running = 0
 
   for (const child of children) {
     switch (child.status) {
       case 'success':
-        completed++;
-        break;
+        completed++
+        break
       case 'error':
-        failed++;
-        break;
+        failed++
+        break
       case 'running':
-        running++;
-        break;
+        running++
+        break
       default:
-        break;
+        break
     }
   }
 
-  return { total, completed, failed, running };
+  return { total, completed, failed, running }
 }
 
 // ---------------------------------------------------------------------------
 // Config preview – shows a summary of what's configured on the node
 // ---------------------------------------------------------------------------
 function getConfigPreview(node) {
-  const cfg = node.config || {};
+  const cfg = node.config || {}
 
   switch (node.type) {
     case 'api': {
-      const method = cfg.method || 'GET';
-      const url = cfg.url;
+      const method = cfg.method || 'GET'
+      const url = cfg.url
       if (url) {
-        const short = url.length > 24 ? url.slice(0, 22) + '\u2026' : url;
-        return `${method} ${short}`;
+        const short = url.length > 24 ? url.slice(0, 22) + '\u2026' : url
+        return `${method} ${short}`
       }
-      return null;
+      return null
     }
     case 'database': {
-      const q = cfg.query;
+      const q = cfg.query
       if (q) {
-        return q.length > 30 ? q.slice(0, 28) + '\u2026' : q;
+        return q.length > 30 ? q.slice(0, 28) + '\u2026' : q
       }
-      return null;
+      return null
     }
     case 'code': {
-      const s = cfg.script;
+      const s = cfg.script
       if (s) {
-        return s.length > 30 ? s.slice(0, 28) + '\u2026' : s;
+        return s.length > 30 ? s.slice(0, 28) + '\u2026' : s
       }
-      return null;
+      return null
     }
     case 'decision': {
-      const c = cfg.condition;
+      const c = cfg.condition
       if (c) {
-        return c.length > 28 ? c.slice(0, 26) + '\u2026' : c;
+        return c.length > 28 ? c.slice(0, 26) + '\u2026' : c
       }
-      return null;
+      return null
     }
     case 'task': {
-      const a = cfg.assignee;
-      return a ? `Assignee: ${a}` : null;
+      const a = cfg.assignee
+      return a ? `Assignee: ${a}` : null
     }
     case 'milestone': {
-      const d = cfg.dueDate;
-      return d ? `Due: ${d}` : null;
+      const d = cfg.dueDate
+      return d ? `Due: ${d}` : null
     }
     case 'phase': {
-      const desc = cfg.description;
+      const desc = cfg.description
       if (desc) {
-        return desc.length > 30 ? desc.slice(0, 28) + '\u2026' : desc;
+        return desc.length > 30 ? desc.slice(0, 28) + '\u2026' : desc
       }
-      return null;
+      return null
     }
     default:
-      return null;
+      return null
   }
 }
 
 function hasConfig(node) {
-  const cfg = node.config || {};
-  return Object.values(cfg).some((v) => v && String(v).trim());
+  const cfg = node.config || {}
+  return Object.values(cfg).some((v) => v && String(v).trim())
 }
 
 // ---------------------------------------------------------------------------
@@ -185,17 +185,17 @@ export default function WorkflowNode({
   onEndConnect,
   onDrillDown,
 }) {
-  const typeDef = getNodeType(node.type);
-  const color = typeDef?.color || '#6b7280';
-  const iconName = typeDef?.icon;
-  const TypeIcon = iconName ? ICON_MAP[iconName] : null;
+  const typeDef = getNodeType(node.type)
+  const color = typeDef?.color || '#6b7280'
+  const iconName = typeDef?.icon
+  const TypeIcon = iconName ? ICON_MAP[iconName] : null
 
-  const configPreview = getConfigPreview(node);
-  const configured = hasConfig(node);
-  const isTerminal = node.type === 'start' || node.type === 'end';
+  const configPreview = getConfigPreview(node)
+  const configured = hasConfig(node)
+  const isTerminal = node.type === 'start' || node.type === 'end'
 
-  const hasChildren = (node.children?.nodes?.length || 0) > 0;
-  const childStats = hasChildren ? getChildStats(node) : null;
+  const hasChildren = (node.children?.nodes?.length || 0) > 0
+  const childStats = hasChildren ? getChildStats(node) : null
 
   return (
     <motion.div
@@ -223,13 +223,13 @@ export default function WorkflowNode({
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={(e) => {
-        e.stopPropagation();
-        onDoubleClick?.();
+        e.stopPropagation()
+        onDoubleClick?.()
       }}
       onContextMenu={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onContextMenu?.(e);
+        e.preventDefault()
+        e.stopPropagation()
+        onContextMenu?.(e)
       }}
     >
       <div className="px-3 py-2.5">
@@ -329,8 +329,8 @@ export default function WorkflowNode({
                 className="flex items-center gap-0.5 rounded-full bg-[var(--color-bg-glass)] px-1.5 py-0.5 text-[9px] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
-                  e.stopPropagation();
-                  onDrillDown?.();
+                  e.stopPropagation()
+                  onDrillDown?.()
                 }}
               >
                 Expand
@@ -347,8 +347,8 @@ export default function WorkflowNode({
       <div
         className="absolute -left-[7px] top-[34px]"
         onMouseUp={(e) => {
-          e.stopPropagation();
-          onEndConnect?.(e);
+          e.stopPropagation()
+          onEndConnect?.(e)
         }}
       >
         <div className="h-3.5 w-3.5 rounded-full border-2 border-[var(--color-bg-emphasis)] bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
@@ -363,8 +363,8 @@ export default function WorkflowNode({
       <div
         className="absolute -right-[7px] top-[34px]"
         onMouseDown={(e) => {
-          e.stopPropagation();
-          onStartConnect?.(e);
+          e.stopPropagation()
+          onStartConnect?.(e)
         }}
       >
         <div className="h-3.5 w-3.5 rounded-full border-2 border-[var(--color-bg-emphasis)] bg-blue-500 transition-transform hover:scale-150 cursor-crosshair" />
@@ -375,5 +375,5 @@ export default function WorkflowNode({
         )}
       </div>
     </motion.div>
-  );
+  )
 }

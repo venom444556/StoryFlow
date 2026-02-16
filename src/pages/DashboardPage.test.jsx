@@ -116,9 +116,7 @@ describe('DashboardPage', () => {
       mockProjects = []
       renderDashboard()
       expect(screen.getByText('Create your first project')).toBeInTheDocument()
-      expect(
-        screen.getByText(/get started by creating a new project/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/get started by creating a new project/i)).toBeInTheDocument()
     })
 
     it('shows "no matching projects" when search has no results', async () => {
@@ -225,9 +223,7 @@ describe('DashboardPage', () => {
     })
 
     it('search is case insensitive', async () => {
-      mockProjects = [
-        createMockProject({ id: '1', name: 'MyAwesomeProject' }),
-      ]
+      mockProjects = [createMockProject({ id: '1', name: 'MyAwesomeProject' })]
       renderDashboard()
 
       const searchInput = screen.getByPlaceholderText('Search projects...')
@@ -419,18 +415,14 @@ describe('DashboardPage', () => {
 
   describe('Edge Cases', () => {
     it('handles project without techStack', () => {
-      mockProjects = [
-        createMockProject({ id: '1', name: 'No Tech', techStack: undefined }),
-      ]
+      mockProjects = [createMockProject({ id: '1', name: 'No Tech', techStack: undefined })]
       renderDashboard()
 
       expect(screen.getByText('No Tech')).toBeInTheDocument()
     })
 
     it('handles project without board issues', () => {
-      mockProjects = [
-        createMockProject({ id: '1', name: 'No Board', board: undefined }),
-      ]
+      mockProjects = [createMockProject({ id: '1', name: 'No Board', board: undefined })]
       renderDashboard()
 
       expect(screen.getByText('No Board')).toBeInTheDocument()
@@ -438,9 +430,7 @@ describe('DashboardPage', () => {
     })
 
     it('handles project with empty techStack', () => {
-      mockProjects = [
-        createMockProject({ id: '1', name: 'Empty Tech', techStack: [] }),
-      ]
+      mockProjects = [createMockProject({ id: '1', name: 'Empty Tech', techStack: [] })]
       renderDashboard()
 
       expect(screen.getByText('Empty Tech')).toBeInTheDocument()

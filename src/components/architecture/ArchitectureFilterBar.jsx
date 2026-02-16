@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Filter, X, ChevronDown, GitBranch, AlertCircle, ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import {
+  Filter,
+  X,
+  ChevronDown,
+  GitBranch,
+  AlertCircle,
+  ArrowDownRight,
+  ArrowUpRight,
+} from 'lucide-react'
 import Badge from '../ui/Badge'
 import { TYPE_HEX_COLORS, TYPE_ICONS, TYPE_COLORS } from './constants'
 
@@ -24,14 +32,16 @@ function CheckboxItem({ value, label, isSelected, onToggle, icon: Icon, iconColo
       <span
         className={[
           'flex h-3.5 w-3.5 items-center justify-center rounded border text-[9px]',
-          isSelected
-            ? 'text-[var(--color-fg-default)]'
-            : 'border-[var(--color-fg-muted)]',
+          isSelected ? 'text-[var(--color-fg-default)]' : 'border-[var(--color-fg-muted)]',
         ].join(' ')}
-        style={isSelected ? {
-          borderColor: 'var(--accent-active, #8b5cf6)',
-          backgroundColor: 'var(--accent-active, #8b5cf6)',
-        } : undefined}
+        style={
+          isSelected
+            ? {
+                borderColor: 'var(--accent-active, #8b5cf6)',
+                backgroundColor: 'var(--accent-active, #8b5cf6)',
+              }
+            : undefined
+        }
       >
         {isSelected && '\u2713'}
       </span>
@@ -62,18 +72,18 @@ function RadioItem({ value, label, isSelected, onSelect, icon: Icon }) {
       <span
         className={[
           'flex h-3.5 w-3.5 items-center justify-center rounded-full border',
-          isSelected
-            ? 'text-[var(--color-fg-default)]'
-            : 'border-[var(--color-fg-muted)]',
+          isSelected ? 'text-[var(--color-fg-default)]' : 'border-[var(--color-fg-muted)]',
         ].join(' ')}
-        style={isSelected ? {
-          borderColor: 'var(--accent-active, #8b5cf6)',
-          backgroundColor: 'var(--accent-active, #8b5cf6)',
-        } : undefined}
+        style={
+          isSelected
+            ? {
+                borderColor: 'var(--accent-active, #8b5cf6)',
+                backgroundColor: 'var(--accent-active, #8b5cf6)',
+              }
+            : undefined
+        }
       >
-        {isSelected && (
-          <span className="block h-1.5 w-1.5 rounded-full bg-white" />
-        )}
+        {isSelected && <span className="block h-1.5 w-1.5 rounded-full bg-white" />}
       </span>
       {Icon && <Icon size={13} className="shrink-0 text-[var(--color-fg-muted)]" />}
       {label}
@@ -113,10 +123,14 @@ function TypeDropdown({ types, selected, onChange }) {
             ? 'text-[var(--color-fg-default)] ring-1'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
-        style={hasSelection ? {
-          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-        } : undefined}
+        style={
+          hasSelection
+            ? {
+                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+              }
+            : undefined
+        }
       >
         Type
         {hasSelection && (
@@ -182,10 +196,14 @@ function ConnectionDropdown({ selected, onChange }) {
             ? 'text-[var(--color-fg-default)] ring-1'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
-        style={hasSelection ? {
-          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-        } : undefined}
+        style={
+          hasSelection
+            ? {
+                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+              }
+            : undefined
+        }
       >
         Connections
         <ChevronDown size={12} className={isOpen ? 'rotate-180' : ''} />
@@ -233,14 +251,12 @@ export default function ArchitectureFilterBar({ components = [], filters, onFilt
   // Build type options from components actually present
   const typeOptions = useMemo(() => {
     const present = new Set(components.map((c) => c.type))
-    return [...present]
-      .sort()
-      .map((type) => ({
-        value: type,
-        label: type,
-        icon: TYPE_ICONS[type] || null,
-        color: TYPE_HEX_COLORS[type] || '#6b7280',
-      }))
+    return [...present].sort().map((type) => ({
+      value: type,
+      label: type,
+      icon: TYPE_ICONS[type] || null,
+      color: TYPE_HEX_COLORS[type] || '#6b7280',
+    }))
   }, [components])
 
   const activeCount = types.length + (connection ? 1 : 0)
@@ -284,9 +300,7 @@ export default function ArchitectureFilterBar({ components = [], filters, onFilt
                 variant={TYPE_COLORS[t] || 'default'}
                 size="xs"
                 removable
-                onRemove={() =>
-                  onFilterChange({ ...filters, types: types.filter((v) => v !== t) })
-                }
+                onRemove={() => onFilterChange({ ...filters, types: types.filter((v) => v !== t) })}
               >
                 {t}
               </Badge>

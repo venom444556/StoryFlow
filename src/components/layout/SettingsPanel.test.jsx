@@ -54,8 +54,8 @@ describe('SettingsPanel', () => {
       const closeButton = screen.getByRole('button', { name: '' }) // X button has no text
       // Find the button with X icon
       const buttons = screen.getAllByRole('button')
-      const closeBtn = buttons.find((btn) =>
-        btn.querySelector('svg') && btn.classList.contains('hover:bg-white/10')
+      const closeBtn = buttons.find(
+        (btn) => btn.querySelector('svg') && btn.classList.contains('hover:bg-white/10')
       )
       if (closeBtn) {
         fireEvent.click(closeBtn)
@@ -125,9 +125,9 @@ describe('SettingsPanel', () => {
 
     it('shows all 5 accent color options', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
-      const colorButtons = screen.getAllByRole('button').filter((btn) =>
-        btn.classList.contains('rounded-full') && btn.classList.contains('h-6')
-      )
+      const colorButtons = screen
+        .getAllByRole('button')
+        .filter((btn) => btn.classList.contains('rounded-full') && btn.classList.contains('h-6'))
       expect(colorButtons).toHaveLength(5)
     })
   })
@@ -229,9 +229,9 @@ describe('SettingsPanel', () => {
     it('clicking accent color button changes selection', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
 
-      const colorButtons = screen.getAllByRole('button').filter((btn) =>
-        btn.classList.contains('rounded-full') && btn.classList.contains('h-6')
-      )
+      const colorButtons = screen
+        .getAllByRole('button')
+        .filter((btn) => btn.classList.contains('rounded-full') && btn.classList.contains('h-6'))
 
       // Click the blue color (second button)
       fireEvent.click(colorButtons[1])

@@ -258,8 +258,8 @@ describe('Sidebar', () => {
       renderWithProviders(<Sidebar {...defaultProps} mobileMenuOpen={true} />)
       // X button for mobile close
       const buttons = document.querySelectorAll('button')
-      const closeButton = Array.from(buttons).find((b) =>
-        b.classList.contains('md:hidden') && b.classList.contains('ml-auto')
+      const closeButton = Array.from(buttons).find(
+        (b) => b.classList.contains('md:hidden') && b.classList.contains('ml-auto')
       )
       expect(closeButton).toBeInTheDocument()
     })
@@ -271,8 +271,8 @@ describe('Sidebar', () => {
       )
 
       const buttons = document.querySelectorAll('button')
-      const closeButton = Array.from(buttons).find((b) =>
-        b.classList.contains('md:hidden') && b.classList.contains('ml-auto')
+      const closeButton = Array.from(buttons).find(
+        (b) => b.classList.contains('md:hidden') && b.classList.contains('ml-auto')
       )
 
       if (closeButton) {
@@ -357,9 +357,7 @@ describe('Sidebar', () => {
 
   describe('Edge cases', () => {
     it('handles missing onMobileMenuClose gracefully', () => {
-      renderWithProviders(
-        <Sidebar collapsed={false} onToggle={vi.fn()} mobileMenuOpen={false} />
-      )
+      renderWithProviders(<Sidebar collapsed={false} onToggle={vi.fn()} mobileMenuOpen={false} />)
       // Should not throw
       expect(screen.getByText('Dashboard')).toBeInTheDocument()
     })

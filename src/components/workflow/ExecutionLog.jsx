@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Trash2, Clock, Terminal } from 'lucide-react';
+import React, { useEffect, useRef } from 'react'
+import { Trash2, Clock, Terminal } from 'lucide-react'
 
 // ---------------------------------------------------------------------------
 // Level styles
@@ -9,14 +9,14 @@ const LEVEL_STYLES = {
   success: 'bg-green-500/10 text-green-300',
   warning: 'bg-yellow-500/10 text-yellow-300',
   error: 'bg-red-500/10 text-red-300',
-};
+}
 
 const LEVEL_DOT = {
   info: 'bg-[var(--color-bg-emphasis)]',
   success: 'bg-green-500',
   warning: 'bg-yellow-500',
   error: 'bg-red-500',
-};
+}
 
 // ---------------------------------------------------------------------------
 // ExecutionLog
@@ -30,18 +30,20 @@ const LEVEL_DOT = {
  * - onClear  {function}  callback to clear all log entries
  */
 export default function ExecutionLog({ logs = [], onClear }) {
-  const scrollRef = useRef(null);
+  const scrollRef = useRef(null)
 
   // Auto-scroll to the latest entry when new logs arrive
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [logs.length]);
+  }, [logs.length])
 
   return (
-    <div className="flex h-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
-      style={{ backgroundColor: 'var(--th-panel)' }}>
+    <div
+      className="flex h-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
+      style={{ backgroundColor: 'var(--th-panel)' }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
         <div className="flex items-center gap-2">
@@ -65,10 +67,7 @@ export default function ExecutionLog({ logs = [], onClear }) {
       </div>
 
       {/* Log entries */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-3 font-mono text-xs"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 font-mono text-xs">
         {logs.length === 0 ? (
           <div className="flex flex-col items-center justify-center pt-12 text-[var(--color-fg-subtle)]">
             <Clock size={28} className="mb-2 opacity-40" />
@@ -107,5 +106,5 @@ export default function ExecutionLog({ logs = [], onClear }) {
         )}
       </div>
     </div>
-  );
+  )
 }

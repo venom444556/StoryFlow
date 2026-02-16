@@ -1,14 +1,6 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import {
-  X,
-  Plus,
-  Trash2,
-  ChevronDown,
-  ChevronRight,
-  Calendar,
-  Scale,
-} from 'lucide-react'
+import { X, Plus, Trash2, ChevronDown, ChevronRight, Calendar, Scale } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import Button from '../ui/Button'
 import Select from '../ui/Select'
@@ -177,7 +169,9 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
         <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-5 py-4">
           <div className="flex items-center gap-2.5">
             <Scale size={18} className="text-purple-400" />
-            <span className="text-sm font-semibold text-[var(--color-fg-default)]">Decision Detail</span>
+            <span className="text-sm font-semibold text-[var(--color-fg-default)]">
+              Decision Detail
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -226,9 +220,7 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
             {/* Decision */}
             <div>
               <SectionHeader>Decision</SectionHeader>
-              <p className="mb-2 text-xs text-[var(--color-fg-muted)]">
-                What was decided?
-              </p>
+              <p className="mb-2 text-xs text-[var(--color-fg-muted)]">What was decided?</p>
               <InlineTextArea
                 value={decision.decision}
                 onChange={handleFieldChange('decision')}
@@ -241,12 +233,7 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <SectionHeader className="mb-0">Alternatives Considered</SectionHeader>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  icon={Plus}
-                  onClick={handleAddAlternative}
-                >
+                <Button variant="ghost" size="sm" icon={Plus} onClick={handleAddAlternative}>
                   Add
                 </Button>
               </div>
@@ -290,7 +277,18 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
                 tags={decision.tags || []}
                 onChange={handleTagsChange}
                 placeholder="Add tag..."
-                suggestions={['architecture', 'database', 'frontend', 'backend', 'security', 'performance', 'ux', 'api', 'infrastructure', 'testing']}
+                suggestions={[
+                  'architecture',
+                  'database',
+                  'frontend',
+                  'backend',
+                  'security',
+                  'performance',
+                  'ux',
+                  'api',
+                  'infrastructure',
+                  'testing',
+                ]}
               />
             </div>
 

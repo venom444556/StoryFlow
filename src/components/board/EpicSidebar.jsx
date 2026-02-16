@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Layers } from 'lucide-react';
-import IssueTypeIcon from './IssueTypeIcon';
-import ProgressBar from '../ui/ProgressBar';
-import Badge from '../ui/Badge';
+import { useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight, Layers } from 'lucide-react'
+import IssueTypeIcon from './IssueTypeIcon'
+import ProgressBar from '../ui/ProgressBar'
+import Badge from '../ui/Badge'
 
 export default function EpicSidebar({
   issues = [],
@@ -14,15 +14,15 @@ export default function EpicSidebar({
 }) {
   // Compute epic data
   const epicData = useMemo(() => {
-    const epics = issues.filter((i) => i.type === 'epic');
+    const epics = issues.filter((i) => i.type === 'epic')
     return epics.map((epic) => {
-      const children = issues.filter((i) => i.epicId === epic.id && i.id !== epic.id);
-      const total = children.length;
-      const done = children.filter((c) => c.status === 'Done').length;
-      const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-      return { ...epic, childCount: total, doneCount: done, progress };
-    });
-  }, [issues]);
+      const children = issues.filter((i) => i.epicId === epic.id && i.id !== epic.id)
+      const total = children.length
+      const done = children.filter((c) => c.status === 'Done').length
+      const progress = total > 0 ? Math.round((done / total) * 100) : 0
+      return { ...epic, childCount: total, doneCount: done, progress }
+    })
+  }, [issues])
 
   return (
     <AnimatePresence mode="wait">
@@ -100,14 +100,16 @@ export default function EpicSidebar({
                   onClick={() => onFilterByEpic?.(epic.id)}
                   className={[
                     'group w-full rounded-lg px-3 py-2.5 text-left transition-colors',
-                    activeEpicId === epic.id
-                      ? 'ring-1'
-                      : 'hover:bg-[var(--color-bg-glass)]',
+                    activeEpicId === epic.id ? 'ring-1' : 'hover:bg-[var(--color-bg-glass)]',
                   ].join(' ')}
-                  style={activeEpicId === epic.id ? {
-                    backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-                    '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-                  } : undefined}
+                  style={
+                    activeEpicId === epic.id
+                      ? {
+                          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
+                          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+                        }
+                      : undefined
+                  }
                 >
                   {/* Epic title row */}
                   <div className="mb-1.5 flex items-center gap-2">
@@ -119,7 +121,11 @@ export default function EpicSidebar({
                           ? ''
                           : 'text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]',
                       ].join(' ')}
-                      style={activeEpicId === epic.id ? { color: 'var(--accent-active, #8b5cf6)' } : undefined}
+                      style={
+                        activeEpicId === epic.id
+                          ? { color: 'var(--accent-active, #8b5cf6)' }
+                          : undefined
+                      }
                     >
                       {epic.title}
                     </span>
@@ -154,5 +160,5 @@ export default function EpicSidebar({
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

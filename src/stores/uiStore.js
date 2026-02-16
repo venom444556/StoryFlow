@@ -14,8 +14,7 @@ export const useUIStore = create(
       sidebarCollapsed: false,
       sidebarWidth: 256,
 
-      toggleSidebar: () =>
-        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+      toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
 
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
 
@@ -30,8 +29,7 @@ export const useUIStore = create(
       openCommandPalette: (scope = null) =>
         set({ commandPaletteOpen: true, commandPaletteScope: scope }),
 
-      closeCommandPalette: () =>
-        set({ commandPaletteOpen: false, commandPaletteScope: null }),
+      closeCommandPalette: () => set({ commandPaletteOpen: false, commandPaletteScope: null }),
 
       toggleCommandPalette: () =>
         set((state) => ({
@@ -142,8 +140,7 @@ export const useUIStore = create(
       // ---------------------------------------------------------------------------
       shortcutsVisible: false,
 
-      toggleShortcuts: () =>
-        set((state) => ({ shortcutsVisible: !state.shortcutsVisible })),
+      toggleShortcuts: () => set((state) => ({ shortcutsVisible: !state.shortcutsVisible })),
 
       showShortcuts: () => set({ shortcutsVisible: true }),
 

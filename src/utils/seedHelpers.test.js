@@ -201,10 +201,7 @@ describe('seedHelpers utilities', () => {
         title: 'Test',
         x: 0,
         y: 0,
-        tasks: [
-          { title: 'Task 1' },
-          { title: 'Task 2', assignee: 'alice', notes: 'Some notes' },
-        ],
+        tasks: [{ title: 'Task 1' }, { title: 'Task 2', assignee: 'alice', notes: 'Some notes' }],
       })
       const nodes = phase.children.nodes
       const taskNodes = nodes.filter((n) => n.type === 'task')

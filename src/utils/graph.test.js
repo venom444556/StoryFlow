@@ -105,9 +105,7 @@ describe('graph utilities', () => {
     })
 
     it('finds orphaned component', () => {
-      const components = [
-        { id: 'child', parentId: 'deleted-parent' },
-      ]
+      const components = [{ id: 'child', parentId: 'deleted-parent' }]
       const orphaned = findOrphanedComponents(components)
       expect(orphaned).toContainEqual({
         componentId: 'child',
@@ -153,9 +151,7 @@ describe('graph utilities', () => {
     })
 
     it('nullifies invalid parentId', () => {
-      const components = [
-        { id: 'a', dependencies: [], parentId: 'deleted' },
-      ]
+      const components = [{ id: 'a', dependencies: [], parentId: 'deleted' }]
       const cleaned = cleanupInvalidReferences(components)
       expect(cleaned[0].parentId).toBeNull()
     })

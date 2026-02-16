@@ -37,9 +37,7 @@ describe('workflow utilities', () => {
     })
 
     it('returns child nodes when viewStack has one entry', () => {
-      const result = getNodesAtLevel(sampleWorkflow, [
-        { nodeId: 'parent1', title: 'Parent 1' },
-      ])
+      const result = getNodesAtLevel(sampleWorkflow, [{ nodeId: 'parent1', title: 'Parent 1' }])
       expect(result.nodes).toHaveLength(2)
       expect(result.nodes[0].id).toBe('child1')
       expect(result.connections).toHaveLength(1)
@@ -54,9 +52,7 @@ describe('workflow utilities', () => {
     })
 
     it('returns empty arrays when node has no children', () => {
-      const result = getNodesAtLevel(sampleWorkflow, [
-        { nodeId: 'parent2', title: 'Parent 2' },
-      ])
+      const result = getNodesAtLevel(sampleWorkflow, [{ nodeId: 'parent2', title: 'Parent 2' }])
       expect(result.nodes).toEqual([])
       expect(result.connections).toEqual([])
     })
@@ -82,10 +78,7 @@ describe('workflow utilities', () => {
         ],
         connections: [],
       }
-      const result = getNodesAtLevel(deepWorkflow, [
-        { nodeId: 'level0' },
-        { nodeId: 'level1' },
-      ])
+      const result = getNodesAtLevel(deepWorkflow, [{ nodeId: 'level0' }, { nodeId: 'level1' }])
       expect(result.nodes).toHaveLength(1)
       expect(result.nodes[0].id).toBe('level2')
     })
@@ -129,11 +122,7 @@ describe('workflow utilities', () => {
         ],
         connections: [],
       }
-      const result = setNodesAtLevel(
-        sampleWorkflow,
-        [{ nodeId: 'parent1' }],
-        updatedData
-      )
+      const result = setNodesAtLevel(sampleWorkflow, [{ nodeId: 'parent1' }], updatedData)
       expect(result.nodes[0].children.nodes).toHaveLength(2)
     })
 
@@ -148,11 +137,10 @@ describe('workflow utilities', () => {
         ],
         connections: [],
       }
-      const result = setNodesAtLevel(
-        workflow,
-        [{ nodeId: 'parent1' }],
-        { nodes: [{ id: 'newChild' }], connections: [] }
-      )
+      const result = setNodesAtLevel(workflow, [{ nodeId: 'parent1' }], {
+        nodes: [{ id: 'newChild' }],
+        connections: [],
+      })
       expect(result.nodes).toHaveLength(2)
       expect(result.nodes[1].id).toBe('parent2')
     })
@@ -167,11 +155,10 @@ describe('workflow utilities', () => {
         nodes: [{ id: 'parent1' }], // no children property
         connections: [],
       }
-      const result = setNodesAtLevel(
-        workflow,
-        [{ nodeId: 'parent1' }],
-        { nodes: [{ id: 'child' }], connections: [] }
-      )
+      const result = setNodesAtLevel(workflow, [{ nodeId: 'parent1' }], {
+        nodes: [{ id: 'child' }],
+        connections: [],
+      })
       expect(result.nodes[0].children.nodes).toHaveLength(1)
     })
   })
@@ -312,51 +299,35 @@ describe('workflow utilities', () => {
     })
 
     it('returns red when fromNode has error', () => {
-      expect(
-        getConnectionColor({ status: 'error' }, { status: 'idle' })
-      ).toBe('#ef4444')
+      expect(getConnectionColor({ status: 'error' }, { status: 'idle' })).toBe('#ef4444')
     })
 
     it('returns red when toNode has error', () => {
-      expect(
-        getConnectionColor({ status: 'success' }, { status: 'error' })
-      ).toBe('#ef4444')
+      expect(getConnectionColor({ status: 'success' }, { status: 'error' })).toBe('#ef4444')
     })
 
     it('returns yellow when fromNode success and toNode running', () => {
-      expect(
-        getConnectionColor({ status: 'success' }, { status: 'running' })
-      ).toBe('#eab308')
+      expect(getConnectionColor({ status: 'success' }, { status: 'running' })).toBe('#eab308')
     })
 
     it('returns green when both success', () => {
-      expect(
-        getConnectionColor({ status: 'success' }, { status: 'success' })
-      ).toBe('#22c55e')
+      expect(getConnectionColor({ status: 'success' }, { status: 'success' })).toBe('#22c55e')
     })
 
     it('returns yellow when fromNode running', () => {
-      expect(
-        getConnectionColor({ status: 'running' }, { status: 'idle' })
-      ).toBe('#eab308')
+      expect(getConnectionColor({ status: 'running' }, { status: 'idle' })).toBe('#eab308')
     })
 
     it('returns yellow when toNode running', () => {
-      expect(
-        getConnectionColor({ status: 'idle' }, { status: 'running' })
-      ).toBe('#eab308')
+      expect(getConnectionColor({ status: 'idle' }, { status: 'running' })).toBe('#eab308')
     })
 
     it('returns gray for idle states', () => {
-      expect(
-        getConnectionColor({ status: 'idle' }, { status: 'idle' })
-      ).toBe('#4b5563')
+      expect(getConnectionColor({ status: 'idle' }, { status: 'idle' })).toBe('#4b5563')
     })
 
     it('returns gray for unknown status', () => {
-      expect(
-        getConnectionColor({ status: 'unknown' }, { status: 'unknown' })
-      ).toBe('#4b5563')
+      expect(getConnectionColor({ status: 'unknown' }, { status: 'unknown' })).toBe('#4b5563')
     })
   })
 
@@ -403,14 +374,7 @@ describe('workflow utilities', () => {
         { id: 'end', type: 'end', title: 'End' },
       ]
       const connections = [{ id: 'c1', from: 'start', to: 'end' }]
-      await executeWorkflow(
-        nodes,
-        connections,
-        onNodeStart,
-        onNodeComplete,
-        onNodeError,
-        onLog
-      )
+      await executeWorkflow(nodes, connections, onNodeStart, onNodeComplete, onNodeError, onLog)
       expect(onNodeStart).toHaveBeenCalledWith('start')
       expect(onNodeStart).toHaveBeenCalledWith('end')
     }, 10000)
@@ -511,18 +475,10 @@ describe('workflow utilities', () => {
         { id: 'end', type: 'end', title: 'End' },
       ]
       const connections = [{ id: 'c1', from: 'start', to: 'end' }]
-      await executeWorkflow(
-        nodes,
-        connections,
-        onNodeStart,
-        onNodeComplete,
-        onNodeError,
-        onLog
-      )
+      await executeWorkflow(nodes, connections, onNodeStart, onNodeComplete, onNodeError, onLog)
       // Should log either success or failure completion
-      const completionLogs = onLog.mock.calls.filter(
-        (call) =>
-          call[0].includes('Workflow completed')
+      const completionLogs = onLog.mock.calls.filter((call) =>
+        call[0].includes('Workflow completed')
       )
       expect(completionLogs.length).toBeGreaterThan(0)
     }, 10000)

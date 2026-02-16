@@ -135,9 +135,7 @@ export function useKeyboardShortcuts(handlers, chordHandlers = {}) {
         }
 
         // Check if this could start a chord (e.g., 'g')
-        const possibleChords = Object.keys(CHORD_SHORTCUTS).filter(
-          (c) => c.startsWith(key + ' ')
-        )
+        const possibleChords = Object.keys(CHORD_SHORTCUTS).filter((c) => c.startsWith(key + ' '))
 
         if (possibleChords.length > 0 && Object.keys(chords).length > 0) {
           e.preventDefault()
@@ -179,12 +177,7 @@ export function useKeyboardShortcuts(handlers, chordHandlers = {}) {
  * Hook for managing focus in a list of items with j/k navigation
  */
 export function useListNavigation(items, options = {}) {
-  const {
-    onSelect,
-    onFocusChange,
-    enabled = true,
-    loop = true,
-  } = options
+  const { onSelect, onFocusChange, enabled = true, loop = true } = options
 
   const focusIndexRef = useRef(0)
 
@@ -212,10 +205,13 @@ export function useListNavigation(items, options = {}) {
     onSelect?.(items[focusIndexRef.current], focusIndexRef.current)
   }, [items, enabled, onSelect])
 
-  const setFocusIndex = useCallback((index) => {
-    focusIndexRef.current = Math.max(0, Math.min(items.length - 1, index))
-    onFocusChange?.(focusIndexRef.current, items[focusIndexRef.current])
-  }, [items, onFocusChange])
+  const setFocusIndex = useCallback(
+    (index) => {
+      focusIndexRef.current = Math.max(0, Math.min(items.length - 1, index))
+      onFocusChange?.(focusIndexRef.current, items[focusIndexRef.current])
+    },
+    [items, onFocusChange]
+  )
 
   useKeyboardShortcuts(
     enabled

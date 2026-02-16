@@ -69,49 +69,25 @@ describe('TemplateSelector', () => {
 
   describe('basic rendering', () => {
     it('renders when isOpen is true', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByTestId('modal')).toBeInTheDocument()
     })
 
     it('does not render when isOpen is false', () => {
-      render(
-        <TemplateSelector
-          isOpen={false}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={false} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
     })
 
     it('displays correct title', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByText('Choose a Template')).toBeInTheDocument()
     })
 
     it('uses lg size for modal', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByTestId('modal')).toHaveAttribute('data-size', 'lg')
     })
@@ -119,13 +95,7 @@ describe('TemplateSelector', () => {
 
   describe('template display', () => {
     it('displays all templates', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByText('Blank Page')).toBeInTheDocument()
       expect(screen.getByText('Meeting Notes')).toBeInTheDocument()
@@ -133,13 +103,7 @@ describe('TemplateSelector', () => {
     })
 
     it('displays template icons', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByText('📄')).toBeInTheDocument()
       expect(screen.getByText('📝')).toBeInTheDocument()
@@ -147,13 +111,7 @@ describe('TemplateSelector', () => {
     })
 
     it('displays template descriptions', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByText('Start with a clean slate')).toBeInTheDocument()
       expect(screen.getByText('Capture meeting discussions')).toBeInTheDocument()
@@ -163,13 +121,7 @@ describe('TemplateSelector', () => {
 
   describe('template selection', () => {
     it('calls onSelect with template when clicked', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       fireEvent.click(screen.getByText('Blank Page'))
 
@@ -183,13 +135,7 @@ describe('TemplateSelector', () => {
     })
 
     it('calls onClose after selecting template', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       fireEvent.click(screen.getByText('Meeting Notes'))
 
@@ -197,13 +143,7 @@ describe('TemplateSelector', () => {
     })
 
     it('passes full template object on selection', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       fireEvent.click(screen.getByText('Technical Spec'))
 
@@ -218,13 +158,7 @@ describe('TemplateSelector', () => {
 
   describe('modal closing', () => {
     it('calls onClose when modal close button is clicked', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       fireEvent.click(screen.getByTestId('modal-close'))
 
@@ -234,13 +168,7 @@ describe('TemplateSelector', () => {
 
   describe('grid layout', () => {
     it('renders templates in a grid', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       const content = screen.getByTestId('modal-content')
       const grid = content.querySelector('.grid')
@@ -252,13 +180,7 @@ describe('TemplateSelector', () => {
 
   describe('template buttons', () => {
     it('renders templates as buttons', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       const buttons = screen.getAllByRole('button')
       // 3 template buttons + 1 modal close button
@@ -266,13 +188,7 @@ describe('TemplateSelector', () => {
     })
 
     it('templates have glass-card styling', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       const content = screen.getByTestId('modal-content')
       const templateButtons = content.querySelectorAll('button')
@@ -285,13 +201,7 @@ describe('TemplateSelector', () => {
 
   describe('edge cases', () => {
     it('handles rapid selection clicks', () => {
-      render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       // Click multiple times rapidly
       fireEvent.click(screen.getByText('Blank Page'))
@@ -305,34 +215,18 @@ describe('TemplateSelector', () => {
 
     it('handles re-opening the modal', () => {
       const { rerender } = render(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
+        <TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />
       )
 
       expect(screen.getByTestId('modal')).toBeInTheDocument()
 
       // Close modal
-      rerender(
-        <TemplateSelector
-          isOpen={false}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      rerender(<TemplateSelector isOpen={false} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.queryByTestId('modal')).not.toBeInTheDocument()
 
       // Re-open modal
-      rerender(
-        <TemplateSelector
-          isOpen={true}
-          onClose={mockOnClose}
-          onSelect={mockOnSelect}
-        />
-      )
+      rerender(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
       expect(screen.getByTestId('modal')).toBeInTheDocument()
       expect(screen.getByText('Blank Page')).toBeInTheDocument()

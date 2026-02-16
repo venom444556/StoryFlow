@@ -146,9 +146,7 @@ export default function ProjectSidebar({ activeTab, projectId, onTabChange }) {
               }}
               className={[
                 'flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition-colors',
-                isActive
-                  ? 'text-[var(--interactive-default)]'
-                  : 'text-[var(--color-fg-muted)]',
+                isActive ? 'text-[var(--interactive-default)]' : 'text-[var(--color-fg-muted)]',
               ].join(' ')}
             >
               <Icon size={20} />
@@ -163,9 +161,7 @@ export default function ProjectSidebar({ activeTab, projectId, onTabChange }) {
             onClick={() => setShowMore(!showMore)}
             className={[
               'flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition-colors',
-              showMore
-                ? 'text-[var(--interactive-default)]'
-                : 'text-[var(--color-fg-muted)]',
+              showMore ? 'text-[var(--interactive-default)]' : 'text-[var(--color-fg-muted)]',
             ].join(' ')}
           >
             <MoreHorizontal size={20} />

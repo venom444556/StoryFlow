@@ -20,7 +20,11 @@ vi.mock('./MarkdownRenderer', () => ({
 
 vi.mock('../ui/Button', () => ({
   default: ({ children, onClick, icon: Icon, ...props }) => (
-    <button onClick={onClick} data-testid={`button-${children?.toLowerCase?.() || 'unknown'}`} {...props}>
+    <button
+      onClick={onClick}
+      data-testid={`button-${children?.toLowerCase?.() || 'unknown'}`}
+      {...props}
+    >
       {Icon && <Icon data-testid="button-icon" />}
       {children}
     </button>
@@ -31,7 +35,9 @@ vi.mock('../ui/TagInput', () => ({
   default: ({ tags, onChange, placeholder }) => (
     <div data-testid="tag-input">
       {tags.map((tag, i) => (
-        <span key={i} data-testid={`tag-${tag}`}>{tag}</span>
+        <span key={i} data-testid={`tag-${tag}`}>
+          {tag}
+        </span>
       ))}
       <input
         placeholder={placeholder}
@@ -195,13 +201,19 @@ describe('PageEditor', () => {
 
       // Simulate rapid typing
       fireEvent.change(textarea, { target: { value: 'First' } })
-      act(() => { vi.advanceTimersByTime(500) })
+      act(() => {
+        vi.advanceTimersByTime(500)
+      })
 
       fireEvent.change(textarea, { target: { value: 'Second' } })
-      act(() => { vi.advanceTimersByTime(500) })
+      act(() => {
+        vi.advanceTimersByTime(500)
+      })
 
       fireEvent.change(textarea, { target: { value: 'Third' } })
-      act(() => { vi.advanceTimersByTime(2000) })
+      act(() => {
+        vi.advanceTimersByTime(2000)
+      })
 
       // Should only be called once with the final value
       expect(mockOnSave).toHaveBeenCalledTimes(1)
@@ -224,19 +236,25 @@ describe('PageEditor', () => {
       fireEvent.click(saveButton)
 
       // Advance timer
-      act(() => { vi.advanceTimersByTime(3000) })
+      act(() => {
+        vi.advanceTimersByTime(3000)
+      })
 
       // Should only be called once (manual save, not auto-save)
       expect(mockOnSave).toHaveBeenCalledTimes(1)
-      expect(mockOnSave).toHaveBeenCalledWith(
-        expect.not.objectContaining({ _autoSave: true })
-      )
+      expect(mockOnSave).toHaveBeenCalledWith(expect.not.objectContaining({ _autoSave: true }))
     })
   })
 
   describe('toolbar insertion', () => {
     it('inserts bold markdown when bold button is clicked', () => {
-      render(<PageEditor page={{ ...mockPage, content: '' }} onSave={mockOnSave} onCancel={mockOnCancel} />)
+      render(
+        <PageEditor
+          page={{ ...mockPage, content: '' }}
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+        />
+      )
 
       const boldButton = screen.getByTitle('Bold')
       fireEvent.click(boldButton)
@@ -246,7 +264,13 @@ describe('PageEditor', () => {
     })
 
     it('inserts italic markdown when italic button is clicked', () => {
-      render(<PageEditor page={{ ...mockPage, content: '' }} onSave={mockOnSave} onCancel={mockOnCancel} />)
+      render(
+        <PageEditor
+          page={{ ...mockPage, content: '' }}
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+        />
+      )
 
       const italicButton = screen.getByTitle('Italic')
       fireEvent.click(italicButton)
@@ -256,7 +280,13 @@ describe('PageEditor', () => {
     })
 
     it('inserts heading markdown when heading button is clicked', () => {
-      render(<PageEditor page={{ ...mockPage, content: '' }} onSave={mockOnSave} onCancel={mockOnCancel} />)
+      render(
+        <PageEditor
+          page={{ ...mockPage, content: '' }}
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+        />
+      )
 
       const headingButton = screen.getByTitle('Heading')
       fireEvent.click(headingButton)
@@ -266,7 +296,13 @@ describe('PageEditor', () => {
     })
 
     it('inserts table markdown when table button is clicked', () => {
-      render(<PageEditor page={{ ...mockPage, content: '' }} onSave={mockOnSave} onCancel={mockOnCancel} />)
+      render(
+        <PageEditor
+          page={{ ...mockPage, content: '' }}
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+        />
+      )
 
       const tableButton = screen.getByTitle('Table')
       fireEvent.click(tableButton)
@@ -278,7 +314,13 @@ describe('PageEditor', () => {
 
   describe('stats display', () => {
     it('displays word count', () => {
-      render(<PageEditor page={{ ...mockPage, content: 'one two three' }} onSave={mockOnSave} onCancel={mockOnCancel} />)
+      render(
+        <PageEditor
+          page={{ ...mockPage, content: 'one two three' }}
+          onSave={mockOnSave}
+          onCancel={mockOnCancel}
+        />
+      )
       expect(screen.getByText(/3 words/)).toBeInTheDocument()
     })
 
@@ -305,7 +347,9 @@ describe('PageEditor', () => {
       rerender(<PageEditor page={newPage} onSave={mockOnSave} onCancel={mockOnCancel} />)
 
       expect(screen.getByPlaceholderText('Page title...')).toHaveValue('Different Page')
-      expect(screen.getByPlaceholderText('Start writing in markdown...')).toHaveValue('Different content')
+      expect(screen.getByPlaceholderText('Start writing in markdown...')).toHaveValue(
+        'Different content'
+      )
     })
   })
 

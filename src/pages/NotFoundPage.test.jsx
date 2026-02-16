@@ -6,11 +6,7 @@ import NotFoundPage from './NotFoundPage'
 
 // Helper to render with router
 function renderWithRouter(ui, { route = '/not-found' } = {}) {
-  return render(
-    <MemoryRouter initialEntries={[route]}>
-      {ui}
-    </MemoryRouter>
-  )
+  return render(<MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>)
 }
 
 describe('NotFoundPage', () => {
@@ -148,12 +144,7 @@ describe('NotFoundPage', () => {
   describe('Edge Cases', () => {
     it('renders correctly regardless of current route', () => {
       // Test with various invalid routes
-      const routes = [
-        '/invalid',
-        '/project/non-existent-id',
-        '/foo/bar/baz',
-        '/api/test',
-      ]
+      const routes = ['/invalid', '/project/non-existent-id', '/foo/bar/baz', '/api/test']
 
       routes.forEach((route) => {
         const { unmount } = render(
@@ -205,7 +196,7 @@ describe('NotFoundPage', () => {
     it('message text has appropriate styling', () => {
       renderWithRouter(<NotFoundPage />)
       const message = screen.getByText(/does not exist/i)
-      expect(message).toHaveClass('text-sm', 'text-slate-500')
+      expect(message).toHaveClass('text-sm', 'text-[var(--color-fg-subtle)]')
     })
   })
 })

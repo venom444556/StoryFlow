@@ -1,5 +1,5 @@
-import React from 'react';
-import { X } from 'lucide-react';
+import React from 'react'
+import { X } from 'lucide-react'
 
 const VARIANTS = {
   default: 'bg-[var(--color-bg-glass-active)] text-[var(--color-fg-muted)]',
@@ -16,7 +16,7 @@ const VARIANTS = {
   warning: 'bg-[var(--color-warning-subtle)] text-[var(--color-warning)]',
   error: 'bg-[var(--color-danger-subtle)] text-[var(--color-danger)]',
   info: 'bg-[var(--color-info-subtle)] text-[var(--color-info)]',
-};
+}
 
 const OUTLINE_VARIANTS = {
   default: 'border-[var(--color-border-default)] text-[var(--color-fg-muted)]',
@@ -32,7 +32,7 @@ const OUTLINE_VARIANTS = {
   warning: 'border-[var(--color-warning)]/40 text-[var(--color-warning)]',
   error: 'border-[var(--color-danger)]/40 text-[var(--color-danger)]',
   info: 'border-[var(--color-info)]/40 text-[var(--color-info)]',
-};
+}
 
 const DOT_COLORS = {
   default: 'bg-[var(--color-fg-subtle)]',
@@ -48,13 +48,13 @@ const DOT_COLORS = {
   warning: 'bg-[var(--color-warning)]',
   error: 'bg-[var(--color-danger)]',
   info: 'bg-[var(--color-info)]',
-};
+}
 
 const SIZES = {
   xs: 'px-1.5 py-px text-[10px] leading-4',
   sm: 'px-2 py-0.5 text-[11px] leading-4',
   md: 'px-2.5 py-1 text-xs',
-};
+}
 
 export default function Badge({
   children,
@@ -69,24 +69,25 @@ export default function Badge({
     <span
       className={[
         'inline-flex items-center gap-1 rounded-full font-medium',
-        outline ? `bg-transparent border ${OUTLINE_VARIANTS[variant] || OUTLINE_VARIANTS.default}` : (VARIANTS[variant] || VARIANTS.default),
+        outline
+          ? `bg-transparent border ${OUTLINE_VARIANTS[variant] || OUTLINE_VARIANTS.default}`
+          : VARIANTS[variant] || VARIANTS.default,
         SIZES[size] || SIZES.sm,
       ].join(' ')}
     >
       {dot && (
         <span
-          className={[
-            'h-1.5 w-1.5 rounded-full',
-            DOT_COLORS[variant] || DOT_COLORS.default,
-          ].join(' ')}
+          className={['h-1.5 w-1.5 rounded-full', DOT_COLORS[variant] || DOT_COLORS.default].join(
+            ' '
+          )}
         />
       )}
       {children}
       {removable && (
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            onRemove?.();
+            e.stopPropagation()
+            onRemove?.()
           }}
           className={[
             'ml-0.5 rounded-full p-0.5 transition-colors',
@@ -102,5 +103,5 @@ export default function Badge({
         </button>
       )}
     </span>
-  );
+  )
 }

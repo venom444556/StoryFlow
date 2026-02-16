@@ -31,9 +31,7 @@ export default function MilestoneMarker({
           <div
             className={[
               'h-3 w-3 rotate-45 border-2 transition-colors cursor-pointer',
-              completed
-                ? 'shadow-lg'
-                : 'bg-transparent',
+              completed ? 'shadow-lg' : 'bg-transparent',
             ].join(' ')}
             style={{
               borderColor: color,
@@ -44,12 +42,7 @@ export default function MilestoneMarker({
           />
         </div>
         {/* Connecting line */}
-        {!isLast && (
-          <div
-            className="mt-0 w-px flex-1"
-            style={{ backgroundColor: `${color}30` }}
-          />
-        )}
+        {!isLast && <div className="mt-0 w-px flex-1" style={{ backgroundColor: `${color}30` }} />}
       </div>
 
       {/* Card */}
@@ -76,7 +69,9 @@ export default function MilestoneMarker({
                 <h4
                   className={[
                     'text-sm font-semibold truncate',
-                    completed ? 'text-[var(--color-fg-muted)] line-through' : 'text-[var(--color-fg-default)]',
+                    completed
+                      ? 'text-[var(--color-fg-muted)] line-through'
+                      : 'text-[var(--color-fg-default)]',
                   ].join(' ')}
                 >
                   {name}

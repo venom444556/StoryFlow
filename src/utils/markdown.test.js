@@ -5,9 +5,7 @@ describe('markdown utilities', () => {
   describe('extractHeadings', () => {
     it('extracts a single h1 heading', () => {
       const result = extractHeadings('# Hello World')
-      expect(result).toEqual([
-        { level: 1, text: 'Hello World', id: 'hello-world' },
-      ])
+      expect(result).toEqual([{ level: 1, text: 'Hello World', id: 'hello-world' }])
     })
 
     it('extracts multiple headings at different levels', () => {

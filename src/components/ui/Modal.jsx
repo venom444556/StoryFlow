@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useCallback } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import React, { useEffect, useRef, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
 
 const SIZE_MAP = {
   sm: 'max-w-sm',
@@ -8,11 +8,11 @@ const SIZE_MAP = {
   lg: 'max-w-2xl',
   xl: 'max-w-4xl',
   full: 'max-w-[calc(100vw-2rem)]',
-};
+}
 
 // Focusable element selector
 const FOCUSABLE_SELECTOR =
-  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 export default function Modal({
   isOpen,
@@ -22,79 +22,79 @@ export default function Modal({
   size = 'md',
   showCloseButton = true,
 }) {
-  const modalRef = useRef(null);
-  const previousActiveElement = useRef(null);
-  const titleId = useRef(`modal-title-${Math.random().toString(36).slice(2, 9)}`);
+  const modalRef = useRef(null)
+  const previousActiveElement = useRef(null)
+  const titleId = useRef(`modal-title-${Math.random().toString(36).slice(2, 9)}`)
 
   // Store the previously focused element when modal opens
   useEffect(() => {
     if (isOpen) {
-      previousActiveElement.current = document.activeElement;
+      previousActiveElement.current = document.activeElement
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Restore focus when modal closes
   useEffect(() => {
     if (!isOpen && previousActiveElement.current) {
-      previousActiveElement.current.focus();
-      previousActiveElement.current = null;
+      previousActiveElement.current.focus()
+      previousActiveElement.current = null
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Focus first focusable element when modal opens
   useEffect(() => {
     if (isOpen && modalRef.current) {
-      const focusableElements = modalRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
+      const focusableElements = modalRef.current.querySelectorAll(FOCUSABLE_SELECTOR)
       if (focusableElements.length > 0) {
         // Focus the close button or first focusable element
-        setTimeout(() => focusableElements[0].focus(), 0);
+        setTimeout(() => focusableElements[0].focus(), 0)
       }
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Trap focus within modal
   const handleKeyDown = useCallback(
     (e) => {
       if (e.key === 'Escape') {
-        onClose();
-        return;
+        onClose()
+        return
       }
 
-      if (e.key !== 'Tab' || !modalRef.current) return;
+      if (e.key !== 'Tab' || !modalRef.current) return
 
-      const focusableElements = modalRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
-      if (focusableElements.length === 0) return;
+      const focusableElements = modalRef.current.querySelectorAll(FOCUSABLE_SELECTOR)
+      if (focusableElements.length === 0) return
 
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
 
       // Shift+Tab on first element -> go to last
       if (e.shiftKey && document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement.focus();
+        e.preventDefault()
+        lastElement.focus()
       }
       // Tab on last element -> go to first
       else if (!e.shiftKey && document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement.focus();
+        e.preventDefault()
+        firstElement.focus()
       }
     },
     [onClose]
-  );
+  )
 
   // Add keydown listener when modal is open
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keydown', handleKeyDown)
       // Prevent body scroll when modal is open
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, handleKeyDown]);
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, handleKeyDown])
 
   return (
     <AnimatePresence>
@@ -171,5 +171,5 @@ export default function Modal({
         </motion.div>
       )}
     </AnimatePresence>
-  );
+  )
 }

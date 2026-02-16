@@ -26,9 +26,7 @@ describe('useCanvasViewport', () => {
 
   describe('initial state', () => {
     it('returns initial viewport state', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       expect(result.current.viewport).toEqual({
         scale: 1,
@@ -38,9 +36,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('returns all expected values and methods', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       expect(result.current.viewport).toBeDefined()
       expect(typeof result.current.setViewport).toBe('function')
@@ -55,9 +51,7 @@ describe('useCanvasViewport', () => {
 
   describe('screenToCanvas', () => {
     it('converts screen coordinates to canvas coordinates at default scale', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       const canvasCoords = result.current.screenToCanvas(100, 200)
 
@@ -65,9 +59,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('accounts for viewport offset', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 1, offsetX: 50, offsetY: 100 })
@@ -79,9 +71,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('accounts for viewport scale', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 2, offsetX: 0, offsetY: 0 })
@@ -93,9 +83,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('accounts for both offset and scale', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 2, offsetX: 100, offsetY: 50 })
@@ -110,9 +98,7 @@ describe('useCanvasViewport', () => {
 
   describe('handleZoomIn', () => {
     it('increases scale by 0.1', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.handleZoomIn()
@@ -122,9 +108,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('does not exceed MAX_ZOOM', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 1.95, offsetX: 0, offsetY: 0 })
@@ -138,9 +122,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('adjusts offset to zoom toward center', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 1, offsetX: 100, offsetY: 50 })
@@ -159,9 +141,7 @@ describe('useCanvasViewport', () => {
 
     it('handles missing canvas ref gracefully', () => {
       const nullRef = { current: null }
-      const { result } = renderHook(() =>
-        useCanvasViewport(nullRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(nullRef, [], 'canvas-1'))
 
       act(() => {
         result.current.handleZoomIn()
@@ -174,9 +154,7 @@ describe('useCanvasViewport', () => {
 
   describe('handleZoomOut', () => {
     it('decreases scale by 0.1', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.handleZoomOut()
@@ -186,9 +164,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('does not go below MIN_ZOOM', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 0.3, offsetX: 0, offsetY: 0 })
@@ -202,9 +178,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('adjusts offset to zoom toward center', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 1.5, offsetX: 100, offsetY: 50 })
@@ -228,9 +202,7 @@ describe('useCanvasViewport', () => {
         { id: 'node-2', x: 300, y: 200 },
       ]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, nodes, 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 0.5, offsetX: 500, offsetY: 500 })
@@ -249,9 +221,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('does nothing when no nodes', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       const initialViewport = { ...result.current.viewport }
 
@@ -266,9 +236,7 @@ describe('useCanvasViewport', () => {
       const nullRef = { current: null }
       const nodes = [{ id: 'node-1', x: 100, y: 100 }]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(nullRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(nullRef, nodes, 'canvas-1'))
 
       const initialViewport = { ...result.current.viewport }
 
@@ -287,9 +255,7 @@ describe('useCanvasViewport', () => {
         { id: 'node-2', x: 300, y: 200 },
       ]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, nodes, 'canvas-1'))
 
       // Auto-center uses setTimeout(280) so it does not fire synchronously.
       // Viewport remains at initial defaults.
@@ -299,9 +265,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('does not auto-center when no nodes initially', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       expect(result.current.viewport).toEqual({
         scale: 1,
@@ -337,9 +301,7 @@ describe('useCanvasViewport', () => {
 
   describe('setViewport', () => {
     it('allows direct viewport updates', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport({ scale: 1.5, offsetX: 200, offsetY: 150 })
@@ -353,9 +315,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('supports functional updates', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       act(() => {
         result.current.setViewport((prev) => ({
@@ -380,9 +340,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('removes wheel event listener on unmount', () => {
-      const { unmount } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { unmount } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       unmount()
 
@@ -404,9 +362,7 @@ describe('useCanvasViewport', () => {
     it('handles single node centering', () => {
       const nodes = [{ id: 'node-1', x: 100, y: 100 }]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, nodes, 'canvas-1'))
 
       // Should center on the single node
       expect(result.current.viewport.scale).toBe(1)
@@ -415,9 +371,7 @@ describe('useCanvasViewport', () => {
     it('handles nodes at origin', () => {
       const nodes = [{ id: 'node-1', x: 0, y: 0 }]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, nodes, 'canvas-1'))
 
       expect(result.current.viewport.scale).toBe(1)
     })
@@ -428,9 +382,7 @@ describe('useCanvasViewport', () => {
         { id: 'node-2', x: 20000, y: 20000 },
       ]
 
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, nodes, 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, nodes, 'canvas-1'))
 
       expect(result.current.viewport.scale).toBe(1)
       expect(typeof result.current.viewport.offsetX).toBe('number')
@@ -438,9 +390,7 @@ describe('useCanvasViewport', () => {
     })
 
     it('multiple zoom operations maintain precision', () => {
-      const { result } = renderHook(() =>
-        useCanvasViewport(mockCanvasRef, [], 'canvas-1')
-      )
+      const { result } = renderHook(() => useCanvasViewport(mockCanvasRef, [], 'canvas-1'))
 
       // Zoom in 5 times
       for (let i = 0; i < 5; i++) {

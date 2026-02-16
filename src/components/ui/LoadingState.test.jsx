@@ -129,7 +129,8 @@ describe('LoadingState', () => {
     it('spinner is decorative and hidden from screen readers', () => {
       render(<LoadingState />)
       const spinner = document.querySelector('.animate-spin')
-      expect(spinner.parentElement).toHaveAttribute('aria-hidden', 'true')
+      // aria-hidden is on the SVG element itself, not its parent
+      expect(spinner).toHaveAttribute('aria-hidden', 'true')
     })
   })
 
@@ -143,13 +144,7 @@ describe('LoadingState', () => {
 
   describe('Combined Features', () => {
     it('renders all features together', () => {
-      render(
-        <LoadingState
-          message="Loading data..."
-          size="lg"
-          className="custom-class"
-        />
-      )
+      render(<LoadingState message="Loading data..." size="lg" className="custom-class" />)
 
       expect(screen.getByText('Loading data...')).toBeInTheDocument()
       expect(document.querySelector('.animate-spin')).toBeInTheDocument()
@@ -157,13 +152,7 @@ describe('LoadingState', () => {
     })
 
     it('fullScreen with custom message and size', () => {
-      const { container } = render(
-        <LoadingState
-          message="Fetching..."
-          size="sm"
-          fullScreen
-        />
-      )
+      const { container } = render(<LoadingState message="Fetching..." size="sm" fullScreen />)
 
       expect(screen.getByText('Fetching...')).toBeInTheDocument()
       expect(container.querySelector('.fixed')).toBeInTheDocument()
@@ -178,7 +167,7 @@ describe('LoadingState', () => {
     })
 
     it('handles long message', () => {
-      const longMessage = 'Loading '.repeat(50)
+      const longMessage = 'Loading '.repeat(50).trim()
       render(<LoadingState message={longMessage} />)
       expect(screen.getByText(longMessage)).toBeInTheDocument()
     })

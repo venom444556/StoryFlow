@@ -76,11 +76,7 @@ export default function TimelineView({
     >
       <AnimatePresence mode="popLayout">
         {items.map((item, index) => (
-          <motion.div
-            key={item.data.id}
-            variants={itemVariants}
-            layout
-          >
+          <motion.div key={item.data.id} variants={itemVariants} layout>
             {item.type === 'phase' ? (
               <PhaseCard
                 phase={item.data}

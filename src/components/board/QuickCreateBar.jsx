@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Plus, ChevronDown } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import IssueTypeIcon from './IssueTypeIcon';
-import { ISSUE_TYPES } from '../../utils/constants';
+import { useState, useRef, useEffect } from 'react'
+import { Plus, ChevronDown } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import IssueTypeIcon from './IssueTypeIcon'
+import { ISSUE_TYPES } from '../../utils/constants'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.TASK, label: 'Task' },
@@ -10,29 +10,29 @@ const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.BUG, label: 'Bug' },
   { value: ISSUE_TYPES.EPIC, label: 'Epic' },
   { value: ISSUE_TYPES.SUBTASK, label: 'Subtask' },
-];
+]
 
 export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' }) {
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState(ISSUE_TYPES.TASK);
-  const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const inputRef = useRef(null);
-  const menuRef = useRef(null);
+  const [title, setTitle] = useState('')
+  const [type, setType] = useState(ISSUE_TYPES.TASK)
+  const [showTypeMenu, setShowTypeMenu] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const inputRef = useRef(null)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowTypeMenu(false);
+        setShowTypeMenu(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleSubmit = () => {
-    const trimmed = title.trim();
-    if (!trimmed) return;
+    const trimmed = title.trim()
+    if (!trimmed) return
 
     onCreateIssue({
       title: trimmed,
@@ -48,23 +48,23 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
       subtasks: [],
       comments: [],
       dependencies: [],
-    });
+    })
 
-    setTitle('');
-    setType(ISSUE_TYPES.TASK);
-    inputRef.current?.focus();
-  };
+    setTitle('')
+    setType(ISSUE_TYPES.TASK)
+    inputRef.current?.focus()
+  }
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && title.trim()) {
-      e.preventDefault();
-      handleSubmit();
+      e.preventDefault()
+      handleSubmit()
     }
     if (e.key === 'Escape') {
-      setTitle('');
-      inputRef.current?.blur();
+      setTitle('')
+      inputRef.current?.blur()
     }
-  };
+  }
 
   return (
     <div
@@ -74,10 +74,14 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
           ? 'bg-[var(--color-bg-glass)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-bg-glass)] hover:border-[var(--color-bg-glass-hover)] hover:bg-[var(--color-bg-glass)]',
       ].join(' ')}
-      style={isFocused ? {
-        borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
-        boxShadow: '0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)',
-      } : undefined}
+      style={
+        isFocused
+          ? {
+              borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
+              boxShadow: '0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)',
+            }
+          : undefined
+      }
     >
       {/* Type selector */}
       <div ref={menuRef} className="relative">
@@ -102,9 +106,9 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
                 <button
                   key={opt.value}
                   onClick={() => {
-                    setType(opt.value);
-                    setShowTypeMenu(false);
-                    inputRef.current?.focus();
+                    setType(opt.value)
+                    setShowTypeMenu(false)
+                    inputRef.current?.focus()
                   }}
                   className={[
                     'flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors',
@@ -152,5 +156,5 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
         </motion.button>
       )}
     </div>
-  );
+  )
 }

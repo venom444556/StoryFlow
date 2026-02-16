@@ -177,7 +177,11 @@ describe('NodeDetailModal', () => {
 
   describe('configuration fields', () => {
     it('shows URL, Method, Timeout fields for API node', () => {
-      const node = { ...defaultNode, type: 'api', config: { url: 'https://api.test.com', method: 'GET' } }
+      const node = {
+        ...defaultNode,
+        type: 'api',
+        config: { url: 'https://api.test.com', method: 'GET' },
+      }
       render(<NodeDetailModal {...defaultProps} node={node} />)
 
       expect(screen.getByText('Configuration')).toBeInTheDocument()
@@ -272,10 +276,14 @@ describe('NodeDetailModal', () => {
     it('calls onUpdate when description is changed', () => {
       render(<NodeDetailModal {...defaultProps} />)
 
-      const descriptionTextarea = screen.getByPlaceholderText('Add a description of what this node does...')
+      const descriptionTextarea = screen.getByPlaceholderText(
+        'Add a description of what this node does...'
+      )
       fireEvent.change(descriptionTextarea, { target: { value: 'New description' } })
 
-      expect(defaultProps.onUpdate).toHaveBeenCalledWith('node-1', { description: 'New description' })
+      expect(defaultProps.onUpdate).toHaveBeenCalledWith('node-1', {
+        description: 'New description',
+      })
     })
   })
 
@@ -427,7 +435,13 @@ describe('NodeDetailModal', () => {
         children: {
           nodes: [
             { id: 'child-1', type: 'start', title: 'Start', status: 'success' },
-            { id: 'child-2', type: 'task', title: 'Process Data', status: 'running', config: { assignee: 'John' } },
+            {
+              id: 'child-2',
+              type: 'task',
+              title: 'Process Data',
+              status: 'running',
+              config: { assignee: 'John' },
+            },
             { id: 'child-3', type: 'end', title: 'End', status: 'idle' },
           ],
           connections: [],
@@ -445,7 +459,13 @@ describe('NodeDetailModal', () => {
         children: {
           nodes: [
             { id: 'child-1', type: 'start', title: 'Start', status: 'success' },
-            { id: 'child-2', type: 'task', title: 'Failed Task', status: 'error', error: 'Task error' },
+            {
+              id: 'child-2',
+              type: 'task',
+              title: 'Failed Task',
+              status: 'error',
+              error: 'Task error',
+            },
             { id: 'child-3', type: 'end', title: 'End', status: 'idle' },
           ],
           connections: [],

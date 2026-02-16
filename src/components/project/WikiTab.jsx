@@ -27,13 +27,10 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
 
   // ----- Page creation -----
 
-  const handleAddPage = useCallback(
-    (parentId) => {
-      setPendingParentId(parentId)
-      setShowTemplateSelector(true)
-    },
-    []
-  )
+  const handleAddPage = useCallback((parentId) => {
+    setPendingParentId(parentId)
+    setShowTemplateSelector(true)
+  }, [])
 
   const handleTemplateSelected = useCallback(
     (template) => {
@@ -151,10 +148,12 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
       )}
 
       {/* Sidebar tree — hidden on mobile, toggle-controlled */}
-      <div className={[
-        'absolute inset-y-0 left-0 z-20 md:relative md:z-auto',
-        showTree ? 'block' : 'hidden md:block',
-      ].join(' ')}>
+      <div
+        className={[
+          'absolute inset-y-0 left-0 z-20 md:relative md:z-auto',
+          showTree ? 'block' : 'hidden md:block',
+        ].join(' ')}
+      >
         <PageTree
           pages={pages}
           selectedPageId={selectedPageId}

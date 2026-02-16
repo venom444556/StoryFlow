@@ -1,38 +1,41 @@
-import React, { forwardRef } from 'react';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import React, { forwardRef } from 'react'
+import { AlertCircle, CheckCircle } from 'lucide-react'
 
 const SIZES = {
   sm: 'h-[var(--size-input-sm)] px-[var(--space-3)] text-[var(--text-xs)]',
   md: 'h-[var(--size-input-md)] px-[var(--space-3)] text-[var(--text-sm)]',
   lg: 'h-[var(--size-input-lg)] px-[var(--space-4)] text-[var(--text-base)]',
-};
+}
 
-const Input = forwardRef(function Input({
-  label,
-  value,
-  onChange,
-  placeholder,
-  disabled = false,
-  className = '',
-  type = 'text',
-  icon: Icon,
-  size = 'md',
-  error,
-  success,
-  helperText,
-  ...rest
-}, ref) {
-  const hasError = Boolean(error);
-  const hasSuccess = Boolean(success) && !hasError;
-  const showIcon = Icon || hasError || hasSuccess;
+const Input = forwardRef(function Input(
+  {
+    label,
+    value,
+    onChange,
+    placeholder,
+    disabled = false,
+    className = '',
+    type = 'text',
+    icon: Icon,
+    size = 'md',
+    error,
+    success,
+    helperText,
+    ...rest
+  },
+  ref
+) {
+  const hasError = Boolean(error)
+  const hasSuccess = Boolean(success) && !hasError
+  const showIcon = Icon || hasError || hasSuccess
 
   // Determine which icon to show (status icons override custom icon)
-  const StatusIcon = hasError ? AlertCircle : hasSuccess ? CheckCircle : Icon;
+  const StatusIcon = hasError ? AlertCircle : hasSuccess ? CheckCircle : Icon
   const iconColorClass = hasError
     ? 'text-[var(--color-danger)]'
     : hasSuccess
       ? 'text-[var(--color-success)]'
-      : 'text-[var(--color-fg-subtle)]';
+      : 'text-[var(--color-fg-subtle)]'
 
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
@@ -98,7 +101,7 @@ const Input = forwardRef(function Input({
         </p>
       )}
     </div>
-  );
-});
+  )
+})
 
-export default Input;
+export default Input

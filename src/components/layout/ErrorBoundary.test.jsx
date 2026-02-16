@@ -68,9 +68,7 @@ describe('ErrorBoundary', () => {
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>
       )
-      expect(
-        screen.getByText(/An unexpected error occurred/i)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/An unexpected error occurred/i)).toBeInTheDocument()
     })
 
     it('shows Try Again button', () => {
@@ -107,24 +105,31 @@ describe('ErrorBoundary', () => {
 
   describe('Try Again button', () => {
     it('resets error state when clicked', () => {
-      const { rerender } = render(
+      // Use a mutable flag so the child stops throwing before handleReset
+      // re-renders children. handleReset sets hasError=false which immediately
+      // re-renders children — if they still throw, the boundary re-catches.
+      let shouldThrow = true
+      function ConditionalThrow() {
+        if (shouldThrow) {
+          throw new Error('Test error message')
+        }
+        return <div>Child content rendered successfully</div>
+      }
+
+      render(
         <ErrorBoundary>
-          <ThrowError shouldThrow={true} />
+          <ConditionalThrow />
         </ErrorBoundary>
       )
 
       // Error UI should be shown
       expect(screen.getByText('Something went wrong')).toBeInTheDocument()
 
-      // Click Try Again
-      fireEvent.click(screen.getByRole('button', { name: /Try Again/i }))
+      // Stop throwing before clicking Try Again
+      shouldThrow = false
 
-      // Re-render with non-throwing component to verify reset
-      rerender(
-        <ErrorBoundary>
-          <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
-      )
+      // Click Try Again — handleReset clears error state, re-renders children
+      fireEvent.click(screen.getByRole('button', { name: /Try Again/i }))
 
       // Should now show children
       expect(screen.getByText('Child content rendered successfully')).toBeInTheDocument()
@@ -193,9 +198,10 @@ describe('ErrorBoundary', () => {
 
   describe('Reload functionality', () => {
     it('has a handleReload method that reloads the page', () => {
-      // This tests the internal method exists, though it's not directly exposed via UI
-      const originalReload = window.location.reload
-      window.location.reload = vi.fn()
+      // Replace window.location entirely to mock reload (jsdom marks reload as non-configurable)
+      const originalLocation = window.location
+      delete window.location
+      window.location = { ...originalLocation, reload: vi.fn() }
 
       // The handleReload is an instance method, verify the component structure supports it
       const errorBoundary = new ErrorBoundary({})
@@ -203,7 +209,8 @@ describe('ErrorBoundary', () => {
 
       expect(window.location.reload).toHaveBeenCalled()
 
-      window.location.reload = originalReload
+      // Restore
+      window.location = originalLocation
     })
   })
 
@@ -236,7 +243,7 @@ describe('ErrorBoundary', () => {
 
     it('handles non-Error throw', () => {
       function ThrowString() {
-        throw 'String error' // eslint-disable-line no-throw-literal
+        throw 'String error'
       }
 
       render(

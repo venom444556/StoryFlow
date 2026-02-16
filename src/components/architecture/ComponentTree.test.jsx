@@ -58,7 +58,9 @@ describe('ComponentTree', () => {
     it('should show empty state when no components', () => {
       render(<ComponentTree {...defaultProps} components={[]} />)
       expect(screen.getByText('No components yet')).toBeInTheDocument()
-      expect(screen.getByText('Add your first component to start building your architecture.')).toBeInTheDocument()
+      expect(
+        screen.getByText('Add your first component to start building your architecture.')
+      ).toBeInTheDocument()
     })
 
     it('should show Add Component button in empty state', () => {
@@ -77,7 +79,7 @@ describe('ComponentTree', () => {
     it('should highlight selected component', () => {
       render(<ComponentTree {...defaultProps} selectedId="2" />)
       const headerButton = screen.getByText('Header').closest('button')
-      expect(headerButton).toHaveClass('bg-white/10')
+      expect(headerButton).toHaveClass('bg-[var(--color-bg-glass-hover)]')
     })
 
     it('should call onSelect when clicking a component', () => {
@@ -159,9 +161,7 @@ describe('ComponentTree', () => {
     })
 
     it('should handle components with unknown type', () => {
-      const unknownType = [
-        { id: '1', name: 'UnknownComp', type: 'unknown', parentId: null },
-      ]
+      const unknownType = [{ id: '1', name: 'UnknownComp', type: 'unknown', parentId: null }]
       render(<ComponentTree {...defaultProps} components={unknownType} />)
       expect(screen.getByText('UnknownComp')).toBeInTheDocument()
       expect(screen.getByText('unknown')).toBeInTheDocument()

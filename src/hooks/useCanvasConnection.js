@@ -31,9 +31,7 @@ export function useCanvasConnection({
         return
       }
 
-      const exists = connections.some(
-        (c) => c.from === connectingFrom && c.to === nodeId
-      )
+      const exists = connections.some((c) => c.from === connectingFrom && c.to === nodeId)
       if (!exists) {
         const newConn = {
           id: generateId(),

@@ -1,7 +1,7 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import BoardColumn from './BoardColumn';
+import React from 'react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import BoardColumn from './BoardColumn'
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -9,7 +9,7 @@ vi.mock('framer-motion', () => ({
     div: ({ children, ...props }) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }) => <>{children}</>,
-}));
+}))
 
 // Mock child components
 vi.mock('./IssueCard', () => ({
@@ -25,7 +25,7 @@ vi.mock('./IssueCard', () => ({
       {issue.title}
     </div>
   ),
-}));
+}))
 
 vi.mock('./QuickCreateBar', () => ({
   default: ({ onCreateIssue, defaultStatus }) => (
@@ -35,7 +35,7 @@ vi.mock('./QuickCreateBar', () => ({
       </button>
     </div>
   ),
-}));
+}))
 
 describe('BoardColumn', () => {
   const mockIssues = [
@@ -55,17 +55,17 @@ describe('BoardColumn', () => {
       status: 'To Do',
       priority: 'medium',
     },
-  ];
+  ]
 
-  let mockOnDrop;
-  let mockOnIssueClick;
-  let mockOnCreateIssue;
+  let mockOnDrop
+  let mockOnIssueClick
+  let mockOnCreateIssue
 
   beforeEach(() => {
-    mockOnDrop = vi.fn();
-    mockOnIssueClick = vi.fn();
-    mockOnCreateIssue = vi.fn();
-  });
+    mockOnDrop = vi.fn()
+    mockOnIssueClick = vi.fn()
+    mockOnCreateIssue = vi.fn()
+  })
 
   describe('Basic Rendering', () => {
     it('renders without crashing', () => {
@@ -78,33 +78,21 @@ describe('BoardColumn', () => {
           onIssueClick={mockOnIssueClick}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
-      expect(screen.getByText('To Do')).toBeInTheDocument();
-    });
+      )
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+    })
 
     it('displays column title', () => {
       render(
-        <BoardColumn
-          title="In Progress"
-          status="In Progress"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('In Progress')).toBeInTheDocument();
-    });
+        <BoardColumn title="In Progress" status="In Progress" issues={[]} onDrop={mockOnDrop} />
+      )
+      expect(screen.getByText('In Progress')).toBeInTheDocument()
+    })
 
     it('displays issue count badge', () => {
-      render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={mockIssues}
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('2')).toBeInTheDocument();
-    });
+      render(<BoardColumn title="To Do" status="To Do" issues={mockIssues} onDrop={mockOnDrop} />)
+      expect(screen.getByText('2')).toBeInTheDocument()
+    })
 
     it('renders all issues', () => {
       render(
@@ -115,173 +103,124 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onIssueClick={mockOnIssueClick}
         />
-      );
-      expect(screen.getByText('First Issue')).toBeInTheDocument();
-      expect(screen.getByText('Second Issue')).toBeInTheDocument();
-    });
-  });
+      )
+      expect(screen.getByText('First Issue')).toBeInTheDocument()
+      expect(screen.getByText('Second Issue')).toBeInTheDocument()
+    })
+  })
 
   describe('Empty State', () => {
     it('shows empty state when no issues', () => {
-      render(
-        <BoardColumn
-          title="Done"
-          status="Done"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('No issues')).toBeInTheDocument();
-    });
+      render(<BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />)
+      expect(screen.getByText('No issues')).toBeInTheDocument()
+    })
 
     it('shows zero in badge when no issues', () => {
-      render(
-        <BoardColumn
-          title="Done"
-          status="Done"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('0')).toBeInTheDocument();
-    });
-  });
+      render(<BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />)
+      expect(screen.getByText('0')).toBeInTheDocument()
+    })
+  })
 
   describe('Status Styling', () => {
     it('applies To Do status styling', () => {
       const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
+      )
       // Check for status dot — uses CSS variable token now
-      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]');
-      expect(dot).toBeInTheDocument();
-    });
+      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]')
+      expect(dot).toBeInTheDocument()
+    })
 
     it('applies In Progress status styling', () => {
       const { container } = render(
-        <BoardColumn
-          title="In Progress"
-          status="In Progress"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      const dot = container.querySelector('.bg-blue-400');
-      expect(dot).toBeInTheDocument();
-    });
+        <BoardColumn title="In Progress" status="In Progress" issues={[]} onDrop={mockOnDrop} />
+      )
+      const dot = container.querySelector('.bg-blue-400')
+      expect(dot).toBeInTheDocument()
+    })
 
     it('applies Done status styling', () => {
       const { container } = render(
-        <BoardColumn
-          title="Done"
-          status="Done"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      const dot = container.querySelector('.bg-green-400');
-      expect(dot).toBeInTheDocument();
-    });
-  });
+        <BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />
+      )
+      const dot = container.querySelector('.bg-green-400')
+      expect(dot).toBeInTheDocument()
+    })
+  })
 
   describe('Drag and Drop', () => {
     it('calls onDrop when issue is dropped', () => {
       const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
+      )
 
-      const column = container.firstChild;
+      const column = container.firstChild
 
       const dataTransferMock = {
         getData: vi.fn().mockReturnValue('issue-1'),
         setData: vi.fn(),
         dropEffect: '',
-      };
+      }
 
-      fireEvent.dragOver(column, { dataTransfer: dataTransferMock });
-      fireEvent.drop(column, { dataTransfer: dataTransferMock });
+      fireEvent.dragOver(column, { dataTransfer: dataTransferMock })
+      fireEvent.drop(column, { dataTransfer: dataTransferMock })
 
-      expect(mockOnDrop).toHaveBeenCalledWith('issue-1', 'To Do');
-    });
+      expect(mockOnDrop).toHaveBeenCalledWith('issue-1', 'To Do')
+    })
 
     it('shows drop indicator on drag over', () => {
       const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
+      )
 
-      const column = container.firstChild;
+      const column = container.firstChild
 
       const dataTransferMock = {
         getData: vi.fn(),
         dropEffect: '',
-      };
+      }
 
-      fireEvent.dragOver(column, { dataTransfer: dataTransferMock });
+      fireEvent.dragOver(column, { dataTransfer: dataTransferMock })
 
-      expect(screen.getByText('Drop here')).toBeInTheDocument();
-    });
+      expect(screen.getByText('Drop here')).toBeInTheDocument()
+    })
 
     it('removes drop indicator on drag leave', () => {
       const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
+      )
 
-      const column = container.firstChild;
+      const column = container.firstChild
 
       const dataTransferMock = {
         getData: vi.fn(),
         dropEffect: '',
-      };
+      }
 
-      fireEvent.dragOver(column, { dataTransfer: dataTransferMock });
-      expect(screen.getByText('Drop here')).toBeInTheDocument();
+      fireEvent.dragOver(column, { dataTransfer: dataTransferMock })
+      expect(screen.getByText('Drop here')).toBeInTheDocument()
 
-      fireEvent.dragLeave(column, { relatedTarget: null });
-      expect(screen.queryByText('Drop here')).not.toBeInTheDocument();
-    });
+      fireEvent.dragLeave(column, { relatedTarget: null })
+      expect(screen.queryByText('Drop here')).not.toBeInTheDocument()
+    })
 
     it('applies drag-over styling when dragging over', () => {
       const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
+      )
 
-      const column = container.firstChild;
+      const column = container.firstChild
 
       const dataTransferMock = {
         getData: vi.fn(),
         dropEffect: '',
-      };
+      }
 
-      fireEvent.dragOver(column, { dataTransfer: dataTransferMock });
+      fireEvent.dragOver(column, { dataTransfer: dataTransferMock })
 
-      expect(column).toHaveClass('ring-2');
-    });
-  });
+      expect(column).toHaveClass('ring-2')
+    })
+  })
 
   describe('Issue Interactions', () => {
     it('calls onIssueClick when issue is clicked', () => {
@@ -293,13 +232,13 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onIssueClick={mockOnIssueClick}
         />
-      );
+      )
 
-      fireEvent.click(screen.getByTestId('issue-card-issue-1'));
+      fireEvent.click(screen.getByTestId('issue-card-issue-1'))
 
-      expect(mockOnIssueClick).toHaveBeenCalledWith(mockIssues[0]);
-    });
-  });
+      expect(mockOnIssueClick).toHaveBeenCalledWith(mockIssues[0])
+    })
+  })
 
   describe('Quick Create', () => {
     it('renders QuickCreateBar', () => {
@@ -311,10 +250,10 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
+      )
 
-      expect(screen.getByTestId('quick-create-bar')).toBeInTheDocument();
-    });
+      expect(screen.getByTestId('quick-create-bar')).toBeInTheDocument()
+    })
 
     it('passes correct status to QuickCreateBar', () => {
       render(
@@ -325,11 +264,11 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
+      )
 
-      const quickCreate = screen.getByTestId('quick-create-bar');
-      expect(quickCreate).toHaveAttribute('data-status', 'In Progress');
-    });
+      const quickCreate = screen.getByTestId('quick-create-bar')
+      expect(quickCreate).toHaveAttribute('data-status', 'In Progress')
+    })
 
     it('calls onCreateIssue with column status', () => {
       render(
@@ -340,17 +279,17 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
+      )
 
-      fireEvent.click(screen.getByText('Create'));
+      fireEvent.click(screen.getByText('Create'))
 
       expect(mockOnCreateIssue).toHaveBeenCalledWith(
         expect.objectContaining({
           status: 'Done',
         })
-      );
-    });
-  });
+      )
+    })
+  })
 
   describe('Add Issue Button', () => {
     it('renders add issue button in header', () => {
@@ -362,11 +301,11 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
+      )
 
-      const addButton = screen.getByTitle('Add issue');
-      expect(addButton).toBeInTheDocument();
-    });
+      const addButton = screen.getByTitle('Add issue')
+      expect(addButton).toBeInTheDocument()
+    })
 
     it('creates default issue when add button clicked', () => {
       render(
@@ -377,9 +316,9 @@ describe('BoardColumn', () => {
           onDrop={mockOnDrop}
           onCreateIssue={mockOnCreateIssue}
         />
-      );
+      )
 
-      fireEvent.click(screen.getByTitle('Add issue'));
+      fireEvent.click(screen.getByTitle('Add issue'))
 
       expect(mockOnCreateIssue).toHaveBeenCalledWith({
         title: 'New Issue',
@@ -395,65 +334,41 @@ describe('BoardColumn', () => {
         subtasks: [],
         comments: [],
         dependencies: [],
-      });
-    });
-  });
+      })
+    })
+  })
 
   describe('Edge Cases', () => {
     it('handles empty issues array', () => {
-      render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('No issues')).toBeInTheDocument();
-    });
+      render(<BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />)
+      expect(screen.getByText('No issues')).toBeInTheDocument()
+    })
 
     it('handles undefined issues prop', () => {
-      render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          onDrop={mockOnDrop}
-        />
-      );
-      expect(screen.getByText('0')).toBeInTheDocument();
-    });
+      render(<BoardColumn title="To Do" status="To Do" onDrop={mockOnDrop} />)
+      expect(screen.getByText('0')).toBeInTheDocument()
+    })
 
     it('handles missing onDrop gracefully', () => {
-      const { container } = render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-        />
-      );
+      const { container } = render(<BoardColumn title="To Do" status="To Do" issues={[]} />)
 
-      const column = container.firstChild;
+      const column = container.firstChild
       const dataTransferMock = {
         getData: vi.fn().mockReturnValue('issue-1'),
         dropEffect: '',
-      };
+      }
 
       // Should not throw
-      fireEvent.drop(column, { dataTransfer: dataTransferMock });
-    });
+      fireEvent.drop(column, { dataTransfer: dataTransferMock })
+    })
 
     it('handles unknown status with default styling', () => {
       const { container } = render(
-        <BoardColumn
-          title="Unknown"
-          status="Unknown"
-          issues={[]}
-          onDrop={mockOnDrop}
-        />
-      );
+        <BoardColumn title="Unknown" status="Unknown" issues={[]} onDrop={mockOnDrop} />
+      )
       // Should fall back to To Do styling — uses CSS variable token
-      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]');
-      expect(dot).toBeInTheDocument();
-    });
-  });
-});
+      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]')
+      expect(dot).toBeInTheDocument()
+    })
+  })
+})

@@ -6,14 +6,20 @@ import MarkdownRenderer from './MarkdownRenderer'
 vi.mock('../../utils/markdown', () => ({
   renderMarkdown: vi.fn((content) => {
     if (!content) return ''
-    // Simple mock that converts basic markdown
-    return content
+    // Simple mock that converts basic markdown with HTML escaping
+    let out = content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+    out = out
       .replace(/^# (.+)$/gm, '<h1>$1</h1>')
       .replace(/^## (.+)$/gm, '<h2>$1</h2>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
       .replace(/`(.+?)`/g, '<code>$1</code>')
       .replace(/\n/g, '<br/>')
+    return out
   }),
 }))
 
@@ -35,9 +41,7 @@ describe('MarkdownRenderer', () => {
     })
 
     it('applies additional className when provided', () => {
-      const { container } = render(
-        <MarkdownRenderer content="Test" className="custom-class" />
-      )
+      const { container } = render(<MarkdownRenderer content="Test" className="custom-class" />)
       const div = container.querySelector('.markdown-body')
       expect(div).toHaveClass('custom-class')
     })
@@ -109,7 +113,7 @@ describe('MarkdownRenderer', () => {
     })
 
     it('renders multiple heading levels', () => {
-      render(<MarkdownRenderer content="# H1\n## H2" />)
+      render(<MarkdownRenderer content={'# H1\n## H2'} />)
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('H1')
       expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('H2')
     })
@@ -123,7 +127,7 @@ describe('MarkdownRenderer', () => {
     })
 
     it('handles special characters', () => {
-      render(<MarkdownRenderer content="Special chars: <>&\"'" />)
+      render(<MarkdownRenderer content={'Special chars: <>&"\''} />)
       // Content should be escaped by renderMarkdown
       const { container } = render(<MarkdownRenderer content="<script>alert('xss')</script>" />)
       expect(container.querySelector('script')).not.toBeInTheDocument()

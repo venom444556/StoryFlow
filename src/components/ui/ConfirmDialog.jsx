@@ -1,7 +1,7 @@
-import React from 'react';
-import { AlertTriangle } from 'lucide-react';
-import Modal from './Modal';
-import Button from './Button';
+import React from 'react'
+import { AlertTriangle } from 'lucide-react'
+import Modal from './Modal'
+import Button from './Button'
 
 export default function ConfirmDialog({
   isOpen,
@@ -29,19 +29,15 @@ export default function ConfirmDialog({
         </p>
 
         <div className="flex w-full gap-[var(--space-3)]">
-          <Button
-            variant="ghost"
-            className="flex-1"
-            onClick={onClose}
-          >
+          <Button variant="ghost" className="flex-1" onClick={onClose}>
             {cancelLabel}
           </Button>
           <Button
             variant={variant}
             className="flex-1"
             onClick={() => {
-              onConfirm?.();
-              onClose();
+              onConfirm?.()
+              onClose()
             }}
           >
             {confirmLabel}
@@ -49,5 +45,5 @@ export default function ConfirmDialog({
         </div>
       </div>
     </Modal>
-  );
+  )
 }

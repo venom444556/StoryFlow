@@ -1,18 +1,16 @@
-import React from 'react';
-import Button from './Button';
+import React from 'react'
+import Button from './Button'
 
-export default function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  action,
-  className = '',
-}) {
+export default function EmptyState({ icon: Icon, title, description, action, className = '' }) {
   return (
-    <div className={[
-      'flex flex-col items-center justify-center py-[var(--space-16)] text-center',
-      className,
-    ].filter(Boolean).join(' ')}>
+    <div
+      className={[
+        'flex flex-col items-center justify-center py-[var(--space-16)] text-center',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {Icon && (
         <Icon
           size={48}
@@ -37,5 +35,5 @@ export default function EmptyState({
         </Button>
       )}
     </div>
-  );
+  )
 }

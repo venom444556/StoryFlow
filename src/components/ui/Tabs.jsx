@@ -1,5 +1,5 @@
-import React, { useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useCallback } from 'react'
+import { motion } from 'framer-motion'
 
 export default function Tabs({
   tabs = [],
@@ -8,37 +8,40 @@ export default function Tabs({
   className = '',
   layoutId = 'tabs',
 }) {
-  const tabsRef = useRef([]);
+  const tabsRef = useRef([])
 
   // Handle keyboard navigation
-  const handleKeyDown = useCallback((e, index) => {
-    const tabCount = tabs.length;
-    let newIndex = index;
+  const handleKeyDown = useCallback(
+    (e, index) => {
+      const tabCount = tabs.length
+      let newIndex = index
 
-    switch (e.key) {
-      case 'ArrowRight':
-        e.preventDefault();
-        newIndex = (index + 1) % tabCount;
-        break;
-      case 'ArrowLeft':
-        e.preventDefault();
-        newIndex = (index - 1 + tabCount) % tabCount;
-        break;
-      case 'Home':
-        e.preventDefault();
-        newIndex = 0;
-        break;
-      case 'End':
-        e.preventDefault();
-        newIndex = tabCount - 1;
-        break;
-      default:
-        return;
-    }
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault()
+          newIndex = (index + 1) % tabCount
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          newIndex = (index - 1 + tabCount) % tabCount
+          break
+        case 'Home':
+          e.preventDefault()
+          newIndex = 0
+          break
+        case 'End':
+          e.preventDefault()
+          newIndex = tabCount - 1
+          break
+        default:
+          return
+      }
 
-    tabsRef.current[newIndex]?.focus();
-    onTabChange(tabs[newIndex].key);
-  }, [tabs, onTabChange]);
+      tabsRef.current[newIndex]?.focus()
+      onTabChange(tabs[newIndex].key)
+    },
+    [tabs, onTabChange]
+  )
 
   return (
     <div
@@ -51,13 +54,13 @@ export default function Tabs({
       role="tablist"
     >
       {tabs.map((tab, index) => {
-        const isActive = tab.key === activeTab;
-        const Icon = tab.icon;
+        const isActive = tab.key === activeTab
+        const Icon = tab.icon
 
         return (
           <button
             key={tab.key}
-            ref={el => tabsRef.current[index] = el}
+            ref={(el) => (tabsRef.current[index] = el)}
             onClick={() => onTabChange(tab.key)}
             onKeyDown={(e) => handleKeyDown(e, index)}
             role="tab"
@@ -92,13 +95,16 @@ export default function Tabs({
               <motion.div
                 layoutId={`${layoutId}-underline`}
                 className="absolute bottom-0 left-[var(--space-2)] right-[var(--space-2)] h-0.5 rounded-full"
-                style={{ backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)' }}
+                style={{
+                  backgroundImage:
+                    'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
           </button>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

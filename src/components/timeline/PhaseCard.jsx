@@ -1,6 +1,15 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Edit3, Trash2, ChevronDown, ChevronRight, Calendar, CheckCircle2, Clock, Target } from 'lucide-react'
+import {
+  Edit3,
+  Trash2,
+  ChevronDown,
+  ChevronRight,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Target,
+} from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
@@ -23,10 +32,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
   const hasDateRange = phase.startDate || phase.endDate
 
   return (
-    <motion.div
-      layout
-      className="relative flex gap-4"
-    >
+    <motion.div layout className="relative flex gap-4">
       {/* Timeline spine */}
       <div className="flex flex-col items-center pt-1">
         {/* Dot */}
@@ -34,7 +40,8 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
           className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 shadow-lg"
           style={{
             borderColor: sanitizeColor(phase.color, '#8b5cf6'),
-            backgroundColor: phase.progress >= 100 ? sanitizeColor(phase.color, '#8b5cf6') : 'transparent',
+            backgroundColor:
+              phase.progress >= 100 ? sanitizeColor(phase.color, '#8b5cf6') : 'transparent',
             boxShadow: `0 0 8px ${sanitizeColor(phase.color, '#8b5cf6')}40`,
           }}
         />
@@ -60,7 +67,9 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
             {/* Header row */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <h4 className="text-sm font-semibold text-[var(--color-fg-default)] truncate">{phase.name}</h4>
+                <h4 className="text-sm font-semibold text-[var(--color-fg-default)] truncate">
+                  {phase.name}
+                </h4>
                 <Badge variant={status.variant} size="sm" dot>
                   {status.label}
                 </Badge>

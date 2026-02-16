@@ -71,7 +71,11 @@ describe('Badge', () => {
     })
 
     it('shows colored dot for different variants', () => {
-      const { container } = render(<Badge dot variant="success">Success</Badge>)
+      const { container } = render(
+        <Badge dot variant="success">
+          Success
+        </Badge>
+      )
       const dot = container.querySelector('.h-1\\.5.w-1\\.5.rounded-full')
       expect(dot).toBeInTheDocument()
     })
@@ -92,7 +96,11 @@ describe('Badge', () => {
     })
 
     it('applies outline variant colors correctly', () => {
-      const { container } = render(<Badge outline variant="purple">Purple Outline</Badge>)
+      const { container } = render(
+        <Badge outline variant="purple">
+          Purple Outline
+        </Badge>
+      )
       const badge = container.querySelector('span')
       expect(badge).toHaveClass('border')
     })
@@ -116,7 +124,11 @@ describe('Badge', () => {
 
     it('calls onRemove when remove button is clicked', () => {
       const handleRemove = vi.fn()
-      render(<Badge removable onRemove={handleRemove}>Removable</Badge>)
+      render(
+        <Badge removable onRemove={handleRemove}>
+          Removable
+        </Badge>
+      )
 
       fireEvent.click(screen.getByRole('button'))
       expect(handleRemove).toHaveBeenCalledTimes(1)
@@ -128,7 +140,9 @@ describe('Badge', () => {
 
       render(
         <div onClick={parentClick}>
-          <Badge removable onRemove={handleRemove}>Removable</Badge>
+          <Badge removable onRemove={handleRemove}>
+            Removable
+          </Badge>
         </div>
       )
 
@@ -155,7 +169,11 @@ describe('Badge', () => {
 
     it('remove button is keyboard accessible', () => {
       const handleRemove = vi.fn()
-      render(<Badge removable onRemove={handleRemove}>Removable</Badge>)
+      render(
+        <Badge removable onRemove={handleRemove}>
+          Removable
+        </Badge>
+      )
 
       const button = screen.getByRole('button')
       button.focus()

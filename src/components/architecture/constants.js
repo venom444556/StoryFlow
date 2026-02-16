@@ -1,13 +1,4 @@
-import {
-  FileText,
-  Box,
-  Anchor,
-  Wrench,
-  Orbit,
-  Globe,
-  Server,
-  Database,
-} from 'lucide-react'
+import { FileText, Box, Anchor, Wrench, Orbit, Globe, Server, Database } from 'lucide-react'
 
 export const COMPONENT_TYPES = [
   { value: 'page', label: 'Page' },

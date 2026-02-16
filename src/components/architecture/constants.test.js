@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  COMPONENT_TYPES,
-  TYPE_COLORS,
-  TYPE_HEX_COLORS,
-  TYPE_ICONS,
-} from './constants'
+import { COMPONENT_TYPES, TYPE_COLORS, TYPE_HEX_COLORS, TYPE_ICONS } from './constants'
 
 describe('constants', () => {
   describe('COMPONENT_TYPES', () => {
@@ -89,7 +84,8 @@ describe('constants', () => {
     it('should have an icon for each component type', () => {
       COMPONENT_TYPES.forEach((type) => {
         expect(TYPE_ICONS[type.value]).toBeDefined()
-        expect(typeof TYPE_ICONS[type.value]).toBe('function')
+        // Lucide icons are forwardRef objects, not plain functions
+        expect(typeof TYPE_ICONS[type.value]).toBe('object')
       })
     })
   })

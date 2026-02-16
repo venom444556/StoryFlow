@@ -41,14 +41,7 @@ function SectionTitle({ icon: Icon, children }) {
   )
 }
 
-function TextArea({
-  label,
-  value,
-  onChange,
-  placeholder,
-  rows = 4,
-  className = '',
-}) {
+function TextArea({ label, value, onChange, placeholder, rows = 4, className = '' }) {
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
       {label && (

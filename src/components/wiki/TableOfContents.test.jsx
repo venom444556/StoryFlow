@@ -15,7 +15,10 @@ vi.mock('../../utils/markdown', () => ({
       if (match) {
         const level = match[1].length
         const text = match[2].trim()
-        const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+        const id = text
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
         headings.push({ level, text, id })
       }
     }

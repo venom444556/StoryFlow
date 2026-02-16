@@ -1,64 +1,58 @@
-import { useMemo } from 'react';
-import { TrendingDown } from 'lucide-react';
-import GlassCard from '../ui/GlassCard';
-import EmptyState from '../ui/EmptyState';
+import { useMemo } from 'react'
+import { TrendingDown } from 'lucide-react'
+import GlassCard from '../ui/GlassCard'
+import EmptyState from '../ui/EmptyState'
 
-const PADDING = { top: 24, right: 20, bottom: 40, left: 44 };
-const VIEW_WIDTH = 600;
-const VIEW_HEIGHT = 300;
-const CHART_W = VIEW_WIDTH - PADDING.left - PADDING.right;
-const CHART_H = VIEW_HEIGHT - PADDING.top - PADDING.bottom;
+const PADDING = { top: 24, right: 20, bottom: 40, left: 44 }
+const VIEW_WIDTH = 600
+const VIEW_HEIGHT = 300
+const CHART_W = VIEW_WIDTH - PADDING.left - PADDING.right
+const CHART_H = VIEW_HEIGHT - PADDING.top - PADDING.bottom
 
 export default function BurndownChart({ data = [] }) {
   const chart = useMemo(() => {
-    if (data.length === 0) return null;
+    if (data.length === 0) return null
 
-    const maxY = Math.max(
-      ...data.map((d) => Math.max(d.ideal ?? 0, d.actual ?? 0)),
-      1
-    );
+    const maxY = Math.max(...data.map((d) => Math.max(d.ideal ?? 0, d.actual ?? 0)), 1)
 
-    const xStep = data.length > 1 ? CHART_W / (data.length - 1) : 0;
-    const yScale = CHART_H / maxY;
+    const xStep = data.length > 1 ? CHART_W / (data.length - 1) : 0
+    const yScale = CHART_H / maxY
 
     // Build path data
     const idealPoints = data
       .map((d, i) => {
-        const x = PADDING.left + i * xStep;
-        const y = PADDING.top + CHART_H - (d.ideal ?? 0) * yScale;
-        return `${x},${y}`;
+        const x = PADDING.left + i * xStep
+        const y = PADDING.top + CHART_H - (d.ideal ?? 0) * yScale
+        return `${x},${y}`
       })
-      .join(' L ');
+      .join(' L ')
 
     const actualPoints = data
       .map((d, i) => {
-        const x = PADDING.left + i * xStep;
-        const y = PADDING.top + CHART_H - (d.actual ?? 0) * yScale;
-        return `${x},${y}`;
+        const x = PADDING.left + i * xStep
+        const y = PADDING.top + CHART_H - (d.actual ?? 0) * yScale
+        return `${x},${y}`
       })
-      .join(' L ');
+      .join(' L ')
 
     // Grid lines
-    const gridLineCount = 5;
-    const gridLines = [];
+    const gridLineCount = 5
+    const gridLines = []
     for (let i = 0; i <= gridLineCount; i++) {
-      const y = PADDING.top + (CHART_H / gridLineCount) * i;
-      const label = Math.round(maxY - (maxY / gridLineCount) * i);
-      gridLines.push({ y, label });
+      const y = PADDING.top + (CHART_H / gridLineCount) * i
+      const label = Math.round(maxY - (maxY / gridLineCount) * i)
+      gridLines.push({ y, label })
     }
 
     // X labels
     const xLabels = data.map((d, i) => ({
       x: PADDING.left + i * xStep,
       label: d.date || `Day ${i + 1}`,
-    }));
+    }))
 
     // Limit x labels so they don't overlap
-    const maxLabels = 8;
-    const labelStep =
-      xLabels.length > maxLabels
-        ? Math.ceil(xLabels.length / maxLabels)
-        : 1;
+    const maxLabels = 8
+    const labelStep = xLabels.length > maxLabels ? Math.ceil(xLabels.length / maxLabels) : 1
 
     return {
       idealPath: `M ${idealPoints}`,
@@ -70,17 +64,15 @@ export default function BurndownChart({ data = [] }) {
         cx: PADDING.left + i * xStep,
         cy: PADDING.top + CHART_H - (d.actual ?? 0) * yScale,
       })),
-    };
-  }, [data]);
+    }
+  }, [data])
 
   if (!chart) {
     return (
       <GlassCard>
         <div className="mb-3 flex items-center gap-2">
           <TrendingDown size={16} className="text-blue-400" />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-            Burndown Chart
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Burndown Chart</h3>
         </div>
         <EmptyState
           icon={TrendingDown}
@@ -88,22 +80,23 @@ export default function BurndownChart({ data = [] }) {
           description="Start a sprint and track progress to see the burndown chart."
         />
       </GlassCard>
-    );
+    )
   }
 
   return (
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
         <TrendingDown size={16} className="text-blue-400" />
-        <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">
-          Burndown Chart
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Burndown Chart</h3>
       </div>
 
       {/* Legend */}
       <div className="mb-2 flex items-center gap-4 px-1">
         <div className="flex items-center gap-1.5">
-          <div className="h-0.5 w-4 rounded bg-[var(--color-fg-muted)]" style={{ strokeDasharray: '4 2' }} />
+          <div
+            className="h-0.5 w-4 rounded bg-[var(--color-fg-muted)]"
+            style={{ strokeDasharray: '4 2' }}
+          />
           <span className="text-[10px] text-[var(--color-fg-muted)]">Ideal</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -228,5 +221,5 @@ export default function BurndownChart({ data = [] }) {
         />
       </svg>
     </GlassCard>
-  );
+  )
 }

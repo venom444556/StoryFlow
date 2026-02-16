@@ -54,8 +54,7 @@ export default function GanttTimeAxis({
   // Today line
   const today = new Date()
   const todayX = dateToX(today)
-  const showToday =
-    isAfter(today, minDate) && isBefore(today, maxDate)
+  const showToday = isAfter(today, minDate) && isBefore(today, maxDate)
 
   return (
     <g>
