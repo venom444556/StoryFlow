@@ -3,7 +3,7 @@ import { generateId } from '../utils/ids'
 export const SEED_PROJECT_ID = 'storyflow'
 // Legacy ID used before slug-based naming convention (v61)
 export const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 68
+export const SEED_VERSION = 69
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -2376,8 +2376,8 @@ export function createSeedProject() {
           type: 'task',
           title: 'Commit all changes — 79+ modified files across multiple sessions',
           description:
-            'Large batch of uncommitted work since last commit (1bf243f). 79 modified files + 100+ new files. Either break into logical commits by feature area or do one well-documented commit. Includes: sub-workflow overlay fixes, canvas grid refactor, ComponentDetail redesign, badge uniformity, skills system, test files, linting config, and seed data updates through v31.',
-          status: 'To Do',
+            'Committed as 94f1561: 34 files, 747 insertions, 147 deletions. Includes export size warnings (SF-100), DashboardPage trash tests (SF-127), vitest fixes (SF-73), board triage (9 issues + 2 epics closed), SF-141 bug filed, Testing lessons learned added. Pre-commit hooks (ESLint + Prettier) passed clean.',
+          status: 'Done',
           priority: 'high',
           storyPoints: 2,
           assignee: 'claude',
