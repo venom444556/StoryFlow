@@ -12,14 +12,22 @@ A visual project planning and management tool built for AI-assisted software dev
 ### Board
 Full Kanban board with epics, stories, tasks, and bugs. Includes sprint management, backlog grooming, story point estimation, burndown charts, and velocity tracking.
 
+![Board](docs/screenshots/board.gif)
+
 ### Wiki
 Nested documentation pages with a markdown editor, live preview, page templates, version history, and table of contents generation.
+
+![Wiki](docs/screenshots/wiki.gif)
 
 ### Workflow Canvas
 Visual node graph for planning project phases, dependencies, and execution flow. Supports sub-workflows, pan/zoom, and a BFS execution engine.
 
+![Workflow Canvas](docs/screenshots/workflow.gif)
+
 ### Architecture View
 Component tree visualization with dependency mapping, cycle detection, and type-based filtering. Plan your system architecture before writing code.
+
+![Architecture View](docs/screenshots/architecture.gif)
 
 ### Timeline
 Phase-based progress tracking with milestone markers, date ranges, and completion percentages.
