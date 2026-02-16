@@ -1,7 +1,7 @@
 import { generateId } from '../utils/ids'
 
 export const SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 50
+export const SEED_VERSION = 60
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -152,6 +152,50 @@ export function createSeedProject() {
   const task44Id = generateId()
   const task45Id = generateId()
 
+  // Go-live audit (v51)
+  const epic7Id = generateId()
+  const audit1Id = generateId()
+  const audit2Id = generateId()
+  const audit3Id = generateId()
+  const audit4Id = generateId()
+  const audit5Id = generateId()
+  const audit6Id = generateId()
+  const audit7Id = generateId()
+  const audit8Id = generateId()
+  const audit9Id = generateId()
+  const audit10Id = generateId()
+  const audit11Id = generateId()
+  const audit12Id = generateId()
+  const decision11Id = generateId()
+
+  // Full Quality Pass (v54)
+  const epic8Id = generateId()
+  const qp1Id = generateId()
+  const qp2Id = generateId()
+  const qp3Id = generateId()
+  const qp4Id = generateId()
+  const qp5Id = generateId()
+  const qp6Id = generateId()
+  const qp7Id = generateId()
+  const qp8Id = generateId()
+  const qp9Id = generateId()
+  const qp10Id = generateId()
+  const qp11Id = generateId()
+  const qp12Id = generateId()
+
+  // Board consolidation (v56)
+  const epic9Id = generateId()
+  const bc1Id = generateId()
+  const bc2Id = generateId()
+  const bc3Id = generateId()
+
+  // Seed data cleanup + naming convention (v57)
+  const sprint6Id = generateId()
+  const epic10Id = generateId()
+  const dc1Id = generateId()
+  const dc2Id = generateId()
+  const dc3Id = generateId()
+
   // New architecture component IDs (v13)
   const archErrorBoundaryId = generateId()
   const archGraphUtilsId = generateId()
@@ -192,9 +236,9 @@ export function createSeedProject() {
 
   return {
     id: projectId,
-    name: 'StoryFlow Development',
+    name: 'StoryFlow',
     description:
-      'A comprehensive project planning and management tool built with React, featuring kanban boards, wiki pages, workflow visualization, and timeline tracking.',
+      'A visual project planning and management tool built with React — kanban boards, wiki documentation, workflow canvas, timeline tracking, architecture mapping, and decision logs in one cohesive interface.',
     status: 'in-progress',
     techStack: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion'],
     createdAt: now,
@@ -300,8 +344,9 @@ export function createSeedProject() {
         // --- Services (children of Services group) ---
         {
           id: archStorageId,
-          name: 'localStorage Persistence',
-          description: 'Auto-save with debouncing, JSON import/export',
+          name: 'IndexedDB Persistence (Dexie.js)',
+          description:
+            'Crash-safe persistence via IndexedDB with Dexie.js. Custom Zustand storage adapter, automatic localStorage migration, fallback support.',
           type: 'service',
           parentId: archGroupServicesId,
           dependencies: [],
@@ -1031,6 +1076,14 @@ export function createSeedProject() {
           goal: 'Design token consolidation, Zustand migration, URL routing, tab consolidation (7→5), activity feed',
           startDate: '2026-02-13',
           endDate: '2026-02-15',
+          status: 'completed',
+        },
+        {
+          id: sprint6Id,
+          name: 'Sprint 6 — Production Hardening',
+          goal: 'Go-live audit fixes, full quality pass, board consolidation, seed data cleanup, naming conventions',
+          startDate: '2026-02-15',
+          endDate: '2026-02-16',
           status: 'active',
         },
       ],
@@ -1098,6 +1151,7 @@ export function createSeedProject() {
           storyPoints: 3,
           assignee: 'claude',
           labels: ['setup', 'tooling'],
+          epicId: epicId,
           sprintId: sprint1Id,
           createdAt: now,
           updatedAt: now,
@@ -1114,6 +1168,7 @@ export function createSeedProject() {
           storyPoints: 5,
           assignee: 'claude',
           labels: ['data', 'state'],
+          epicId: epicId,
           sprintId: sprint1Id,
           createdAt: now,
           updatedAt: now,
@@ -1130,6 +1185,7 @@ export function createSeedProject() {
           storyPoints: 2,
           assignee: 'claude',
           labels: ['workflow', 'bug'],
+          epicId: epicId,
           sprintId: sprint3Id,
           createdAt: now,
           updatedAt: now,
@@ -1283,6 +1339,7 @@ export function createSeedProject() {
           storyPoints: 13,
           assignee: 'claude',
           labels: ['polish', 'release'],
+          sprintId: sprint3Id,
           createdAt: now,
           updatedAt: now,
         },
@@ -1332,6 +1389,7 @@ export function createSeedProject() {
           storyPoints: 2,
           assignee: 'claude',
           labels: ['ui', 'bug', 'navigation'],
+          epicId: epicId,
           sprintId: sprint2Id,
           createdAt: now,
           updatedAt: now,
@@ -2567,16 +2625,16 @@ export function createSeedProject() {
         {
           id: generateId(),
           type: 'task',
-          title: 'SF-87: Clean up 119 ESLint warnings (unused vars/imports)',
+          title: 'SF-87: Clean up ESLint warnings to zero',
           description:
-            'The CI gate passes with 119 warnings (exit code 0). Most are no-unused-vars in source files (unused React imports, unused variables in tests, unused function params). Clean these up to reach a zero-warning baseline. Consider adding eslint --max-warnings 0 to the CI script after cleanup.',
-          status: 'To Do',
+            'Cleaned up all 127 ESLint warnings to reach a zero-warning baseline. Removed unused React imports (52 files), unused variables/imports in test files, added useMemo wrapping for react-hooks/exhaustive-deps in WorkflowTab and ActivityPanel, added eslint-disable comments for intentional patterns (react-refresh/only-export-components in contexts, PageEditor useEffect sync). ESLint now reports 0 problems.',
+          status: 'Done',
           priority: 'low',
           storyPoints: 3,
           assignee: 'claude',
           labels: ['dx', 'cleanup'],
           epicId: epic6Id,
-          sprintId: null,
+          sprintId: sprint6Id,
           createdAt: now,
           updatedAt: now,
         },
@@ -2586,14 +2644,703 @@ export function createSeedProject() {
           type: 'task',
           title: 'SF-88: Investigate 6 moderate npm audit vulnerabilities',
           description:
-            'npm ci reports 6 moderate severity vulnerabilities. Investigate whether these are in devDependencies only (test tooling) or affect production. If dev-only, document and accept. If production, fix or pin.',
-          status: 'To Do',
+            'All 6 moderate vulnerabilities are in devDependencies only: esbuild (via vitest/vite-node) — development server request vulnerability (GHSA-67mh-4wv8-2f99). Does NOT affect production builds. Accepted risk. Will resolve naturally when vitest upgrades.',
+          status: 'Done',
           priority: 'medium',
           storyPoints: 2,
           assignee: 'claude',
           labels: ['security', 'dx'],
           epicId: epic6Id,
-          sprintId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // =====================================================================
+        // GO-LIVE AUDIT (v51) — SF-89 through SF-100
+        // =====================================================================
+
+        // === Epic: Go-Live Audit (SF-89) ===
+        {
+          id: epic7Id,
+          type: 'epic',
+          title: 'SF-89: Go-Live Audit — Security, Accessibility, Persistence',
+          description:
+            'Comprehensive go-live audit covering security (sanitizeColor gaps), accessibility (ARIA, keyboard), data safety (NaN guards, epic self-ref), form validation, and IndexedDB migration via Dexie.js. All findings tracked as sub-issues.',
+          status: 'In Progress',
+          priority: 'high',
+          storyPoints: 21,
+          assignee: 'claude',
+          labels: ['audit', 'go-live'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === H1: Unsanitized color injection (SF-90) ===
+        {
+          id: audit1Id,
+          type: 'bug',
+          title: 'SF-90: sanitizeColor() not applied in 8+ component files',
+          description:
+            'sanitizeColor() exists in src/utils/sanitize.js but is NOT used in WorkflowNode.jsx (3 sites), DependencyGraph.jsx, ComponentDetail.jsx, ArchitectureFilterBar.jsx, BacklogView.jsx:135, FilterBar.jsx (lines 215, 421), NodeDetailModal.jsx, NodePalette.jsx, SubWorkflowOverlay.jsx. User-editable color fields could inject CSS expressions. Fix: wrap every user-supplied color in sanitizeColor() before style={} rendering.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['security', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === H2: Accessibility gaps (SF-91) ===
+        {
+          id: audit2Id,
+          type: 'story',
+          title: 'SF-91: Add ARIA attributes to interactive elements',
+          description:
+            'Workflow nodes lack aria-label, architecture tree nodes missing aria-expanded, kanban columns missing role=listbox. Add tabIndex, role, aria-label, aria-expanded where needed. Defer full keyboard workflow canvas to post-launch.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['accessibility', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === H3: IndexedDB migration (SF-92) ===
+        {
+          id: audit3Id,
+          type: 'story',
+          title: 'SF-92: Migrate persistence from localStorage to IndexedDB (Dexie.js)',
+          description:
+            'localStorage is not crash-safe, caps at 5MB, and writes synchronously on every mutation. Migrated to Dexie.js (~33KB): (1) Created src/db/storyflowDb.js key-value schema, (2) Created src/db/indexedDbStorage.js Zustand persist adapter, (3) Created src/db/migrateFromLocalStorage.js one-time migration, (4) Wired all 3 stores (projects, activity, ui) to IndexedDB via createJSONStorage, (5) Added auto-migration in App.jsx on mount, (6) Fallback to localStorage if IndexedDB unavailable.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['persistence', 'audit', 'architecture'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === M4: WorkflowCanvas NaN coordinate risk (SF-93) ===
+        {
+          id: audit4Id,
+          type: 'bug',
+          title: 'SF-93: WorkflowCanvas + DependencyGraph NaN coordinate guard',
+          description:
+            'If a node has undefined x/y coordinates, the canvas renders NaN in transform, causing invisible nodes. Added Number.isFinite() guard in both WorkflowCanvas (safeNodes useMemo) and DependencyGraph (positionedComponents). Defaults to { x: 0, y: 0 } when coordinates are missing.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === M5: PageEditor title validation (SF-94) ===
+        {
+          id: audit5Id,
+          type: 'bug',
+          title: 'SF-94: PageEditor allows saving with empty title',
+          description:
+            'PageEditor handleSave() does not validate that title is non-empty before calling onSave(). QuickCreateBar and DecisionForm already validate. Added: if (!title.trim()) return before onSave call.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['validation', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === M6: Large list virtualization (SF-95) ===
+        {
+          id: audit6Id,
+          type: 'story',
+          title: 'SF-95: Add virtualization for large lists (react-window)',
+          description:
+            'Board kanban columns, backlog list, and wiki page tree render all items in DOM. With 100+ issues this causes jank. Deferred to post-launch. If needed, add react-window for the backlog list only (highest item count).',
+          status: 'To Do',
+          priority: 'low',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['performance', 'audit', 'post-launch'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === L1: Toast ID collision (SF-96) ===
+        {
+          id: audit7Id,
+          type: 'bug',
+          title: 'SF-96: Toast ID collision — use crypto.randomUUID()',
+          description:
+            'uiStore.addToast() used Date.now() + Math.random() for IDs. Replaced with crypto.randomUUID() to match the createToast() helper pattern. Zero collision risk.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === L2: Firefox CSS zoom (SF-97) ===
+        {
+          id: audit8Id,
+          type: 'task',
+          title: 'SF-97: Test workflow canvas CSS zoom on Firefox',
+          description:
+            'Workflow canvas uses CSS zoom which Firefox handles differently. Test on Firefox and add -moz-transform: scale() fallback if broken.',
+          status: 'To Do',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['compatibility', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === L3: Memory leak — event listeners (SF-98) ===
+        {
+          id: audit9Id,
+          type: 'bug',
+          title: 'SF-98: useCanvasViewport pointerup listener cleanup',
+          description:
+            'Verified: useCanvasViewport only uses wheel event listener with proper cleanup in useEffect return. No pointerup/pointermove listeners exist — the original concern was about an older implementation. Already clean.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === L4: Hardcoded NODE_WIDTH (SF-99) ===
+        {
+          id: audit10Id,
+          type: 'task',
+          title: 'SF-99: Extract NODE_WIDTH to shared canvasConstants.js',
+          description:
+            'Created src/utils/canvasConstants.js with NODE_WIDTH=180 and NODE_HEIGHT_ESTIMATE=80. Updated 6 files: WorkflowCanvas, WorkflowConnection, DependencyGraph, DependencyEdge, archLayout, useCanvasViewport — all now import from the shared constant.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['refactor', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // === Graph pattern consistency: DependencyGraph → WorkflowCanvas grid (SF-101) ===
+        {
+          id: audit12Id,
+          type: 'task',
+          title: 'SF-101: Apply WorkflowCanvas CSS grid pattern to DependencyGraph',
+          description:
+            'DependencyGraph used a static SVG <pattern> for the dot grid while WorkflowCanvas used a CSS radial-gradient background that moves with pan/zoom. Updated DependencyGraph to use the same CSS backgroundImage grid pattern, removed the old SVG pattern/rect elements, and cleaned up redundant || 0 fallbacks since the NaN guard already ensures valid coordinates.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['ui', 'audit', 'architecture'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === M2: Export size warning (SF-100) ===
+        {
+          id: audit11Id,
+          type: 'task',
+          title: 'SF-100: Show export size warning for large projects',
+          description:
+            'Projects with many issues (100+) create large JSON exports. Show estimated export size in the Export button. Consider optional gzip for large projects.',
+          status: 'To Do',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['dx', 'audit'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // =====================================================================
+        // FULL QUALITY PASS (v54) — SF-102 through SF-114
+        // =====================================================================
+        {
+          id: epic8Id,
+          type: 'epic',
+          title: 'SF-102: Full Quality Pass — User Readiness',
+          description:
+            'Comprehensive quality pass to make StoryFlow production-ready for end users. Covers P0 blockers (version history, sprints, cross-tab sync), P1 first-experience improvements (onboarding, confirmations, empty states), P2 quality upgrades (validation, sanitization, virtualization), and elevation of all Good-rated areas to Excellent.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 0,
+          assignee: 'claude',
+          labels: ['quality', 'ux'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P0: Wiki version history (SF-103) ===
+        {
+          id: qp1Id,
+          type: 'story',
+          title: 'SF-103: Implement wiki page version history backend',
+          description:
+            'VersionHistory.jsx shows restore UI but store never saves snapshots. Fix: auto-create version entries on manual save in updatePage(), cap at 50 versions per page (FIFO), wire onRestore in WikiTab.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['p0', 'wiki', 'data'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P0: Sprint management (SF-104) ===
+        {
+          id: qp2Id,
+          type: 'story',
+          title: 'SF-104: Implement sprint CRUD and board integration',
+          description:
+            'board.sprints initialized but never used. Implement: addSprint/updateSprint/closeSprint/deleteSprint actions, SprintModal for create/edit, sprint selector in SprintBoard, assign-to-sprint in backlog, wire BurndownChart/VelocityChart to real sprint data.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['p0', 'board', 'feature'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P0: Cross-tab sync (SF-105) ===
+        {
+          id: qp3Id,
+          type: 'story',
+          title: 'SF-105: Add cross-tab sync via BroadcastChannel',
+          description:
+            'Two browser tabs editing same project causes silent overwrites. Fix: BroadcastChannel wrapper, broadcast on Zustand persist write, re-hydrate on receive, stale-data toast warning. Fallback to storage events.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['p0', 'data', 'infrastructure'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P1: Onboarding modal (SF-106) ===
+        {
+          id: qp4Id,
+          type: 'story',
+          title: 'SF-106: Add first-run welcome/onboarding modal',
+          description:
+            'First-time users see pre-loaded project with no context. Add WelcomeModal explaining 7 tabs, show on first visit, "Don\'t show again" checkbox, help button in sidebar to re-open.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['p1', 'ux', 'onboarding'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P1: Wire confirmation dialogs (SF-107) ===
+        {
+          id: qp5Id,
+          type: 'task',
+          title: 'SF-107: Wire ConfirmDialog to all delete actions',
+          description:
+            'ConfirmDialog exists but only used for project/wiki deletion. Wire to: BacklogView issue delete, IssueDetail delete, WorkflowCanvas node delete, DependencyGraph edge delete, TimelineTab phase/milestone delete, DecisionsTab decision delete. Respect "Confirm on Delete" setting.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['p1', 'ux', 'safety'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P1: Empty states (SF-108) ===
+        {
+          id: qp6Id,
+          type: 'task',
+          title: 'SF-108: Add consistent empty states across all tabs',
+          description:
+            "Dashboard/Wiki have empty states but Architecture, Timeline, Board columns, WorkflowCanvas don't. Add EmptyState with contextual icons and CTAs to all empty views.",
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['p1', 'ux'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P2: Form validation (SF-109) ===
+        {
+          id: qp7Id,
+          type: 'task',
+          title: 'SF-109: Add form validation to all creation flows',
+          description:
+            "Issue/page/decision titles can be blank. Input components have error props but forms don't use them. Add required field validation with inline error states and * indicators to QuickCreateBar, PageEditor, DecisionForm, SprintModal.",
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['p2', 'ux', 'validation'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P2: Markdown sanitization (SF-110) ===
+        {
+          id: qp8Id,
+          type: 'task',
+          title: 'SF-110: Sanitize wiki markdown on import with DOMPurify',
+          description:
+            'Imported wiki content rendered via dangerouslySetInnerHTML. Parser escapes HTML but imported projects could contain pre-rendered HTML. Install dompurify, sanitize in MarkdownRenderer and on import.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['p2', 'security', 'wiki'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P2: IndexedDB migration robustness (SF-111) ===
+        {
+          id: qp9Id,
+          type: 'task',
+          title: 'SF-111: Add IndexedDB migration failure toast + retry',
+          description:
+            'Migration catches errors silently. Return detailed status object, show error toast on failure with "Data migration failed" message and retry button.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['p2', 'data', 'dx'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === P2: Virtualization (SF-112) ===
+        {
+          id: qp10Id,
+          type: 'task',
+          title: 'SF-112: Add virtualization to BacklogView for large lists',
+          description:
+            'Install @tanstack/react-virtual, wrap BacklogView issue list with virtualizer. Only virtualize when issue count > 50. Keep Framer Motion animations on visible items.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['p2', 'performance', 'board'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Elevation: Good → Excellent (SF-113) ===
+        {
+          id: qp11Id,
+          type: 'story',
+          title: 'SF-113: Elevate Good-rated areas to Excellent',
+          description:
+            'Responsive: full-screen mobile modals, touch targets. Export/Import: preview modal, drag-drop import. Drag&Drop: ghost preview, touch long-press. CommandPalette: fuzzy match, category filters. Security: CSP meta tag, noopener links, debounce saves. Confirm: undo-toast pattern.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['polish', 'ux', 'elevation'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Tracker + verification (SF-114) ===
+        {
+          id: qp12Id,
+          type: 'task',
+          title: 'SF-114: Final verification pass + tracker completion',
+          description:
+            'Run all verification checks from the plan. Verify build, test all new features, confirm tracker is complete.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['meta', 'verification'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // BOARD CONSOLIDATION + LIGHT MODE FIX (v56) — SF-115 through SF-118
+        // === Epic: Board Consolidation (SF-115) ===
+        {
+          id: epic9Id,
+          type: 'epic',
+          title: 'SF-115: Consolidate Board sub-tabs into unified view',
+          description:
+            'Board tab had 4 redundant sub-tabs. Consolidated into 2-mode switcher (Board|Epics) with charts as slide-out panel. Removed Table/Backlog view. Fixed epic sidebar filter not populating sprint board. Fixed filter dropdown light mode bug.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 13,
+          assignee: 'claude',
+          labels: ['refactor', 'ux', 'board'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Fix filter dropdown light mode (SF-116) ===
+        {
+          id: bc1Id,
+          type: 'bug',
+          title: 'SF-116: Fix filter dropdown background in light mode',
+          description:
+            'FilterBar and ArchitectureFilterBar use bg-[var(--color-bg-inverse)] for dropdown backgrounds. In light mode, --color-bg-inverse is dark charcoal (#2c2825), making dropdowns unreadable. Add --color-dropdown-bg token with proper light/dark values.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'light-mode', 'filter'],
+          epicId: epic9Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Board tab view-mode consolidation (SF-117) ===
+        {
+          id: bc2Id,
+          type: 'story',
+          title: 'SF-117: Merge Board/Backlog/Epics into unified view-mode switcher',
+          description:
+            'Replaced 4 sub-tabs with 2-mode segmented control (Board|Epics). Removed Table view. Created EpicsView with epic cards + expandable child issues. Created ChartsPanel slide-out. Ungated EpicSidebar for all modes. Fixed epic filter bypassing sprint filter in SprintBoard.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['refactor', 'ux', 'board'],
+          epicId: epic9Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Final verification (SF-118) ===
+        {
+          id: bc3Id,
+          type: 'task',
+          title: 'SF-118: Board consolidation verification + tracker',
+          description:
+            'Verify all 3 view modes render correctly, charts panel toggles, EpicSidebar works in all modes, filter dropdowns look correct in light mode, IssueDetail works from all views. Build clean.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['meta', 'verification'],
+          epicId: epic9Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+
+        // =====================================================================
+        // SEED DATA CLEANUP + NAMING CONVENTION (v57) — SF-119 through SF-123
+        // =====================================================================
+
+        // === Epic: Data Quality & Naming (SF-119) ===
+        {
+          id: epic10Id,
+          type: 'epic',
+          title: 'SF-119: Seed Data Cleanup & Project Naming Convention',
+          description:
+            'Fix seed project data relationships (orphan issues, missing sprintId/epicId), rename project from "StoryFlow Development" to "StoryFlow", add Sprint 6 for production hardening work, implement project naming convention for new projects, and update Lessons Learned wiki.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['data', 'quality', 'process'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Wire up sprint/epic assignments (SF-120) ===
+        {
+          id: dc1Id,
+          type: 'task',
+          title: 'SF-120: Fix 30+ issues missing sprintId and 4 orphan issues missing epicId',
+          description:
+            'Audit found: SF-89 epic (14 children, 0 with sprintId), SF-102 epic (13 children, 0 with sprintId), SF-115 epic (3 children, 0 with sprintId), SF-4/SF-5/SF-6 missing epicId, SF-18 missing epicId, SF-15 epic missing sprintId. Created Sprint 6 (Production Hardening) and assigned all backlog epics + children. Fixed orphan issues with proper epicId. Sprint 5 marked completed.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['data', 'quality', 'board'],
+          epicId: epic10Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Rename project + naming convention (SF-121) ===
+        {
+          id: dc2Id,
+          type: 'story',
+          title: 'SF-121: Rename seed project and establish naming convention',
+          description:
+            'Renamed seed project from "StoryFlow Development" to "StoryFlow" — it is no longer a POC. Updated description to reflect current scope. Made project name a required field: disabled Create button when empty, inline validation error, duplicate name detection (case-insensitive). Updated test.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['ux', 'naming', 'process'],
+          epicId: epic10Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Lessons Learned update (SF-122) ===
+        {
+          id: dc3Id,
+          type: 'task',
+          title: 'SF-122: Update Lessons Learned wiki with seed data and naming insights',
+          description:
+            'Document the seed data consistency lesson: always assign both sprintId AND epicId when adding new issues. Document project naming convention. Proactive — user requested lessons learned be kept current.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['docs', 'process'],
+          epicId: epic10Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Fix WelcomeModal tooltip hover effects (SF-123) ===
+        {
+          id: generateId(),
+          type: 'bug',
+          title: 'SF-123: Remove hover effects from non-interactive WelcomeModal tab buttons',
+          description:
+            'The Welcome to StoryFlow modal shows tab descriptions with hover effects (cursor, background highlight) but the buttons are purely informational — clicking them does nothing. Removed transition-colors and hover:bg-[...] from feature card divs.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'ux', 'onboarding'],
+          epicId: epic10Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Soft-Delete / Trash System (SF-124) ===
+        {
+          id: generateId(),
+          type: 'story',
+          title: 'SF-124: Add soft-delete / trash system for projects',
+          description:
+            'Implemented soft-delete for projects. Deleting a project now moves it to trash (sets deletedAt timestamp) instead of permanent removal. Dashboard shows a collapsible Trash section with restore and permanent delete options, plus Empty Trash. Store adds trashProject, restoreProject, permanentlyDeleteProject, emptyTrash actions. selectActiveProjects/selectTrashedProjects selectors filter by deletedAt. Legacy deleteProject maps to trashProject for backward compat.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 5,
+          assignee: 'claude',
+          labels: ['feature', 'ux', 'safety'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-97: Firefox CSS zoom test ===
+        {
+          id: generateId(),
+          type: 'task',
+          title: 'SF-97: Test workflow canvas CSS zoom on Firefox',
+          description:
+            'Firefox handles CSS zoom differently from Chromium browsers. Need to verify that the workflow canvas (which uses CSS zoom for crisp text) renders correctly in Firefox, including node positioning, connection paths, and zoom controls.',
+          status: 'To Do',
+          priority: 'low',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['testing', 'browser-compat'],
+          epicId: epic7Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-126: Lessons Learned wiki update (v60) ===
+        {
+          id: generateId(),
+          type: 'task',
+          title:
+            'SF-126: Update Lessons Learned wiki with ESLint patterns and soft-delete architecture',
+          description:
+            'Added 6 new lessons across 3 new sections: ESLint Patterns (useMemo for hook deps, _ prefix scope, react-refresh suppression, background agent limitations), Data Patterns (deletedAt soft-delete, store-level selector filtering), and a Claude Failures entry (over-removed imports). v60.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['docs', 'process'],
+          epicId: epic10Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-127: Update DashboardPage tests for trash system ===
+        {
+          id: generateId(),
+          type: 'task',
+          title: 'SF-127: Update DashboardPage.test.jsx for trash system UI',
+          description:
+            'DashboardPage.test.jsx needs updating for the new trash system. Tests should cover: trash toggle button visibility, trash section expand/collapse, restore project flow, permanent delete confirmation, empty trash confirmation. The existing delete test should be updated to test "move to trash" flow instead of permanent delete.',
+          status: 'To Do',
+          priority: 'medium',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['testing', 'trash'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
           createdAt: now,
           updatedAt: now,
         },
@@ -2601,7 +3348,7 @@ export function createSeedProject() {
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 89,
+      nextIssueNumber: 128,
     },
 
     pages: [
@@ -3321,6 +4068,8 @@ A living record of hard-won knowledge from building StoryFlow. Categorized for q
 | Architecture components use \`parentId\` + \`dependencies[]\` | Always include \`dependencies\` array, even if empty. |
 | Story points field is \`storyPoints\` — not \`points\` | Board UI reads \`issue.storyPoints\`. Wrong field name = invisible points. |
 | Check CLAUDE.md "Field Conventions by Domain" before writing project JSON | The canonical reference for which fields each domain uses. |
+| Every issue needs BOTH \`epicId\` AND \`sprintId\` | v57 audit found 30+ issues missing \`sprintId\` and 4 missing \`epicId\`. Orphan issues break epic progress counts and sprint board filtering. When adding issues, always assign both fields — even if the value is the "backlog" sprint. Epics themselves need \`sprintId\` too. |
+| Seed project naming: "StoryFlow" (not "StoryFlow Development") | Renamed in v57. The project is no longer a POC — use the product name directly. |
 
 ---
 
@@ -3339,6 +4088,8 @@ A living record of hard-won knowledge from building StoryFlow. Categorized for q
 |--------|---------|
 | Parallel agent strategy: launch 3-5 agents for independent component sets | Significantly faster for multi-file work. Always verify builds after — import mismatches are common. |
 | \`SEED_VERSION\` bump triggers auto-migration on next app load | The store's \`onRehydrateStorage\` replaces the seed project when version is outdated. Fixed project ID prevents URL breakage. |
+| New project naming convention: auto-increment "Untitled Project N" | When user clicks "New Project" with no name, DashboardPage checks existing project names and picks the next available number. Avoids collision. |
+| Composable filtering: epic sidebar + sprint tab are independent dimensions | BoardTab epic filter passes filtered issues to SprintBoard, which further filters by sprint. Auto-switches to "All" on epic activation (transition detection via useRef), then user freely picks any sprint. Don't force-override — compose. |
 
 ---
 
@@ -3357,6 +4108,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 | Light mode redesign (v42) only updated token files, not the ~20 components with hardcoded colors | Treated the theme system as "just change the tokens" without auditing all consumers. 11 undefined \`--th-*\` vars, hardcoded Tailwind shades (\`-300\` for dark), \`fill="#94a3b8"\`, \`text-white\`, \`bg-slate-*\` in Badge, Dashboard, markdown.js, charts, graph, workflow — all silently broke in light mode. User called it a "dumpster fire." | Gate: any theme change requires a full grep audit of ALL color references: (1) \`--th-*\` and custom CSS vars, (2) Tailwind shade classes (\`-300\`, \`-400\`), (3) hardcoded hex in JSX (\`fill=\`, \`bg-[#\`), (4) \`text-white\`/\`text-black\` outside accent backgrounds. Fix every hit before claiming done. |
 | Backlog compact fix (v45): coded the change before creating tracker issue | Jumped straight to editing BacklogView.jsx without first adding an "In Progress" issue to seedProject.js. Tracker was only updated after the code was done — violating the mandatory 6-step workflow (step 3: update tracker BEFORE execution). | The tracker issue must be the FIRST thing created — before touching any component file. Sequence: (1) add issue as "In Progress" + bump SEED_VERSION, (2) write code, (3) mark issue "Done" + bump again. Never code-first-track-later. |
 | Parallel test agents introduced \\\`react/display-name\\\` lint errors (v49) | 3 agents independently added \\\`React.forwardRef()\\\` mocks for framer-motion without \\\`displayName\\\`. Lint passed in agent scope but failed in CI gate (eslint \\\`react/display-name\\\` rule). | When mocking with \\\`React.forwardRef()\\\`, always assign \\\`displayName\\\`: \\\`const MotionDiv = React.forwardRef(...); MotionDiv.displayName = 'MotionDiv'\\\`. Add to parallel-agent post-merge checklist: run full lint before declaring done. |
+| Repeated tracker update failure — go-live audit (v51) | Despite HARD GATE, started Batch 1 (sanitizeColor fixes) without updating seedProject.js first. User had to ask "where are my tracker updates" — the same failure as v30, v40, v45. Four prior remediations (HARD GATE checklist, MEMORY.md, inline tracking, sequence enforcement) all failed to prevent recurrence. | Root cause: tracker update is mentally categorized as "administrative overhead" rather than "the first line of code I write." New rule: the VERY FIRST edit in any session must be seedProject.js. No grep, no file reads for other files, no "let me understand the code first" — open seedProject.js and add the issue BEFORE doing anything else. If the issue description is incomplete, write a placeholder and refine later. The tracker is the work. |
+| Over-removed imports in NotFoundPage.test.jsx (v59) | Removed \`userEvent\` and \`BrowserRouter\` imports along with truly unused \`vi\` and \`fireEvent\` — but userEvent (line 88) and BrowserRouter (line 167) were actually used. Caused 2 ESLint errors (\`no-undef\`, \`jsx-no-undef\`). | When removing "unused" imports flagged by ESLint, grep the file for actual usages of each import before deleting. ESLint warns on \`vi\` and \`fireEvent\` specifically — don't assume neighboring imports are also unused. Remove only what ESLint explicitly flags. |
 
 ---
 
@@ -3366,6 +4119,26 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 |--------|---------|
 | CSS \`radial-gradient\` grid repaints on every pan frame | Monitor for performance regressions vs old SVG pattern approach. Consider tiling CSS background-image if janky. |
 | \`centerOnNodes()\` needs 280ms delay after overlay mount | Framer Motion scale-in animation takes ~250ms. Measuring container dimensions before animation completes gives wrong values. Added dimension guard (\`rect.width < 10\`). |
+
+---
+
+## ESLint Patterns
+
+| Lesson | Context |
+|--------|---------|
+| Logical expressions (\`??\`, \`\\|\\|\`) in hook deps create new refs every render | \`const nodes = workflow.nodes ?? []\` creates a new array every render if \`workflow.nodes\` is undefined. Wrap in \`useMemo()\`: \`const nodes = useMemo(() => workflow.nodes ?? [], [workflow.nodes])\`. Fixed 12 warnings in WorkflowTab.jsx alone. |
+| \`_\` prefix for unused vars only works on function parameters | ESLint \`no-unused-vars\` with \`argsIgnorePattern: "^_"\` only applies to function args, not assigned \`const\` variables. For unused destructured values use omission (\`const { used } = obj\`) or restructure the code. |
+| \`react-refresh/only-export-components\` is structural — suppress, don't fix | Context files that export both a Provider component and a \`useXxx\` hook trigger this. The alternative (separate files) adds complexity for no benefit. Use \`// eslint-disable-next-line react-refresh/only-export-components\`. |
+| Background agents cannot Edit/Write files | Task agents have tool permissions denied for Edit and Write. Never delegate file edits to background agents — use them only for research/exploration. Do file edits in the main thread. |
+
+---
+
+## Data Patterns
+
+| Lesson | Context |
+|--------|---------|
+| Soft-delete uses \`deletedAt\` timestamp, not status field | \`deletedAt\` is orthogonal to project status (a project can be "in-progress" and trashed). Enables "deleted N ago" display. \`selectActiveProjects\` filters \`!p.deletedAt\`. Legacy \`deleteProject()\` now maps to \`trashProject()\` for backward compatibility. |
+| Zustand selectors filter at the store level, not the component | \`selectActiveProjects\` and \`selectTrashedProjects\` are store-level selectors. Components never see trashed projects unless they explicitly use \`selectTrashedProjects\`. This means Sidebar, search, etc. automatically exclude trashed items with zero code changes. |
 `,
         parentId: page1Id,
         status: 'published',
@@ -3842,6 +4615,43 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
         ],
         consequences:
           'State management is now split across focused stores. Components subscribe to specific slices via selectors, eliminating cascading re-renders. The old ProjectsContext is kept as a thin wrapper for backwards compatibility. Critical lesson learned: never create selector functions inside render — use stable references with useCallback or subscribe to parent objects.',
+        createdAt: now,
+        updatedAt: now,
+      },
+
+      // === IndexedDB Migration Decision Record (v51) ===
+      {
+        id: decision11Id,
+        title: 'Migrate Persistence from localStorage to IndexedDB (Dexie.js)',
+        status: 'proposed',
+        context:
+          'Go-live audit revealed localStorage is not crash-safe (synchronous writes, no transaction safety), caps at 5MB (seed project alone is ~175KB), and has no per-entity querying. Every mutation serializes the entire projects array. A crash mid-write can corrupt the JSON blob.',
+        decision:
+          'Migrate to Dexie.js (~33KB IndexedDB wrapper) with entity-indexed schema. Use useLiveQuery for reactive reads. Keep Zustand for in-memory UI state, delegate persistence to Dexie adapter. Auto-migrate existing localStorage data on first load.',
+        alternatives: [
+          {
+            name: 'idb (tiny IndexedDB wrapper)',
+            pros: '~1.3KB, minimal API',
+            cons: 'No reactive queries, manual state lifting required, too minimal for our schema',
+          },
+          {
+            name: 'localForage',
+            pros: '~8KB, familiar key-value API',
+            cons: 'Key-value only, no indexes or queries, not much better than localStorage for structured data',
+          },
+          {
+            name: 'PouchDB',
+            pros: '~100KB, sync capability, offline-first',
+            cons: 'Sync not needed, massive bundle, overkill for client-only app',
+          },
+          {
+            name: 'Dexie.js',
+            pros: '~33KB, ORM-like API, useLiveQuery for React, entity-indexed schema, transactions for crash safety, strong community',
+            cons: 'Requires schema migration planning, adds async to reads',
+          },
+        ],
+        consequences:
+          'All persistence moves to IndexedDB via Dexie.js. Writes are transactional — a crash mid-write rolls back cleanly. Storage limit goes from 5MB to ~50% of disk free. New files: src/db/storyflowDb.js (schema), src/db/persistenceAdapter.js (normalize/denormalize), src/db/migrateFromLocalStorage.js (one-time migration). Zustand stores drop persist middleware, delegate to Dexie adapter.',
         createdAt: now,
         updatedAt: now,
       },

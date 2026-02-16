@@ -7,6 +7,7 @@ import Select from '../ui/Select'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import { COMPONENT_TYPES, TYPE_COLORS, TYPE_HEX_COLORS, TYPE_ICONS } from './constants'
+import { sanitizeColor } from '../../utils/sanitize'
 import { buildBezierPath } from '../../utils/workflow'
 import { wouldCreateCycle } from '../../utils/graph'
 
@@ -264,7 +265,7 @@ export default function ComponentDetail({
   parentOptions,
 }) {
   const TypeIcon = TYPE_ICONS[component.type] || null
-  const hexColor = TYPE_HEX_COLORS[component.type] || '#6b7280'
+  const hexColor = sanitizeColor(TYPE_HEX_COLORS[component.type], '#6b7280')
 
   // Components that depend on this one ("Used by")
   const usedBy = useMemo(

@@ -91,8 +91,6 @@ describe('DependencyEdge', () => {
       const edge = renderEdge()
       const visiblePath = edge.querySelectorAll('path')[1]
 
-      const initialStroke = visiblePath?.getAttribute('stroke')
-
       fireEvent.mouseEnter(edge)
 
       const hoveredStroke = visiblePath?.getAttribute('stroke')

@@ -3,6 +3,7 @@
 // Supports schema versioning and CLI bridge via the projects/ directory
 // ---------------------------------------------------------------------------
 
+import DOMPurify from 'dompurify'
 import { stripDangerousKeys } from './sanitize'
 
 const CURRENT_SCHEMA_VERSION = 1
@@ -167,6 +168,16 @@ function fillDefaults(project) {
         filled.board[key] = Array.isArray(defaultValue) ? [...defaultValue] : defaultValue
       }
     }
+  }
+
+  // Sanitize wiki page content on import to prevent XSS
+  if (Array.isArray(filled.pages)) {
+    filled.pages = filled.pages.map((page) => {
+      if (typeof page.content === 'string' && /<[a-z][\s\S]*>/i.test(page.content)) {
+        return { ...page, content: DOMPurify.sanitize(page.content) }
+      }
+      return page
+    })
   }
 
   return filled

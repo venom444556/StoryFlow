@@ -20,10 +20,12 @@ const DEFAULT_FORM = {
 
 export default function DecisionForm({ isOpen, onClose, onSave }) {
   const [form, setForm] = useState(DEFAULT_FORM)
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     if (isOpen) {
       setForm(DEFAULT_FORM)
+      setErrors({})
     }
   }, [isOpen])
 
@@ -32,7 +34,10 @@ export default function DecisionForm({ isOpen, onClose, onSave }) {
   }
 
   const handleSave = () => {
-    if (!form.title.trim()) return
+    const newErrors = {}
+    if (!form.title.trim()) newErrors.title = 'Decision title is required'
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length > 0) return
     onSave({
       title: form.title.trim(),
       context: form.context.trim(),
@@ -50,10 +55,15 @@ export default function DecisionForm({ isOpen, onClose, onSave }) {
       <div className="space-y-5">
         {/* Title */}
         <Input
-          label="Title"
+          label="Title *"
           value={form.title}
-          onChange={handleChange('title')}
+          onChange={(e) => {
+            handleChange('title')(e)
+            if (errors.title && e.target.value.trim())
+              setErrors((prev) => ({ ...prev, title: undefined }))
+          }}
           placeholder="e.g. Use PostgreSQL for primary database"
+          error={errors.title}
           autoFocus
         />
 

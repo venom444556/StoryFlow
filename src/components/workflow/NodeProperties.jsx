@@ -1,4 +1,3 @@
-import React from 'react'
 import { X, Trash2, AlertCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { getNodeType } from '../../data/nodeTypes'

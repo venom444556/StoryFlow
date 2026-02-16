@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react'
-import { Plus, Flag, BarChart3, List } from 'lucide-react'
+import { Plus, Flag, BarChart3, List, Clock } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Button from '../ui/Button'
 import Tabs from '../ui/Tabs'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import EmptyState from '../ui/EmptyState'
 import TimelineStats from '../timeline/TimelineStats'
 import TimelineView from '../timeline/TimelineView'
 import GanttChart from '../timeline/GanttChart'
@@ -157,43 +158,57 @@ export default function TimelineTab({
       </div>
 
       {/* View content */}
-      <AnimatePresence mode="wait">
-        {view === 'chart' ? (
-          <motion.div
-            key="chart"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-          >
-            <GanttChart
-              phases={phases}
-              milestones={milestones}
-              onPhaseClick={handlePhaseClick}
-              onMilestoneClick={handleMilestoneClick}
-              timeScale={timeScale}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="list"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-          >
-            <TimelineView
-              phases={phases}
-              milestones={milestones}
-              onEditPhase={(phase) => setEditingPhase(phase)}
-              onDeletePhase={(phase) => setDeletingPhase(phase)}
-              onEditMilestone={(milestone) => setEditingMilestone(milestone)}
-              onDeleteMilestone={(milestone) => setDeletingMilestone(milestone)}
-              onToggleMilestone={handleToggleMilestone}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {phases.length === 0 && milestones.length === 0 ? (
+        <div className="flex items-center justify-center py-16">
+          <EmptyState
+            icon={Clock}
+            title="No phases defined"
+            description="Create a phase to start planning your project timeline, then add milestones to track key deliverables."
+            action={{
+              label: 'Add Phase',
+              onClick: () => setShowPhaseForm(true),
+            }}
+          />
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          {view === 'chart' ? (
+            <motion.div
+              key="chart"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+            >
+              <GanttChart
+                phases={phases}
+                milestones={milestones}
+                onPhaseClick={handlePhaseClick}
+                onMilestoneClick={handleMilestoneClick}
+                timeScale={timeScale}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="list"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+            >
+              <TimelineView
+                phases={phases}
+                milestones={milestones}
+                onEditPhase={(phase) => setEditingPhase(phase)}
+                onDeletePhase={(phase) => setDeletingPhase(phase)}
+                onEditMilestone={(milestone) => setEditingMilestone(milestone)}
+                onDeleteMilestone={(milestone) => setDeletingMilestone(milestone)}
+                onToggleMilestone={handleToggleMilestone}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       {/* Phase forms */}
       <PhaseForm

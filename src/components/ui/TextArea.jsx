@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { AlertCircle, CheckCircle } from 'lucide-react'
 
 const TextArea = forwardRef(function TextArea(

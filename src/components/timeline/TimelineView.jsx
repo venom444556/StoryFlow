@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock } from 'lucide-react'
 import PhaseCard from './PhaseCard'

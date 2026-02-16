@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import Header from './Header'
 import { ProjectsProvider } from '../../contexts/ProjectsContext'
 
@@ -350,7 +350,7 @@ describe('Header', () => {
 
   describe('Export functionality', () => {
     it('exports current project when on project page', async () => {
-      const { exportProjectJSON, downloadJSON } = await import('../../utils/exportImport')
+      await import('../../utils/exportImport')
 
       // This needs to be tested with proper route params
       renderWithRoute(<Header {...defaultProps} />, '/project/test-id')

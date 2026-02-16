@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ProjectPage from './ProjectPage'
@@ -8,12 +8,26 @@ import ProjectPage from './ProjectPage'
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => children,
   motion: {
-    div: ({ children, ...props }) => {
-      const { initial, animate, exit, transition, layoutId, ...rest } = props
+    div: ({
+      children,
+      initial: _i,
+      animate: _a,
+      exit: _e,
+      transition: _t,
+      layoutId: _l,
+      ...rest
+    }) => {
       return <div {...rest}>{children}</div>
     },
-    span: ({ children, ...props }) => {
-      const { initial, animate, exit, transition, layoutId, ...rest } = props
+    span: ({
+      children,
+      initial: _i2,
+      animate: _a2,
+      exit: _e2,
+      transition: _t2,
+      layoutId: _l2,
+      ...rest
+    }) => {
       return <span {...rest}>{children}</span>
     },
   },

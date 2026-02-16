@@ -57,10 +57,11 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
   const handleSave = useCallback(
     (data) => {
       if (!selectedPageId) return
-      const isAutoSave = data._autoSave
-      const { _autoSave: _autoSaveFlag, ...updates } = data
+      const { _autoSave: isAutoSave, ...updates } = data
 
       // Build a version snapshot (only for explicit saves, not auto-saves)
+      // Cap at 50 versions per page (FIFO — oldest removed first)
+      const MAX_VERSIONS = 50
       if (!isAutoSave && selectedPage) {
         const version = {
           id: generateId(),
@@ -69,7 +70,11 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
           summary: data.title !== selectedPage.title ? 'Title changed' : 'Manual save',
         }
         const existingVersions = selectedPage.versions || []
-        updates.versions = [...existingVersions, version]
+        const allVersions = [...existingVersions, version]
+        updates.versions =
+          allVersions.length > MAX_VERSIONS
+            ? allVersions.slice(allVersions.length - MAX_VERSIONS)
+            : allVersions
       }
 
       updatePage(selectedPageId, updates)
@@ -222,11 +227,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
                   onEdit={() => setIsEditing(true)}
                   onDelete={() => handleRequestDelete(selectedPageId)}
                   onTogglePin={handleTogglePin}
-                  onShowVersions={
-                    selectedPage.versions?.length > 0
-                      ? () => setShowVersionHistory(true)
-                      : undefined
-                  }
+                  onShowVersions={() => setShowVersionHistory(true)}
                 />
               </div>
               <TableOfContents

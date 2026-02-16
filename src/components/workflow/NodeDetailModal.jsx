@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   Trash2,
   AlertCircle,
@@ -23,6 +23,7 @@ import {
   ListChecks,
 } from 'lucide-react'
 import { getNodeType } from '../../data/nodeTypes'
+import { sanitizeColor } from '../../utils/sanitize'
 import Modal from '../ui/Modal'
 import Input from '../ui/Input'
 import TextArea from '../ui/TextArea'
@@ -195,12 +196,12 @@ function getChildStats(children) {
 // ---------------------------------------------------------------------------
 
 export default function NodeDetailModal({ node, isOpen, onClose, onUpdate, onDelete }) {
-  const typeDef = useMemo(() => (node ? getNodeType(node.type) : null), [node?.type])
-  const configFields = useMemo(() => (node ? getConfigFields(node.type) : []), [node?.type])
+  const typeDef = useMemo(() => (node ? getNodeType(node.type) : null), [node])
+  const configFields = useMemo(() => (node ? getConfigFields(node.type) : []), [node])
 
   if (!node) return null
 
-  const color = typeDef?.color || '#6b7280'
+  const color = sanitizeColor(typeDef?.color, '#6b7280')
   const iconName = typeDef?.icon
   const TypeIcon = iconName ? ICON_MAP[iconName] : null
 

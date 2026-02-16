@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { buildBezierPath } from '../../utils/workflow'
 import { TYPE_HEX_COLORS } from './constants'
+import { NODE_WIDTH } from '../../utils/canvasConstants'
 
 // ---------------------------------------------------------------------------
 // DependencyEdge
@@ -9,8 +10,6 @@ import { TYPE_HEX_COLORS } from './constants'
 // Adapted from WorkflowConnection but simplified — no execution status.
 // Arrow goes FROM depender TO dependency (A→B means "A depends on B").
 // ---------------------------------------------------------------------------
-
-const NODE_WIDTH = 180
 const NODE_HEIGHT_CENTER = 40 // approximate center of a node
 
 function getOutputPoint(node) {

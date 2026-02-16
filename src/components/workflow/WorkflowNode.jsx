@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import {
   Clock,
@@ -18,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { getNodeType } from '../../data/nodeTypes'
+import { sanitizeColor } from '../../utils/sanitize'
 
 // ---------------------------------------------------------------------------
 // Icon lookup – maps the string icon name from nodeTypes to the component
@@ -186,7 +186,7 @@ export default function WorkflowNode({
   onDrillDown,
 }) {
   const typeDef = getNodeType(node.type)
-  const color = typeDef?.color || '#6b7280'
+  const color = sanitizeColor(typeDef?.color, '#6b7280')
   const iconName = typeDef?.icon
   const TypeIcon = iconName ? ICON_MAP[iconName] : null
 
@@ -200,6 +200,9 @@ export default function WorkflowNode({
   return (
     <motion.div
       data-workflow-node
+      role="button"
+      tabIndex={0}
+      aria-label={`${node.title} (${typeDef?.label || node.type})${node.status !== 'idle' ? `, status: ${node.status}` : ''}`}
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}

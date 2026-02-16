@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { PanelRightClose, PanelRightOpen } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import { executeWorkflow } from '../../utils/workflow'
@@ -14,10 +14,13 @@ import SubWorkflowOverlay from '../workflow/SubWorkflowOverlay'
 // ---------------------------------------------------------------------------
 
 export default function WorkflowTab({ project, onUpdate }) {
-  // ------ Root-level workflow data ------
-  const workflow = project?.workflow ?? { nodes: [], connections: [] }
-  const nodes = workflow.nodes ?? []
-  const connections = workflow.connections ?? []
+  // ------ Root-level workflow data (memoized to stabilize hook dependencies) ------
+  const workflow = useMemo(
+    () => project?.workflow ?? { nodes: [], connections: [] },
+    [project?.workflow]
+  )
+  const nodes = useMemo(() => workflow.nodes ?? [], [workflow.nodes])
+  const connections = useMemo(() => workflow.connections ?? [], [workflow.connections])
 
   // ------ Local UI state ------
   const [selectedNodeId, setSelectedNodeId] = useState(null)

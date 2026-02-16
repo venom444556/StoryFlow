@@ -8,6 +8,7 @@ import {
   ChevronRight,
   X,
   Zap,
+  HelpCircle,
 } from 'lucide-react'
 import { useProjects } from '../../hooks/useProjects'
 import Tooltip from '../ui/Tooltip'
@@ -181,6 +182,33 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
       {/* Bottom section */}
       <div className="border-t border-[var(--color-border-default)] p-[var(--space-3)]">
+        {/* Help button */}
+        {collapsed && !mobileMenuOpen ? (
+          <Tooltip content="Help" position="right">
+            <button
+              onClick={() => {
+                localStorage.removeItem('storyflow-welcomed')
+                window.dispatchEvent(new Event('storyflow-show-welcome'))
+              }}
+              className="mb-2 flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+            >
+              <HelpCircle size={16} />
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            onClick={() => {
+              localStorage.removeItem('storyflow-welcomed')
+              window.dispatchEvent(new Event('storyflow-show-welcome'))
+            }}
+            className="mb-2 flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+          >
+            <HelpCircle size={14} />
+            <span>Help & Tour</span>
+          </button>
+        )}
+      </div>
+      <div className="px-[var(--space-3)] pb-[var(--space-3)]">
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="New Project" position="right">
             <button

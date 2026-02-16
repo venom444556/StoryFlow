@@ -17,6 +17,7 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
   const [type, setType] = useState(ISSUE_TYPES.TASK)
   const [showTypeMenu, setShowTypeMenu] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
+  const [showError, setShowError] = useState(false)
   const inputRef = useRef(null)
   const menuRef = useRef(null)
 
@@ -32,7 +33,12 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
 
   const handleSubmit = () => {
     const trimmed = title.trim()
-    if (!trimmed) return
+    if (!trimmed) {
+      setShowError(true)
+      inputRef.current?.focus()
+      return
+    }
+    setShowError(false)
 
     onCreateIssue({
       title: trimmed,
@@ -56,12 +62,13 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
   }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && title.trim()) {
+    if (e.key === 'Enter') {
       e.preventDefault()
       handleSubmit()
     }
     if (e.key === 'Escape') {
       setTitle('')
+      setShowError(false)
       inputRef.current?.blur()
     }
   }
@@ -75,12 +82,17 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
           : 'border-[var(--color-border-default)] bg-[var(--color-bg-glass)] hover:border-[var(--color-bg-glass-hover)] hover:bg-[var(--color-bg-glass)]',
       ].join(' ')}
       style={
-        isFocused
+        showError
           ? {
-              borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
-              boxShadow: '0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)',
+              borderColor: 'rgba(239, 68, 68, 0.5)',
+              boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.1)',
             }
-          : undefined
+          : isFocused
+            ? {
+                borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
+                boxShadow: '0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)',
+              }
+            : undefined
       }
     >
       {/* Type selector */}
@@ -131,11 +143,14 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
         ref={inputRef}
         type="text"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          setTitle(e.target.value)
+          if (showError && e.target.value.trim()) setShowError(false)
+        }}
         onKeyDown={handleKeyDown}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        placeholder="Create issue..."
+        placeholder={showError ? 'Title is required' : 'Create issue...'}
         className="min-w-0 flex-1 border-none bg-transparent py-0.5 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none"
       />
 

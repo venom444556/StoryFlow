@@ -88,6 +88,7 @@ export default function ToastContainer({ toasts, onDismiss }) {
 }
 
 // Export a simple hook-compatible toast function
+// eslint-disable-next-line react-refresh/only-export-components
 export function createToast(variant, title, message, duration = 4000) {
   return {
     id: crypto.randomUUID(),
