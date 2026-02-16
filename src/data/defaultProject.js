@@ -1,4 +1,7 @@
 export function createDefaultProject(name, id) {
+  if (!id || typeof id !== 'string') {
+    throw new Error('createDefaultProject requires a valid string id')
+  }
   const now = new Date().toISOString()
 
   return {

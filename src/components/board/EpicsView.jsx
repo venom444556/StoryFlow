@@ -55,6 +55,7 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
             <GlassCard key={epic.id} className="overflow-hidden p-0">
               {/* Card header — clickable to expand */}
               <button
+                type="button"
                 onClick={() => setExpandedEpicId(isExpanded ? null : epic.id)}
                 className="w-full cursor-pointer p-4 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)]"
               >
@@ -177,6 +178,7 @@ function OrphanSection({ issues, onIssueClick, onDeleteIssue }) {
   return (
     <GlassCard className="p-0">
       <button
+        type="button"
         onClick={() => setIsOpen((v) => !v)}
         className="flex w-full items-center gap-2 p-4 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)]"
       >

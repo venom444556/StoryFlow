@@ -138,6 +138,8 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
               <button
                 key={color}
                 type="button"
+                aria-label={`Select color ${color}`}
+                aria-pressed={form.color === color}
                 onClick={() => setForm((prev) => ({ ...prev, color }))}
                 className={[
                   'h-7 w-7 rounded-full transition-all duration-150',

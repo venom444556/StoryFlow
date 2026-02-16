@@ -5,9 +5,13 @@
  */
 
 const CHANNEL_NAME = 'storyflow-sync'
-const TAB_ID = crypto.randomUUID()
+const TAB_ID =
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2)
 
 let channel = null
+let _isRehydrating = false
 
 try {
   if (typeof BroadcastChannel !== 'undefined') {
@@ -19,10 +23,12 @@ try {
 
 /**
  * Broadcast a store update to other tabs.
+ * Suppressed during rehydration to prevent cross-tab ping-pong loops:
+ * Tab A updates → broadcasts → Tab B rehydrates (new ref) → would broadcast → loop.
  * @param {string} storeName - Name of the store that changed ('projects' | 'activity' | 'ui')
  */
 export function broadcastUpdate(storeName) {
-  if (!channel) return
+  if (!channel || _isRehydrating) return
   try {
     channel.postMessage({
       type: 'store-updated',
@@ -33,6 +39,15 @@ export function broadcastUpdate(storeName) {
   } catch {
     // Silently ignore send errors
   }
+}
+
+/**
+ * Mark the start/end of a rehydration cycle.
+ * While rehydrating, broadcastUpdate() is suppressed to prevent loops.
+ * @param {boolean} value
+ */
+export function setRehydrating(value) {
+  _isRehydrating = value
 }
 
 /**

@@ -26,6 +26,8 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
 
   return (
     <motion.div
+      role="option"
+      aria-selected={false}
       layout
       layoutId={issue.id}
       initial={{ opacity: 0, y: 8 }}

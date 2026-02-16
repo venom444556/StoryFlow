@@ -55,6 +55,7 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <button
+          type="button"
           onClick={() => setExpanded((prev) => !prev)}
           className="flex items-center gap-2 text-sm font-medium text-[var(--color-fg-default)] transition-colors hover:text-[var(--color-fg-default)]"
         >
@@ -62,6 +63,7 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
           <span>{alt.name || `Alternative ${index + 1}`}</span>
         </button>
         <button
+          type="button"
           onClick={onRemove}
           className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
         >
@@ -107,7 +109,7 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
 }
 
 export default function DecisionDetail({ decision, onUpdate, onClose }) {
-  const [removeAltIndex, setRemoveAltIndex] = useState(null)
+  const [removeAltId, setRemoveAltId] = useState(null)
 
   const handleFieldChange = useCallback(
     (field) => (e) => {
@@ -145,16 +147,16 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
     [decision.id, decision.alternatives, onUpdate]
   )
 
-  const handleRequestRemoveAlternative = useCallback((index) => {
-    setRemoveAltIndex(index)
+  const handleRequestRemoveAlternative = useCallback((altId) => {
+    setRemoveAltId(altId)
   }, [])
 
   const handleConfirmRemoveAlternative = useCallback(() => {
-    if (removeAltIndex === null) return
-    const alternatives = (decision.alternatives || []).filter((_, i) => i !== removeAltIndex)
+    if (removeAltId === null) return
+    const alternatives = (decision.alternatives || []).filter((a) => a.id !== removeAltId)
     onUpdate(decision.id, { alternatives })
-    setRemoveAltIndex(null)
-  }, [removeAltIndex, decision.id, decision.alternatives, onUpdate])
+    setRemoveAltId(null)
+  }, [removeAltId, decision.id, decision.alternatives, onUpdate])
 
   return (
     <motion.div
@@ -174,6 +176,7 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
             </span>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
           >
@@ -245,7 +248,7 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
                       alt={alt}
                       index={i}
                       onUpdate={(updated) => handleUpdateAlternative(i, updated)}
-                      onRemove={() => handleRequestRemoveAlternative(i)}
+                      onRemove={() => handleRequestRemoveAlternative(alt.id)}
                     />
                   ))}
                 </div>
@@ -316,8 +319,8 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
 
       {/* Remove alternative confirmation */}
       <ConfirmDialog
-        isOpen={removeAltIndex !== null}
-        onClose={() => setRemoveAltIndex(null)}
+        isOpen={removeAltId !== null}
+        onClose={() => setRemoveAltId(null)}
         onConfirm={handleConfirmRemoveAlternative}
         title="Remove alternative?"
         message="This alternative and its pros/cons will be removed. This cannot be undone."

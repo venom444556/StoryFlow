@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useEffect, useMemo } from 'react'
 import {
   useParams,
   Link,
@@ -12,6 +12,7 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Loader2, Box, Workflow, FileEdit, Scale } from 'lucide-react'
 import { useProject } from '../hooks/useProject'
 import { useKeyboardShortcuts, SHORTCUTS } from '../hooks/useKeyboardShortcuts'
+import { SEED_PROJECT_ID, LEGACY_SEED_PROJECT_ID } from '../data/storyflow'
 import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import ProjectSidebar from '../components/project/ProjectSidebar'
@@ -88,6 +89,15 @@ export default function ProjectPage() {
   const { id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Redirect legacy seed project URL to new slug-based URL
+  useEffect(() => {
+    if (id === LEGACY_SEED_PROJECT_ID) {
+      const rest = location.pathname.replace(`/project/${LEGACY_SEED_PROJECT_ID}`, '')
+      navigate(`/project/${SEED_PROJECT_ID}${rest}`, { replace: true })
+    }
+  }, [id, location.pathname, navigate])
+
   const hooks = useProject(id)
   const { project, updateProject } = hooks
 

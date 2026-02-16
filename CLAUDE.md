@@ -30,6 +30,8 @@ StoryFlow is a visual project planning tool that Claude uses to architect, decom
 | Framer Motion | 11+ | Animations |
 | Lucide React | Latest | Icons |
 | react-router-dom | 6+ | Routing |
+| Zustand | 5+ | State management (with persist middleware) |
+| idb-keyval | 6+ | IndexedDB storage adapter |
 | date-fns | 3+ | Date formatting |
 | uuid | 11+ | ID generation |
 
@@ -48,14 +50,15 @@ src/
     decisions/    3 decision components
   pages/          3 pages (Dashboard, Project, 404)
   hooks/          8 custom hooks (useProject, useSearch, useDragAndDrop, etc.)
-  contexts/       1 context (ProjectsContext with useReducer)
+  stores/         3 Zustand stores (projectsStore, uiStore, activityStore)
+  contexts/       2 contexts (ProjectsContext wrapper, SettingsContext)
   utils/          8 utility modules
   data/           4 data files (defaults, sample, templates, node types)
 ```
 
 ## Data Model
 
-Projects are stored in localStorage under `storyflow-projects`. Each project contains:
+Projects are persisted in IndexedDB via Zustand's persist middleware (with idb-keyval adapter). Legacy localStorage data is auto-migrated on first load. Cross-tab sync uses the BroadcastChannel API. Each project contains:
 
 - **overview** — goals, constraints, tech stack, target audience
 - **architecture** — component tree with types and dependencies
@@ -94,9 +97,23 @@ User asks to plan a project
   → Claude reads back changes for follow-up work
 ```
 
+## File Naming Convention
+
+| Category | Convention | Examples |
+|----------|-----------|----------|
+| React components | `PascalCase.jsx` | `SprintBoard.jsx`, `GlassCard.jsx`, `BoardColumn.jsx` |
+| Hooks | `camelCase.js` with `use` prefix | `useSearch.js`, `useProject.js`, `useDragAndDrop.js` |
+| Stores | `camelCase.js` with `Store` suffix | `projectsStore.js`, `uiStore.js`, `activityStore.js` |
+| Utils / data / db | `camelCase.js` | `crossTabSync.js`, `storyflow.js`, `indexedDbStorage.js` |
+| Tests | `{SourceName}.test.{js,jsx}` co-located | `SprintBoard.test.jsx`, `ids.test.js` |
+| Contexts | `PascalCase.jsx` | `ProjectsContext.jsx`, `SettingsContext.jsx` |
+| Pages | `PascalCase.jsx` | `DashboardPage.jsx`, `ProjectPage.jsx`, `NotFoundPage.jsx` |
+
+**Rule:** `.jsx` for files containing JSX (components, pages, contexts, component tests). `.js` for everything else (hooks, stores, utils, data, pure JS tests).
+
 ## Key Patterns
 
-- **State:** ProjectsContext (useReducer) → localStorage auto-persist
+- **State:** Zustand stores (projectsStore, uiStore, activityStore) → IndexedDB persist via idb-keyval; ProjectsContext wraps projectsStore for legacy hook compatibility
 - **Styling:** Tailwind v4 + custom glassmorphism classes in index.css
 - **IDs:** Project IDs are slug-based (`generateProjectId("My App")` → `"my-app"`); internal entity IDs use UUIDs via `generateId()` (crypto.randomUUID)
 - **Updates:** useProject hook returns per-field updaters (updateOverview, addIssue, etc.)

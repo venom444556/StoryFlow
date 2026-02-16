@@ -216,6 +216,7 @@ export default function BoardTab({
             const isActive = activeView === mode.key
             return (
               <button
+                type="button"
                 key={mode.key}
                 onClick={() => setActiveView(mode.key)}
                 className={[
@@ -245,6 +246,7 @@ export default function BoardTab({
 
         {/* Epic sidebar toggle */}
         <button
+          type="button"
           onClick={() => setShowEpicSidebar((v) => !v)}
           className={[
             'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
@@ -264,6 +266,7 @@ export default function BoardTab({
 
         {/* Charts toggle */}
         <button
+          type="button"
           onClick={() => setShowCharts((v) => !v)}
           className={[
             'flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors',

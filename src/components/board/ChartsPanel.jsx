@@ -18,6 +18,7 @@ export default function ChartsPanel({ onClose, burndownData = [], velocityData =
         <BarChart3 size={16} className="text-[var(--color-fg-muted)]" />
         <h3 className="flex-1 text-sm font-semibold text-[var(--color-fg-default)]">Charts</h3>
         <button
+          type="button"
           onClick={onClose}
           className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
         >

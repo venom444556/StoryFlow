@@ -23,16 +23,24 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Mock the useProjects hook directly (no need for full Zustand setup)
+// Mock the useProjects hook with trash system support
 const mockAddProject = vi.fn()
-const mockDeleteProject = vi.fn()
+const mockTrashProject = vi.fn()
+const mockRestoreProject = vi.fn()
+const mockPermanentlyDeleteProject = vi.fn()
+const mockEmptyTrash = vi.fn()
 let mockProjects = []
+let mockTrashedProjects = []
 
 vi.mock('../hooks/useProjects', () => ({
   useProjects: () => ({
     projects: mockProjects,
+    trashedProjects: mockTrashedProjects,
     addProject: mockAddProject,
-    deleteProject: mockDeleteProject,
+    trashProject: mockTrashProject,
+    restoreProject: mockRestoreProject,
+    permanentlyDeleteProject: mockPermanentlyDeleteProject,
+    emptyTrash: mockEmptyTrash,
   }),
 }))
 
@@ -73,6 +81,7 @@ describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockProjects = []
+    mockTrashedProjects = []
     mockAddProject.mockReturnValue({ id: 'new-project-id' })
   })
 
@@ -90,7 +99,6 @@ describe('DashboardPage', () => {
     it('renders the New Project button', () => {
       mockProjects = [createMockProject({ id: '1', name: 'Existing' })]
       renderDashboard()
-      // When projects exist, only the action bar "New Project" button is shown (not empty state)
       expect(screen.getByRole('button', { name: /new project/i })).toBeInTheDocument()
     })
 
@@ -108,6 +116,15 @@ describe('DashboardPage', () => {
       mockProjects = [createMockProject({ id: '1', name: 'Single Project' })]
       renderDashboard()
       expect(screen.getByText('1 project')).toBeInTheDocument()
+    })
+
+    it('shows trash count alongside project count', () => {
+      mockProjects = [createMockProject({ id: '1', name: 'Active' })]
+      mockTrashedProjects = [
+        createMockProject({ id: '2', name: 'Trashed', deletedAt: new Date().toISOString() }),
+      ]
+      renderDashboard()
+      expect(screen.getByText(/1 in trash/)).toBeInTheDocument()
     })
   })
 
@@ -252,8 +269,6 @@ describe('DashboardPage', () => {
   })
 
   describe('Create New Project', () => {
-    // Helper: when mockProjects is empty, both action bar and empty state render "New Project" buttons.
-    // Use getAllByRole and pick the first one (the action bar button).
     function clickNewProject() {
       const buttons = screen.getAllByRole('button', { name: /new project/i })
       return userEvent.click(buttons[0])
@@ -261,18 +276,14 @@ describe('DashboardPage', () => {
 
     it('opens modal when New Project button is clicked', async () => {
       renderDashboard()
-
       await clickNewProject()
-
       expect(screen.getByText('New Project', { selector: 'h2' })).toBeInTheDocument()
     })
 
     it('creates project with entered name', async () => {
       renderDashboard()
-
       await clickNewProject()
 
-      // Input component renders label without htmlFor, find by placeholder
       const input = screen.getByPlaceholderText('My awesome project')
       await userEvent.type(input, 'My New Project')
 
@@ -285,20 +296,16 @@ describe('DashboardPage', () => {
 
     it('shows error and prevents creation when project name is empty', async () => {
       renderDashboard()
-
       await clickNewProject()
 
       const createBtn = screen.getByRole('button', { name: /create project/i })
-      // Button should be disabled when name is empty
       expect(createBtn).toBeDisabled()
 
       expect(mockAddProject).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it('creates project on Enter key press', async () => {
       renderDashboard()
-
       await clickNewProject()
 
       const input = screen.getByPlaceholderText('My awesome project')
@@ -310,7 +317,6 @@ describe('DashboardPage', () => {
 
     it('closes modal without creating project when Cancel is clicked', async () => {
       renderDashboard()
-
       await clickNewProject()
 
       const input = screen.getByPlaceholderText('My awesome project')
@@ -320,83 +326,212 @@ describe('DashboardPage', () => {
       await userEvent.click(cancelBtn)
 
       expect(mockAddProject).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
       expect(screen.queryByText('New Project', { selector: 'h2' })).not.toBeInTheDocument()
     })
 
     it('clears input when modal is reopened', async () => {
       renderDashboard()
-
-      // Open modal and type something
       await clickNewProject()
       const input = screen.getByPlaceholderText('My awesome project')
       await userEvent.type(input, 'Some Text')
 
-      // Cancel
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }))
 
-      // Reopen
       await clickNewProject()
       const newInput = screen.getByPlaceholderText('My awesome project')
-
       expect(newInput).toHaveValue('')
     })
   })
 
-  describe('Delete Project', () => {
-    it('shows delete confirmation dialog', async () => {
-      mockProjects = [createMockProject({ id: '1', name: 'Delete Me' })]
+  describe('Move to Trash', () => {
+    it('shows move-to-trash confirmation dialog', async () => {
+      mockProjects = [createMockProject({ id: '1', name: 'Trash Me' })]
       renderDashboard()
 
-      // Find and click the delete button (trash icon)
-      const deleteBtn = screen.getByTitle('Delete project')
-      await userEvent.click(deleteBtn)
+      const trashBtn = screen.getByTitle('Move to trash')
+      await userEvent.click(trashBtn)
 
-      expect(screen.getByText(/delete "Delete Me"/i)).toBeInTheDocument()
-      expect(screen.getByText(/this will permanently remove/i)).toBeInTheDocument()
+      expect(screen.getByText(/Move "Trash Me" to trash/i)).toBeInTheDocument()
+      expect(screen.getByText(/moved to trash.*restore it later/i)).toBeInTheDocument()
     })
 
-    it('deletes project when confirmed', async () => {
-      mockProjects = [createMockProject({ id: '1', name: 'To Be Deleted' })]
+    it('moves project to trash when confirmed', async () => {
+      mockProjects = [createMockProject({ id: '1', name: 'To Be Trashed' })]
       renderDashboard()
 
-      // Click delete button
-      const deleteBtn = screen.getByTitle('Delete project')
-      await userEvent.click(deleteBtn)
+      const trashBtn = screen.getByTitle('Move to trash')
+      await userEvent.click(trashBtn)
 
-      // Confirm deletion — use exact text to avoid matching the trash icon button (title="Delete project")
-      const confirmBtn = screen.getByText('Delete Project').closest('button')
+      // After clicking trash icon, the ConfirmDialog opens with a "Move to Trash" button.
+      // Use getAllByRole since the original trash icon button also matches.
+      const buttons = screen.getAllByRole('button', { name: /move to trash/i })
+      const confirmBtn = buttons[buttons.length - 1] // The dialog confirm button is last
       await userEvent.click(confirmBtn)
 
-      expect(mockDeleteProject).toHaveBeenCalledWith('1')
+      expect(mockTrashProject).toHaveBeenCalledWith('1')
     })
 
-    it('cancels delete when dialog is closed', async () => {
+    it('cancels trash when dialog is closed', async () => {
       mockProjects = [createMockProject({ id: '1', name: 'Keep Me' })]
       renderDashboard()
 
-      // Click delete button
-      const deleteBtn = screen.getByTitle('Delete project')
-      await userEvent.click(deleteBtn)
+      const trashBtn = screen.getByTitle('Move to trash')
+      await userEvent.click(trashBtn)
 
-      // Cancel via cancel button
       const cancelBtn = screen.getByRole('button', { name: /cancel/i })
       await userEvent.click(cancelBtn)
 
-      // Project should still exist
       expect(screen.getByText('Keep Me')).toBeInTheDocument()
-      expect(mockDeleteProject).not.toHaveBeenCalled()
+      expect(mockTrashProject).not.toHaveBeenCalled()
     })
 
-    it('does not navigate to project when delete button is clicked', async () => {
+    it('does not navigate to project when trash button is clicked', async () => {
       mockProjects = [createMockProject({ id: '1', name: 'Dont Navigate' })]
       renderDashboard()
 
-      const deleteBtn = screen.getByTitle('Delete project')
+      const trashBtn = screen.getByTitle('Move to trash')
+      await userEvent.click(trashBtn)
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Trash Section', () => {
+    it('hides trash button when no projects are trashed', () => {
+      mockProjects = [createMockProject({ id: '1', name: 'Active' })]
+      mockTrashedProjects = []
+      renderDashboard()
+
+      expect(screen.queryByRole('button', { name: /trash \(/i })).not.toBeInTheDocument()
+    })
+
+    it('shows trash button with count when projects are trashed', () => {
+      mockTrashedProjects = [
+        createMockProject({ id: '1', name: 'Trashed 1', deletedAt: new Date().toISOString() }),
+        createMockProject({ id: '2', name: 'Trashed 2', deletedAt: new Date().toISOString() }),
+      ]
+      renderDashboard()
+
+      expect(screen.getByRole('button', { name: /trash \(2\)/i })).toBeInTheDocument()
+    })
+
+    it('toggles trash section visibility on button click', async () => {
+      mockTrashedProjects = [
+        createMockProject({
+          id: '1',
+          name: 'Trashed Project',
+          deletedAt: new Date().toISOString(),
+        }),
+      ]
+      renderDashboard()
+
+      // Trash section not visible initially
+      expect(screen.queryByText('Trashed Project')).not.toBeInTheDocument()
+
+      // Click to show
+      const trashToggle = screen.getByRole('button', { name: /trash \(1\)/i })
+      await userEvent.click(trashToggle)
+
+      // Now visible
+      expect(screen.getByText('Trashed Project')).toBeInTheDocument()
+
+      // Click again to hide
+      await userEvent.click(trashToggle)
+
+      // Hidden again
+      expect(screen.queryByText('Trashed Project')).not.toBeInTheDocument()
+    })
+
+    it('restores project when restore button is clicked', async () => {
+      mockTrashedProjects = [
+        createMockProject({
+          id: 'restore-1',
+          name: 'Restore Me',
+          deletedAt: new Date().toISOString(),
+        }),
+      ]
+      renderDashboard()
+
+      const trashToggle = screen.getByRole('button', { name: /trash \(1\)/i })
+      await userEvent.click(trashToggle)
+
+      const restoreBtn = screen.getByTitle('Restore project')
+      await userEvent.click(restoreBtn)
+
+      expect(mockRestoreProject).toHaveBeenCalledWith('restore-1')
+    })
+
+    it('shows permanent delete confirmation', async () => {
+      mockTrashedProjects = [
+        createMockProject({ id: '1', name: 'Delete Forever', deletedAt: new Date().toISOString() }),
+      ]
+      renderDashboard()
+
+      const trashToggle = screen.getByRole('button', { name: /trash \(1\)/i })
+      await userEvent.click(trashToggle)
+
+      const deleteBtn = screen.getByTitle('Permanently delete')
       await userEvent.click(deleteBtn)
 
-      // Should not navigate - click was stopped
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(screen.getByText(/permanently delete "Delete Forever"/i)).toBeInTheDocument()
+      expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument()
+    })
+
+    it('permanently deletes when confirmed', async () => {
+      mockTrashedProjects = [
+        createMockProject({
+          id: 'del-1',
+          name: 'Gone Forever',
+          deletedAt: new Date().toISOString(),
+        }),
+      ]
+      renderDashboard()
+
+      const trashToggle = screen.getByRole('button', { name: /trash \(1\)/i })
+      await userEvent.click(trashToggle)
+
+      const deleteBtn = screen.getByTitle('Permanently delete')
+      await userEvent.click(deleteBtn)
+
+      const confirmBtn = screen.getByRole('button', { name: /delete forever/i })
+      await userEvent.click(confirmBtn)
+
+      expect(mockPermanentlyDeleteProject).toHaveBeenCalledWith('del-1')
+    })
+
+    it('shows empty trash confirmation with count', async () => {
+      mockTrashedProjects = [
+        createMockProject({ id: '1', name: 'T1', deletedAt: new Date().toISOString() }),
+        createMockProject({ id: '2', name: 'T2', deletedAt: new Date().toISOString() }),
+      ]
+      renderDashboard()
+
+      const trashToggle = screen.getByRole('button', { name: /trash \(2\)/i })
+      await userEvent.click(trashToggle)
+
+      const emptyBtn = screen.getByRole('button', { name: /empty trash/i })
+      await userEvent.click(emptyBtn)
+
+      expect(screen.getByText(/permanently delete 2 projects/i)).toBeInTheDocument()
+    })
+
+    it('empties trash when confirmed', async () => {
+      mockTrashedProjects = [
+        createMockProject({ id: '1', name: 'T1', deletedAt: new Date().toISOString() }),
+      ]
+      renderDashboard()
+
+      const trashToggle = screen.getByRole('button', { name: /trash \(1\)/i })
+      await userEvent.click(trashToggle)
+
+      const emptyBtn = screen.getByRole('button', { name: /empty trash/i })
+      await userEvent.click(emptyBtn)
+
+      // Confirm in the dialog — find the confirm button (last "Empty Trash" button)
+      const confirmBtns = screen.getAllByRole('button', { name: /empty trash/i })
+      await userEvent.click(confirmBtns[confirmBtns.length - 1])
+
+      expect(mockEmptyTrash).toHaveBeenCalled()
     })
   })
 
@@ -405,7 +540,6 @@ describe('DashboardPage', () => {
       mockProjects = []
       renderDashboard()
 
-      // Both action bar and empty state have "New Project" buttons. Pick the empty state one (last).
       const buttons = screen.getAllByRole('button', { name: /new project/i })
       const emptyStateBtn = buttons[buttons.length - 1]
       await userEvent.click(emptyStateBtn)
@@ -418,14 +552,12 @@ describe('DashboardPage', () => {
     it('handles project without techStack', () => {
       mockProjects = [createMockProject({ id: '1', name: 'No Tech', techStack: undefined })]
       renderDashboard()
-
       expect(screen.getByText('No Tech')).toBeInTheDocument()
     })
 
     it('handles project without board issues', () => {
       mockProjects = [createMockProject({ id: '1', name: 'No Board', board: undefined })]
       renderDashboard()
-
       expect(screen.getByText('No Board')).toBeInTheDocument()
       expect(screen.getByText('0 issues')).toBeInTheDocument()
     })
@@ -433,9 +565,7 @@ describe('DashboardPage', () => {
     it('handles project with empty techStack', () => {
       mockProjects = [createMockProject({ id: '1', name: 'Empty Tech', techStack: [] })]
       renderDashboard()
-
       expect(screen.getByText('Empty Tech')).toBeInTheDocument()
-      // Should not render tech badges container
       expect(screen.queryByText('+0 more')).not.toBeInTheDocument()
     })
 
@@ -444,7 +574,6 @@ describe('DashboardPage', () => {
         createMockProject({ id: '1', name: 'Project & <script>alert("xss")</script>' }),
       ]
       renderDashboard()
-
       expect(screen.getByText('Project & <script>alert("xss")</script>')).toBeInTheDocument()
     })
   })

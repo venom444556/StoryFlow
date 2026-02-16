@@ -98,6 +98,7 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
       {/* Type selector */}
       <div ref={menuRef} className="relative">
         <button
+          type="button"
           onClick={() => setShowTypeMenu((p) => !p)}
           className="flex items-center gap-0.5 rounded p-0.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
         >
@@ -116,6 +117,7 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
             >
               {TYPE_OPTIONS.map((opt) => (
                 <button
+                  type="button"
                   key={opt.value}
                   onClick={() => {
                     setType(opt.value)
@@ -151,12 +153,15 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do' 
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         placeholder={showError ? 'Title is required' : 'Create issue...'}
+        aria-invalid={showError || undefined}
+        aria-label="Issue title"
         className="min-w-0 flex-1 border-none bg-transparent py-0.5 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none"
       />
 
       {/* Submit button */}
       {title.trim() && (
         <motion.button
+          type="button"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
