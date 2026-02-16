@@ -98,7 +98,7 @@ User asks to plan a project
 
 - **State:** ProjectsContext (useReducer) → localStorage auto-persist
 - **Styling:** Tailwind v4 + custom glassmorphism classes in index.css
-- **IDs:** UUIDs via crypto.randomUUID()
+- **IDs:** Project IDs are slug-based (`generateProjectId("My App")` → `"my-app"`); internal entity IDs use UUIDs via `generateId()` (crypto.randomUUID)
 - **Updates:** useProject hook returns per-field updaters (updateOverview, addIssue, etc.)
 - **Animations:** Framer Motion for page transitions, tab switches, layout animations
 
