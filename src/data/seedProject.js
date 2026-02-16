@@ -1,7 +1,7 @@
 import { generateId } from '../utils/ids'
 
 export const SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 47
+export const SEED_VERSION = 48
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -2070,11 +2070,26 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        {
+          id: generateId(),
+          type: 'task',
+          title: 'SF-85: Convert TRACKER_WORKFLOW.md to Claude skill',
+          description: 'Moved TRACKER_WORKFLOW.md from repo root into skills/storyflow-tracker/SKILL.md as a proper Claude Code skill. Added YAML frontmatter (name, description), structured with When to use / Instructions / Examples sections following the established skill format. Updated CLAUDE.md skills section to reflect only active skills (other 7 skills remain in _archived/). Updated MEMORY.md reference. Removed old file via git rm.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['dx', 'skills'],
+          epicId: epic6Id,
+          sprintId: sprint5Id,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 85,
+      nextIssueNumber: 86,
     },
 
     pages: [
