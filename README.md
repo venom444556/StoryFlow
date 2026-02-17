@@ -115,27 +115,27 @@ The client stores data in IndexedDB for fast access. The Express server persists
 ## Project Structure
 
 ```
+server/              Express backend (app.js, db.js, ws.js, index.js)
 src/
   components/
-    ui/            Shared components (Button, Modal, Badge, Input, etc.)
-    layout/        App shell (Sidebar, Header, Settings, ErrorBoundary)
-    project/       Tab components (Board, Wiki, Workflow, Architecture, etc.)
-    board/         Kanban board (SprintBoard, BacklogView, IssueCard, etc.)
-    wiki/          Documentation (PageTree, PageEditor, MarkdownRenderer)
-    workflow/      Visual canvas (WorkflowCanvas, WorkflowNode, NodePalette)
-    architecture/  Component tree (ComponentDetail, DependencyGraph)
-    timeline/      Phase tracking (PhaseCard, MilestoneMarker)
-    decisions/     Decision records (DecisionCard, DecisionForm)
-    activity/      Activity feed
-  pages/           Dashboard, Project, 404
-  hooks/           Custom hooks (useProject, useDragAndDrop, useCanvasPan, etc.)
-  contexts/        ProjectsContext (React Context + Zustand)
-  stores/          Zustand stores (projects, activity, UI)
-  styles/          Design tokens (tokens.css)
-  utils/           Helpers (markdown, sanitize, graph, colors, export/import)
-  data/            Seed data, defaults, templates, node types
-  server/          Express backend (app.js, db.js, ws.js, index.js)
-data/              SQLite database (auto-created on first run, gitignored)
+    ui/              Shared components (Button, Modal, Badge, Input, etc.)
+    layout/          App shell (Sidebar, Header, Settings, ErrorBoundary)
+    project/         Tab components (Board, Wiki, Workflow, Architecture, etc.)
+    board/           Kanban board (SprintBoard, BacklogView, IssueCard, etc.)
+    wiki/            Documentation (PageTree, PageEditor, MarkdownRenderer)
+    workflow/        Visual canvas (WorkflowCanvas, WorkflowNode, NodePalette)
+    architecture/    Component tree (ComponentDetail, DependencyGraph)
+    timeline/        Phase tracking (PhaseCard, MilestoneMarker)
+    decisions/       Decision records (DecisionCard, DecisionForm)
+    activity/        Activity feed
+  pages/             Dashboard, Project, 404
+  hooks/             Custom hooks (useProject, useDragAndDrop, useCanvasPan, etc.)
+  contexts/          ProjectsContext (React Context + Zustand)
+  stores/            Zustand stores (projects, activity, UI)
+  styles/            Design tokens (tokens.css)
+  utils/             Helpers (markdown, sanitize, graph, colors, export/import)
+  data/              Seed data, defaults, templates, node types
+data/                SQLite database (auto-created on first run, gitignored)
 ```
 
 ## Data Model

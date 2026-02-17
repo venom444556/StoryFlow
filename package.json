@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node src/server/index.js",
+    "server": "node server/index.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
@@ -18,7 +18,7 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
     "typecheck": "tsc --noEmit",
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run test:run && npm run build",
-    "postinstall": "cd src/server && npm install",
+    "postinstall": "cd server && npm install",
     "prepare": "husky || true"
   },
   "dependencies": {
