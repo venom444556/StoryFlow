@@ -20,11 +20,12 @@ async function main() {
   // Attach WebSocket server
   initWs(server)
 
-  // Start listening
-  server.listen(PORT, () => {
-    console.log(`[StoryFlow Server] HTTP:      http://localhost:${PORT}`)
-    console.log(`[StoryFlow Server] WebSocket: ws://localhost:${PORT}`)
-    console.log(`[StoryFlow Server] API:       http://localhost:${PORT}/api/projects`)
+  // Start listening — bind to loopback only to prevent LAN exposure
+  const HOST = process.env.STORYFLOW_HOST || '127.0.0.1'
+  server.listen(PORT, HOST, () => {
+    console.log(`[StoryFlow Server] HTTP:      http://${HOST}:${PORT}`)
+    console.log(`[StoryFlow Server] WebSocket: ws://${HOST}:${PORT}`)
+    console.log(`[StoryFlow Server] API:       http://${HOST}:${PORT}/api/projects`)
   })
 
   // Graceful shutdown — flush SQLite to disk

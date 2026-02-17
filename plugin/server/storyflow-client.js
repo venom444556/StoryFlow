@@ -28,6 +28,22 @@ export function getBaseUrl() {
   return null
 }
 
+/** Read the auth token from env var or config file */
+function getAuthToken() {
+  if (process.env.STORYFLOW_MCP_TOKEN) {
+    return process.env.STORYFLOW_MCP_TOKEN
+  }
+  if (existsSync(CONFIG_PATH)) {
+    try {
+      const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'))
+      if (config.token) return config.token
+    } catch {
+      // Fall through
+    }
+  }
+  return null
+}
+
 /** Check if StoryFlow is configured */
 export function isConfigured() {
   return getBaseUrl() !== null
@@ -42,11 +58,15 @@ async function request(path, options = {}) {
     )
   }
 
+  const token = getAuthToken()
+  const authHeaders = token ? { Authorization: `Bearer ${token}` } : {}
+
   const url = `${base}${path}`
   const res = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
       ...options.headers,
     },
   })

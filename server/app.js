@@ -12,17 +12,61 @@ const app = express()
 // --- Middleware ---
 app.use(express.json({ limit: '10mb' }))
 
-// CORS
+// CORS — strict origin allowlist (no wildcard)
+const ALLOWED_ORIGINS = new Set(
+  (process.env.STORYFLOW_CORS_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+)
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
+  const origin = req.headers.origin
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.header('Access-Control-Allow-Origin', origin)
+    res.header('Vary', 'Origin')
+  }
+  // No Access-Control-Allow-Origin header if origin is not in allowlist —
+  // browser will block the response.
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.header('Access-Control-Allow-Headers', 'Content-Type')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-StoryFlow-Token, X-Confirm')
+  res.header('Access-Control-Max-Age', '600')
   if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
 })
 
-// --- Sync endpoint ---
+// Token auth — if STORYFLOW_MCP_TOKEN is set, require it on mutating requests
+const AUTH_TOKEN = process.env.STORYFLOW_MCP_TOKEN || null
+
+function requireToken(req, res, next) {
+  if (!AUTH_TOKEN) return next() // token not configured — skip auth
+
+  // Accept token via Authorization: Bearer <token> or X-StoryFlow-Token header
+  const bearer = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7)
+    : null
+  const headerToken = req.headers['x-storyflow-token'] || null
+  const provided = bearer || headerToken
+
+  if (!provided || provided !== AUTH_TOKEN) {
+    return res.status(401).json({ error: 'Missing or invalid authentication token' })
+  }
+  next()
+}
+
+// Apply token auth to all mutating API routes
+app.post('/api/*', requireToken)
+app.put('/api/*', requireToken)
+app.delete('/api/*', requireToken)
+
+// --- Sync endpoint (destructive: replaces all projects) ---
 app.post('/api/sync', (req, res) => {
+  // Require explicit confirmation header for this destructive operation
+  if (req.headers['x-confirm'] !== 'overwrite-all') {
+    return res.status(400).json({
+      error: 'Sync replaces all data. Set header X-Confirm: overwrite-all to proceed.',
+    })
+  }
   if (req.body.projects) {
     db.syncAll(req.body.projects)
     return res.json({ success: true, count: req.body.projects.length })
