@@ -50,17 +50,19 @@ All components use semantic CSS variable tokens (`--color-fg-default`, `--color-
 ## Quick Start
 
 ```bash
-npm install
-npm run dev
+npm install          # Installs client + server dependencies
+npm run dev:full     # Starts Express server + Vite dev server
 ```
 
-Opens at [http://localhost:3000](http://localhost:3000).
+Opens at [http://localhost:3000](http://localhost:3000). The Express API server runs on port 3001 (Vite proxies `/api` requests automatically).
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start dev server |
+| `npm run dev:full` | Start server + client together |
+| `npm run dev` | Start Vite dev server only (client) |
+| `npm run server` | Start Express API server only |
 | `npm run build` | Production build |
 | `npm run preview` | Preview production build |
 | `npm run test` | Run vitest in watch mode |
@@ -70,16 +72,38 @@ Opens at [http://localhost:3000](http://localhost:3000).
 
 ## Tech Stack
 
+### Client
+
 | Technology | Purpose |
 |-----------|---------|
 | React 18 | UI framework |
-| Vite 6 | Build tool |
+| Vite 6 | Build tool + dev server |
 | Tailwind CSS 4.0 | Styling via `@tailwindcss/vite` |
 | Framer Motion | Animations |
 | Zustand + Dexie | State management with IndexedDB persistence |
 | Lucide React | Icons |
 | date-fns | Date formatting |
 | Vitest | Testing |
+
+### Server
+
+| Technology | Purpose |
+|-----------|---------|
+| Express 4 | HTTP API server |
+| sql.js | SQLite database (pure JS, no native deps) |
+| ws | WebSocket server for real-time sync |
+
+## Architecture
+
+```
+Browser (localhost:3000)          Express Server (localhost:3001)
+  React + Zustand + IndexedDB  <──>  REST API + SQLite + WebSocket
+       ↑                                    ↑
+       └── Vite dev server proxies          └── Standalone process
+           /api/* to :3001                      Data persists in data/storyflow.db
+```
+
+The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
 
 ## Project Structure
 
@@ -103,11 +127,13 @@ src/
   styles/          Design tokens (tokens.css)
   utils/           Helpers (markdown, sanitize, graph, colors, export/import)
   data/            Seed data, defaults, templates, node types
+  server/          Express backend (app.js, db.js, ws.js, index.js)
+data/              SQLite database (auto-created on first run, gitignored)
 ```
 
 ## Data Model
 
-Projects are persisted in IndexedDB (with localStorage fallback) and can be exported/imported as JSON. Each project contains:
+Projects are persisted in both IndexedDB (client) and SQLite (server). The server is the source of truth -- data survives browser clears and server restarts. Each project contains:
 
 - **Overview** -- goals, constraints, tech stack, target audience
 - **Architecture** -- component tree with types and dependencies
@@ -119,20 +145,20 @@ Projects are persisted in IndexedDB (with localStorage fallback) and can be expo
 
 ## Deployment
 
-StoryFlow is a static client-side SPA with no backend. Deploy the `dist/` folder to any static hosting provider:
+StoryFlow requires the Express server for data persistence. Build the client and run the server:
 
 ```bash
-npm run build    # Produces dist/
+npm run build        # Produces dist/
+npm run server       # Express serves dist/ + API on port 3001
 ```
 
-| Provider | Command |
-|----------|---------|
-| **Vercel** | `npx vercel --prod` |
-| **Netlify** | Drag `dist/` to Netlify dashboard, or `npx netlify deploy --prod --dir=dist` |
-| **GitHub Pages** | Use `gh-pages` package or Actions workflow |
-| **S3 + CloudFront** | `aws s3 sync dist/ s3://your-bucket --delete` |
+The server auto-detects `dist/` and serves it as static files alongside the API. Open [http://localhost:3001](http://localhost:3001) in production mode.
 
-For SPA routing, configure your host to serve `index.html` for all paths (Vercel and Netlify handle this automatically).
+To change the server port, set the `STORYFLOW_PORT` environment variable:
+
+```bash
+STORYFLOW_PORT=8080 npm run server
+```
 
 ## License
 

@@ -18,6 +18,7 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
     "typecheck": "tsc --noEmit",
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run test:run && npm run build",
+    "postinstall": "cd src/server && npm install",
     "prepare": "husky || true"
   },
   "dependencies": {

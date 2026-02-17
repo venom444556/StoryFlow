@@ -26,6 +26,7 @@ npm-debug.log*
 
 # Claude Code
 .claude/
+CLAUDE.md
 
 # Windows artifacts
 nul
