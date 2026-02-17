@@ -24,8 +24,8 @@ const indexedDbStorage = {
     try {
       const row = await db.keyval.get(name)
       return row?.value ?? null
-    } catch {
-      // Fallback to localStorage if IndexedDB fails
+    } catch (err) {
+      console.warn('[StoryFlow] IndexedDB read failed, falling back to localStorage:', err)
       return localStorage.getItem(name)
     }
   },
@@ -33,8 +33,8 @@ const indexedDbStorage = {
   setItem: async (name, value) => {
     try {
       await db.keyval.put({ key: name, value })
-    } catch {
-      // Fallback to localStorage if IndexedDB fails
+    } catch (err) {
+      console.warn('[StoryFlow] IndexedDB write failed, falling back to localStorage:', err)
       localStorage.setItem(name, value)
     }
   },
@@ -42,7 +42,8 @@ const indexedDbStorage = {
   removeItem: async (name) => {
     try {
       await db.keyval.delete(name)
-    } catch {
+    } catch (err) {
+      console.warn('[StoryFlow] IndexedDB delete failed, falling back to localStorage:', err)
       localStorage.removeItem(name)
     }
   },

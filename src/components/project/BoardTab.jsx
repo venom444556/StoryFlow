@@ -83,7 +83,7 @@ export default function BoardTab({
   const [activeView, setActiveView] = useState('board')
   const [selectedIssue, setSelectedIssue] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
-  const [showEpicSidebar, setShowEpicSidebar] = useState(false)
+  const [showEpicSidebar, setShowEpicSidebar] = useState(true)
   const [showCharts, setShowCharts] = useState(false)
   const [activeEpicId, setActiveEpicId] = useState(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
@@ -244,26 +244,6 @@ export default function BoardTab({
 
         <div className="flex-1" />
 
-        {/* Epic sidebar toggle */}
-        <button
-          type="button"
-          onClick={() => setShowEpicSidebar((v) => !v)}
-          className={[
-            'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-            showEpicSidebar
-              ? 'text-[var(--color-fg-default)]'
-              : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
-          ].join(' ')}
-          style={
-            showEpicSidebar
-              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' }
-              : undefined
-          }
-        >
-          <Layers size={13} />
-          Epics
-        </button>
-
         {/* Charts toggle */}
         <button
           type="button"
@@ -307,7 +287,7 @@ export default function BoardTab({
         />
 
         {/* Views */}
-        <div className="min-w-0 flex-1 overflow-auto p-1">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden p-1">
           <AnimatePresence mode="wait">
             {activeView === 'board' && (
               <motion.div
@@ -374,6 +354,7 @@ export default function BoardTab({
             onDelete={handleRequestDeleteIssue}
             onClose={handleCloseDetail}
             allIssues={allIssues}
+            sprints={board?.sprints ?? []}
           />
         )}
       </AnimatePresence>

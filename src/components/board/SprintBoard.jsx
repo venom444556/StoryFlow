@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import BoardColumn from './BoardColumn'
+import QuickCreateBar from './QuickCreateBar'
 import SprintModal from './SprintModal'
 import Badge from '../ui/Badge'
 import ConfirmDialog from '../ui/ConfirmDialog'
@@ -336,7 +337,7 @@ export default function SprintBoard({
       )}
 
       {/* Kanban columns */}
-      <div className="flex flex-1 gap-4 overflow-x-auto pb-4">
+      <div className="flex min-h-0 flex-1 gap-4 overflow-x-auto pb-2">
         {statusColumns.map((status) => (
           <BoardColumn
             key={status}
@@ -348,6 +349,15 @@ export default function SprintBoard({
             onCreateIssue={onCreateIssue}
           />
         ))}
+      </div>
+
+      {/* Quick create bar */}
+      <div className="shrink-0 pt-1 pb-2">
+        <QuickCreateBar
+          onCreateIssue={onCreateIssue}
+          defaultStatus={statusColumns[0] || 'To Do'}
+          statusColumns={statusColumns}
+        />
       </div>
 
       {/* Backlog summary (if a specific sprint is selected and there are unassigned issues) */}

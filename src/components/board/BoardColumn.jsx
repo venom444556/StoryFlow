@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import IssueCard from './IssueCard'
-import QuickCreateBar from './QuickCreateBar'
 import Badge from '../ui/Badge'
 
 const STATUS_ACCENT = {
@@ -58,13 +57,6 @@ export default function BoardColumn({
     [onDrop, status]
   )
 
-  const handleCreateIssue = useCallback(
-    (issueData) => {
-      onCreateIssue?.({ ...issueData, status })
-    },
-    [onCreateIssue, status]
-  )
-
   return (
     <div
       role="listbox"
@@ -73,7 +65,7 @@ export default function BoardColumn({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={[
-        'flex min-w-[280px] flex-1 flex-col rounded-xl border transition-all duration-200',
+        'flex min-w-[280px] flex-1 flex-col self-stretch rounded-xl border transition-all duration-200',
         'bg-[var(--color-bg-glass)] backdrop-blur-sm',
         isDragOver
           ? `border-2 ${accent.dropGlow} ring-2 bg-[var(--color-bg-glass-hover)]`
@@ -157,11 +149,6 @@ export default function BoardColumn({
             </span>
           </motion.div>
         )}
-      </div>
-
-      {/* Quick create */}
-      <div className="shrink-0 border-t border-[var(--color-border-default)] px-3 py-2">
-        <QuickCreateBar onCreateIssue={handleCreateIssue} defaultStatus={status} />
       </div>
     </div>
   )

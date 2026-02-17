@@ -76,7 +76,7 @@ Opens at [http://localhost:3000](http://localhost:3000).
 | Vite 6 | Build tool |
 | Tailwind CSS 4.0 | Styling via `@tailwindcss/vite` |
 | Framer Motion | Animations |
-| Zustand | State management with localStorage persistence |
+| Zustand + Dexie | State management with IndexedDB persistence |
 | Lucide React | Icons |
 | date-fns | Date formatting |
 | Vitest | Testing |
@@ -107,7 +107,7 @@ src/
 
 ## Data Model
 
-Projects are stored in localStorage and can be exported/imported as JSON. Each project contains:
+Projects are persisted in IndexedDB (with localStorage fallback) and can be exported/imported as JSON. Each project contains:
 
 - **Overview** -- goals, constraints, tech stack, target audience
 - **Architecture** -- component tree with types and dependencies
@@ -116,6 +116,23 @@ Projects are stored in localStorage and can be exported/imported as JSON. Each p
 - **Wiki** -- nested pages with markdown content and version history
 - **Timeline** -- phases with progress tracking and milestones
 - **Decisions** -- architectural decisions with alternatives and consequences
+
+## Deployment
+
+StoryFlow is a static client-side SPA with no backend. Deploy the `dist/` folder to any static hosting provider:
+
+```bash
+npm run build    # Produces dist/
+```
+
+| Provider | Command |
+|----------|---------|
+| **Vercel** | `npx vercel --prod` |
+| **Netlify** | Drag `dist/` to Netlify dashboard, or `npx netlify deploy --prod --dir=dist` |
+| **GitHub Pages** | Use `gh-pages` package or Actions workflow |
+| **S3 + CloudFront** | `aws s3 sync dist/ s3://your-bucket --delete` |
+
+For SPA routing, configure your host to serve `index.html` for all paths (Vercel and Netlify handle this automatically).
 
 ## License
 

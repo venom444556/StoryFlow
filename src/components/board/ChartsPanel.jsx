@@ -10,7 +10,7 @@ export default function ChartsPanel({ onClose, burndownData = [], velocityData =
       animate={{ x: 0, opacity: 1 }}
       exit={{ x: '100%', opacity: 0 }}
       transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-      className="absolute right-0 top-0 bottom-0 z-20 flex w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)] bg-[var(--color-bg-overlay)]"
+      className="absolute right-2 top-2 bottom-2 z-20 flex w-[480px] max-w-[calc(100%-1rem)] flex-col overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-overlay)] shadow-xl"
       style={{ backdropFilter: 'blur(16px)' }}
     >
       {/* Header */}
