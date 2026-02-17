@@ -24,6 +24,30 @@ import {
 const STORAGE_KEY = 'storyflow-projects'
 
 // ---------------------------------------------------------------------------
+// Server sync: push client state to REST API (debounced)
+// ---------------------------------------------------------------------------
+let _syncTimer = null
+let _isSyncing = false
+
+/** Push all projects to the server-side JSON store */
+function syncToServer(projects) {
+  // Don't sync during rehydration (prevents loops)
+  if (_isSyncing) return
+  clearTimeout(_syncTimer)
+  _syncTimer = setTimeout(async () => {
+    try {
+      await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projects }),
+      })
+    } catch {
+      // Server may not be running (production build, etc.) — silently ignore
+    }
+  }, 500)
+}
+
+// ---------------------------------------------------------------------------
 // Migrate seed project if a new version is available
 // ---------------------------------------------------------------------------
 function migrateSeedProject(projects) {
@@ -1008,3 +1032,94 @@ onCrossTabUpdate(({ store: storeName }) => {
     })
   }
 })
+
+// ---------------------------------------------------------------------------
+// Server Sync: push local changes to REST API + listen for external writes
+// ---------------------------------------------------------------------------
+
+// Push to server on every local state change (debounced 500ms)
+useProjectsStore.subscribe(
+  (state) => state.projects,
+  (projects) => syncToServer(projects)
+)
+
+// Listen for external writes via WebSocket (replaces Vite HMR)
+function reloadFromServer() {
+  _isSyncing = true
+  fetch('/api/projects')
+    .then((res) => (res.ok ? res.json() : null))
+    .then(async (summaries) => {
+      if (!summaries || summaries.length === 0) return
+      // Fetch full project data for each project
+      const fullProjects = await Promise.all(
+        summaries.map((s) =>
+          fetch(`/api/projects/${s.id}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+        )
+      )
+      const projects = fullProjects.filter(Boolean)
+      if (projects.length > 0) {
+        // Merge: keep client-only projects, update/add server projects
+        const currentProjects = useProjectsStore.getState().projects
+        const serverIds = new Set(projects.map((p) => p.id))
+        const clientOnly = currentProjects.filter((p) => !serverIds.has(p.id))
+        useProjectsStore.setState({ projects: [...clientOnly, ...projects] })
+      }
+    })
+    .catch(() => {
+      // Server unavailable — ignore
+    })
+    .finally(() => {
+      _isSyncing = false
+    })
+}
+
+let _ws = null
+let _wsReconnectTimer = null
+
+function connectWebSocket() {
+  // Determine WebSocket URL from current page origin
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const wsUrl = `${wsProtocol}//localhost:3001`
+
+  try {
+    _ws = new WebSocket(wsUrl)
+  } catch {
+    // WebSocket constructor can throw in some environments
+    return
+  }
+
+  _ws.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data)
+      if (msg.type === 'sync') {
+        reloadFromServer()
+      }
+    } catch {
+      // Ignore malformed messages
+    }
+  }
+
+  _ws.onclose = () => {
+    // Auto-reconnect after 3 seconds
+    clearTimeout(_wsReconnectTimer)
+    _wsReconnectTimer = setTimeout(connectWebSocket, 3000)
+  }
+
+  _ws.onerror = () => {
+    // Error triggers close, which triggers reconnect
+  }
+}
+
+// Initial sync: push client state to server + connect WebSocket
+{
+  const unsub = useProjectsStore.persist.onFinishHydration(() => {
+    const { projects } = useProjectsStore.getState()
+    if (projects.length > 0) {
+      syncToServer(projects)
+    }
+    connectWebSocket()
+    unsub()
+  })
+}

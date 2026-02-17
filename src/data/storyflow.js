@@ -3,7 +3,7 @@ import { generateId } from '../utils/ids'
 export const SEED_PROJECT_ID = 'storyflow'
 // Legacy ID used before slug-based naming convention (v61)
 export const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 80
+export const SEED_VERSION = 81
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -225,6 +225,14 @@ export function createSeedProject() {
   const pr7Id = generateId()
   const pr8Id = generateId()
   const pr9Id = generateId()
+
+  // Backend + Plugin (v81)
+  const epic13Id = generateId()
+  const be1Id = generateId()
+  const be2Id = generateId()
+  const be3Id = generateId()
+  const be4Id = generateId()
+  const be5Id = generateId()
 
   // New architecture component IDs (v13)
   const archErrorBoundaryId = generateId()
@@ -4434,11 +4442,116 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        // =====================================================================
+        // BACKEND + PLUGIN (v81) — SF-164 through SF-169
+        // =====================================================================
+        {
+          id: epic13Id,
+          type: 'epic',
+          key: 'SF-164',
+          title: 'Standalone Backend + Claude Code Plugin',
+          description:
+            'Migrate StoryFlow from Vite middleware + JSON file to a standalone Express server + SQLite database. Build a Claude Code plugin with MCP server for external project management integration.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: null,
+          assignee: 'claude',
+          labels: ['epic', 'backend', 'plugin'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: be1Id,
+          type: 'story',
+          key: 'SF-165',
+          title: 'REST API via Vite configureServer + JSON data store',
+          description:
+            'Add server-side data layer using Vite configureServer hook. 15 REST endpoints under /api/* backed by JSON file persistence. Zero new deps. Includes sync endpoint for client push and HMR WebSocket notifications for external writes.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 5,
+          assignee: 'claude',
+          labels: ['backend', 'api'],
+          epicId: epic13Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: be2Id,
+          type: 'story',
+          key: 'SF-166',
+          title: 'Client ↔ server bidirectional sync',
+          description:
+            'Add debounced push to /api/sync on store mutations. Listen for Vite HMR storyflow:sync events on external API writes. Initial sync on app load pushes IndexedDB state to server.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['sync', 'client'],
+          epicId: epic13Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: be3Id,
+          type: 'story',
+          key: 'SF-167',
+          title: 'Claude Code plugin with MCP server',
+          description:
+            'Standalone plugin at storyflow-plugin/ with .claude-plugin/plugin.json manifest, .mcp.json, stdio MCP server (14 tools), REST API client, 4 commands (setup/open/board/sync), skill + data model reference, and project-planner agent.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['plugin', 'mcp'],
+          epicId: epic13Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: be4Id,
+          type: 'story',
+          key: 'SF-168',
+          title: 'Migrate to Express + SQLite standalone server',
+          description:
+            'Replace Vite middleware with standalone Express server on port 3001. SQLite via sql.js (pure JS, no native deps). WebSocket notifications replace Vite HMR. Auto-migration from JSON to SQLite on first start. Vite proxies /api/* to Express.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 8,
+          assignee: 'claude',
+          labels: ['backend', 'sqlite', 'migration'],
+          epicId: epic13Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: be5Id,
+          type: 'task',
+          key: 'SF-169',
+          title: 'Global config persistence for StoryFlow URL',
+          description:
+            'Store StoryFlow URL at ~/.config/storyflow/config.json. Written by /storyflow:setup command. Read by MCP server (with STORYFLOW_URL env var fallback). Persists across all Claude Code projects.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['config', 'plugin'],
+          epicId: epic13Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 164,
+      nextIssueNumber: 170,
     },
 
     pages: [
