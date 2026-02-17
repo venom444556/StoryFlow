@@ -1,6 +1,12 @@
 # StoryFlow
 
-A visual project planning and management tool built for AI-assisted software development. StoryFlow combines the best of JIRA, Confluence, and visual workflow tools into a single glassmorphic interface.
+**Project management that your AI coding assistant can actually use.**
+
+Most project tools live in a browser tab your AI can't see. StoryFlow is different — it exposes every board, wiki page, and workflow as MCP tools, so Claude Code (or any MCP-compatible agent) can read your backlog, create issues, update sprint progress, and write docs while it works alongside you. No copy-pasting context between tabs.
+
+It's also the tool you'd want even without AI: a Kanban board with sprints and burndown charts, a wiki with live markdown preview, a visual workflow canvas, architecture diagrams, decision logs, and timeline tracking — all in one local-first app with a glassmorphic UI. Think JIRA + Confluence + Miro, minus the SaaS bill and the latency.
+
+Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud sync, no telemetry.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
