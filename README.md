@@ -150,6 +150,52 @@ Projects are persisted in both IndexedDB (client) and SQLite (server). The serve
 - **Timeline** -- phases with progress tracking and milestones
 - **Decisions** -- architectural decisions with alternatives and consequences
 
+## Claude Code Plugin
+
+StoryFlow includes a Claude Code plugin that lets Claude manage projects, issues, sprints, and wiki pages directly from any codebase.
+
+### Install
+
+```bash
+claude plugin add /path/to/storyflow-plugin
+```
+
+### Setup
+
+```bash
+/storyflow:setup     # Configure the StoryFlow URL (default: http://localhost:3001)
+```
+
+Configuration is saved to `~/.config/storyflow/config.json` and persists across all Claude Code sessions.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/storyflow:setup` | Configure StoryFlow URL |
+| `/storyflow:sync` | Check connectivity and sync status |
+| `/storyflow:open` | Open StoryFlow UI in browser |
+| `/storyflow:board [project]` | Show board summary for a project |
+
+### MCP Tools
+
+The plugin exposes MCP tools that Claude can use automatically during development:
+
+| Tool | Purpose |
+|------|---------|
+| `storyflow_list_projects` | List all projects |
+| `storyflow_create_project` | Create new project |
+| `storyflow_list_issues` | List/filter issues |
+| `storyflow_create_issue` | Create issue (epic/story/task/bug) |
+| `storyflow_update_issue` | Update issue fields |
+| `storyflow_get_board_summary` | Board overview with counts and progress |
+| `storyflow_list_sprints` | List sprints |
+| `storyflow_create_sprint` | Create sprint |
+| `storyflow_list_pages` | List wiki pages |
+| `storyflow_create_page` | Create wiki page |
+| `storyflow_update_page` | Update page content |
+| `storyflow_check_connection` | Verify connectivity |
+
 ## Deployment
 
 StoryFlow requires the Express server for data persistence. Build the client and run the server:
