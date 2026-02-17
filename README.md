@@ -54,7 +54,12 @@ npm install          # Installs client + server dependencies
 npm run dev:full     # Starts Express server + Vite dev server
 ```
 
-Opens at [http://localhost:3000](http://localhost:3000). The Express API server runs on port 3001 (Vite proxies `/api` requests automatically).
+This starts two processes:
+
+- **Vite dev server** on [http://localhost:3000](http://localhost:3000) -- open this in your browser
+- **Express API server** on port 3001 -- Vite proxies `/api` requests automatically
+
+In production, only the Express server runs (on port 3001) and serves both the API and the built frontend.
 
 ## Commands
 
@@ -96,11 +101,13 @@ Opens at [http://localhost:3000](http://localhost:3000). The Express API server 
 ## Architecture
 
 ```
-Browser (localhost:3000)          Express Server (localhost:3001)
-  React + Zustand + IndexedDB  <──>  REST API + SQLite + WebSocket
-       ↑                                    ↑
-       └── Vite dev server proxies          └── Standalone process
-           /api/* to :3001                      Data persists in data/storyflow.db
+Development:
+  Vite (:3000) ──proxy /api──> Express (:3001) ──> SQLite (data/storyflow.db)
+       ↑                            ↕ WebSocket
+       └── Browser (React + Zustand + IndexedDB)
+
+Production:
+  Express (:3001) ──> serves dist/ + API + WebSocket ──> SQLite
 ```
 
 The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
