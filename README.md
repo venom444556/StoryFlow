@@ -203,6 +203,31 @@ The plugin exposes MCP tools that Claude can use automatically during developmen
 | `storyflow_update_page` | Update page content |
 | `storyflow_check_connection` | Verify connectivity |
 
+## Security
+
+StoryFlow is intended for **local single-user use only**. It is not designed or hardened for multi-user or public-facing deployments.
+
+### Threat Model
+
+The primary threat StoryFlow guards against is **unauthorized tool access** — preventing untrusted MCP clients or rogue processes from reading and modifying your project data through the API.
+
+**What's protected:**
+
+- MCP tool calls require a shared secret (`MCP_AUTH_TOKEN`) passed as a Bearer token. Without it, all tool requests are rejected with `401 Unauthorized`.
+- The token is validated using constant-time comparison to prevent timing attacks.
+
+**What's NOT in scope:**
+
+- **Network-level security.** By default the server binds to `127.0.0.1` (localhost). If you bind to `0.0.0.0` or expose the port externally, you must provide your own controls (firewall rules, reverse proxy with TLS, VPN, etc.).
+- **Encryption at rest.** The SQLite database is stored unencrypted on disk. Protect it with filesystem permissions.
+- **Multi-user access control.** There are no user accounts, roles, or per-user permissions. Anyone with the token has full access.
+
+### Recommendations
+
+- Always set `MCP_AUTH_TOKEN` to a strong random value (e.g., `openssl rand -hex 32`).
+- Never commit the token to version control — use environment variables or a `.env` file.
+- Do not expose the server port to untrusted networks without additional safeguards.
+
 ## Deployment
 
 StoryFlow requires the Express server for data persistence. Build the client and run the server:
