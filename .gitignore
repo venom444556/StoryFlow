@@ -27,6 +27,8 @@ npm-debug.log*
 # Claude Code
 .claude/
 CLAUDE.md
+src/data/storyflow.js
+_archived/
 
 # Windows artifacts
 nul

@@ -6,12 +6,21 @@ import { generateId, generateProjectId } from '../utils/ids'
 import indexedDbStorage from '../db/indexedDbStorage'
 import { broadcastUpdate, onCrossTabUpdate, setRehydrating } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
-import {
-  createSeedProject,
-  SEED_VERSION,
-  SEED_PROJECT_ID,
-  LEGACY_SEED_PROJECT_ID,
-} from '../data/storyflow'
+// Seed project support (optional — loaded dynamically if src/data/storyflow.js exists)
+let _createSeedProject = null
+let _SEED_VERSION = 0
+const SEED_PROJECT_ID = 'storyflow'
+const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
+
+// Eagerly start loading seed data (non-blocking, optional file)
+// import.meta.glob returns {} if the file doesn't exist — no build error
+const _seedModules = import.meta.glob('../data/storyflow.js')
+const _seedReady = _seedModules['../data/storyflow.js']
+  ? _seedModules['../data/storyflow.js']().then((seed) => {
+      _createSeedProject = seed.createSeedProject
+      _SEED_VERSION = seed.SEED_VERSION
+    })
+  : Promise.resolve()
 import {
   useActivityStore,
   ACTIVITY_TYPES,
@@ -51,6 +60,9 @@ function syncToServer(projects) {
 // Migrate seed project if a new version is available
 // ---------------------------------------------------------------------------
 function migrateSeedProject(projects) {
+  // Skip seed migration if no seed data is available
+  if (!_createSeedProject) return projects
+
   // Find seed project by isSeed flag, new ID, or legacy ID
   let seedIndex = projects.findIndex((p) => p.isSeed === true)
 
@@ -71,16 +83,16 @@ function migrateSeedProject(projects) {
     )
     if (legacyIndex !== -1) {
       const updated = [...projects]
-      updated[legacyIndex] = createSeedProject()
+      updated[legacyIndex] = _createSeedProject()
       return updated
     }
     return projects
   }
 
   // Check version — replace if outdated (also handles ID migration from legacy → slug)
-  if ((projects[seedIndex].seedVersion || 0) < SEED_VERSION) {
+  if ((projects[seedIndex].seedVersion || 0) < _SEED_VERSION) {
     const updated = [...projects]
-    updated[seedIndex] = createSeedProject()
+    updated[seedIndex] = _createSeedProject()
     return updated
   }
 
@@ -829,15 +841,18 @@ export const useProjectsStore = create(
         storage: createJSONStorage(() => indexedDbStorage),
         onRehydrateStorage: () => (state) => {
           if (state) {
-            // Migrate seed project on load
-            const migrated = migrateSeedProject(state.projects)
-            if (migrated !== state.projects) {
-              state.projects = migrated
-            }
-            // Seed with project if empty
-            if (state.projects.length === 0) {
-              state.projects = [createSeedProject()]
-            }
+            // Wait for seed data to load, then migrate if needed
+            _seedReady.then(() => {
+              const store = useProjectsStore.getState()
+              const migrated = migrateSeedProject(store.projects)
+              if (migrated !== store.projects) {
+                useProjectsStore.setState({ projects: migrated })
+              }
+              // Seed with project if empty (only if seed data is available)
+              if (store.projects.length === 0 && _createSeedProject) {
+                useProjectsStore.setState({ projects: [_createSeedProject()] })
+              }
+            })
 
             // Seed initial activities for the seed project if activity store is empty
             const seedProject = state.projects.find((p) => p.isSeed)
