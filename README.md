@@ -115,6 +115,7 @@ The client stores data in IndexedDB for fast access. The Express server persists
 ## Project Structure
 
 ```
+plugin/              Claude Code plugin (MCP server, commands, skills)
 server/              Express backend (app.js, db.js, ws.js, index.js)
 src/
   components/
@@ -157,7 +158,7 @@ StoryFlow includes a Claude Code plugin that lets Claude manage projects, issues
 ### Install
 
 ```bash
-claude plugin add /path/to/storyflow-plugin
+claude plugin add /path/to/StoryFlow/plugin
 ```
 
 ### Setup

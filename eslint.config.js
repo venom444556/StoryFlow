@@ -44,7 +44,7 @@ export default [
     },
   },
   {
-    files: ['server/**/*.js'],
+    files: ['server/**/*.js', 'plugin/server/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.node,

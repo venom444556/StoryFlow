@@ -1,0 +1,6 @@
+{
+  "name": "storyflow",
+  "version": "1.0.0",
+  "description": "Integrate Claude Code with StoryFlow project management — create issues, track sprints, update boards, and manage wiki docs from any codebase.",
+  "author": "StoryFlow"
+}
