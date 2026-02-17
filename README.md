@@ -5,7 +5,7 @@ A visual project planning and management tool built for AI-assisted software dev
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+![License](https://img.shields.io/badge/License-Proprietary-red)
 
 ## Features
 
@@ -169,4 +169,4 @@ STORYFLOW_PORT=8080 npm run server
 
 ## License
 
-MIT
+Copyright (c) 2026 Sheldon Spence. All rights reserved. See [COPYRIGHT.txt](COPYRIGHT.txt).
