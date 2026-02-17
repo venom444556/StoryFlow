@@ -25,7 +25,17 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
   const navigate = useNavigate()
 
   const handleNewProject = () => {
-    const project = addProject('New Project')
+    const active = projects.filter((p) => !p.deletedAt)
+    const lowerNames = new Set(active.map((p) => p.name.toLowerCase()))
+
+    let name = 'Untitled Project'
+    if (lowerNames.has(name.toLowerCase())) {
+      let counter = 2
+      while (lowerNames.has(`untitled project ${counter}`)) counter++
+      name = `Untitled Project ${counter}`
+    }
+
+    const project = addProject(name)
     navigate(`/project/${project.id}`)
     onMobileMenuClose?.()
   }
@@ -75,6 +85,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           <button
             type="button"
             onClick={onMobileMenuClose}
+            aria-label="Close menu"
             className={[
               'ml-auto rounded-[var(--radius-lg)] p-[var(--space-2)]',
               'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
@@ -89,7 +100,10 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-[var(--space-3)] py-[var(--space-4)]">
+      <nav
+        aria-label="Main navigation"
+        className="flex-1 overflow-y-auto px-[var(--space-3)] py-[var(--space-4)]"
+      >
         {/* Dashboard link */}
         <NavLink
           to="/"
@@ -175,7 +189,11 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 ].join(' ')}
                 style={{ transitionDuration: 'var(--duration-fast)' }}
               >
-                <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`} />
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}
+                  aria-label={`Status: ${project.status || 'planning'}`}
+                  role="img"
+                />
                 <span className="truncate">{project.name}</span>
               </button>
             )

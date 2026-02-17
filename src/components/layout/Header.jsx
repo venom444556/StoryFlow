@@ -212,6 +212,7 @@ export default function Header({
         {/* Search */}
         <button
           onClick={onSearchClick}
+          aria-label="Search (Ctrl+/)"
           title="Search (Ctrl+/)"
           className={[
             'flex items-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
@@ -239,6 +240,7 @@ export default function Header({
         {/* Import */}
         <button
           onClick={handleImportClick}
+          aria-label="Import project"
           title="Import project"
           className={iconButtonClasses}
           style={{ transitionDuration: 'var(--duration-fast)' }}
@@ -249,6 +251,7 @@ export default function Header({
         {/* Export */}
         <button
           onClick={handleExportClick}
+          aria-label={params.id ? 'Export current project' : 'Export all projects'}
           title={
             exportSize
               ? `Export${params.id ? '' : ` all ${projects.length} projects`} (${exportSize})`
@@ -265,6 +268,7 @@ export default function Header({
         {/* Settings */}
         <button
           onClick={onSettingsClick}
+          aria-label="Settings"
           title="Settings"
           className={iconButtonClasses}
           style={{ transitionDuration: 'var(--duration-fast)' }}

@@ -3,7 +3,7 @@ import { generateId } from '../utils/ids'
 export const SEED_PROJECT_ID = 'storyflow'
 // Legacy ID used before slug-based naming convention (v61)
 export const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
-export const SEED_VERSION = 69
+export const SEED_VERSION = 80
 
 export function createSeedProject() {
   const now = new Date().toISOString()
@@ -214,6 +214,18 @@ export function createSeedProject() {
   const bug16Id = generateId()
   const task46Id = generateId()
 
+  // Production readiness sweep (v80)
+  const epic12Id = generateId()
+  const pr1Id = generateId()
+  const pr2Id = generateId()
+  const pr3Id = generateId()
+  const pr4Id = generateId()
+  const pr5Id = generateId()
+  const pr6Id = generateId()
+  const pr7Id = generateId()
+  const pr8Id = generateId()
+  const pr9Id = generateId()
+
   // New architecture component IDs (v13)
   const archErrorBoundaryId = generateId()
   const archGraphUtilsId = generateId()
@@ -252,7 +264,14 @@ export function createSeedProject() {
   const wfPolishId = generateId()
   const endNodeId = generateId()
 
-  return {
+  // Post-MVP workflow phase IDs (v70)
+  const wfQualityId = generateId()
+  const wfOverhaulId = generateId()
+  const wfGoLiveId = generateId()
+  const wfProdPolishId = generateId()
+  const newEndNodeId = generateId()
+
+  const project = {
     id: projectId,
     name: 'StoryFlow',
     description:
@@ -1035,9 +1054,438 @@ export function createSeedProject() {
         },
         {
           id: endNodeId,
-          type: 'end',
+          type: 'milestone',
           title: 'MVP Release',
           x: 1160,
+          y: 250,
+          status: 'success',
+          config: {
+            dueDate: '2026-02-12',
+            criteria: 'All 5 original phases complete. Responsive, accessible, performant.',
+          },
+        },
+        // --- Phase 6: Quality Infrastructure ---
+        {
+          id: wfQualityId,
+          type: 'phase',
+          title: 'Quality Infrastructure',
+          x: 1360,
+          y: 130,
+          status: 'success',
+          config: {
+            description:
+              'Error boundaries, Vitest + ESLint/Prettier setup, WorkflowCanvas refactor, cycle detection, unit tests',
+          },
+          children: (() => {
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
+            return {
+              nodes: [
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Error Boundaries',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'React ErrorBoundary wrapper, ErrorState + LoadingState components, graceful fallbacks',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Vitest + ESLint Setup',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Vitest with jsdom, ESLint + Prettier config, pre-commit hooks, zero-warning target',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Canvas Refactor',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Extracted useCanvasDrag, useCanvasZoom, useCanvasConnections from monolithic WorkflowCanvas',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Cycle Detection + Tests',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Architecture dependency cycle detection, useProject + ProjectsContext unit tests',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Quality Baseline',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+              ],
+              connections: [
+                { id: generateId(), from: sId, to: e1 },
+                { id: generateId(), from: sId, to: e2 },
+                { id: generateId(), from: sId, to: e3 },
+                { id: generateId(), from: e1, to: e4 },
+                { id: generateId(), from: e2, to: e4 },
+                { id: generateId(), from: e3, to: e4 },
+                { id: generateId(), from: e4, to: eEnd },
+              ],
+            }
+          })(),
+        },
+        // --- Phase 7: StoryFlow 2.0 ---
+        {
+          id: wfOverhaulId,
+          type: 'phase',
+          title: 'StoryFlow 2.0',
+          x: 1610,
+          y: 250,
+          status: 'success',
+          config: {
+            description:
+              'Design token consolidation, Zustand migration, tab consolidation (7→5), URL routing, activity feed',
+          },
+          children: (() => {
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
+            return {
+              nodes: [
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Design Token Consolidation',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Semantic tokens in tokens.css, theme bridge vars, light/dark mode support, accent color system',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Zustand Migration',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'useReducer→Zustand with immer, IndexedDB persist via idb-keyval, BroadcastChannel cross-tab sync',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'Tab Consolidation + Routing',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '7→5 tabs, sub-tabs moved to content area, react-router URL routing with deep links',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Activity Feed + Bug Fixes',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'ActivityPanel with audit log, 12+ bug fixes (epic progress, filter dropdowns, re-render loops)',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: '2.0 Complete',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+              ],
+              connections: [
+                { id: generateId(), from: sId, to: e1 },
+                { id: generateId(), from: sId, to: e2 },
+                { id: generateId(), from: sId, to: e3 },
+                { id: generateId(), from: e1, to: e4 },
+                { id: generateId(), from: e2, to: e4 },
+                { id: generateId(), from: e3, to: e4 },
+                { id: generateId(), from: e4, to: eEnd },
+              ],
+            }
+          })(),
+        },
+        // --- Phase 8: Go-Live Hardening ---
+        {
+          id: wfGoLiveId,
+          type: 'phase',
+          title: 'Go-Live Hardening',
+          x: 1860,
+          y: 130,
+          status: 'success',
+          config: {
+            description:
+              'Security audit, accessibility pass, IndexedDB persistence, export warnings, onboarding flow',
+          },
+          children: (() => {
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
+            return {
+              nodes: [
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Security Audit',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'XSS prevention, URL sanitization, import validation, npm audit, CSP headers',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Accessibility Pass',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'ARIA labels, focus trapping in modals, keyboard navigation, screen reader support',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'IndexedDB + Cross-tab Sync',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Migrated localStorage→IndexedDB via idb-keyval, BroadcastChannel for cross-tab sync',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Export Warnings + Onboarding',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Export size warnings for large projects, welcome modal with guided tour, help button',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Hardened',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+              ],
+              connections: [
+                { id: generateId(), from: sId, to: e1 },
+                { id: generateId(), from: sId, to: e2 },
+                { id: generateId(), from: sId, to: e3 },
+                { id: generateId(), from: e1, to: e4 },
+                { id: generateId(), from: e2, to: e4 },
+                { id: generateId(), from: e3, to: e4 },
+                { id: generateId(), from: e4, to: eEnd },
+              ],
+            }
+          })(),
+        },
+        // --- Phase 9: Production Polish ---
+        {
+          id: wfProdPolishId,
+          type: 'phase',
+          title: 'Production Polish',
+          x: 1860,
+          y: 370,
+          status: 'success',
+          config: {
+            description:
+              'Board consolidation, seed data cleanup, slug-based IDs, CodeRabbit review fixes, soft-delete trash system',
+          },
+          children: (() => {
+            const sId = generateId(),
+              e1 = generateId(),
+              e2 = generateId(),
+              e3 = generateId(),
+              e4 = generateId(),
+              eEnd = generateId()
+            return {
+              nodes: [
+                {
+                  id: sId,
+                  type: 'start',
+                  title: 'Start',
+                  x: 100,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+                {
+                  id: e1,
+                  type: 'task',
+                  title: 'Board Consolidation',
+                  x: 350,
+                  y: 80,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Merged Board/Epics/Charts into unified BoardTab with segmented control and panel toggles',
+                  },
+                },
+                {
+                  id: e2,
+                  type: 'task',
+                  title: 'Seed Data + Slug IDs',
+                  x: 350,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'Slug-based project IDs, seed data integrity audit (epicId+sprintId), naming conventions',
+                  },
+                },
+                {
+                  id: e3,
+                  type: 'task',
+                  title: 'CodeRabbit Fixes',
+                  x: 350,
+                  y: 320,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      '8 critical/major fixes from automated review: key props, ref handling, event cleanup, race conditions',
+                  },
+                },
+                {
+                  id: e4,
+                  type: 'task',
+                  title: 'Soft-Delete Trash System',
+                  x: 600,
+                  y: 200,
+                  status: 'success',
+                  config: {
+                    assignee: 'claude',
+                    notes:
+                      'deletedAt timestamps, trash view on dashboard, restore/permanent delete, auto-purge after 30 days',
+                  },
+                },
+                {
+                  id: eEnd,
+                  type: 'end',
+                  title: 'Polished',
+                  x: 850,
+                  y: 200,
+                  status: 'success',
+                  config: {},
+                },
+              ],
+              connections: [
+                { id: generateId(), from: sId, to: e1 },
+                { id: generateId(), from: sId, to: e2 },
+                { id: generateId(), from: sId, to: e3 },
+                { id: generateId(), from: e1, to: e4 },
+                { id: generateId(), from: e2, to: e4 },
+                { id: generateId(), from: e3, to: e4 },
+                { id: generateId(), from: e4, to: eEnd },
+              ],
+            }
+          })(),
+        },
+        // --- End: v2.0 Stable ---
+        {
+          id: newEndNodeId,
+          type: 'end',
+          title: 'v2.0 Stable',
+          x: 2110,
           y: 250,
           status: 'success',
           config: {},
@@ -1051,6 +1499,13 @@ export function createSeedProject() {
         { id: generateId(), from: wfBoardWikiId, to: wfWorkflowTimelineId },
         { id: generateId(), from: wfWorkflowTimelineId, to: wfPolishId },
         { id: generateId(), from: wfPolishId, to: endNodeId },
+        // Post-MVP connections
+        { id: generateId(), from: endNodeId, to: wfQualityId },
+        { id: generateId(), from: wfQualityId, to: wfOverhaulId },
+        { id: generateId(), from: wfOverhaulId, to: wfGoLiveId },
+        { id: generateId(), from: wfOverhaulId, to: wfProdPolishId },
+        { id: generateId(), from: wfGoLiveId, to: newEndNodeId },
+        { id: generateId(), from: wfProdPolishId, to: newEndNodeId },
       ],
     },
 
@@ -3584,7 +4039,7 @@ export function createSeedProject() {
           title: 'SF-141: Sidebar "New Project" button crashes on duplicate name',
           description:
             'Sidebar.jsx handleNewProject() calls addProject("New Project") which throws if a project named "New Project" already exists (from a previous click). The store\'s addProject() has a strict duplicate-name check that throws. Sidebar should either catch the error and auto-increment the name, or use the same auto-suffix pattern as importProject(). Discovered during vitest fix — the Sidebar.test.jsx had to reset the Zustand store between tests to avoid this.',
-          status: 'To Do',
+          status: 'Done',
           priority: 'medium',
           storyPoints: 1,
           assignee: 'claude',
@@ -3594,11 +4049,396 @@ export function createSeedProject() {
           createdAt: now,
           updatedAt: now,
         },
+        // === SF-142: Expand workflow canvas with post-MVP phases ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-142',
+          title: 'SF-142: Expand workflow canvas with post-MVP phases',
+          description:
+            'Workflow canvas was frozen at the original 5-phase MVP plan. Added 4 post-MVP phases (Quality Infrastructure, StoryFlow 2.0, Go-Live Hardening, Production Polish) with sub-workflows, converted MVP Release end node to milestone, added v2.0 Stable end node. Canvas now reflects the full project history.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['workflow', 'seed-data'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-143: Fix dropdown bg white in dark mode ===
+        {
+          id: generateId(),
+          type: 'bug',
+          key: 'SF-143',
+          title: 'SF-143: Architecture/Board filter dropdown has white background in dark mode',
+          description:
+            '--color-dropdown-bg was set to #f8fafc (near-white) in dark theme tokens.css. Should be a dark color. Radio button labels invisible against white background. Fix: change to #1e293b (--color-bg-subtle equivalent).',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['bug', 'theme', 'architecture'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-144: Remove redundant Epics button from Board toolbar ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-144',
+          title: 'SF-144: Remove redundant Epics button from Board toolbar',
+          description:
+            'Board tab had two Epics controls: the Board/Epics segmented view switcher (left) and a separate "Epics" toggle button (right) for the EpicSidebar. The right-side button was redundant since the EpicSidebar has its own expand/collapse toggle. Removed the button and defaulted the sidebar to open.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['ux', 'board', 'cleanup'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-145: Equalize Board column heights ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-145',
+          title: 'SF-145: Equalize Board column heights so Create Issue inputs align',
+          description:
+            'Board Kanban columns had uneven bottom edges — columns with fewer cards were shorter, causing the "Create issue..." inputs to sit at different vertical positions. Root cause: BoardTab views container used overflow-auto which broke height constraint flow. Fixed with overflow-hidden on views container, min-h-0 on SprintBoard, and self-stretch on BoardColumn.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['ux', 'board', 'css'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-146: Charts panel rounded corners ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-146',
+          title: 'SF-146: Add rounded corners to Charts slide-out panel',
+          description:
+            'Charts panel was flush against the right edge with no rounded corners, looking like a raw sidebar. Changed to a floating panel with rounded-xl corners, 8px inset from edges, full border, and shadow-xl for a cleaner look.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['ux', 'board', 'css'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-147: Consolidate 3 Create Issue bars into 1 with status picker ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-147',
+          title: 'SF-147: Single Create Issue bar with status picker instead of per-column bars',
+          description:
+            'Board had 3 redundant "Create issue..." bars, one per column. Consolidated into a single bar below the columns with a status dropdown to pick which column the new issue goes into. Cleaner UI, less visual noise.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['ux', 'board', 'enhancement'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-148: Track issue phase durations ===
+        {
+          id: generateId(),
+          type: 'story',
+          key: 'SF-148',
+          title: 'SF-148: Track issue phase durations (To Do → In Progress → Done timestamps)',
+          description:
+            'Added todoAt, inProgressAt, doneAt timestamp fields to issues. Auto-set on every status change via projectsStore.updateIssue. IssueDetail shows phase timestamps and calculated durations (wait time, active time, total cycle time). Enables tracking how long each task spends in each phase.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['feature', 'board', 'data-model'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-149: Issue data standardization plan ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-149',
+          title: 'SF-149: Document issue data standardization plan in Lessons Learned wiki',
+          description:
+            'Audited the full issue data flow (seed → store → UI) and documented a 3-tier standardization plan: Tier 1 (store-guaranteed: id, timestamps, phase timestamps), Tier 2 (caller-required: key, type, title, status, priority), Tier 3 (optional: description, assignee, labels, etc). Includes checklist for adding new fields, known gaps (key generation split, epicId inconsistency, dead dependencies field), and key rules for data integrity.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['docs', 'data-model', 'process'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Follow-up: Known gaps from data audit ===
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-150',
+          title: 'Move issue key generation into projectsStore.addIssue()',
+          description:
+            'Key generation is currently split: store tracks nextIssueNumber but BoardTab.handleCreateIssue() formats the key string. Direct addIssue() calls produce keyless issues. Move key generation into the store as a fallback: key: issue.key || `SF-${nextNumber}`. This makes the store the single source of truth and prevents future code paths from accidentally creating keyless issues.',
+          status: 'To Do',
+          priority: 'high',
+          storyPoints: 2,
+          assignee: null,
+          labels: ['data-model', 'refactor'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-151',
+          title: 'Add sprint selector to IssueDetail panel',
+          description:
+            'sprintId is a critical field (used for sprint filtering and stats) but IssueDetail has no way to edit it. Users cannot reassign issues between sprints from the detail panel. Add a Select dropdown for sprint assignment, same row pattern as the existing epicId selector.',
+          status: 'To Do',
+          priority: 'medium',
+          storyPoints: 2,
+          assignee: null,
+          labels: ['feature', 'board', 'ui'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: generateId(),
+          type: 'task',
+          key: 'SF-152',
+          title: 'Normalize epicId on all seed issues (remove undefined gaps)',
+          description:
+            'Early seed epics (SF-1, SF-7, SF-11, SF-15) have no epicId field at all, while later epics explicitly set epicId: null. This inconsistency means some issues have undefined and others have null. Normalize all to explicit null for consistent data representation.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: null,
+          labels: ['data-model', 'cleanup'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === SF-153: Rewrite storyflow-tracker skill v3.0 ===
+        {
+          id: generateId(),
+          type: 'story',
+          key: 'SF-153',
+          title: 'SF-153: Rewrite storyflow-tracker skill — constraint-first execution protocol',
+          description:
+            'Rewrote the tracker skill from 326 lines (212 SKILL.md + 114 reference) down to ~70 lines. Root cause of 6 tracker-update failures: skill was a reference manual that buried WHEN to update on line 50+. New design puts the sequencing constraint first (tracker edit before code edit), explains WHY (phase duration measurement integrity), and replaces hard-coded field lists with "read the file, match the patterns." Deleted update-areas.md reference, deleted project-level skill duplicate, trimmed MEMORY.md HARD GATE from 8 items to 5.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 5,
+          assignee: 'claude',
+          labels: ['process', 'docs', 'refactor'],
+          epicId: epic8Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        // === Production Readiness Sweep (v80) ===
+        {
+          id: epic12Id,
+          type: 'epic',
+          key: 'SF-154',
+          title: 'Production Readiness Sweep',
+          description:
+            'Comprehensive production readiness audit and fix pass. Covers P0 (key generation, CLAUDE.md), P1 (a11y, IDB fallback logging, epicId normalization), and P2 (browserslist, activity sync, sprint selector, uuid cleanup, deploy docs) items identified by 3-agent deep audit.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: null,
+          assignee: 'claude',
+          labels: ['epic', 'prod-readiness'],
+          epicId: null,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr1Id,
+          type: 'task',
+          key: 'SF-155',
+          title: 'Move issue key generation into projectsStore.addIssue() as fallback',
+          description:
+            'Key generation is split: store tracks nextIssueNumber but BoardTab formats the key. Direct addIssue() calls produce keyless issues. Add fallback: if no key is provided, auto-generate from project prefix + nextIssueNumber.',
+          status: 'Done',
+          priority: 'critical',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['data-model', 'refactor', 'P0'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr2Id,
+          type: 'task',
+          key: 'SF-156',
+          title: 'Update CLAUDE.md — idb-keyval → Dexie, other outdated refs',
+          description:
+            'CLAUDE.md tech stack table says idb-keyval but code uses Dexie. Also says uuid for ID generation but code uses crypto.randomUUID(). Key Patterns says "IndexedDB persist via idb-keyval". Update all to match actual implementation.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['docs', 'P0'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr3Id,
+          type: 'task',
+          key: 'SF-157',
+          title: 'Add ARIA labels to icon buttons, skip-to-main link, form labels',
+          description:
+            'Accessibility audit found: icon buttons in Sidebar/Header lack aria-label, no skip-to-main-content link, status dot colors are color-only (no text alternative for colorblind users). Add aria-labels, sr-only skip link in AppLayout, and aria-label on mobile close button.',
+          status: 'Done',
+          priority: 'high',
+          storyPoints: 3,
+          assignee: 'claude',
+          labels: ['a11y', 'P1'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr4Id,
+          type: 'task',
+          key: 'SF-158',
+          title: 'Add console.warn on IndexedDB → localStorage fallback',
+          description:
+            'indexedDbStorage.js silently falls back to localStorage when IndexedDB fails. Add console.warn so developers know when this happens.',
+          status: 'Done',
+          priority: 'medium',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['resilience', 'P1'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr5Id,
+          type: 'task',
+          key: 'SF-159',
+          title: 'Add browserslist to package.json',
+          description:
+            'No browserslist defined. Add target: last 2 versions, >1% usage. Helps Vite produce appropriate output.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['config', 'P2'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr6Id,
+          type: 'task',
+          key: 'SF-160',
+          title: 'Add cross-tab activity store sync via BroadcastChannel',
+          description:
+            'Only projectsStore broadcasts cross-tab updates. activityStore changes are not synced. Add activity store to BroadcastChannel so users see real-time activity across tabs.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['feature', 'P2'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr7Id,
+          type: 'task',
+          key: 'SF-161',
+          title: 'Add sprint selector to IssueDetail panel',
+          description:
+            'sprintId is critical for filtering but IssueDetail has no way to edit it. Add Sprint dropdown selector, same pattern as existing Epic selector.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 2,
+          assignee: 'claude',
+          labels: ['feature', 'board', 'ui', 'P2'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr8Id,
+          type: 'task',
+          key: 'SF-162',
+          title: 'Remove unused uuid package from dependencies',
+          description:
+            'uuid is listed in package.json dependencies but no import from uuid exists in src/. Code uses crypto.randomUUID() via generateId(). Remove dead dependency.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['cleanup', 'P2'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          id: pr9Id,
+          type: 'task',
+          key: 'SF-163',
+          title: 'Add deployment documentation to README',
+          description:
+            'README has no deployment guidance. Add section covering static hosting options (Vercel, Netlify, S3+CloudFront) since StoryFlow is a client-side SPA with no backend.',
+          status: 'Done',
+          priority: 'low',
+          storyPoints: 1,
+          assignee: 'claude',
+          labels: ['docs', 'P2'],
+          epicId: epic12Id,
+          sprintId: sprint6Id,
+          createdAt: now,
+          updatedAt: now,
+        },
       ],
       issueTypes: ['epic', 'story', 'task', 'bug', 'subtask'],
       customFields: [],
       statusColumns: ['To Do', 'In Progress', 'Done'],
-      nextIssueNumber: 142,
+      nextIssueNumber: 164,
     },
 
     pages: [
@@ -4340,6 +5180,7 @@ A living record of hard-won knowledge from building StoryFlow. Categorized for q
 | \`SEED_VERSION\` bump triggers auto-migration on next app load | The store's \`onRehydrateStorage\` replaces the seed project when version is outdated. Fixed project ID prevents URL breakage. |
 | New project naming convention: auto-increment "Untitled Project N" | When user clicks "New Project" with no name, DashboardPage checks existing project names and picks the next available number. Avoids collision. |
 | Composable filtering: epic sidebar + sprint tab are independent dimensions | BoardTab epic filter passes filtered issues to SprintBoard, which further filters by sprint. Auto-switches to "All" on epic activation (transition detection via useRef), then user freely picks any sprint. Don't force-override — compose. |
+| Workflow canvas drift: update the canvas when completing major phases | The workflow canvas was frozen at the original 5-phase MVP plan for 7 major epics of post-MVP work. When completing a major phase/epic, check if the workflow tab needs a new phase node. The workflow should reflect actual project history, not just the initial plan. |
 | File naming convention: PascalCase for JSX, camelCase for JS | Components/pages/contexts → \`PascalCase.jsx\` (\`SprintBoard.jsx\`). Hooks → \`camelCase.js\` with \`use\` prefix (\`useSearch.js\`). Stores → \`camelCase.js\` with \`Store\` suffix (\`projectsStore.js\`). Utils/data/db → \`camelCase.js\` (\`crossTabSync.js\`). Tests → \`{SourceName}.test.{js,jsx}\` co-located. \`.jsx\` = has JSX, \`.js\` = pure JS. Documented in CLAUDE.md "File Naming Convention" table. |
 
 ---
@@ -4362,6 +5203,8 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 | Repeated tracker update failure — go-live audit (v51) | Despite HARD GATE, started Batch 1 (sanitizeColor fixes) without updating seedProject.js first. User had to ask "where are my tracker updates" — the same failure as v30, v40, v45. Four prior remediations (HARD GATE checklist, MEMORY.md, inline tracking, sequence enforcement) all failed to prevent recurrence. | Root cause: tracker update is mentally categorized as "administrative overhead" rather than "the first line of code I write." New rule: the VERY FIRST edit in any session must be seedProject.js. No grep, no file reads for other files, no "let me understand the code first" — open seedProject.js and add the issue BEFORE doing anything else. If the issue description is incomplete, write a placeholder and refine later. The tracker is the work. |
 | Over-removed imports in NotFoundPage.test.jsx (v59) | Removed \`userEvent\` and \`BrowserRouter\` imports along with truly unused \`vi\` and \`fireEvent\` — but userEvent (line 88) and BrowserRouter (line 167) were actually used. Caused 2 ESLint errors (\`no-undef\`, \`jsx-no-undef\`). | When removing "unused" imports flagged by ESLint, grep the file for actual usages of each import before deleting. ESLint warns on \`vi\` and \`fireEvent\` specifically — don't assume neighboring imports are also unused. Remove only what ESLint explicitly flags. |
 | Named tracker file \`seedProject.js\` instead of project name (v65) | Used an internal implementation name ("seed project") instead of the project name ("storyflow"). User rightly called out "WTF is seedProject.js?" — file names should communicate what they ARE, not how they work internally. | Name data files after what they represent. The StoryFlow tracker is \`storyflow.js\`, not \`seedProject.js\`. Convention documented in CLAUDE.md "File Naming Convention". |
+| User had to ask "did you update the tracker?" after workflow expansion (v71) | Tracker WAS updated (SF-142 added, SEED_VERSION bumped), but user still had to prompt because the update wasn't the FIRST action — explored code, planned, then tracked. The HARD GATE and TRACKER-FIRST rules exist specifically to prevent this. Sixth recurrence (v30, v40, v45, v49, v51, v71). | The failure pattern is now clear: plan mode creates a false sense of "I'll track after planning." But the tracker-first rule means the VERY FIRST edit when exiting plan mode must be storyflow.js — add the issue as In Progress BEFORE any code changes. Every prior remediation assumes good intentions fail under cognitive load. The rule must be mechanical: exit plan mode → open storyflow.js → add issue → then code. |
+| Fixed column alignment without flagging redundant 3x Create Issue bars (v75) | User asked to fix uneven column heights. Claude fixed the CSS but didn't notice the 3 identical "Create issue..." bars at the bottom of each column were redundant UX clutter. User had to separately point it out: "And do we need 3 create issue buttons?" | When fixing a UI issue, zoom out and audit the surrounding area for other improvements. Don't just fix the literal symptom — look at what else could be cleaned up in the same area. Redundancy elimination is always worth flagging proactively. |
 
 ---
 
@@ -4405,6 +5248,80 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
 | Zustand persist middleware with IndexedDB doesn't rehydrate synchronously in tests | \`onRehydrateStorage\` seeds the store after async rehydration. In test env, the store starts with \`projects: []\`. Don't assert seed project existence on initial render — instead verify the hook returns an array. |
 | Zustand selectors with \`.filter()\` require \`useShallow()\` | \`selectActiveProjects\` uses \`.filter()\` creating new array refs every render. Zustand's default \`Object.is\` equality sees them as changed → infinite re-renders. Wrap with \`useShallow()\` from \`zustand/react/shallow\` for shallow element comparison. Also: never use inline \`{}\` literals as React state defaults — cache constants like \`EMPTY_RESULTS\` to prevent reference churn in useEffect deps. |
 | Seed migration ID changes need URL redirect support | When changing a project's internal ID (e.g. legacy UUID → slug), add a \`useEffect\` redirect in ProjectPage.jsx for the old URL AND a \`getProject()\` fallback in the store. Otherwise bookmarks, browser history, and race conditions during rehydration will 404. |
+
+---
+
+## Issue Data Standardization Plan
+
+A canonical reference for how issue data flows through StoryFlow. Defines what the store guarantees, what callers must provide, and what's safe to add later.
+
+### The Three Tiers
+
+**Tier 1 — Store-Guaranteed (auto-generated, never provide these):**
+
+| Field | Generated By | Notes |
+|-------|-------------|-------|
+| \`id\` | \`addIssue()\` | UUID via \`generateId()\` |
+| \`createdAt\` | \`addIssue()\` | ISO timestamp at creation |
+| \`updatedAt\` | \`addIssue()\` + \`updateIssue()\` | Refreshed on every mutation |
+| \`todoAt\` | \`addIssue()\` / \`updateIssue()\` | Auto-set when status becomes "To Do" |
+| \`inProgressAt\` | \`addIssue()\` / \`updateIssue()\` | Auto-set when status becomes "In Progress" |
+| \`doneAt\` | \`addIssue()\` / \`updateIssue()\` | Auto-set when status becomes "Done" |
+
+These fields are the store's responsibility. Callers should never set them. The store also auto-increments \`board.nextIssueNumber\`.
+
+**Tier 2 — Required from Caller (UI breaks without these):**
+
+| Field | Type | Why Required |
+|-------|------|-------------|
+| \`key\` | \`"SF-N"\` | Rendered in IssueCard, BacklogRow, IssueDetail, EpicsView with NO null guards. Generated by \`BoardTab.handleCreateIssue()\`, NOT the store. |
+| \`type\` | \`epic/story/task/bug/subtask\` | Determines icon, color, and filtering logic |
+| \`title\` | non-empty string | Displayed everywhere |
+| \`status\` | \`To Do/In Progress/Done\` | Drives column grouping, progress calc, phase timestamps |
+| \`priority\` | \`critical/high/medium/low\` | Badge display, sorting, filtering |
+
+**Tier 3 — Optional / Flexible (safe to omit or add later):**
+
+| Field | Default | Notes |
+|-------|---------|-------|
+| \`description\` | \`''\` | TextArea guards with \`or ''\` |
+| \`storyPoints\` | \`null\` | Guarded with \`?? 0\` for math, \`?? ''\` for display |
+| \`assignee\` | \`null\` | Guarded with \`issue.assignee &&\` |
+| \`epicId\` | \`null\` | Always set explicitly — never leave \`undefined\` |
+| \`sprintId\` | \`null\` | Always set — needed for sprint filtering and stats |
+| \`labels\` | \`[]\` | Guarded with \`or []\` |
+| \`subtasks\` | \`[]\` | Array of \`{id, title, completed}\` — populated via UI |
+| \`comments\` | \`[]\` | Array of \`{id, text, author, createdAt}\` — populated via UI |
+| \`dependencies\` | \`[]\` | Currently unused in UI — vestigial field |
+
+### Key Rules
+
+1. **\`key\` generation is split** — store tracks \`nextIssueNumber\` but does NOT generate the key string. \`BoardTab.handleCreateIssue()\` formats it as \`SF-N\`. All issue creation MUST flow through this wrapper or explicitly provide a key.
+2. **Always set both \`epicId\` and \`sprintId\`** — even if \`null\`. Omitting them creates \`undefined\` which behaves differently than \`null\` in filters.
+3. **Phase timestamps are append-only per phase** — moving backward (Done to In Progress) resets \`inProgressAt\` to now, capturing the latest entry into each phase.
+4. **New fields go in Tier 3** — add as optional with null/undefined guards in the UI. Store auto-sets going forward; seed data gets a post-processing backfill loop. Existing persisted issues won't have it and that's fine.
+5. **Seed data post-processing** — for new optional fields, add a \`.forEach()\` loop after the issues array in \`createSeedProject()\`. Don't inline 148+ field additions.
+
+### Adding a New Issue Field (Checklist)
+
+1. Decide the tier: auto-generated (Tier 1), required (Tier 2), or optional (Tier 3)?
+2. If Tier 1: add to \`addIssue()\` and/or \`updateIssue()\` in \`projectsStore.js\`
+3. If Tier 2: add to \`BoardTab.handleCreateIssue()\`, \`QuickCreateBar\`, and \`BoardColumn\` + button
+4. If Tier 3: add to creation templates with a safe default (\`null\`, \`[]\`, \`''\`)
+5. Add null guards in every UI component that reads the field (\`&&\`, \`??\`, \`||\`)
+6. Add to seed data via post-processing loop (don't inline across 148 issues)
+7. Bump \`SEED_VERSION\` so migration picks it up
+8. Document in this table
+
+### Known Gaps to Address
+
+| Gap | Risk | Fix |
+|-----|------|-----|
+| \`key\` generated in component, not store | Direct \`addIssue()\` calls produce keyless issues | Move key generation into \`addIssue()\` as fallback |
+| \`epicId\` sometimes \`undefined\` on early seed epics | Works due to permissive guards, but data inconsistency | Normalize all to explicit \`null\` |
+| \`sprintId\` not editable in IssueDetail | Users cannot reassign issues between sprints | Add sprint select dropdown |
+| \`dependencies\` field never rendered or edited | Dead data on every issue | Either implement or remove |
+| \`BLOCKED\` status defined in constants but unreachable | Dead code | Remove from constants or add column |
 `,
         parentId: page1Id,
         status: 'published',
@@ -4929,4 +5846,39 @@ Systematic log of Claude agent failures. Each entry must include root cause and 
       sprintLength: 14,
     },
   }
+
+  // Post-process: normalize data and add phase timestamps
+  const msPerHour = 3_600_000
+  project.board.issues.forEach((issue, i) => {
+    // Normalize epicId: ensure every issue has explicit null instead of undefined
+    if (issue.epicId === undefined) {
+      issue.epicId = null
+    }
+    // Normalize sprintId: ensure every issue has explicit null instead of undefined
+    if (issue.sprintId === undefined) {
+      issue.sprintId = null
+    }
+
+    // Add phase timestamps based on status
+    const created = new Date(issue.createdAt).getTime()
+    // Stagger offsets so each issue has slightly different durations
+    const waitHours = 1 + (i % 12) // 1–12 hours in To Do
+    const activeHours = 2 + (i % 24) // 2–25 hours actively worked
+
+    if (issue.status === 'Done') {
+      issue.todoAt = issue.todoAt || new Date(created).toISOString()
+      issue.inProgressAt =
+        issue.inProgressAt || new Date(created + waitHours * msPerHour).toISOString()
+      issue.doneAt =
+        issue.doneAt || new Date(created + (waitHours + activeHours) * msPerHour).toISOString()
+    } else if (issue.status === 'In Progress') {
+      issue.todoAt = issue.todoAt || new Date(created).toISOString()
+      issue.inProgressAt =
+        issue.inProgressAt || new Date(created + waitHours * msPerHour).toISOString()
+    } else if (issue.status === 'To Do') {
+      issue.todoAt = issue.todoAt || new Date(created).toISOString()
+    }
+  })
+
+  return project
 }

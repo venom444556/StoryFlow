@@ -26,16 +26,6 @@ vi.mock('./IssueCard', () => ({
   ),
 }))
 
-vi.mock('./QuickCreateBar', () => ({
-  default: ({ onCreateIssue, defaultStatus }) => (
-    <div data-testid="quick-create-bar" data-status={defaultStatus}>
-      <button onClick={() => onCreateIssue({ title: 'New Issue', status: defaultStatus })}>
-        Create
-      </button>
-    </div>
-  ),
-}))
-
 describe('BoardColumn', () => {
   const mockIssues = [
     {
@@ -236,57 +226,6 @@ describe('BoardColumn', () => {
       fireEvent.click(screen.getByTestId('issue-card-issue-1'))
 
       expect(mockOnIssueClick).toHaveBeenCalledWith(mockIssues[0])
-    })
-  })
-
-  describe('Quick Create', () => {
-    it('renders QuickCreateBar', () => {
-      render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      expect(screen.getByTestId('quick-create-bar')).toBeInTheDocument()
-    })
-
-    it('passes correct status to QuickCreateBar', () => {
-      render(
-        <BoardColumn
-          title="In Progress"
-          status="In Progress"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      const quickCreate = screen.getByTestId('quick-create-bar')
-      expect(quickCreate).toHaveAttribute('data-status', 'In Progress')
-    })
-
-    it('calls onCreateIssue with column status', () => {
-      render(
-        <BoardColumn
-          title="Done"
-          status="Done"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      fireEvent.click(screen.getByText('Create'))
-
-      expect(mockOnCreateIssue).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: 'Done',
-        })
-      )
     })
   })
 

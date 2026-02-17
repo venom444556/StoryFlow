@@ -222,11 +222,30 @@ export const useProjectsStore = create(
             if (!project) return
 
             const nextNumber = project.board.nextIssueNumber || 1
+            // Derive a key prefix from the project name (e.g. "StoryFlow" → "SF",
+            // "My App" → "MA"). Falls back to "IS" if no words found.
+            const prefix =
+              project.name
+                .split(/[\s-]+/)
+                .filter(Boolean)
+                .map((w) => w[0].toUpperCase())
+                .join('')
+                .slice(0, 3) || 'IS'
+            const now = new Date().toISOString()
             newIssue = {
-              id: generateId(),
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
               ...issue,
+              id: generateId(),
+              key: issue.key || `${prefix}-${nextNumber}`,
+              createdAt: now,
+              updatedAt: now,
+            }
+            // Set initial phase timestamp based on starting status
+            if (newIssue.status === 'To Do' && !newIssue.todoAt) {
+              newIssue.todoAt = now
+            } else if (newIssue.status === 'In Progress' && !newIssue.inProgressAt) {
+              newIssue.inProgressAt = now
+            } else if (newIssue.status === 'Done' && !newIssue.doneAt) {
+              newIssue.doneAt = now
             }
             project.board.issues.push(newIssue)
             project.board.nextIssueNumber = nextNumber + 1
@@ -252,12 +271,23 @@ export const useProjectsStore = create(
             const issueIndex = project.board.issues.findIndex((i) => i.id === issueId)
             if (issueIndex !== -1) {
               oldIssue = { ...project.board.issues[issueIndex] }
+              const now = new Date().toISOString()
               project.board.issues[issueIndex] = {
                 ...project.board.issues[issueIndex],
                 ...updates,
-                updatedAt: new Date().toISOString(),
+                updatedAt: now,
               }
-              project.updatedAt = new Date().toISOString()
+              // Auto-set phase timestamps on status change
+              if (updates.status && updates.status !== oldIssue.status) {
+                if (updates.status === 'To Do') {
+                  project.board.issues[issueIndex].todoAt = now
+                } else if (updates.status === 'In Progress') {
+                  project.board.issues[issueIndex].inProgressAt = now
+                } else if (updates.status === 'Done') {
+                  project.board.issues[issueIndex].doneAt = now
+                }
+              }
+              project.updatedAt = now
             }
           })
 
@@ -958,11 +988,22 @@ useProjectsStore.subscribe(
   () => broadcastUpdate('projects')
 )
 
+// Sync activity store across tabs
+useActivityStore.subscribe(
+  (state) => state.activities,
+  () => broadcastUpdate('activity')
+)
+
 onCrossTabUpdate(({ store: storeName }) => {
   if (storeName === 'projects') {
     // Suppress broadcasts during rehydration to prevent cross-tab ping-pong
     setRehydrating(true)
     useProjectsStore.persist.rehydrate().finally(() => {
+      setRehydrating(false)
+    })
+  } else if (storeName === 'activity') {
+    setRehydrating(true)
+    useActivityStore.persist.rehydrate().finally(() => {
       setRehydrating(false)
     })
   }

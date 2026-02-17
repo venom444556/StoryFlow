@@ -31,9 +31,9 @@ StoryFlow is a visual project planning tool that Claude uses to architect, decom
 | Lucide React | Latest | Icons |
 | react-router-dom | 6+ | Routing |
 | Zustand | 5+ | State management (with persist middleware) |
-| idb-keyval | 6+ | IndexedDB storage adapter |
+| Dexie | 4+ | IndexedDB ORM (storage adapter) |
+| DOMPurify | 3+ | HTML sanitization (XSS prevention) |
 | date-fns | 3+ | Date formatting |
-| uuid | 11+ | ID generation |
 
 ## Project Structure
 
@@ -54,11 +54,12 @@ src/
   contexts/       2 contexts (ProjectsContext wrapper, SettingsContext)
   utils/          8 utility modules
   data/           4 data files (defaults, sample, templates, node types)
+  db/             2 database files (storyflowDb, indexedDbStorage)
 ```
 
 ## Data Model
 
-Projects are persisted in IndexedDB via Zustand's persist middleware (with idb-keyval adapter). Legacy localStorage data is auto-migrated on first load. Cross-tab sync uses the BroadcastChannel API. Each project contains:
+Projects are persisted in IndexedDB via Zustand's persist middleware (with Dexie ORM adapter). Legacy localStorage data is auto-migrated on first load. Cross-tab sync uses the BroadcastChannel API. Each project contains:
 
 - **overview** — goals, constraints, tech stack, target audience
 - **architecture** — component tree with types and dependencies
@@ -113,7 +114,7 @@ User asks to plan a project
 
 ## Key Patterns
 
-- **State:** Zustand stores (projectsStore, uiStore, activityStore) → IndexedDB persist via idb-keyval; ProjectsContext wraps projectsStore for legacy hook compatibility
+- **State:** Zustand stores (projectsStore, uiStore, activityStore) → IndexedDB persist via Dexie; ProjectsContext wraps projectsStore for legacy hook compatibility
 - **Styling:** Tailwind v4 + custom glassmorphism classes in index.css
 - **IDs:** Project IDs are slug-based (`generateProjectId("My App")` → `"my-app"`); internal entity IDs use UUIDs via `generateId()` (crypto.randomUUID)
 - **Updates:** useProject hook returns per-field updaters (updateOverview, addIssue, etc.)
