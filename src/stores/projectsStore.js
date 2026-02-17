@@ -47,7 +47,10 @@ function syncToServer(projects) {
     try {
       await fetch('/api/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Confirm': 'overwrite-all',
+        },
         body: JSON.stringify({ projects }),
       })
     } catch {

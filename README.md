@@ -1,6 +1,12 @@
 # StoryFlow
 
-A visual project planning and management tool built for AI-assisted software development. StoryFlow combines the best of JIRA, Confluence, and visual workflow tools into a single glassmorphic interface.
+**Project management that your AI coding assistant can actually use.**
+
+Most project tools live in a browser tab your AI can't see. StoryFlow is different — it exposes every board, wiki page, and workflow as MCP tools, so Claude Code (or any MCP-compatible agent) can read your backlog, create issues, update sprint progress, and write docs while it works alongside you. No copy-pasting context between tabs.
+
+It's also the tool you'd want even without AI: a Kanban board with sprints and burndown charts, a wiki with live markdown preview, a visual workflow canvas, architecture diagrams, decision logs, and timeline tracking — all in one local-first app with a glassmorphic UI. Think JIRA + Confluence + Miro, minus the SaaS bill and the latency.
+
+Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud sync, no telemetry.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
@@ -196,6 +202,31 @@ The plugin exposes MCP tools that Claude can use automatically during developmen
 | `storyflow_create_page` | Create wiki page |
 | `storyflow_update_page` | Update page content |
 | `storyflow_check_connection` | Verify connectivity |
+
+## Security
+
+StoryFlow is intended for **local single-user use only**. It is not designed or hardened for multi-user or public-facing deployments.
+
+### Threat Model
+
+The primary threat StoryFlow guards against is **unauthorized tool access** — preventing untrusted MCP clients or rogue processes from reading and modifying your project data through the API.
+
+**What's protected:**
+
+- MCP tool calls require a shared secret (`MCP_AUTH_TOKEN`) passed as a Bearer token. Without it, all tool requests are rejected with `401 Unauthorized`.
+- The token is validated using constant-time comparison to prevent timing attacks.
+
+**What's NOT in scope:**
+
+- **Network-level security.** By default the server binds to `127.0.0.1` (localhost). If you bind to `0.0.0.0` or expose the port externally, you must provide your own controls (firewall rules, reverse proxy with TLS, VPN, etc.).
+- **Encryption at rest.** The SQLite database is stored unencrypted on disk. Protect it with filesystem permissions.
+- **Multi-user access control.** There are no user accounts, roles, or per-user permissions. Anyone with the token has full access.
+
+### Recommendations
+
+- Always set `MCP_AUTH_TOKEN` to a strong random value (e.g., `openssl rand -hex 32`).
+- Never commit the token to version control — use environment variables or a `.env` file.
+- Do not expose the server port to untrusted networks without additional safeguards.
 
 ## Deployment
 
