@@ -27,8 +27,8 @@ You should receive a response within 72 hours. If the vulnerability is confirmed
 
 ## Scope
 
-StoryFlow is a client-side application that stores data in localStorage. There is no backend, no authentication, and no network requests to a StoryFlow server. Security concerns are limited to:
+StoryFlow is a local-first application. The client stores data in IndexedDB, and a local Express server persists data in SQLite. There is no authentication and no external network requests. Security concerns are limited to:
 
 - XSS through user-provided markdown content
 - Malicious data in imported JSON project files
-- Client-side data integrity
+- Client-side and server-side data integrity
