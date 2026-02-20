@@ -175,7 +175,7 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const DIST_DIR = join(__dirname, '../../dist')
+const DIST_DIR = join(__dirname, '../dist')
 
 if (existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR))
