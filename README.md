@@ -1,5 +1,7 @@
 # StoryFlow
 
+![StoryFlow Banner](docs/Storyflow%20project%20management%20in%20pixel%20art.png)
+
 **Project management that your AI coding assistant can actually use.**
 
 Most project tools live in a browser tab your AI can't see. StoryFlow is different — it exposes every board, wiki page, and workflow as MCP tools, so Claude Code (or any MCP-compatible agent) can read your backlog, create issues, update sprint progress, and write docs while it works alongside you. No copy-pasting context between tabs.
