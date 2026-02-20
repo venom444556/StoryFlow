@@ -171,7 +171,6 @@ describe('ConfirmDialog', () => {
     it('renders buttons in a flex row', () => {
       render(<ConfirmDialog {...defaultProps} />)
       const cancelButton = screen.getByText('Cancel')
-      const confirmButton = screen.getByText('Delete')
       const buttonContainer = cancelButton.parentElement
       expect(buttonContainer).toHaveClass('flex')
     })

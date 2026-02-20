@@ -1,4 +1,4 @@
-import React, { useRef, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 
 export default function Tabs({

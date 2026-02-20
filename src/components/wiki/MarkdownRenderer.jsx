@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
+import DOMPurify from 'dompurify'
 import { renderMarkdown } from '../../utils/markdown'
 
 /**
@@ -8,11 +9,18 @@ import { renderMarkdown } from '../../utils/markdown'
  * HTML by `renderMarkdown()` in utils/markdown.js, so all headings, code
  * blocks, tables, lists, etc. are already styled.
  *
- * NOTE: We use dangerouslySetInnerHTML intentionally -- the content is
- * author-written markdown, not untrusted user input from external sources.
+ * Even though the content is author-written markdown, imported projects
+ * could contain pre-rendered HTML. We sanitize via DOMPurify to prevent
+ * XSS from imported content or markdown edge-cases.
  */
 export default function MarkdownRenderer({ content, className = '' }) {
-  const html = useMemo(() => renderMarkdown(content || ''), [content])
+  const html = useMemo(() => {
+    const raw = renderMarkdown(content || '')
+    return DOMPurify.sanitize(raw, {
+      ADD_ATTR: ['target', 'rel', 'class', 'id', 'style'],
+      ADD_TAGS: ['code', 'pre', 'span'],
+    })
+  }, [content])
 
   if (!content) {
     return (

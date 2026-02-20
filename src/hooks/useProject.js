@@ -164,6 +164,36 @@ export function useProject(projectId) {
     [projectId, getStore]
   )
 
+  // ------ Sprints ------
+
+  const addSprint = useCallback(
+    (sprintData) => {
+      return getStore().addSprint(projectId, sprintData)
+    },
+    [projectId, getStore]
+  )
+
+  const updateSprint = useCallback(
+    (sprintId, updates) => {
+      getStore().updateSprint(projectId, sprintId, updates)
+    },
+    [projectId, getStore]
+  )
+
+  const deleteSprint = useCallback(
+    (sprintId) => {
+      getStore().deleteSprint(projectId, sprintId)
+    },
+    [projectId, getStore]
+  )
+
+  const closeSprint = useCallback(
+    (sprintId, moveIncomplete = 'backlog') => {
+      getStore().closeSprint(projectId, sprintId, moveIncomplete)
+    },
+    [projectId, getStore]
+  )
+
   // ------ Board settings ------
 
   const updateBoardSettings = useCallback(
@@ -205,6 +235,10 @@ export function useProject(projectId) {
       updateArchitecture,
       updateBoardSettings,
       updateSettings,
+      addSprint,
+      updateSprint,
+      deleteSprint,
+      closeSprint,
     }),
     [
       project,
@@ -224,6 +258,10 @@ export function useProject(projectId) {
       addMilestone,
       updateMilestone,
       deleteMilestone,
+      addSprint,
+      updateSprint,
+      deleteSprint,
+      closeSprint,
       updateWorkflow,
       updateArchitecture,
       updateBoardSettings,

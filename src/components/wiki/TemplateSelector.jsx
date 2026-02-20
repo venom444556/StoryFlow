@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 import Modal from '../ui/Modal'
 import { pageTemplates } from '../../data/pageTemplates'

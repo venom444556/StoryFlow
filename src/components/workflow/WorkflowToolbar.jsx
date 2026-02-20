@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Play, RotateCcw, Plus, Loader2, GitBranch, Link } from 'lucide-react'
 import NodePalette from './NodePalette'
 

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo } from 'react'
+import { lazy, Suspense, useEffect, useMemo } from 'react'
 import {
   useParams,
   Link,
@@ -12,6 +12,8 @@ import { motion } from 'framer-motion'
 import { ArrowLeft, Loader2, Box, Workflow, FileEdit, Scale } from 'lucide-react'
 import { useProject } from '../hooks/useProject'
 import { useKeyboardShortcuts, SHORTCUTS } from '../hooks/useKeyboardShortcuts'
+const SEED_PROJECT_ID = 'storyflow'
+const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
 import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import ProjectSidebar from '../components/project/ProjectSidebar'
@@ -61,17 +63,6 @@ function TabFallback() {
   )
 }
 
-// Map route paths to tab keys
-const TAB_ROUTES = {
-  overview: 'overview',
-  plan: 'architecture',
-  'plan/workflow': 'workflow',
-  work: 'board',
-  docs: 'wiki',
-  'docs/decisions': 'decisions',
-  insights: 'timeline',
-}
-
 // Get active tab from pathname
 function getActiveTabFromPath(pathname, projectId) {
   const basePath = `/project/${projectId}/`
@@ -99,6 +90,15 @@ export default function ProjectPage() {
   const { id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Redirect legacy seed project URL to new slug-based URL
+  useEffect(() => {
+    if (id === LEGACY_SEED_PROJECT_ID) {
+      const rest = location.pathname.replace(`/project/${LEGACY_SEED_PROJECT_ID}`, '')
+      navigate(`/project/${SEED_PROJECT_ID}${rest}`, { replace: true })
+    }
+  }, [id, location.pathname, navigate])
+
   const hooks = useProject(id)
   const { project, updateProject } = hooks
 
@@ -213,6 +213,10 @@ export default function ProjectPage() {
                       addIssue={hooks.addIssue}
                       updateIssue={hooks.updateIssue}
                       deleteIssue={hooks.deleteIssue}
+                      addSprint={hooks.addSprint}
+                      updateSprint={hooks.updateSprint}
+                      deleteSprint={hooks.deleteSprint}
+                      closeSprint={hooks.closeSprint}
                     />
                   }
                 />
@@ -224,6 +228,10 @@ export default function ProjectPage() {
                       addIssue={hooks.addIssue}
                       updateIssue={hooks.updateIssue}
                       deleteIssue={hooks.deleteIssue}
+                      addSprint={hooks.addSprint}
+                      updateSprint={hooks.updateSprint}
+                      deleteSprint={hooks.deleteSprint}
+                      closeSprint={hooks.closeSprint}
                     />
                   }
                 />

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, ChevronDown, FileText, Plus, Trash2, Pin } from 'lucide-react'
 import SearchBar from '../ui/SearchBar'

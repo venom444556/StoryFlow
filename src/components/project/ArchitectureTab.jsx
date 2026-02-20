@@ -1,9 +1,10 @@
 import { useState, useMemo, useCallback } from 'react'
-import { Plus, Network, List } from 'lucide-react'
+import { Plus, Network, List, Boxes } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { generateId } from '../../utils/ids'
 import Button from '../ui/Button'
 import Tabs from '../ui/Tabs'
+import EmptyState from '../ui/EmptyState'
 import ArchitectureFilterBar from '../architecture/ArchitectureFilterBar'
 import ComponentTree from '../architecture/ComponentTree'
 import ComponentDetail from '../architecture/ComponentDetail'
@@ -185,29 +186,43 @@ export default function ArchitectureTab({ project, onUpdate }) {
 
       {/* View content */}
       {view === 'graph' ? (
-        <div className="flex flex-1 gap-4 min-h-0">
-          <DependencyGraph
-            components={components}
-            selectedId={selectedId}
-            onSelectNode={setSelectedId}
-            onUpdateComponents={updateComponents}
-            highlightIds={highlightIds}
-          />
-          {selected && (
-            <div className="w-80 shrink-0 overflow-y-auto">
-              <AnimatePresence mode="wait">
-                <ComponentDetail
-                  key={selected.id}
-                  component={selected}
-                  allComponents={components}
-                  onUpdate={handleUpdateSelected}
-                  onDelete={handleDeleteSelected}
-                  parentOptions={parentOptions}
-                />
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
+        components.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center min-h-0">
+            <EmptyState
+              icon={Boxes}
+              title="No components yet"
+              description="Add your first component to start mapping your architecture and dependencies."
+              action={{
+                label: 'Add Component',
+                onClick: () => setShowComponentForm(true),
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-1 gap-4 min-h-0">
+            <DependencyGraph
+              components={components}
+              selectedId={selectedId}
+              onSelectNode={setSelectedId}
+              onUpdateComponents={updateComponents}
+              highlightIds={highlightIds}
+            />
+            {selected && (
+              <div className="w-80 shrink-0 overflow-y-auto">
+                <AnimatePresence mode="wait">
+                  <ComponentDetail
+                    key={selected.id}
+                    component={selected}
+                    allComponents={components}
+                    onUpdate={handleUpdateSelected}
+                    onDelete={handleDeleteSelected}
+                    parentOptions={parentOptions}
+                  />
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        )
       ) : (
         <div className="flex flex-1 flex-col gap-4 md:flex-row min-h-0">
           <div className="flex w-full shrink-0 flex-col max-h-64 md:max-h-none md:w-80">

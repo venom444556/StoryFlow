@@ -1,5 +1,3 @@
-import React from 'react'
-
 const PADDING = {
   none: '',
   sm: 'p-[var(--space-3)]',

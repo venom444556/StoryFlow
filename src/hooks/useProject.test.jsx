@@ -1,41 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useProject } from './useProject'
 import { useProjectsStore } from '../stores/projectsStore'
-
-// Mock project data
-const createMockProject = () => ({
-  id: 'test-project-1',
-  name: 'Test Project',
-  createdAt: '2024-01-01T00:00:00.000Z',
-  updatedAt: '2024-01-01T00:00:00.000Z',
-  overview: {
-    goals: ['Goal 1'],
-    constraints: [],
-    techStack: [],
-    targetAudience: '',
-  },
-  board: {
-    issues: [],
-    sprints: [],
-    columns: ['backlog', 'todo', 'in-progress', 'done'],
-    nextIssueNumber: 1,
-  },
-  pages: [],
-  decisions: [],
-  timeline: {
-    phases: [],
-    milestones: [],
-  },
-  workflow: {
-    nodes: [],
-    edges: [],
-  },
-  architecture: {
-    components: [],
-  },
-  settings: {},
-})
 
 describe('useProject hook', () => {
   beforeEach(() => {

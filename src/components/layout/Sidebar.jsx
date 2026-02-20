@@ -8,6 +8,7 @@ import {
   ChevronRight,
   X,
   Zap,
+  HelpCircle,
 } from 'lucide-react'
 import { useProjects } from '../../hooks/useProjects'
 import Tooltip from '../ui/Tooltip'
@@ -24,7 +25,17 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
   const navigate = useNavigate()
 
   const handleNewProject = () => {
-    const project = addProject('New Project')
+    const active = projects.filter((p) => !p.deletedAt)
+    const lowerNames = new Set(active.map((p) => p.name.toLowerCase()))
+
+    let name = 'Untitled Project'
+    if (lowerNames.has(name.toLowerCase())) {
+      let counter = 2
+      while (lowerNames.has(`untitled project ${counter}`)) counter++
+      name = `Untitled Project ${counter}`
+    }
+
+    const project = addProject(name)
     navigate(`/project/${project.id}`)
     onMobileMenuClose?.()
   }
@@ -72,7 +83,9 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Mobile close button */}
         {mobileMenuOpen && (
           <button
+            type="button"
             onClick={onMobileMenuClose}
+            aria-label="Close menu"
             className={[
               'ml-auto rounded-[var(--radius-lg)] p-[var(--space-2)]',
               'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
@@ -87,7 +100,10 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-[var(--space-3)] py-[var(--space-4)]">
+      <nav
+        aria-label="Main navigation"
+        className="flex-1 overflow-y-auto px-[var(--space-3)] py-[var(--space-4)]"
+      >
         {/* Dashboard link */}
         <NavLink
           to="/"
@@ -142,6 +158,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
               return (
                 <Tooltip key={project.id} content={project.name} position="right">
                   <button
+                    type="button"
                     onClick={() => handleNavClick(`/project/${project.id}`)}
                     className={[
                       'flex w-full items-center justify-center rounded-[var(--radius-lg)]',
@@ -160,6 +177,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
             return (
               <button
+                type="button"
                 key={project.id}
                 onClick={() => handleNavClick(`/project/${project.id}`)}
                 className={[
@@ -171,7 +189,11 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 ].join(' ')}
                 style={{ transitionDuration: 'var(--duration-fast)' }}
               >
-                <span className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`} />
+                <span
+                  className={`h-2 w-2 shrink-0 rounded-full ${dotColor}`}
+                  aria-label={`Status: ${project.status || 'planning'}`}
+                  role="img"
+                />
                 <span className="truncate">{project.name}</span>
               </button>
             )
@@ -181,9 +203,39 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
       {/* Bottom section */}
       <div className="border-t border-[var(--color-border-default)] p-[var(--space-3)]">
+        {/* Help button */}
+        {collapsed && !mobileMenuOpen ? (
+          <Tooltip content="Help" position="right">
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem('storyflow-welcomed')
+                window.dispatchEvent(new Event('storyflow-show-welcome'))
+              }}
+              className="mb-2 flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+            >
+              <HelpCircle size={16} />
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.removeItem('storyflow-welcomed')
+              window.dispatchEvent(new Event('storyflow-show-welcome'))
+            }}
+            className="mb-2 flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+          >
+            <HelpCircle size={14} />
+            <span>Help & Tour</span>
+          </button>
+        )}
+      </div>
+      <div className="px-[var(--space-3)] pb-[var(--space-3)]">
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="New Project" position="right">
             <button
+              type="button"
               onClick={handleNewProject}
               className={[
                 'flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)]',
@@ -201,6 +253,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           </Tooltip>
         ) : (
           <button
+            type="button"
             onClick={handleNewProject}
             className={[
               'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
@@ -221,6 +274,8 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
       {/* Collapse toggle (desktop only) */}
       <button
+        type="button"
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         onClick={onToggle}
         className={[
           'absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full',

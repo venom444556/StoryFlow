@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server/index.js",
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
@@ -16,17 +18,21 @@
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
     "typecheck": "tsc --noEmit",
     "ci": "npm run format:check && npm run lint && npm run typecheck && npm run test:run && npm run build",
+    "postinstall": "cd server && npm install",
     "prepare": "husky || true"
   },
   "dependencies": {
+    "@tanstack/react-virtual": "^3.13.18",
     "date-fns": "^3.6.0",
+    "dexie": "^4.3.0",
+    "dexie-react-hooks": "^4.2.0",
+    "dompurify": "^3.3.1",
     "framer-motion": "^11.15.0",
     "immer": "^11.1.4",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
-    "uuid": "^11.0.0",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
@@ -39,6 +45,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
     "@vitest/coverage-v8": "^2.1.8",
+    "concurrently": "^9.2.1",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.1.0",
@@ -53,6 +60,11 @@
     "vite": "^6.0.0",
     "vitest": "^2.1.8"
   },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead"
+  ],
   "lint-staged": {
     "*.{js,jsx}": [
       "eslint --fix",

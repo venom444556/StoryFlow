@@ -80,7 +80,7 @@ StoryFlow is a unified visual project planning tool that combines seven distinct
 
 ### 2.6 Self-Tracking Project Seed with Version Migration
 
-**What:** StoryFlow uses itself as its own project tracker via a seed project (`seedProject.js`) with an auto-incrementing `SEED_VERSION` constant. When the version changes, the app's store detects the mismatch and rehydrates the seed data, ensuring the tracker always reflects the latest development state. This creates a self-documenting development history inside the application's own data.
+**What:** StoryFlow uses itself as its own project tracker via a seed project (`storyflow.js`) with an auto-incrementing `SEED_VERSION` constant. When the version changes, the app's store detects the mismatch and rehydrates the seed data, ensuring the tracker always reflects the latest development state. This creates a self-documenting development history inside the application's own data.
 
 **Why novel:** No known project management tool ships with its own development tracker as seed data that auto-migrates on version bumps. This pattern creates a living development log that users see on first launch and that developers maintain as part of the codebase.
 

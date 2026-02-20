@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import IssueCard from './IssueCard'
-import QuickCreateBar from './QuickCreateBar'
 import Badge from '../ui/Badge'
 
 const STATUS_ACCENT = {
@@ -58,20 +57,15 @@ export default function BoardColumn({
     [onDrop, status]
   )
 
-  const handleCreateIssue = useCallback(
-    (issueData) => {
-      onCreateIssue?.({ ...issueData, status })
-    },
-    [onCreateIssue, status]
-  )
-
   return (
     <div
+      role="listbox"
+      aria-label={`${title} column, ${issues.length} items`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={[
-        'flex min-w-[280px] flex-1 flex-col rounded-xl border transition-all duration-200',
+        'flex min-w-[280px] flex-1 flex-col self-stretch rounded-xl border transition-all duration-200',
         'bg-[var(--color-bg-glass)] backdrop-blur-sm',
         isDragOver
           ? `border-2 ${accent.dropGlow} ring-2 bg-[var(--color-bg-glass-hover)]`
@@ -88,6 +82,7 @@ export default function BoardColumn({
           </Badge>
         </div>
         <button
+          type="button"
           onClick={() => {
             onCreateIssue?.({
               title: 'New Issue',
@@ -130,7 +125,10 @@ export default function BoardColumn({
         {/* Empty state */}
         {issues.length === 0 && !isDragOver && (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <p className="text-xs text-[var(--color-fg-subtle)]">No issues</p>
+            <p className="text-xs text-[var(--color-fg-muted)]">No issues in {status}</p>
+            <p className="mt-1 text-[10px] text-[var(--color-fg-subtle)]">
+              Drag issues here or create new ones
+            </p>
           </div>
         )}
 
@@ -151,11 +149,6 @@ export default function BoardColumn({
             </span>
           </motion.div>
         )}
-      </div>
-
-      {/* Quick create */}
-      <div className="shrink-0 border-t border-[var(--color-border-default)] px-3 py-2">
-        <QuickCreateBar onCreateIssue={handleCreateIssue} defaultStatus={status} />
       </div>
     </div>
   )

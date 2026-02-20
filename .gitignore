@@ -26,9 +26,17 @@ npm-debug.log*
 
 # Claude Code
 .claude/
+CLAUDE.md
+src/data/storyflow.js
+_archived/
 
 # Windows artifacts
 nul
+
+# API data store (synced at runtime, not committed)
+data/*.json
+data/*.db
+data/*.json.backup
 
 # Development scratchpads
 workflow-builder.jsx

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { generateId } from '../../utils/ids'
 import { useCanvasViewport } from '../../hooks/useCanvasViewport'
 import { useCanvasDrag } from '../../hooks/useCanvasDrag'
@@ -8,6 +8,8 @@ import WorkflowNode from './WorkflowNode'
 import WorkflowConnection from './WorkflowConnection'
 import NodeContextMenu from './NodeContextMenu'
 import WorkflowZoomControls from './WorkflowZoomControls'
+import ConfirmDialog from '../ui/ConfirmDialog'
+import { NODE_WIDTH } from '../../utils/canvasConstants'
 
 // ---------------------------------------------------------------------------
 // WorkflowCanvas
@@ -16,8 +18,6 @@ import WorkflowZoomControls from './WorkflowZoomControls'
 // drag, connection-drawing, zoom/pan, and context menu support.
 // Uses extracted hooks for viewport, drag, pan, and connection management.
 // ---------------------------------------------------------------------------
-
-const NODE_WIDTH = 180
 const HANDLE_CENTER_Y = 41
 
 export default function WorkflowCanvas({
@@ -37,6 +37,17 @@ export default function WorkflowCanvas({
   const canvasRef = useRef(null)
   const [contextMenu, setContextMenu] = useState(null)
 
+  // Guard against NaN/undefined coordinates (M4 audit fix)
+  const safeNodes = useMemo(
+    () =>
+      (nodes || []).map((n) => ({
+        ...n,
+        x: Number.isFinite(n.x) ? n.x : 0,
+        y: Number.isFinite(n.y) ? n.y : 0,
+      })),
+    [nodes]
+  )
+
   // ------ Viewport (zoom + pan offset) ------
   const {
     viewport,
@@ -47,7 +58,7 @@ export default function WorkflowCanvas({
     handleResetView,
     MIN_ZOOM,
     MAX_ZOOM,
-  } = useCanvasViewport(canvasRef, nodes, canvasId)
+  } = useCanvasViewport(canvasRef, safeNodes, canvasId)
 
   // ------ Drag handling ------
   const {
@@ -109,24 +120,23 @@ export default function WorkflowCanvas({
 
   // ------ Node CRUD ------
 
-  const handleUpdateNode = useCallback(
-    (nodeId, updates) => {
-      const updatedNodes = nodes.map((n) => (n.id === nodeId ? { ...n, ...updates } : n))
-      onSaveNodes(updatedNodes)
-    },
-    [nodes, onSaveNodes]
-  )
+  const [deleteConfirmNodeId, setDeleteConfirmNodeId] = useState(null)
 
-  const handleDeleteNode = useCallback(
-    (nodeId) => {
-      const updatedNodes = nodes.filter((n) => n.id !== nodeId)
-      const updatedConns = connections.filter((c) => c.from !== nodeId && c.to !== nodeId)
-      onSaveBoth(updatedNodes, updatedConns)
-      if (selectedNodeId === nodeId) onSelectNode?.(null)
-      setContextMenu(null)
-    },
-    [nodes, connections, onSaveBoth, selectedNodeId, onSelectNode]
-  )
+  const handleRequestDeleteNode = useCallback((nodeId) => {
+    setDeleteConfirmNodeId(nodeId)
+    setContextMenu(null)
+  }, [])
+
+  const handleConfirmDeleteNode = useCallback(() => {
+    if (!deleteConfirmNodeId) return
+    const updatedNodes = nodes.filter((n) => n.id !== deleteConfirmNodeId)
+    const updatedConns = connections.filter(
+      (c) => c.from !== deleteConfirmNodeId && c.to !== deleteConfirmNodeId
+    )
+    onSaveBoth(updatedNodes, updatedConns)
+    if (selectedNodeId === deleteConfirmNodeId) onSelectNode?.(null)
+    setDeleteConfirmNodeId(null)
+  }, [deleteConfirmNodeId, nodes, connections, onSaveBoth, selectedNodeId, onSelectNode])
 
   const handleDuplicateNode = useCallback(
     (nodeId) => {
@@ -233,7 +243,7 @@ export default function WorkflowCanvas({
   const renderTempConnection = () => {
     if (!connectingFrom || !tempConnectionEnd) return null
 
-    const fromNode = nodes.find((n) => n.id === connectingFrom)
+    const fromNode = safeNodes.find((n) => n.id === connectingFrom)
     if (!fromNode) return null
 
     const startX = fromNode.x + NODE_WIDTH + 7
@@ -295,8 +305,8 @@ export default function WorkflowCanvas({
         >
           {/* Connections */}
           {connections.map((conn) => {
-            const fromNode = nodes.find((n) => n.id === conn.from)
-            const toNode = nodes.find((n) => n.id === conn.to)
+            const fromNode = safeNodes.find((n) => n.id === conn.from)
+            const toNode = safeNodes.find((n) => n.id === conn.to)
             if (!fromNode || !toNode) return null
 
             return (
@@ -315,7 +325,7 @@ export default function WorkflowCanvas({
         </svg>
 
         {/* Nodes rendered as HTML positioned over the SVG */}
-        {nodes.map((node) => (
+        {safeNodes.map((node) => (
           <WorkflowNode
             key={node.id}
             node={node}
@@ -344,7 +354,7 @@ export default function WorkflowCanvas({
             setContextMenu(null)
           }}
           onDuplicate={() => handleDuplicateNode(contextMenu.nodeId)}
-          onDelete={() => handleDeleteNode(contextMenu.nodeId)}
+          onDelete={() => handleRequestDeleteNode(contextMenu.nodeId)}
           onAddChildren={
             onAddChildren && !contextMenuNode.children?.nodes?.length
               ? () => {
@@ -373,6 +383,16 @@ export default function WorkflowCanvas({
         onReset={handleResetView}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
+      />
+
+      {/* Delete node confirmation */}
+      <ConfirmDialog
+        isOpen={deleteConfirmNodeId !== null}
+        onClose={() => setDeleteConfirmNodeId(null)}
+        onConfirm={handleConfirmDeleteNode}
+        title="Delete node?"
+        message="This workflow node and all its connections will be permanently removed. This cannot be undone."
+        confirmLabel="Delete"
       />
     </div>
   )

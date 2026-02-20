@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Trash2, Clock, Terminal } from 'lucide-react'
 
 // ---------------------------------------------------------------------------

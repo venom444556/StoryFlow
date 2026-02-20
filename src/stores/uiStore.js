@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import indexedDbStorage from '../db/indexedDbStorage'
 
 // ---------------------------------------------------------------------------
 // UI Store
@@ -7,7 +8,7 @@ import { persist } from 'zustand/middleware'
 // ---------------------------------------------------------------------------
 export const useUIStore = create(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       // ---------------------------------------------------------------------------
       // Sidebar State
       // ---------------------------------------------------------------------------
@@ -61,7 +62,7 @@ export const useUIStore = create(
       toasts: [],
 
       addToast: (toast) => {
-        const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+        const id = crypto.randomUUID()
         set((state) => ({
           toasts: [
             ...state.toasts,
@@ -165,6 +166,7 @@ export const useUIStore = create(
     }),
     {
       name: 'storyflow-ui',
+      storage: createJSONStorage(() => indexedDbStorage),
       partialize: (state) => ({
         // Only persist these UI preferences
         sidebarCollapsed: state.sidebarCollapsed,

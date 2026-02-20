@@ -1,10 +1,26 @@
 import { useCallback } from 'react'
 import { create } from 'zustand'
-import { persist, subscribeWithSelector } from 'zustand/middleware'
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { generateId } from '../utils/ids'
+import { generateId, generateProjectId } from '../utils/ids'
+import indexedDbStorage from '../db/indexedDbStorage'
+import { broadcastUpdate, onCrossTabUpdate, setRehydrating } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
-import { createSeedProject, SEED_VERSION } from '../data/seedProject'
+// Seed project support (optional — loaded dynamically if src/data/storyflow.js exists)
+let _createSeedProject = null
+let _SEED_VERSION = 0
+const SEED_PROJECT_ID = 'storyflow'
+const LEGACY_SEED_PROJECT_ID = 'storyflow-seed-00000000-0001'
+
+// Eagerly start loading seed data (non-blocking, optional file)
+// import.meta.glob returns {} if the file doesn't exist — no build error
+const _seedModules = import.meta.glob('../data/storyflow.js')
+const _seedReady = _seedModules['../data/storyflow.js']
+  ? _seedModules['../data/storyflow.js']().then((seed) => {
+      _createSeedProject = seed.createSeedProject
+      _SEED_VERSION = seed.SEED_VERSION
+    })
+  : Promise.resolve()
 import {
   useActivityStore,
   ACTIVITY_TYPES,
@@ -17,28 +33,69 @@ import {
 const STORAGE_KEY = 'storyflow-projects'
 
 // ---------------------------------------------------------------------------
+// Server sync: push client state to REST API (debounced)
+// ---------------------------------------------------------------------------
+let _syncTimer = null
+let _isSyncing = false
+
+/** Push all projects to the server-side JSON store */
+function syncToServer(projects) {
+  // Don't sync during rehydration (prevents loops)
+  if (_isSyncing) return
+  clearTimeout(_syncTimer)
+  _syncTimer = setTimeout(async () => {
+    try {
+      await fetch('/api/sync', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Confirm': 'overwrite-all',
+        },
+        body: JSON.stringify({ projects }),
+      })
+    } catch {
+      // Server may not be running (production build, etc.) — silently ignore
+    }
+  }, 500)
+}
+
+// ---------------------------------------------------------------------------
 // Migrate seed project if a new version is available
 // ---------------------------------------------------------------------------
 function migrateSeedProject(projects) {
-  const seedIndex = projects.findIndex((p) => p.isSeed === true)
+  // Skip seed migration if no seed data is available
+  if (!_createSeedProject) return projects
+
+  // Find seed project by isSeed flag, new ID, or legacy ID
+  let seedIndex = projects.findIndex((p) => p.isSeed === true)
 
   if (seedIndex === -1) {
-    // Legacy: pre-versioning seed project has no isSeed flag
+    // Check for legacy ID (pre-slug naming convention)
+    seedIndex = projects.findIndex((p) => p.id === LEGACY_SEED_PROJECT_ID)
+  }
+
+  if (seedIndex === -1) {
+    // Check for new slug-based ID
+    seedIndex = projects.findIndex((p) => p.id === SEED_PROJECT_ID)
+  }
+
+  if (seedIndex === -1) {
+    // Oldest legacy: pre-versioning seed project matched by name
     const legacyIndex = projects.findIndex(
       (p) => p.name === 'StoryFlow Development' && p.isSeed === undefined
     )
     if (legacyIndex !== -1) {
       const updated = [...projects]
-      updated[legacyIndex] = createSeedProject()
+      updated[legacyIndex] = _createSeedProject()
       return updated
     }
     return projects
   }
 
-  // Check version — replace if outdated
-  if ((projects[seedIndex].seedVersion || 0) < SEED_VERSION) {
+  // Check version — replace if outdated (also handles ID migration from legacy → slug)
+  if ((projects[seedIndex].seedVersion || 0) < _SEED_VERSION) {
     const updated = [...projects]
-    updated[seedIndex] = createSeedProject()
+    updated[seedIndex] = _createSeedProject()
     return updated
   }
 
@@ -56,7 +113,15 @@ export const useProjectsStore = create(
         projects: [],
 
         // Computed selectors (use these for memoized reads)
-        getProject: (id) => get().projects.find((p) => p.id === id) || null,
+        getProject: (id) => {
+          const project = get().projects.find((p) => p.id === id)
+          if (project) return project
+          // Fallback: handle legacy seed project ID
+          if (id === LEGACY_SEED_PROJECT_ID) {
+            return get().projects.find((p) => p.id === SEED_PROJECT_ID && p.isSeed) || null
+          }
+          return null
+        },
 
         getProjectsByStatus: (status) => get().projects.filter((p) => p.status === status),
 
@@ -64,7 +129,17 @@ export const useProjectsStore = create(
         setProjects: (projects) => set({ projects }),
 
         addProject: (name) => {
-          const project = createDefaultProject(name)
+          const trimmed = (name || '').trim()
+          if (!trimmed) {
+            throw new Error('Project name is required')
+          }
+          const active = get().projects.filter((p) => !p.deletedAt)
+          if (active.some((p) => p.name.toLowerCase() === trimmed.toLowerCase())) {
+            throw new Error(`A project named "${trimmed}" already exists`)
+          }
+          const existingIds = get().projects.map((p) => p.id)
+          const id = generateProjectId(trimmed, existingIds)
+          const project = createDefaultProject(trimmed, id)
           set((state) => {
             state.projects.push(project)
           })
@@ -84,16 +159,89 @@ export const useProjectsStore = create(
           })
         },
 
-        deleteProject: (id) => {
+        // Soft-delete: moves project to trash (recoverable)
+        trashProject: (id) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === id)
+            if (project) {
+              project.deletedAt = new Date().toISOString()
+              project.updatedAt = new Date().toISOString()
+            }
+          })
+        },
+
+        // Restore a trashed project (with unique-name check)
+        restoreProject: (id) => {
+          const state = get()
+          const project = state.projects.find((p) => p.id === id)
+          if (!project) return
+
+          // Check for name conflict with active projects
+          const active = state.projects.filter((p) => !p.deletedAt)
+          const nameConflict = active.some(
+            (p) => p.name.toLowerCase() === project.name.toLowerCase()
+          )
+
+          set((draft) => {
+            const target = draft.projects.find((p) => p.id === id)
+            if (!target) return
+            // If name conflicts, auto-suffix with "(restored)"
+            if (nameConflict) {
+              let suffix = '(restored)'
+              const allNames = new Set(active.map((p) => p.name.toLowerCase()))
+              if (allNames.has(`${target.name} ${suffix}`.toLowerCase())) {
+                let counter = 2
+                while (allNames.has(`${target.name} (restored ${counter})`.toLowerCase())) {
+                  counter++
+                }
+                suffix = `(restored ${counter})`
+              }
+              target.name = `${target.name} ${suffix}`
+            }
+            delete target.deletedAt
+            target.updatedAt = new Date().toISOString()
+          })
+        },
+
+        // Permanently delete (no recovery)
+        permanentlyDeleteProject: (id) => {
           set((state) => {
             state.projects = state.projects.filter((p) => p.id !== id)
           })
         },
 
+        // Empty all trashed projects
+        emptyTrash: () => {
+          set((state) => {
+            state.projects = state.projects.filter((p) => !p.deletedAt)
+          })
+        },
+
+        // Legacy alias — maps to soft delete for backward compatibility
+        deleteProject: (id) => {
+          get().trashProject(id)
+        },
+
         importProject: (data) => {
+          let name = (data.name || '').trim()
+          if (!name) {
+            throw new Error('Imported project must have a name')
+          }
+          // Auto-suffix if name already exists (imports are copies, not rejects)
+          const active = get().projects.filter((p) => !p.deletedAt)
+          const lowerNames = new Set(active.map((p) => p.name.toLowerCase()))
+          if (lowerNames.has(name.toLowerCase())) {
+            let counter = 2
+            while (lowerNames.has(`${name} (${counter})`.toLowerCase())) {
+              counter++
+            }
+            name = `${name} (${counter})`
+          }
+          const existingIds = get().projects.map((p) => p.id)
           const imported = {
             ...data,
-            id: generateId(),
+            name,
+            id: generateProjectId(name, existingIds),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           }
@@ -113,11 +261,30 @@ export const useProjectsStore = create(
             if (!project) return
 
             const nextNumber = project.board.nextIssueNumber || 1
+            // Derive a key prefix from the project name (e.g. "StoryFlow" → "SF",
+            // "My App" → "MA"). Falls back to "IS" if no words found.
+            const prefix =
+              project.name
+                .split(/[\s-]+/)
+                .filter(Boolean)
+                .map((w) => w[0].toUpperCase())
+                .join('')
+                .slice(0, 3) || 'IS'
+            const now = new Date().toISOString()
             newIssue = {
-              id: generateId(),
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
               ...issue,
+              id: generateId(),
+              key: issue.key || `${prefix}-${nextNumber}`,
+              createdAt: now,
+              updatedAt: now,
+            }
+            // Set initial phase timestamp based on starting status
+            if (newIssue.status === 'To Do' && !newIssue.todoAt) {
+              newIssue.todoAt = now
+            } else if (newIssue.status === 'In Progress' && !newIssue.inProgressAt) {
+              newIssue.inProgressAt = now
+            } else if (newIssue.status === 'Done' && !newIssue.doneAt) {
+              newIssue.doneAt = now
             }
             project.board.issues.push(newIssue)
             project.board.nextIssueNumber = nextNumber + 1
@@ -143,12 +310,23 @@ export const useProjectsStore = create(
             const issueIndex = project.board.issues.findIndex((i) => i.id === issueId)
             if (issueIndex !== -1) {
               oldIssue = { ...project.board.issues[issueIndex] }
+              const now = new Date().toISOString()
               project.board.issues[issueIndex] = {
                 ...project.board.issues[issueIndex],
                 ...updates,
-                updatedAt: new Date().toISOString(),
+                updatedAt: now,
               }
-              project.updatedAt = new Date().toISOString()
+              // Auto-set phase timestamps on status change
+              if (updates.status && updates.status !== oldIssue.status) {
+                if (updates.status === 'To Do') {
+                  project.board.issues[issueIndex].todoAt = now
+                } else if (updates.status === 'In Progress') {
+                  project.board.issues[issueIndex].inProgressAt = now
+                } else if (updates.status === 'Done') {
+                  project.board.issues[issueIndex].doneAt = now
+                }
+              }
+              project.updatedAt = now
             }
           })
 
@@ -554,6 +732,87 @@ export const useProjectsStore = create(
         },
 
         // ---------------------------------------------------------------------------
+        // Sprint Actions
+        // ---------------------------------------------------------------------------
+        addSprint: (projectId, sprintData) => {
+          const now = new Date().toISOString()
+          const newSprint = {
+            id: sprintData.id || crypto.randomUUID(),
+            name: sprintData.name || 'New Sprint',
+            goal: sprintData.goal || '',
+            startDate: sprintData.startDate || null,
+            endDate: sprintData.endDate || null,
+            status: sprintData.status || 'planning',
+            createdAt: now,
+            updatedAt: now,
+          }
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            if (!project.board.sprints) project.board.sprints = []
+            project.board.sprints.push(newSprint)
+            project.updatedAt = now
+          })
+          return newSprint
+        },
+
+        updateSprint: (projectId, sprintId, updates) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            const sprint = (project.board.sprints || []).find((s) => s.id === sprintId)
+            if (!sprint) return
+            Object.assign(sprint, updates, { updatedAt: new Date().toISOString() })
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        deleteSprint: (projectId, sprintId) => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            project.board.sprints = (project.board.sprints || []).filter((s) => s.id !== sprintId)
+            // Unassign issues from deleted sprint
+            project.board.issues.forEach((issue) => {
+              if (issue.sprintId === sprintId) {
+                issue.sprintId = null
+              }
+            })
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        closeSprint: (projectId, sprintId, moveIncomplete = 'backlog') => {
+          set((state) => {
+            const project = state.projects.find((p) => p.id === projectId)
+            if (!project) return
+            const sprint = (project.board.sprints || []).find((s) => s.id === sprintId)
+            if (!sprint) return
+            sprint.status = 'completed'
+            sprint.updatedAt = new Date().toISOString()
+
+            // Handle incomplete issues
+            if (moveIncomplete === 'backlog') {
+              project.board.issues.forEach((issue) => {
+                if (issue.sprintId === sprintId && issue.status !== 'Done') {
+                  issue.sprintId = null
+                }
+              })
+            }
+            // If moveIncomplete is a sprint ID, move to that sprint
+            else if (moveIncomplete && moveIncomplete !== 'backlog') {
+              project.board.issues.forEach((issue) => {
+                if (issue.sprintId === sprintId && issue.status !== 'Done') {
+                  issue.sprintId = moveIncomplete
+                }
+              })
+            }
+
+            project.updatedAt = new Date().toISOString()
+          })
+        },
+
+        // ---------------------------------------------------------------------------
         // Board Settings
         // ---------------------------------------------------------------------------
         updateBoardSettings: (projectId, settings) => {
@@ -582,17 +841,21 @@ export const useProjectsStore = create(
       {
         name: STORAGE_KEY,
         version: 1,
+        storage: createJSONStorage(() => indexedDbStorage),
         onRehydrateStorage: () => (state) => {
           if (state) {
-            // Migrate seed project on load
-            const migrated = migrateSeedProject(state.projects)
-            if (migrated !== state.projects) {
-              state.projects = migrated
-            }
-            // Seed with project if empty
-            if (state.projects.length === 0) {
-              state.projects = [createSeedProject()]
-            }
+            // Wait for seed data to load, then migrate if needed
+            _seedReady.then(() => {
+              const store = useProjectsStore.getState()
+              const migrated = migrateSeedProject(store.projects)
+              if (migrated !== store.projects) {
+                useProjectsStore.setState({ projects: migrated })
+              }
+              // Seed with project if empty (only if seed data is available)
+              if (store.projects.length === 0 && _createSeedProject) {
+                useProjectsStore.setState({ projects: [_createSeedProject()] })
+              }
+            })
 
             // Seed initial activities for the seed project if activity store is empty
             const seedProject = state.projects.find((p) => p.isSeed)
@@ -687,9 +950,15 @@ export const useProjectsStore = create(
 // ---------------------------------------------------------------------------
 // Selectors (for optimized component subscriptions)
 // ---------------------------------------------------------------------------
+// All projects (including trashed) — use selectActiveProjects for normal views
 export const selectProjects = (state) => state.projects
+// Active projects (excludes trashed)
+export const selectActiveProjects = (state) => state.projects.filter((p) => !p.deletedAt)
+// Trashed projects only
+export const selectTrashedProjects = (state) => state.projects.filter((p) => !!p.deletedAt)
 export const selectProject = (id) => (state) => state.projects.find((p) => p.id === id)
-export const selectProjectCount = (state) => state.projects.length
+export const selectProjectCount = (state) => state.projects.filter((p) => !p.deletedAt).length
+export const selectTrashCount = (state) => state.projects.filter((p) => !!p.deletedAt).length
 
 // Issue selectors
 export const selectIssues = (projectId) => (state) => {
@@ -751,4 +1020,124 @@ export function useProjectStore(projectId) {
     updateBoardSettings: (settings) => store.updateBoardSettings(projectId, settings),
     updateSettings: (settings) => store.updateSettings(projectId, settings),
   }
+}
+
+// ---------------------------------------------------------------------------
+// Cross-Tab Sync: broadcast updates and re-hydrate on remote changes
+// ---------------------------------------------------------------------------
+useProjectsStore.subscribe(
+  (state) => state.projects,
+  () => broadcastUpdate('projects')
+)
+
+// Sync activity store across tabs
+useActivityStore.subscribe(
+  (state) => state.activities,
+  () => broadcastUpdate('activity')
+)
+
+onCrossTabUpdate(({ store: storeName }) => {
+  if (storeName === 'projects') {
+    // Suppress broadcasts during rehydration to prevent cross-tab ping-pong
+    setRehydrating(true)
+    useProjectsStore.persist.rehydrate().finally(() => {
+      setRehydrating(false)
+    })
+  } else if (storeName === 'activity') {
+    setRehydrating(true)
+    useActivityStore.persist.rehydrate().finally(() => {
+      setRehydrating(false)
+    })
+  }
+})
+
+// ---------------------------------------------------------------------------
+// Server Sync: push local changes to REST API + listen for external writes
+// ---------------------------------------------------------------------------
+
+// Push to server on every local state change (debounced 500ms)
+useProjectsStore.subscribe(
+  (state) => state.projects,
+  (projects) => syncToServer(projects)
+)
+
+// Listen for external writes via WebSocket (replaces Vite HMR)
+function reloadFromServer() {
+  _isSyncing = true
+  fetch('/api/projects')
+    .then((res) => (res.ok ? res.json() : null))
+    .then(async (summaries) => {
+      if (!summaries || summaries.length === 0) return
+      // Fetch full project data for each project
+      const fullProjects = await Promise.all(
+        summaries.map((s) =>
+          fetch(`/api/projects/${s.id}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+        )
+      )
+      const projects = fullProjects.filter(Boolean)
+      if (projects.length > 0) {
+        // Merge: keep client-only projects, update/add server projects
+        const currentProjects = useProjectsStore.getState().projects
+        const serverIds = new Set(projects.map((p) => p.id))
+        const clientOnly = currentProjects.filter((p) => !serverIds.has(p.id))
+        useProjectsStore.setState({ projects: [...clientOnly, ...projects] })
+      }
+    })
+    .catch(() => {
+      // Server unavailable — ignore
+    })
+    .finally(() => {
+      _isSyncing = false
+    })
+}
+
+let _ws = null
+let _wsReconnectTimer = null
+
+function connectWebSocket() {
+  // Determine WebSocket URL from current page origin
+  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const wsUrl = `${wsProtocol}//localhost:3001`
+
+  try {
+    _ws = new WebSocket(wsUrl)
+  } catch {
+    // WebSocket constructor can throw in some environments
+    return
+  }
+
+  _ws.onmessage = (event) => {
+    try {
+      const msg = JSON.parse(event.data)
+      if (msg.type === 'sync') {
+        reloadFromServer()
+      }
+    } catch {
+      // Ignore malformed messages
+    }
+  }
+
+  _ws.onclose = () => {
+    // Auto-reconnect after 3 seconds
+    clearTimeout(_wsReconnectTimer)
+    _wsReconnectTimer = setTimeout(connectWebSocket, 3000)
+  }
+
+  _ws.onerror = () => {
+    // Error triggers close, which triggers reconnect
+  }
+}
+
+// Initial sync: push client state to server + connect WebSocket
+{
+  const unsub = useProjectsStore.persist.onFinishHydration(() => {
+    const { projects } = useProjectsStore.getState()
+    if (projects.length > 0) {
+      syncToServer(projects)
+    }
+    connectWebSocket()
+    unsub()
+  })
 }

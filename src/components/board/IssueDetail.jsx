@@ -10,6 +10,7 @@ import ConfirmDialog from '../ui/ConfirmDialog'
 import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
 import { generateId } from '../../utils/ids'
 import { getSuggestions } from '../../utils/labelDefinitions'
+import { formatDistanceStrict } from 'date-fns'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.EPIC, label: 'Epic' },
@@ -61,7 +62,14 @@ function formatDate(isoString) {
   })
 }
 
-export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIssues = [] }) {
+export default function IssueDetail({
+  issue,
+  onUpdate,
+  onDelete,
+  onClose,
+  allIssues = [],
+  sprints = [],
+}) {
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleDraft, setTitleDraft] = useState('')
   const [newSubtask, setNewSubtask] = useState('')
@@ -77,6 +85,14 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
   )
 
   const epicOptions = useMemo(() => [{ value: '', label: 'No Epic' }, ...epics], [epics])
+
+  const sprintOptions = useMemo(
+    () => [
+      { value: '', label: 'No Sprint' },
+      ...sprints.map((s) => ({ value: s.id, label: s.name })),
+    ],
+    [sprints]
+  )
 
   const handleUpdate = useCallback(
     (updates) => {
@@ -196,6 +212,7 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
             </div>
             <button
               onClick={onClose}
+              aria-label="Close issue detail"
               className="shrink-0 rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
             >
               <X size={18} />
@@ -238,8 +255,8 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
                 />
               </div>
 
-              {/* Details row: Points, Assignee, Epic */}
-              <div className="grid grid-cols-3 gap-3">
+              {/* Details row: Points, Assignee */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">
                     Story Points
@@ -268,6 +285,10 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
                   }
                   options={ASSIGNEE_OPTIONS}
                 />
+              </div>
+
+              {/* Epic & Sprint row */}
+              <div className="grid grid-cols-2 gap-3">
                 <Select
                   label="Epic"
                   value={issue.epicId || ''}
@@ -277,6 +298,16 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
                     })
                   }
                   options={epicOptions}
+                />
+                <Select
+                  label="Sprint"
+                  value={issue.sprintId || ''}
+                  onChange={(e) =>
+                    handleUpdate({
+                      sprintId: e.target.value || null,
+                    })
+                  }
+                  options={sprintOptions}
                 />
               </div>
 
@@ -455,6 +486,61 @@ export default function IssueDetail({ issue, onUpdate, onDelete, onClose, allIss
                     {formatDate(issue.updatedAt)}
                   </div>
                 </div>
+
+                {/* Phase timestamps & durations */}
+                {(issue.todoAt || issue.inProgressAt || issue.doneAt) && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-fg-subtle)]">
+                      {issue.todoAt && (
+                        <div>
+                          <span className="text-[var(--color-fg-faint)]">To Do:</span>{' '}
+                          {formatDate(issue.todoAt)}
+                        </div>
+                      )}
+                      {issue.inProgressAt && (
+                        <div>
+                          <span className="text-blue-400">In Progress:</span>{' '}
+                          {formatDate(issue.inProgressAt)}
+                        </div>
+                      )}
+                      {issue.doneAt && (
+                        <div>
+                          <span className="text-green-400">Done:</span> {formatDate(issue.doneAt)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Calculated durations */}
+                    {(issue.inProgressAt || issue.doneAt) && (
+                      <div className="flex flex-wrap gap-x-3 gap-y-1">
+                        {issue.todoAt && issue.inProgressAt && (
+                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
+                            Wait:{' '}
+                            {formatDistanceStrict(
+                              new Date(issue.todoAt),
+                              new Date(issue.inProgressAt)
+                            )}
+                          </span>
+                        )}
+                        {issue.inProgressAt && issue.doneAt && (
+                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-blue-400">
+                            Active:{' '}
+                            {formatDistanceStrict(
+                              new Date(issue.inProgressAt),
+                              new Date(issue.doneAt)
+                            )}
+                          </span>
+                        )}
+                        {issue.todoAt && issue.doneAt && (
+                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-green-400">
+                            Total:{' '}
+                            {formatDistanceStrict(new Date(issue.todoAt), new Date(issue.doneAt))}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

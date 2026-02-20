@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Play,
@@ -12,6 +12,7 @@ import {
   Code,
 } from 'lucide-react'
 import NODE_TYPES from '../../data/nodeTypes'
+import { sanitizeColor } from '../../utils/sanitize'
 
 // ---------------------------------------------------------------------------
 // Icon lookup (mirrors WorkflowNode)
@@ -93,7 +94,7 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
                   {Icon && (
                     <Icon
                       size={20}
-                      style={{ color: typeDef.color }}
+                      style={{ color: sanitizeColor(typeDef.color) }}
                       className="transition-transform duration-150 group-hover:scale-110"
                     />
                   )}

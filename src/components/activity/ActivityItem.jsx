@@ -7,7 +7,6 @@ import {
   User,
   AlertTriangle,
   CheckCircle,
-  FileText,
   GitBranch,
   MessageSquare,
   Scale,

@@ -1,16 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Filter,
-  X,
-  ChevronDown,
-  GitBranch,
-  AlertCircle,
-  ArrowDownRight,
-  ArrowUpRight,
-} from 'lucide-react'
+import { Filter, X, ChevronDown, AlertCircle, ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import Badge from '../ui/Badge'
 import { TYPE_HEX_COLORS, TYPE_ICONS, TYPE_COLORS } from './constants'
+import { sanitizeColor } from '../../utils/sanitize'
 
 const CONNECTION_OPTIONS = [
   { value: 'has-deps', label: 'Has dependencies', icon: ArrowDownRight },
@@ -48,9 +41,9 @@ function CheckboxItem({ value, label, isSelected, onToggle, icon: Icon, iconColo
       {Icon && (
         <div
           className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
-          style={iconColor ? { backgroundColor: `${iconColor}22` } : undefined}
+          style={iconColor ? { backgroundColor: `${sanitizeColor(iconColor)}22` } : undefined}
         >
-          <Icon size={12} style={iconColor ? { color: iconColor } : undefined} />
+          <Icon size={12} style={iconColor ? { color: sanitizeColor(iconColor) } : undefined} />
         </div>
       )}
       <span className="capitalize">{label}</span>
@@ -151,7 +144,7 @@ function TypeDropdown({ types, selected, onChange }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 top-full z-30 mt-1.5 min-w-[180px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-bg-inverse)] p-1 shadow-xl"
+            className="absolute left-0 top-full z-30 mt-1.5 min-w-[180px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-dropdown-bg)] p-1 shadow-xl"
             style={{ isolation: 'isolate' }}
           >
             {types.map(({ value, label, icon, color }) => (
@@ -216,7 +209,7 @@ function ConnectionDropdown({ selected, onChange }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 top-full z-30 mt-1.5 min-w-[200px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-bg-inverse)] p-1 shadow-xl"
+            className="absolute left-0 top-full z-30 mt-1.5 min-w-[200px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-dropdown-bg)] p-1 shadow-xl"
             style={{ isolation: 'isolate' }}
           >
             {CONNECTION_OPTIONS.map((opt) => (

@@ -36,6 +36,8 @@ function TreeNode({ node, selectedId, onSelect, depth = 0, highlightIds }) {
     <div>
       <button
         onClick={() => onSelect(node.id)}
+        aria-expanded={hasChildren ? expanded : undefined}
+        aria-label={`${node.name} (${node.type || 'component'})`}
         className={[
           'group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-all duration-200',
           isSelected

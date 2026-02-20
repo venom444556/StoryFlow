@@ -4,7 +4,7 @@ import PageViewer from './PageViewer'
 
 // Mock utils
 vi.mock('../../utils/dates', () => ({
-  formatRelative: vi.fn((date) => 'just now'),
+  formatRelative: vi.fn((_date) => 'just now'),
 }))
 
 // Mock child components

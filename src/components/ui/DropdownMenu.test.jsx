@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { Edit, Trash2, Copy } from 'lucide-react'
 import DropdownMenu from './DropdownMenu'
 

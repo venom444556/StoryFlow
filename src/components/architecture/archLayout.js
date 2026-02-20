@@ -6,7 +6,7 @@
 // spaced vertically.
 // ---------------------------------------------------------------------------
 
-const NODE_WIDTH = 180
+import { NODE_WIDTH } from '../../utils/canvasConstants'
 const NODE_HEIGHT = 80
 const HORIZONTAL_GAP = 100
 const VERTICAL_GAP = 40

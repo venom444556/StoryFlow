@@ -4,6 +4,7 @@ import { Filter, X, ChevronDown, Search } from 'lucide-react'
 import Badge from '../ui/Badge'
 import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
 import { getLabelsByCategory, getLabel } from '../../utils/labelDefinitions'
+import { sanitizeColor } from '../../utils/sanitize'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.EPIC, label: 'Epic', variant: 'purple' },
@@ -122,7 +123,7 @@ function MultiSelectDropdown({ label, options, selected = [], onChange }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 top-full z-30 mt-1.5 min-w-[160px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-bg-inverse)] p-1 shadow-xl"
+            className="absolute left-0 top-full z-30 mt-1.5 min-w-[160px] overflow-hidden rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-dropdown-bg)] p-1 shadow-xl"
             style={{ isolation: 'isolate' }}
           >
             {options.map((opt) => (
@@ -204,7 +205,7 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 top-full z-30 mt-1.5 max-h-[320px] min-w-[200px] overflow-y-auto rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-bg-inverse)] p-1 shadow-xl"
+            className="absolute left-0 top-full z-30 mt-1.5 max-h-[320px] min-w-[200px] overflow-y-auto rounded-xl border border-[var(--color-border-emphasis)] bg-[var(--color-dropdown-bg)] p-1 shadow-xl"
             style={{ isolation: 'isolate' }}
           >
             {groups.map((group, gi) => (
@@ -212,7 +213,7 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
                 {gi > 0 && <div className="mx-2 my-1 h-px bg-[var(--color-border-default)]" />}
                 <div
                   className="px-2.5 pb-0.5 pt-1.5 text-[10px] font-semibold uppercase tracking-wider"
-                  style={{ color: group.color }}
+                  style={{ color: sanitizeColor(group.color) }}
                 >
                   {group.categoryName}
                 </div>
@@ -418,7 +419,7 @@ export default function FilterBar({
                   {def && (
                     <span
                       className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: def.color }}
+                      style={{ backgroundColor: sanitizeColor(def.color) }}
                     />
                   )}
                   {l}

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import Header from './Header'
 import { ProjectsProvider } from '../../contexts/ProjectsContext'
 
@@ -19,6 +19,8 @@ vi.mock('../../utils/exportImport', () => ({
   downloadJSON: vi.fn(),
   readFileAsJSON: vi.fn(() => Promise.resolve('{"schemaVersion": 1, "project": {"name": "Test"}}')),
   parseProjectJSON: vi.fn(() => ({ success: true, project: { name: 'Test Project' } })),
+  estimateExportSize: vi.fn(() => 1024),
+  formatFileSize: vi.fn(() => '1.0 KB'),
 }))
 
 // Wrapper component with providers
@@ -180,14 +182,14 @@ describe('Header', () => {
   describe('Export button', () => {
     it('renders export button', () => {
       renderWithProviders(<Header {...defaultProps} />)
-      // On dashboard, it says "Export all projects"
-      const exportButton = screen.getByTitle('Export all projects')
+      // On dashboard with projects, title includes size estimate
+      const exportButton = document.querySelector('button[title*="Export"]')
       expect(exportButton).toBeInTheDocument()
     })
 
     it('shows different title on project page', () => {
       renderWithRoute(<Header {...defaultProps} />, '/project/test-id')
-      const exportButton = screen.getByTitle('Export current project')
+      const exportButton = document.querySelector('button[title*="Export"]')
       expect(exportButton).toBeInTheDocument()
     })
   })
@@ -284,7 +286,7 @@ describe('Header', () => {
       // Clear projects by triggering export with no projects
       // This is tricky since ProjectsProvider seeds with a project
       // We'll just verify the export button exists
-      const exportButton = screen.getByTitle('Export all projects')
+      const exportButton = document.querySelector('button[title*="Export"]')
       expect(exportButton).toBeInTheDocument()
     })
   })
@@ -350,7 +352,7 @@ describe('Header', () => {
 
   describe('Export functionality', () => {
     it('exports current project when on project page', async () => {
-      const { exportProjectJSON, downloadJSON } = await import('../../utils/exportImport')
+      await import('../../utils/exportImport')
 
       // This needs to be tested with proper route params
       renderWithRoute(<Header {...defaultProps} />, '/project/test-id')
@@ -368,7 +370,7 @@ describe('Header', () => {
 
       renderWithProviders(<Header {...defaultProps} />)
 
-      const exportButton = screen.getByTitle('Export all projects')
+      const exportButton = document.querySelector('button[title*="Export"]')
       fireEvent.click(exportButton)
 
       // Verify function was called

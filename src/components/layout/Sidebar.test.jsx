@@ -3,11 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { ProjectsProvider } from '../../contexts/ProjectsContext'
+import { useProjectsStore } from '../../stores/projectsStore'
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
-    aside: ({ children, animate, ...props }) => <aside {...props}>{children}</aside>,
+    aside: ({ children, animate: _animate, ...props }) => <aside {...props}>{children}</aside>,
     span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
 }))
@@ -42,6 +43,33 @@ describe('Sidebar', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset Zustand store with a single test project to avoid state leaking
+    // between tests (e.g., "New Project" name collisions)
+    useProjectsStore.setState({
+      projects: [
+        {
+          id: 'test-project',
+          name: 'Test Project',
+          status: 'planning',
+          isSeed: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          overview: {},
+          board: {
+            issues: [],
+            sprints: [],
+            statusColumns: ['To Do', 'In Progress', 'Done'],
+            nextIssueNumber: 1,
+          },
+          pages: [],
+          decisions: [],
+          timeline: { phases: [], milestones: [] },
+          workflow: { nodes: [], connections: [] },
+          architecture: { components: [] },
+          settings: {},
+        },
+      ],
+    })
   })
 
   describe('Basic rendering', () => {

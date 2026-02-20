@@ -178,7 +178,7 @@ describe('ProjectsContext', () => {
       return <ProjectsProvider>{children}</ProjectsProvider>
     }
 
-    it('removes project from list', () => {
+    it('soft-deletes project (sets deletedAt)', () => {
       const { result } = renderHook(() => useProjectsContext(), { wrapper })
 
       let createdProject
@@ -186,14 +186,14 @@ describe('ProjectsContext', () => {
         createdProject = result.current.addProject('To Be Deleted')
       })
 
-      const beforeCount = result.current.projects.length
-
       act(() => {
         result.current.deleteProject(createdProject.id)
       })
 
-      expect(result.current.projects.length).toBe(beforeCount - 1)
-      expect(result.current.getProject(createdProject.id)).toBeNull()
+      // deleteProject now does a soft-delete (sets deletedAt)
+      const project = result.current.getProject(createdProject.id)
+      expect(project).toBeDefined()
+      expect(project.deletedAt).toBeDefined()
     })
   })
 

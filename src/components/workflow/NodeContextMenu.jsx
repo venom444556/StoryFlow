@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Edit3, Copy, Play, Trash2, ChevronRight, Plus } from 'lucide-react'
 
@@ -83,7 +83,6 @@ function buildMenuItems({
 // ---------------------------------------------------------------------------
 
 const MENU_WIDTH = 192
-const MENU_HEIGHT_ESTIMATE = 220
 
 // ---------------------------------------------------------------------------
 // NodeContextMenu

@@ -3,6 +3,7 @@
 // Supports schema versioning and CLI bridge via the projects/ directory
 // ---------------------------------------------------------------------------
 
+import DOMPurify from 'dompurify'
 import { stripDangerousKeys } from './sanitize'
 
 const CURRENT_SCHEMA_VERSION = 1
@@ -115,6 +116,32 @@ export function parseProjectJSON(jsonString) {
 }
 
 /**
+ * Calculate the approximate export size of a project or project array.
+ * Uses JSON.stringify with 2-space indentation (same as export functions).
+ *
+ * @param {object|object[]} data — A single project or array of projects
+ * @returns {number} Size in bytes
+ */
+export function estimateExportSize(data) {
+  const wrapper = Array.isArray(data)
+    ? { schemaVersion: 1, exportedAt: new Date().toISOString(), projects: data }
+    : { schemaVersion: 1, exportedAt: new Date().toISOString(), project: data }
+  return new Blob([JSON.stringify(wrapper, null, 2)]).size
+}
+
+/**
+ * Format a byte count into a human-readable string.
+ *
+ * @param {number} bytes
+ * @returns {string} e.g. "1.2 KB", "3.4 MB"
+ */
+export function formatFileSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+/**
  * Trigger a browser download of a JSON string as a .json file.
  */
 export function downloadJSON(content, filename) {
@@ -167,6 +194,16 @@ function fillDefaults(project) {
         filled.board[key] = Array.isArray(defaultValue) ? [...defaultValue] : defaultValue
       }
     }
+  }
+
+  // Sanitize wiki page content on import to prevent XSS
+  if (Array.isArray(filled.pages)) {
+    filled.pages = filled.pages.map((page) => {
+      if (typeof page.content === 'string' && /<[a-z][\s\S]*>/i.test(page.content)) {
+        return { ...page, content: DOMPurify.sanitize(page.content) }
+      }
+      return page
+    })
   }
 
   return filled

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Plus, Minus, Maximize2 } from 'lucide-react'
 import Tooltip from '../ui/Tooltip'
 

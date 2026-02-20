@@ -1,4 +1,3 @@
-import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import BoardColumn from './BoardColumn'
@@ -23,16 +22,6 @@ vi.mock('./IssueCard', () => ({
       onDragEnd={() => onDragEnd?.(issue)}
     >
       {issue.title}
-    </div>
-  ),
-}))
-
-vi.mock('./QuickCreateBar', () => ({
-  default: ({ onCreateIssue, defaultStatus }) => (
-    <div data-testid="quick-create-bar" data-status={defaultStatus}>
-      <button onClick={() => onCreateIssue({ title: 'New Issue', status: defaultStatus })}>
-        Create
-      </button>
     </div>
   ),
 }))
@@ -112,7 +101,7 @@ describe('BoardColumn', () => {
   describe('Empty State', () => {
     it('shows empty state when no issues', () => {
       render(<BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />)
-      expect(screen.getByText('No issues')).toBeInTheDocument()
+      expect(screen.getByText('No issues in Done')).toBeInTheDocument()
     })
 
     it('shows zero in badge when no issues', () => {
@@ -240,57 +229,6 @@ describe('BoardColumn', () => {
     })
   })
 
-  describe('Quick Create', () => {
-    it('renders QuickCreateBar', () => {
-      render(
-        <BoardColumn
-          title="To Do"
-          status="To Do"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      expect(screen.getByTestId('quick-create-bar')).toBeInTheDocument()
-    })
-
-    it('passes correct status to QuickCreateBar', () => {
-      render(
-        <BoardColumn
-          title="In Progress"
-          status="In Progress"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      const quickCreate = screen.getByTestId('quick-create-bar')
-      expect(quickCreate).toHaveAttribute('data-status', 'In Progress')
-    })
-
-    it('calls onCreateIssue with column status', () => {
-      render(
-        <BoardColumn
-          title="Done"
-          status="Done"
-          issues={[]}
-          onDrop={mockOnDrop}
-          onCreateIssue={mockOnCreateIssue}
-        />
-      )
-
-      fireEvent.click(screen.getByText('Create'))
-
-      expect(mockOnCreateIssue).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: 'Done',
-        })
-      )
-    })
-  })
-
   describe('Add Issue Button', () => {
     it('renders add issue button in header', () => {
       render(
@@ -341,7 +279,7 @@ describe('BoardColumn', () => {
   describe('Edge Cases', () => {
     it('handles empty issues array', () => {
       render(<BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />)
-      expect(screen.getByText('No issues')).toBeInTheDocument()
+      expect(screen.getByText('No issues in To Do')).toBeInTheDocument()
     })
 
     it('handles undefined issues prop', () => {

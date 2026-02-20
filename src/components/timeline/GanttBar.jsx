@@ -1,4 +1,3 @@
-import React from 'react'
 import { sanitizeColor } from '../../utils/sanitize'
 
 const BAR_V_PADDING = 10

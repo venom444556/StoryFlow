@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { parseISO, differenceInDays, addDays, subDays, min, max } from 'date-fns'
 import { Calendar } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'

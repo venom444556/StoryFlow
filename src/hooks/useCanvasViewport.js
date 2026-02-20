@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { NODE_WIDTH, NODE_HEIGHT_ESTIMATE } from '../utils/canvasConstants'
 
 const MIN_ZOOM = 0.25
 const MAX_ZOOM = 2.0
@@ -30,9 +31,6 @@ export function useCanvasViewport(canvasRef, nodes, canvasId) {
   const centerOnNodes = useCallback(() => {
     const container = canvasRef.current
     if (!container || nodes.length === 0) return false
-
-    const NODE_WIDTH = 180
-    const NODE_HEIGHT_ESTIMATE = 80
 
     const rect = container.getBoundingClientRect()
     // Guard: container must have real dimensions (not mid-animation or hidden)

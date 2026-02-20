@@ -1,11 +1,19 @@
 # StoryFlow
 
-A visual project planning and management tool built for AI-assisted software development. StoryFlow combines the best of JIRA, Confluence, and visual workflow tools into a single glassmorphic interface.
+![StoryFlow Banner](docs/Storyflow%20project%20management%20in%20pixel%20art.png)
+
+**Project management that your AI coding assistant can actually use.**
+
+Most project tools live in a browser tab your AI can't see. StoryFlow is different — it exposes every board, wiki page, and workflow as MCP tools, so Claude Code (or any MCP-compatible agent) can read your backlog, create issues, update sprint progress, and write docs while it works alongside you. No copy-pasting context between tabs.
+
+It's also the tool you'd want even without AI: a Kanban board with sprints and burndown charts, a wiki with live markdown preview, a visual workflow canvas, architecture diagrams, decision logs, and timeline tracking — all in one local-first app with a glassmorphic UI. Think JIRA + Confluence + Miro, minus the SaaS bill and the latency.
+
+Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud sync, no telemetry.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green)
+![License](https://img.shields.io/badge/License-Proprietary-red)
 
 ## Features
 
@@ -50,17 +58,24 @@ All components use semantic CSS variable tokens (`--color-fg-default`, `--color-
 ## Quick Start
 
 ```bash
-npm install
-npm run dev
+npm install          # Installs client + server dependencies
+npm run dev:full     # Starts Express server + Vite dev server
 ```
 
-Opens at [http://localhost:3000](http://localhost:3000).
+This starts two processes:
+
+- **Vite dev server** on [http://localhost:3000](http://localhost:3000) -- open this in your browser
+- **Express API server** on port 3001 -- Vite proxies `/api` requests automatically
+
+In production, only the Express server runs (on port 3001) and serves both the API and the built frontend.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start dev server |
+| `npm run dev:full` | Start server + client together |
+| `npm run dev` | Start Vite dev server only (client) |
+| `npm run server` | Start Express API server only |
 | `npm run build` | Production build |
 | `npm run preview` | Preview production build |
 | `npm run test` | Run vitest in watch mode |
@@ -70,44 +85,71 @@ Opens at [http://localhost:3000](http://localhost:3000).
 
 ## Tech Stack
 
+### Client
+
 | Technology | Purpose |
 |-----------|---------|
 | React 18 | UI framework |
-| Vite 6 | Build tool |
+| Vite 6 | Build tool + dev server |
 | Tailwind CSS 4.0 | Styling via `@tailwindcss/vite` |
 | Framer Motion | Animations |
-| Zustand | State management with localStorage persistence |
+| Zustand + Dexie | State management with IndexedDB persistence |
 | Lucide React | Icons |
 | date-fns | Date formatting |
 | Vitest | Testing |
 
+### Server
+
+| Technology | Purpose |
+|-----------|---------|
+| Express 4 | HTTP API server |
+| sql.js | SQLite database (pure JS, no native deps) |
+| ws | WebSocket server for real-time sync |
+
+## Architecture
+
+```
+Development:
+  Vite (:3000) ──proxy /api──> Express (:3001) ──> SQLite (data/storyflow.db)
+       ↑                            ↕ WebSocket
+       └── Browser (React + Zustand + IndexedDB)
+
+Production:
+  Express (:3001) ──> serves dist/ + API + WebSocket ──> SQLite
+```
+
+The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
+
 ## Project Structure
 
 ```
+plugin/              Claude Code plugin (MCP server, commands, skills)
+server/              Express backend (app.js, db.js, ws.js, index.js)
 src/
   components/
-    ui/            Shared components (Button, Modal, Badge, Input, etc.)
-    layout/        App shell (Sidebar, Header, Settings, ErrorBoundary)
-    project/       Tab components (Board, Wiki, Workflow, Architecture, etc.)
-    board/         Kanban board (SprintBoard, BacklogView, IssueCard, etc.)
-    wiki/          Documentation (PageTree, PageEditor, MarkdownRenderer)
-    workflow/      Visual canvas (WorkflowCanvas, WorkflowNode, NodePalette)
-    architecture/  Component tree (ComponentDetail, DependencyGraph)
-    timeline/      Phase tracking (PhaseCard, MilestoneMarker)
-    decisions/     Decision records (DecisionCard, DecisionForm)
-    activity/      Activity feed
-  pages/           Dashboard, Project, 404
-  hooks/           Custom hooks (useProject, useDragAndDrop, useCanvasPan, etc.)
-  contexts/        ProjectsContext (React Context + Zustand)
-  stores/          Zustand stores (projects, activity, UI)
-  styles/          Design tokens (tokens.css)
-  utils/           Helpers (markdown, sanitize, graph, colors, export/import)
-  data/            Seed data, defaults, templates, node types
+    ui/              Shared components (Button, Modal, Badge, Input, etc.)
+    layout/          App shell (Sidebar, Header, Settings, ErrorBoundary)
+    project/         Tab components (Board, Wiki, Workflow, Architecture, etc.)
+    board/           Kanban board (SprintBoard, BacklogView, IssueCard, etc.)
+    wiki/            Documentation (PageTree, PageEditor, MarkdownRenderer)
+    workflow/        Visual canvas (WorkflowCanvas, WorkflowNode, NodePalette)
+    architecture/    Component tree (ComponentDetail, DependencyGraph)
+    timeline/        Phase tracking (PhaseCard, MilestoneMarker)
+    decisions/       Decision records (DecisionCard, DecisionForm)
+    activity/        Activity feed
+  pages/             Dashboard, Project, 404
+  hooks/             Custom hooks (useProject, useDragAndDrop, useCanvasPan, etc.)
+  contexts/          ProjectsContext (React Context + Zustand)
+  stores/            Zustand stores (projects, activity, UI)
+  styles/            Design tokens (tokens.css)
+  utils/             Helpers (markdown, sanitize, graph, colors, export/import)
+  data/              Seed data, defaults, templates, node types
+data/                SQLite database (auto-created on first run, gitignored)
 ```
 
 ## Data Model
 
-Projects are stored in localStorage and can be exported/imported as JSON. Each project contains:
+Projects are persisted in both IndexedDB (client) and SQLite (server). The server is the source of truth -- data survives browser clears and server restarts. Each project contains:
 
 - **Overview** -- goals, constraints, tech stack, target audience
 - **Architecture** -- component tree with types and dependencies
@@ -117,6 +159,181 @@ Projects are stored in localStorage and can be exported/imported as JSON. Each p
 - **Timeline** -- phases with progress tracking and milestones
 - **Decisions** -- architectural decisions with alternatives and consequences
 
+## Claude Code Plugin
+
+StoryFlow includes a Claude Code plugin that lets Claude manage projects, issues, sprints, and wiki pages directly from any codebase.
+
+### Install
+
+```bash
+claude plugin add /path/to/StoryFlow/plugin
+```
+
+### Setup
+
+```bash
+/storyflow:setup     # Configure the StoryFlow URL (default: http://localhost:3001)
+```
+
+Configuration is saved to `~/.config/storyflow/config.json` and persists across all Claude Code sessions.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/storyflow:setup` | Configure StoryFlow URL |
+| `/storyflow:sync` | Check connectivity and sync status |
+| `/storyflow:open` | Open StoryFlow UI in browser |
+| `/storyflow:board [project]` | Show board summary for a project |
+
+### MCP Tools
+
+The plugin exposes MCP tools that Claude can use automatically during development:
+
+| Tool | Purpose |
+|------|---------|
+| `storyflow_list_projects` | List all projects |
+| `storyflow_create_project` | Create new project |
+| `storyflow_list_issues` | List/filter issues |
+| `storyflow_create_issue` | Create issue (epic/story/task/bug) |
+| `storyflow_update_issue` | Update issue fields |
+| `storyflow_get_board_summary` | Board overview with counts and progress |
+| `storyflow_list_sprints` | List sprints |
+| `storyflow_create_sprint` | Create sprint |
+| `storyflow_list_pages` | List wiki pages |
+| `storyflow_create_page` | Create wiki page |
+| `storyflow_update_page` | Update page content |
+| `storyflow_check_connection` | Verify connectivity |
+
+## Security
+
+StoryFlow is intended for **local single-user use only**. It is not designed or hardened for multi-user or public-facing deployments.
+
+### Threat Model
+
+The primary threat StoryFlow guards against is **unauthorized tool access** — preventing untrusted MCP clients or rogue processes from reading and modifying your project data through the API.
+
+**What's protected:**
+
+- MCP tool calls require a shared secret (`MCP_AUTH_TOKEN`) passed as a Bearer token. Without it, all tool requests are rejected with `401 Unauthorized`.
+- The token is validated using constant-time comparison to prevent timing attacks.
+
+**What's NOT in scope:**
+
+- **Network-level security.** By default the server binds to `127.0.0.1` (localhost). If you bind to `0.0.0.0` or expose the port externally, you must provide your own controls (firewall rules, reverse proxy with TLS, VPN, etc.).
+- **Encryption at rest.** The SQLite database is stored unencrypted on disk. Protect it with filesystem permissions.
+- **Multi-user access control.** There are no user accounts, roles, or per-user permissions. Anyone with the token has full access.
+
+### Recommendations
+
+- Always set `MCP_AUTH_TOKEN` to a strong random value (e.g., `openssl rand -hex 32`).
+- Never commit the token to version control — use environment variables or a `.env` file.
+- Do not expose the server port to untrusted networks without additional safeguards.
+
+## Deployment
+
+StoryFlow requires the Express server for data persistence. Build the client and run the server:
+
+```bash
+npm run build        # Produces dist/
+npm run server       # Express serves dist/ + API on port 3001
+```
+
+The server auto-detects `dist/` and serves it as static files alongside the API. Open [http://localhost:3001](http://localhost:3001) in production mode.
+
+To change the server port, set the `STORYFLOW_PORT` environment variable:
+
+```bash
+STORYFLOW_PORT=8080 npm run server
+```
+
+### Running as a Background Service
+
+To keep StoryFlow running automatically (survives reboots, restarts on crash):
+
+#### Windows (Task Scheduler)
+
+1. Open **Task Scheduler** → Create Task
+2. **General tab:** Name it `StoryFlow`, check "Run whether user is logged on or not"
+3. **Triggers tab:** New → "At startup"
+4. **Actions tab:** New →
+   - Program: `node`
+   - Arguments: `server/index.js`
+   - Start in: `C:\path\to\StoryFlow`
+5. **Settings tab:** Check "If the task fails, restart every 1 minute" (up to 3 times)
+
+Or use PowerShell to create it in one shot:
+
+```powershell
+$action = New-ScheduledTaskAction -Execute "node" -Argument "server/index.js" -WorkingDirectory "C:\path\to\StoryFlow"
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName "StoryFlow" -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest
+```
+
+#### macOS (launchd)
+
+Create `~/Library/LaunchAgents/com.storyflow.server.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.storyflow.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/node</string>
+    <string>server/index.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/path/to/StoryFlow</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/storyflow.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/storyflow.err</string>
+</dict>
+</plist>
+```
+
+Then load it:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.storyflow.server.plist
+```
+
+#### Linux (systemd)
+
+Create `/etc/systemd/system/storyflow.service`:
+
+```ini
+[Unit]
+Description=StoryFlow Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/StoryFlow
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable and start:
+
+```bash
+sudo systemctl enable storyflow
+sudo systemctl start storyflow
+```
+
 ## License
 
-MIT
+Copyright (c) 2026 Sheldon Spence. All rights reserved. See [COPYRIGHT.txt](COPYRIGHT.txt).

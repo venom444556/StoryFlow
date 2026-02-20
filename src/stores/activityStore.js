@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { generateId } from '../utils/ids'
+import indexedDbStorage from '../db/indexedDbStorage'
 
 // ---------------------------------------------------------------------------
 // Activity Types
@@ -143,7 +144,9 @@ export const useActivityStore = create(
       // Clear activities for a project
       clearProjectActivities: (projectId) => {
         set((state) => {
-          const { [projectId]: removed, ...rest } = state.activities
+          const rest = Object.fromEntries(
+            Object.entries(state.activities).filter(([key]) => key !== projectId)
+          )
           return { activities: rest }
         })
       },
@@ -156,6 +159,7 @@ export const useActivityStore = create(
     {
       name: 'storyflow-activity',
       version: 1,
+      storage: createJSONStorage(() => indexedDbStorage),
     }
   )
 )
