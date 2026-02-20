@@ -245,6 +245,93 @@ To change the server port, set the `STORYFLOW_PORT` environment variable:
 STORYFLOW_PORT=8080 npm run server
 ```
 
+### Running as a Background Service
+
+To keep StoryFlow running automatically (survives reboots, restarts on crash):
+
+#### Windows (Task Scheduler)
+
+1. Open **Task Scheduler** → Create Task
+2. **General tab:** Name it `StoryFlow`, check "Run whether user is logged on or not"
+3. **Triggers tab:** New → "At startup"
+4. **Actions tab:** New →
+   - Program: `node`
+   - Arguments: `server/index.js`
+   - Start in: `C:\path\to\StoryFlow`
+5. **Settings tab:** Check "If the task fails, restart every 1 minute" (up to 3 times)
+
+Or use PowerShell to create it in one shot:
+
+```powershell
+$action = New-ScheduledTaskAction -Execute "node" -Argument "server/index.js" -WorkingDirectory "C:\path\to\StoryFlow"
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$settings = New-ScheduledTaskSettingsSet -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName "StoryFlow" -Action $action -Trigger $trigger -Settings $settings -RunLevel Highest
+```
+
+#### macOS (launchd)
+
+Create `~/Library/LaunchAgents/com.storyflow.server.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.storyflow.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/node</string>
+    <string>server/index.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/path/to/StoryFlow</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/storyflow.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/storyflow.err</string>
+</dict>
+</plist>
+```
+
+Then load it:
+
+```bash
+launchctl load ~/Library/LaunchAgents/com.storyflow.server.plist
+```
+
+#### Linux (systemd)
+
+Create `/etc/systemd/system/storyflow.service`:
+
+```ini
+[Unit]
+Description=StoryFlow Server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/path/to/StoryFlow
+ExecStart=/usr/bin/node server/index.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then enable and start:
+
+```bash
+sudo systemctl enable storyflow
+sudo systemctl start storyflow
+```
+
 ## License
 
 Copyright (c) 2026 Sheldon Spence. All rights reserved. See [COPYRIGHT.txt](COPYRIGHT.txt).
