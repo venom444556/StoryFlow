@@ -15,13 +15,15 @@
 
 ## The Problem
 
-Your AI coding assistant can write code — but it can't see your project.
+AI can write your code. But it can't see your roadmap.
 
-Backlogs, sprint state, architecture decisions, workflow dependencies, docs — they all live in a browser tab the agent can't touch. So you copy-paste context into prompts. Sessions are stateless relative to your roadmap. Tickets lag behind code. The project drifts.
+It doesn't know your architecture. It can't track your sprint. It won't remember your decisions. So you copy-paste context, lose state between sessions, and prompt about what you prompted about.
 
-And if you're vibecoding — it's worse. You're six hours deep, Claude's touched 30 files, you've pivoted twice, and now you can't remember what's done, what's broken, or what the plan even was. You're prompting about what you prompted about. That's prompt inception, and it's not a tooling problem — it's an organizational one.
+That's not a skills gap. It's a coordination gap.
 
-That's friction in AI-assisted development. StoryFlow removes it.
+And if you're vibecoding — six hours in, 30 files touched, two pivots deep — it's prompt inception. And it's not a tooling problem. It's an organizational one.
+
+StoryFlow fixes that.
 
 ---
 
