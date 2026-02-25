@@ -7,6 +7,16 @@ Integrate Claude Code with [StoryFlow](https://github.com/venom444556/StoryFlow)
 - StoryFlow server running locally (default: `http://localhost:3001`)
 - Node.js 18+
 
+## Security Note
+
+When installing, Claude Code will show a warning: **"This plugin includes local MCP servers — Installing will grant access to everything on your computer."** This is a standard warning for all plugins that include MCP servers.
+
+What the StoryFlow MCP server actually does:
+
+- Runs a lightweight Node.js process that makes HTTP requests **only** to your local StoryFlow server (`localhost:3001` by default)
+- Does **not** access your filesystem, shell, or any external services
+- Source code is fully auditable in `server/index.js` and `server/storyflow-client.js`
+
 ## Installation
 
 ### As a Claude Code plugin

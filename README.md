@@ -161,6 +161,8 @@ Projects are persisted in both IndexedDB (client) and SQLite (server). The serve
 
 StoryFlow includes a Claude Code plugin that lets Claude manage projects, issues, sprints, and wiki pages directly from any codebase.
 
+> **Note:** Claude Code will show an MCP server warning during installation. This is standard for all plugins with MCP servers. The StoryFlow MCP server only communicates with your local StoryFlow instance — it does not access your filesystem or external services. See [`plugin/README.md`](plugin/README.md#security-note) for details.
+
 ### Install
 
 ```bash
