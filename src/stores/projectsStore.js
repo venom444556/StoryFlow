@@ -1062,7 +1062,9 @@ useProjectsStore.subscribe(
 )
 
 // Listen for external writes via WebSocket (replaces Vite HMR)
-function reloadFromServer() {
+// Also called on startup when IndexedDB is empty (no browser tab was open during
+// prior MCP / REST writes), so the client hydrates from the server on first load.
+export function reloadFromServer() {
   _isSyncing = true
   fetch('/api/projects')
     .then((res) => (res.ok ? res.json() : null))
@@ -1135,7 +1137,13 @@ function connectWebSocket() {
   const unsub = useProjectsStore.persist.onFinishHydration(() => {
     const { projects } = useProjectsStore.getState()
     if (projects.length > 0) {
+      // Client has data — push it to the server as the source of truth
       syncToServer(projects)
+    } else {
+      // IndexedDB is empty (e.g. first load, or data was written via MCP /
+      // REST while no browser tab was open).  Pull from server so the UI
+      // reflects what the server already knows about.
+      reloadFromServer()
     }
     connectWebSocket()
     unsub()
