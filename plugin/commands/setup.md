@@ -1,3 +1,9 @@
+---
+description: Configure the StoryFlow URL for this and all future Claude Code sessions
+allowed-tools: ["Bash", "Write", "Read"]
+argument-hint: "[url]"
+---
+
 # /storyflow:setup
 
 Configure the StoryFlow URL for this and all future Claude Code sessions.
@@ -27,6 +33,6 @@ Once you have the URL:
 > /storyflow:setup
 What's your StoryFlow URL? (default: http://localhost:3001)
 > http://localhost:3001
-✓ Connected to StoryFlow at http://localhost:3001 — found 2 projects.
+Connected to StoryFlow at http://localhost:3001 — found 2 projects.
   Configuration saved to ~/.config/storyflow/config.json
 ```

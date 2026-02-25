@@ -1,3 +1,9 @@
+---
+description: Open the StoryFlow UI in your browser
+allowed-tools: ["Bash", "Read"]
+argument-hint: "[project]"
+---
+
 # /storyflow:open
 
 Open the StoryFlow UI in the user's browser.

@@ -1,3 +1,8 @@
+---
+description: Show a board summary for a StoryFlow project
+argument-hint: "[project]"
+---
+
 # /storyflow:board
 
 Show a board summary for a StoryFlow project.
@@ -10,7 +15,7 @@ Show a board summary for a StoryFlow project.
 4. Format the output as a readable summary:
 
 ```
-📋 Board Summary — <Project Name>
+Board Summary — <Project Name>
 Status: <project status>
 
 Issues: <total>
@@ -19,7 +24,7 @@ Issues: <total>
   Done:         <count>
 
 Story Points: <done>/<total> (<percent>%)
-Active Sprint: <name> (<start> → <end>)
+Active Sprint: <name> (<start> -> <end>)
 ```
 
 ## Arguments
@@ -31,7 +36,7 @@ Active Sprint: <name> (<start> → <end>)
 ```
 > /storyflow:board my-app
 
-📋 Board Summary — My App
+Board Summary — My App
 Status: in-progress
 
 Issues: 47
@@ -40,5 +45,5 @@ Issues: 47
   Done:         27
 
 Story Points: 89/134 (66%)
-Active Sprint: Sprint 3 — Auth & Roles (Feb 10 → Feb 17)
+Active Sprint: Sprint 3 — Auth & Roles (Feb 10 -> Feb 17)
 ```

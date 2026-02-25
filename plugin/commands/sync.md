@@ -1,3 +1,8 @@
+---
+description: Check StoryFlow connectivity and sync status
+argument-hint: ""
+---
+
 # /storyflow:sync
 
 Check StoryFlow connectivity and sync status.
@@ -9,13 +14,13 @@ Check StoryFlow connectivity and sync status.
 
 ### If connected:
 ```
-✓ StoryFlow is reachable at <url>
+StoryFlow is reachable at <url>
   Projects: <count>
 ```
 
 ### If not connected:
 ```
-✗ Cannot reach StoryFlow at <url>
+Cannot reach StoryFlow at <url>
   Error: <error message>
 
   Make sure StoryFlow is running: cd <storyflow-dir> && npm run dev:full
@@ -24,6 +29,6 @@ Check StoryFlow connectivity and sync status.
 
 ### If not configured:
 ```
-✗ StoryFlow is not configured.
+StoryFlow is not configured.
   Run /storyflow:setup to set your StoryFlow URL.
 ```

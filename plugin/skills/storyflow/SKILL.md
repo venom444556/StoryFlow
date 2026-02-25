@@ -1,3 +1,9 @@
+---
+name: StoryFlow Project Management
+description: Use when managing project boards, creating or updating issues, planning sprints, tracking progress, or writing wiki documentation in StoryFlow. Activates when the user mentions StoryFlow, project boards, issue tracking, sprint planning, or wiki pages in the context of project management.
+version: 1.0.0
+---
+
 # StoryFlow Project Management
 
 Use StoryFlow to plan, track, and manage coding projects. StoryFlow provides a visual board (like JIRA), wiki documentation (like Confluence), and more — all accessible via MCP tools.
@@ -23,6 +29,7 @@ Configuration is stored globally at `~/.config/storyflow/config.json` and persis
 | `storyflow_list_projects` | List all projects |
 | `storyflow_get_project` | Get full project data |
 | `storyflow_create_project` | Create new project |
+| `storyflow_update_project` | Update project fields |
 | `storyflow_list_issues` | List/filter issues |
 | `storyflow_create_issue` | Create issue (epic/story/task/bug) |
 | `storyflow_update_issue` | Update issue fields |
@@ -30,9 +37,11 @@ Configuration is stored globally at `~/.config/storyflow/config.json` and persis
 | `storyflow_get_board_summary` | Board overview with counts and progress |
 | `storyflow_list_sprints` | List sprints |
 | `storyflow_create_sprint` | Create sprint |
+| `storyflow_delete_sprint` | Delete sprint |
 | `storyflow_list_pages` | List wiki pages |
 | `storyflow_create_page` | Create wiki page |
 | `storyflow_update_page` | Update page content |
+| `storyflow_delete_page` | Delete wiki page |
 | `storyflow_check_connection` | Verify connectivity |
 
 ## Workflow: Planning a Feature
@@ -62,7 +71,7 @@ See `references/data-model.md` for full field details.
 - **bug** — Defect to fix
 
 ### Statuses
-`To Do` → `In Progress` → `Done`
+`To Do` -> `In Progress` -> `Done`
 
 ### Priorities
 `critical` | `high` | `medium` | `low`
