@@ -14,7 +14,10 @@ app.use(express.json({ limit: '10mb' }))
 
 // CORS — strict origin allowlist (no wildcard)
 const ALLOWED_ORIGINS = new Set(
-  (process.env.STORYFLOW_CORS_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001')
+  (
+    process.env.STORYFLOW_CORS_ORIGINS ||
+    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001'
+  )
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean)
@@ -29,7 +32,10 @@ app.use((req, res, next) => {
   // No Access-Control-Allow-Origin header if origin is not in allowlist —
   // browser will block the response.
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-StoryFlow-Token, X-Confirm')
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, X-StoryFlow-Token, X-Confirm'
+  )
   res.header('Access-Control-Max-Age', '600')
   if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
@@ -115,6 +121,7 @@ app.get('/api/projects/:id/issues', (req, res) => {
 app.post('/api/projects/:id/issues', (req, res) => {
   const issue = db.addIssue(req.params.id, req.body)
   if (!issue) return res.status(404).json({ error: 'Project not found' })
+  if (issue.error) return res.status(400).json({ error: issue.error })
   notifyClients()
   res.status(201).json(issue)
 })
@@ -122,6 +129,7 @@ app.post('/api/projects/:id/issues', (req, res) => {
 app.put('/api/projects/:id/issues/:issueId', (req, res) => {
   const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
   if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+  if (issue.error) return res.status(400).json({ error: issue.error })
   notifyClients()
   res.json(issue)
 })

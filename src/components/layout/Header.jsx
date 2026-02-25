@@ -25,8 +25,8 @@ function Toast({ message, type = 'success', onDone }) {
 
   const colorClasses =
     type === 'success'
-      ? 'bg-[var(--status-success-subtle)] border-[var(--status-success)]/30 text-[var(--status-success)]'
-      : 'bg-[var(--status-error-subtle)] border-[var(--status-error)]/30 text-[var(--status-error)]'
+      ? 'bg-[var(--color-success-subtle)] border-[var(--color-success)]/30 text-[var(--color-success)]'
+      : 'bg-[var(--color-danger-subtle)] border-[var(--color-danger)]/30 text-[var(--color-danger)]'
 
   return (
     <motion.div

@@ -34,7 +34,7 @@ export default function LoadingState({
         aria-hidden="true"
       />
       {message && (
-        <p className={`${text} text-[var(--text-muted)]`} role="status" aria-live="polite">
+        <p className={`${text} text-[var(--color-fg-muted)]`} role="status" aria-live="polite">
           {message}
         </p>
       )}
@@ -44,7 +44,7 @@ export default function LoadingState({
   if (fullScreen) {
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center bg-[var(--surface-base)]/80 backdrop-blur-sm"
+        className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-base)]/80 backdrop-blur-sm"
         style={{ zIndex: 'var(--z-overlay)' }}
       >
         {content}

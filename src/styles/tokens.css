@@ -293,6 +293,10 @@
   --color-info-subtle: rgba(59, 130, 246, 0.15);
   --color-info-fg: #3b82f6;
 
+  /* Semantic aliases used by board/UI components */
+  --color-accent-emphasis: var(--accent-purple);
+  --color-bg-tertiary: var(--color-bg-muted);
+
   /* -------------------------------------------------
      INPUT COLORS
      ------------------------------------------------- */
@@ -451,6 +455,10 @@
   --color-info: #2563eb;
   --color-info-subtle: #eff6ff;
   --color-info-fg: #1e40af;
+
+  /* Semantic aliases used by board/UI components */
+  --color-accent-emphasis: var(--accent-purple);
+  --color-bg-tertiary: var(--color-bg-muted);
 
   /* -------------------------------------------------
      INPUT COLORS

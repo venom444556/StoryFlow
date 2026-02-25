@@ -14,9 +14,9 @@ import { useProjects } from '../../hooks/useProjects'
 import Tooltip from '../ui/Tooltip'
 
 const STATUS_DOT_COLORS = {
-  planning: 'bg-[var(--status-info)]',
-  'in-progress': 'bg-[var(--status-warning)]',
-  completed: 'bg-[var(--status-success)]',
+  planning: 'bg-[var(--color-info)]',
+  'in-progress': 'bg-[var(--color-warning)]',
+  completed: 'bg-[var(--color-success)]',
   archived: 'bg-[var(--color-fg-muted)]',
 }
 

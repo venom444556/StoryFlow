@@ -112,7 +112,7 @@ export default function Modal({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-[var(--backdrop)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--color-bg-backdrop)] backdrop-blur-sm"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -144,7 +144,7 @@ export default function Modal({
               <div className="flex items-center justify-between border-b border-[var(--border-default)] px-[var(--space-6)] py-[var(--space-4)]">
                 <h2
                   id={titleId.current}
-                  className="text-[var(--text-lg)] font-[var(--font-semibold)] text-[var(--text-primary)]"
+                  className="text-[var(--text-lg)] font-[var(--font-semibold)] text-[var(--color-fg-default)]"
                 >
                   {title}
                 </h2>
@@ -152,8 +152,8 @@ export default function Modal({
                   <button
                     onClick={onClose}
                     className={[
-                      'rounded-[var(--radius-lg)] p-[var(--space-2)] text-[var(--text-muted)]',
-                      'transition-colors hover:bg-[var(--surface-glass-hover)] hover:text-[var(--text-primary)]',
+                      'rounded-[var(--radius-lg)] p-[var(--space-2)] text-[var(--color-fg-muted)]',
+                      'transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
                     ].join(' ')}
                     style={{

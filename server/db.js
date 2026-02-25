@@ -251,10 +251,42 @@ export function listIssues(projectId, filters = {}) {
   return issues
 }
 
+// Normalize common status variants to canonical Title Case values
+const STATUS_ALIASES = {
+  'to do': 'To Do',
+  todo: 'To Do',
+  'to-do': 'To Do',
+  backlog: 'To Do',
+  'in progress': 'In Progress',
+  'in-progress': 'In Progress',
+  inprogress: 'In Progress',
+  wip: 'In Progress',
+  done: 'Done',
+  completed: 'Done',
+  closed: 'Done',
+}
+
+function normalizeStatus(status) {
+  if (!status) return 'To Do'
+  // Already canonical
+  if (['To Do', 'In Progress', 'Done'].includes(status)) return status
+  // Try case-insensitive alias lookup
+  const normalized = STATUS_ALIASES[status.toLowerCase().trim()]
+  return normalized || null // null = unknown status
+}
+
 export function addIssue(projectId, issue) {
   const project = getProject(projectId)
   if (!project) return null
   if (!project.board) project.board = { issues: [], sprints: [], nextIssueNumber: 1 }
+
+  // Normalize status — reject unknown values
+  if (issue.status) {
+    const normalized = normalizeStatus(issue.status)
+    if (!normalized)
+      return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Done` }
+    issue.status = normalized
+  }
 
   const nextNumber = project.board.nextIssueNumber || 1
   const prefix =
@@ -290,6 +322,14 @@ export function updateIssue(projectId, issueId, updates) {
   if (!project) return null
   const issue = project.board?.issues?.find((i) => i.id === issueId)
   if (!issue) return null
+
+  // Normalize status if provided
+  if (updates.status) {
+    const normalized = normalizeStatus(updates.status)
+    if (!normalized)
+      return { error: `Unknown status "${updates.status}". Valid: To Do, In Progress, Done` }
+    updates.status = normalized
+  }
 
   const now = new Date().toISOString()
 
