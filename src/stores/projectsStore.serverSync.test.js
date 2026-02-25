@@ -1,10 +1,16 @@
 /**
  * Tests for the server-sync behaviour of projectsStore.
  *
- * Regression coverage for the "0 projects on fresh load" bug:
- * When all data was written via MCP tools or REST with no browser tab open,
- * IndexedDB is empty.  On startup the store must pull from the server rather
- * than stay blank.
+ * Regression coverage for two related bugs:
+ *
+ * 1. "0 projects on fresh load" — IndexedDB is empty (data was written via
+ *    MCP/REST with no browser tab open).  reloadFromServer() must hydrate the
+ *    store from the server on startup.
+ *
+ * 2. "Browser refresh doesn't show MCP changes" — IndexedDB has stale data;
+ *    old code called syncToServer(stale) on startup, overwriting server-side
+ *    MCP writes.  reloadFromServer() is now called unconditionally so the
+ *    server (which has the MCP changes) always wins on startup.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useProjectsStore, reloadFromServer } from './projectsStore'

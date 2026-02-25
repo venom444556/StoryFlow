@@ -1132,19 +1132,16 @@ function connectWebSocket() {
   }
 }
 
-// Initial sync: push client state to server + connect WebSocket
+// Initial sync: pull latest from server + connect WebSocket
+//
+// Always pull from server on startup so that a browser refresh picks up any
+// changes written by MCP tools or REST calls while the tab was away.
+// Merge strategy: server wins for shared project IDs; client-only projects
+// (IDs not on the server) are preserved.  Real-time push for user changes
+// during the session is handled by the projects subscribe() listener below.
 {
   const unsub = useProjectsStore.persist.onFinishHydration(() => {
-    const { projects } = useProjectsStore.getState()
-    if (projects.length > 0) {
-      // Client has data — push it to the server as the source of truth
-      syncToServer(projects)
-    } else {
-      // IndexedDB is empty (e.g. first load, or data was written via MCP /
-      // REST while no browser tab was open).  Pull from server so the UI
-      // reflects what the server already knows about.
-      reloadFromServer()
-    }
+    reloadFromServer()
     connectWebSocket()
     unsub()
   })
