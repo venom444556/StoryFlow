@@ -41,3 +41,12 @@ data/*.json.backup
 # Development scratchpads
 workflow-builder.jsx
 workflow-execution-engine.jsx
+
+# Serena / local tooling
+.serena/
+
+# Internal planning docs
+docs/plans/
+
+# Plugin archive (use plugin/ directory instead)
+plugin.zip

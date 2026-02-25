@@ -247,4 +247,4 @@ STORYFLOW_PORT=8080 npm run server
 
 ## License
 
-Copyright (c) 2026 Sheldon Spence. All rights reserved. See [COPYRIGHT.txt](COPYRIGHT.txt).
+Copyright (c) 2026 Sheldon Spence. See [LICENSE](LICENSE) for details.
