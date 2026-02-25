@@ -425,6 +425,32 @@ export function updatePage(projectId, pageId, updates) {
   return page
 }
 
+export function deletePage(projectId, pageId) {
+  const project = getProject(projectId)
+  if (!project || !project.pages) return false
+  const idx = project.pages.findIndex((p) => p.id === pageId)
+  if (idx === -1) return false
+  project.pages.splice(idx, 1)
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Sprint deletion
+// ---------------------------------------------------------------------------
+
+export function deleteSprint(projectId, sprintId) {
+  const project = getProject(projectId)
+  if (!project || !project.board?.sprints) return false
+  const idx = project.board.sprints.findIndex((s) => s.id === sprintId)
+  if (idx === -1) return false
+  project.board.sprints.splice(idx, 1)
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
 // ---------------------------------------------------------------------------
 // Board summary
 // ---------------------------------------------------------------------------
@@ -469,7 +495,8 @@ export function getBoardSummary(projectId) {
 
 export function addProject(project) {
   const now = new Date().toISOString()
-  const newProject = { ...project, createdAt: now, updatedAt: now }
-  upsertProject(newProject.id || crypto.randomUUID(), newProject)
+  const id = project.id || crypto.randomUUID()
+  const newProject = { ...project, id, createdAt: now, updatedAt: now }
+  upsertProject(id, newProject)
   return newProject
 }

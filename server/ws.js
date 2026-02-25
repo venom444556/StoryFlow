@@ -5,6 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import { WebSocketServer } from 'ws'
+import { timingSafeEqual } from 'node:crypto'
 
 let wss = null
 
@@ -14,9 +15,55 @@ const RATE_LIMIT_WINDOW_MS = 10_000 // per 10-second window
 const MAX_MESSAGE_SIZE = 4096 // bytes
 const MAX_CONNECTIONS = 20 // max concurrent clients
 
+// Auth: reuse the same token as REST API
+const AUTH_TOKEN = process.env.STORYFLOW_MCP_TOKEN || null
+
+// Allowed origins for WebSocket connections (same as REST CORS)
+const ALLOWED_ORIGINS = new Set(
+  (
+    process.env.STORYFLOW_CORS_ORIGINS ||
+    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001'
+  )
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+)
+
+/** Verify WebSocket upgrade request (origin + token) */
+function verifyClient(info) {
+  const origin = info.origin || info.req.headers.origin
+  // Reject connections from unknown origins (browser clients send Origin header)
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    console.warn(`[WS] Rejected connection from disallowed origin: ${origin}`)
+    return false
+  }
+
+  // If token auth is configured, require it on WebSocket connections too
+  if (AUTH_TOKEN) {
+    const url = new URL(info.req.url, 'http://localhost')
+    const token = url.searchParams.get('token')
+    if (!token) {
+      console.warn('[WS] Rejected connection: missing auth token')
+      return false
+    }
+    const a = Buffer.from(token)
+    const b = Buffer.from(AUTH_TOKEN)
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      console.warn('[WS] Rejected connection: invalid auth token')
+      return false
+    }
+  }
+
+  return true
+}
+
 /** Attach WebSocket server to an HTTP server instance */
 export function initWs(server) {
-  wss = new WebSocketServer({ server, maxPayload: MAX_MESSAGE_SIZE })
+  wss = new WebSocketServer({
+    server,
+    maxPayload: MAX_MESSAGE_SIZE,
+    verifyClient,
+  })
 
   wss.on('connection', (ws, req) => {
     // --- Connection limit ---
@@ -36,9 +83,7 @@ export function initWs(server) {
       const now = Date.now()
 
       // Prune timestamps outside the window
-      ws._messageTimestamps = ws._messageTimestamps.filter(
-        (t) => now - t < RATE_LIMIT_WINDOW_MS
-      )
+      ws._messageTimestamps = ws._messageTimestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
 
       if (ws._messageTimestamps.length >= RATE_LIMIT_MAX) {
         console.warn(`[WS] Rate limit exceeded for ${ip}, closing connection`)

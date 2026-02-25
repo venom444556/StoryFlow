@@ -92,6 +92,40 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Update Project
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_project',
+  {
+    description: 'Update an existing StoryFlow project. Only provided fields are changed.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID (slug-based, e.g. "my-app")'),
+      name: z.string().optional().describe('New project name'),
+      description: z.string().optional().describe('New project description'),
+      status: z
+        .enum(['planning', 'in-progress', 'completed', 'on-hold'])
+        .optional()
+        .describe('New project status'),
+    },
+  },
+  async ({ project_id, name, description, status }) => {
+    const data = {}
+    if (name !== undefined) data.name = name
+    if (description !== undefined) data.description = description
+    if (status !== undefined) data.status = status
+    const project = await sf.updateProject(project_id, data)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(project, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: List Issues
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -433,6 +467,56 @@ server.registerTool(
         {
           type: 'text',
           text: JSON.stringify(page, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Page
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_page',
+  {
+    description: 'Delete a wiki page from a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      page_id: z.string().describe('Page ID to delete'),
+    },
+  },
+  async ({ project_id, page_id }) => {
+    await sf.deletePage(project_id, page_id)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Page ${page_id} deleted successfully.`,
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Sprint
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_sprint',
+  {
+    description: 'Delete a sprint from a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      sprint_id: z.string().describe('Sprint ID to delete'),
+    },
+  },
+  async ({ project_id, sprint_id }) => {
+    await sf.deleteSprint(project_id, sprint_id)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Sprint ${sprint_id} deleted successfully.`,
         },
       ],
     }

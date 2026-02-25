@@ -49,7 +49,9 @@ export function isConfigured() {
   return getBaseUrl() !== null
 }
 
-/** Generic fetch wrapper with error handling */
+const REQUEST_TIMEOUT_MS = parseInt(process.env.STORYFLOW_TIMEOUT_MS, 10) || 15_000
+
+/** Generic fetch wrapper with error handling and timeout */
 async function request(path, options = {}) {
   const base = getBaseUrl()
   if (!base) {
@@ -62,27 +64,40 @@ async function request(path, options = {}) {
   const authHeaders = token ? { Authorization: `Bearer ${token}` } : {}
 
   const url = `${base}${path}`
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders,
-      ...options.headers,
-    },
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
 
-  if (!res.ok) {
-    const body = await res.text()
-    let message
-    try {
-      message = JSON.parse(body).error
-    } catch {
-      message = body
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...options.headers,
+      },
+    })
+
+    if (!res.ok) {
+      const body = await res.text()
+      let message
+      try {
+        message = JSON.parse(body).error
+      } catch {
+        message = body
+      }
+      throw new Error(`StoryFlow API error (${res.status}): ${message}`)
     }
-    throw new Error(`StoryFlow API error (${res.status}): ${message}`)
-  }
 
-  return res.json()
+    return res.json()
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error(`StoryFlow API request timed out after ${REQUEST_TIMEOUT_MS}ms: ${path}`)
+    }
+    throw err
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 // --- Projects ---
@@ -92,7 +107,7 @@ export function listProjects() {
 }
 
 export function getProject(id) {
-  return request(`/api/projects/${id}`)
+  return request(`/api/projects/${encodeURIComponent(id)}`)
 }
 
 export function createProject(data) {
@@ -103,7 +118,7 @@ export function createProject(data) {
 }
 
 export function updateProject(id, data) {
-  return request(`/api/projects/${id}`, {
+  return request(`/api/projects/${encodeURIComponent(id)}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   })
@@ -117,43 +132,49 @@ export function listIssues(projectId, filters = {}) {
     if (value) params.set(key, value)
   }
   const qs = params.toString()
-  return request(`/api/projects/${projectId}/issues${qs ? `?${qs}` : ''}`)
+  return request(`/api/projects/${encodeURIComponent(projectId)}/issues${qs ? `?${qs}` : ''}`)
 }
 
 export function createIssue(projectId, data) {
-  return request(`/api/projects/${projectId}/issues`, {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/issues`, {
     method: 'POST',
     body: JSON.stringify(data),
   })
 }
 
 export function updateIssue(projectId, issueId, data) {
-  return request(`/api/projects/${projectId}/issues/${issueId}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  })
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }
+  )
 }
 
 export function deleteIssue(projectId, issueId) {
-  return request(`/api/projects/${projectId}/issues/${issueId}`, {
-    method: 'DELETE',
-  })
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}`,
+    {
+      method: 'DELETE',
+    }
+  )
 }
 
 // --- Board ---
 
 export function getBoardSummary(projectId) {
-  return request(`/api/projects/${projectId}/board-summary`)
+  return request(`/api/projects/${encodeURIComponent(projectId)}/board-summary`)
 }
 
 // --- Sprints ---
 
 export function listSprints(projectId) {
-  return request(`/api/projects/${projectId}/sprints`)
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sprints`)
 }
 
 export function createSprint(projectId, data) {
-  return request(`/api/projects/${projectId}/sprints`, {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sprints`, {
     method: 'POST',
     body: JSON.stringify(data),
   })
@@ -162,21 +183,42 @@ export function createSprint(projectId, data) {
 // --- Pages ---
 
 export function listPages(projectId) {
-  return request(`/api/projects/${projectId}/pages`)
+  return request(`/api/projects/${encodeURIComponent(projectId)}/pages`)
 }
 
 export function createPage(projectId, data) {
-  return request(`/api/projects/${projectId}/pages`, {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/pages`, {
     method: 'POST',
     body: JSON.stringify(data),
   })
 }
 
 export function updatePage(projectId, pageId, data) {
-  return request(`/api/projects/${projectId}/pages/${pageId}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  })
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }
+  )
+}
+
+export function deletePage(projectId, pageId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`,
+    {
+      method: 'DELETE',
+    }
+  )
+}
+
+export function deleteSprint(projectId, sprintId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
+    {
+      method: 'DELETE',
+    }
+  )
 }
 
 // --- Health check ---

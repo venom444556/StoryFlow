@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import express from 'express'
+import { timingSafeEqual } from 'node:crypto'
 import * as db from './db.js'
 import { notifyClients } from './ws.js'
 
@@ -11,6 +12,36 @@ const app = express()
 
 // --- Middleware ---
 app.use(express.json({ limit: '10mb' }))
+
+// Rate limiting — sliding window per IP
+const RATE_LIMIT_MAX = parseInt(process.env.STORYFLOW_RATE_LIMIT_MAX, 10) || 100
+const RATE_LIMIT_WINDOW_MS = parseInt(process.env.STORYFLOW_RATE_LIMIT_WINDOW_MS, 10) || 60_000
+const rateLimitMap = new Map()
+
+// Clean up stale entries every 5 minutes
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, timestamps] of rateLimitMap) {
+    const valid = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+    if (valid.length === 0) rateLimitMap.delete(ip)
+    else rateLimitMap.set(ip, valid)
+  }
+}, 5 * 60_000)
+
+app.use((req, res, next) => {
+  const ip = req.ip || req.socket.remoteAddress
+  const now = Date.now()
+  const timestamps = (rateLimitMap.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+
+  if (timestamps.length >= RATE_LIMIT_MAX) {
+    res.set('Retry-After', String(Math.ceil(RATE_LIMIT_WINDOW_MS / 1000)))
+    return res.status(429).json({ error: 'Too many requests' })
+  }
+
+  timestamps.push(now)
+  rateLimitMap.set(ip, timestamps)
+  next()
+})
 
 // CORS — strict origin allowlist (no wildcard)
 const ALLOWED_ORIGINS = new Set(
@@ -54,7 +85,14 @@ function requireToken(req, res, next) {
   const headerToken = req.headers['x-storyflow-token'] || null
   const provided = bearer || headerToken
 
-  if (!provided || provided !== AUTH_TOKEN) {
+  if (!provided) {
+    return res.status(401).json({ error: 'Missing or invalid authentication token' })
+  }
+
+  // Timing-safe comparison to prevent character-by-character brute force
+  const a = Buffer.from(provided)
+  const b = Buffer.from(AUTH_TOKEN)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
     return res.status(401).json({ error: 'Missing or invalid authentication token' })
   }
   next()
@@ -64,6 +102,17 @@ function requireToken(req, res, next) {
 app.post('/api/*', requireToken)
 app.put('/api/*', requireToken)
 app.delete('/api/*', requireToken)
+
+// Project ID format validation (slug-based: lowercase alphanumeric + hyphens)
+const PROJECT_ID_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/
+function validateProjectId(req, res, next) {
+  const id = req.params.id
+  if (id && (!PROJECT_ID_RE.test(id) || id.length > 255)) {
+    return res.status(400).json({ error: 'Invalid project ID format' })
+  }
+  next()
+}
+app.param('id', validateProjectId)
 
 // --- Sync endpoint (destructive: replaces all projects) ---
 app.post('/api/sync', (req, res) => {
@@ -176,6 +225,21 @@ app.put('/api/projects/:id/pages/:pageId', (req, res) => {
   res.json(page)
 })
 
+app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
+  const ok = db.deletePage(req.params.id, req.params.pageId)
+  if (!ok) return res.status(404).json({ error: 'Page or project not found' })
+  notifyClients()
+  res.json({ success: true })
+})
+
+// --- Sprint deletion ---
+app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
+  const ok = db.deleteSprint(req.params.id, req.params.sprintId)
+  if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
+  notifyClients()
+  res.json({ success: true })
+})
+
 // --- Catch-all for production SPA serving ---
 // (only activated when dist/ exists and NODE_ENV=production)
 import { existsSync } from 'node:fs'
@@ -197,7 +261,8 @@ if (existsSync(DIST_DIR)) {
 // --- Error handler ---
 app.use((err, req, res, _next) => {
   console.error('[API]', err)
-  res.status(500).json({ error: err.message || 'Internal server error' })
+  // Never leak internal error details to client
+  res.status(500).json({ error: 'Internal server error' })
 })
 
 export default app
