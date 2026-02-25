@@ -10,6 +10,73 @@ import { notifyClients } from './ws.js'
 
 const app = express()
 
+// --- Request body validation helpers ---
+const VALID_ISSUE_TYPES = ['epic', 'story', 'task', 'bug', 'subtask']
+const VALID_ISSUE_STATUSES = ['To Do', 'In Progress', 'Done']
+const VALID_PROJECT_STATUSES = ['planning', 'in-progress', 'completed', 'on-hold']
+const VALID_SPRINT_STATUSES = ['planning', 'active', 'completed']
+
+function requireString(body, field) {
+  if (typeof body[field] !== 'string' || body[field].trim() === '') {
+    return `"${field}" is required and must be a non-empty string`
+  }
+  return null
+}
+
+function validateIssueBody(body, isUpdate = false) {
+  if (!isUpdate) {
+    const titleErr = requireString(body, 'title')
+    if (titleErr) return titleErr
+    const typeErr = requireString(body, 'type')
+    if (typeErr) return typeErr
+    if (!VALID_ISSUE_TYPES.includes(body.type)) {
+      return `"type" must be one of: ${VALID_ISSUE_TYPES.join(', ')}`
+    }
+  } else {
+    if (body.type !== undefined && !VALID_ISSUE_TYPES.includes(body.type)) {
+      return `"type" must be one of: ${VALID_ISSUE_TYPES.join(', ')}`
+    }
+  }
+  if (body.storyPoints !== undefined && typeof body.storyPoints !== 'number') {
+    return '"storyPoints" must be a number'
+  }
+  if (body.labels !== undefined && !Array.isArray(body.labels)) {
+    return '"labels" must be an array'
+  }
+  return null
+}
+
+function validateProjectBody(body, isUpdate = false) {
+  if (!isUpdate) {
+    const nameErr = requireString(body, 'name')
+    if (nameErr) return nameErr
+  }
+  if (body.status !== undefined && !VALID_PROJECT_STATUSES.includes(body.status)) {
+    return `"status" must be one of: ${VALID_PROJECT_STATUSES.join(', ')}`
+  }
+  if (body.techStack !== undefined && !Array.isArray(body.techStack)) {
+    return '"techStack" must be an array'
+  }
+  return null
+}
+
+function validateSprintBody(body) {
+  const nameErr = requireString(body, 'name')
+  if (nameErr) return nameErr
+  if (body.status !== undefined && !VALID_SPRINT_STATUSES.includes(body.status)) {
+    return `"status" must be one of: ${VALID_SPRINT_STATUSES.join(', ')}`
+  }
+  return null
+}
+
+function validatePageBody(body, isUpdate = false) {
+  if (!isUpdate) {
+    const titleErr = requireString(body, 'title')
+    if (titleErr) return titleErr
+  }
+  return null
+}
+
 // --- Middleware ---
 app.use(express.json({ limit: '10mb' }))
 
@@ -135,6 +202,8 @@ app.get('/api/projects', (req, res) => {
 })
 
 app.post('/api/projects', (req, res) => {
+  const err = validateProjectBody(req.body)
+  if (err) return res.status(400).json({ error: err })
   const project = db.addProject(req.body)
   notifyClients()
   res.status(201).json(project)
@@ -147,6 +216,8 @@ app.get('/api/projects/:id', (req, res) => {
 })
 
 app.put('/api/projects/:id', (req, res) => {
+  const err = validateProjectBody(req.body, true)
+  if (err) return res.status(400).json({ error: err })
   const project = db.updateProject(req.params.id, req.body)
   if (!project) return res.status(404).json({ error: 'Project not found' })
   notifyClients()
@@ -168,6 +239,8 @@ app.get('/api/projects/:id/issues', (req, res) => {
 })
 
 app.post('/api/projects/:id/issues', (req, res) => {
+  const err = validateIssueBody(req.body)
+  if (err) return res.status(400).json({ error: err })
   const issue = db.addIssue(req.params.id, req.body)
   if (!issue) return res.status(404).json({ error: 'Project not found' })
   if (issue.error) return res.status(400).json({ error: issue.error })
@@ -176,6 +249,8 @@ app.post('/api/projects/:id/issues', (req, res) => {
 })
 
 app.put('/api/projects/:id/issues/:issueId', (req, res) => {
+  const err = validateIssueBody(req.body, true)
+  if (err) return res.status(400).json({ error: err })
   const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
   if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
   if (issue.error) return res.status(400).json({ error: issue.error })
@@ -198,6 +273,8 @@ app.get('/api/projects/:id/sprints', (req, res) => {
 })
 
 app.post('/api/projects/:id/sprints', (req, res) => {
+  const err = validateSprintBody(req.body)
+  if (err) return res.status(400).json({ error: err })
   const sprint = db.addSprint(req.params.id, req.body)
   if (!sprint) return res.status(404).json({ error: 'Project not found' })
   notifyClients()
@@ -212,6 +289,8 @@ app.get('/api/projects/:id/pages', (req, res) => {
 })
 
 app.post('/api/projects/:id/pages', (req, res) => {
+  const err = validatePageBody(req.body)
+  if (err) return res.status(400).json({ error: err })
   const page = db.addPage(req.params.id, req.body)
   if (!page) return res.status(404).json({ error: 'Project not found' })
   notifyClients()
@@ -219,6 +298,8 @@ app.post('/api/projects/:id/pages', (req, res) => {
 })
 
 app.put('/api/projects/:id/pages/:pageId', (req, res) => {
+  const err = validatePageBody(req.body, true)
+  if (err) return res.status(400).json({ error: err })
   const page = db.updatePage(req.params.id, req.params.pageId, req.body)
   if (!page) return res.status(404).json({ error: 'Page or project not found' })
   notifyClients()

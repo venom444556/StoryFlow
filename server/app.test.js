@@ -337,3 +337,100 @@ describe('Rate limiting', () => {
     expect(status).toBe(200)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Schema validation
+// ---------------------------------------------------------------------------
+
+describe('Schema validation', () => {
+  let projectId
+
+  beforeEach(async () => {
+    const project = await seedProject({ name: 'Validation Test' })
+    projectId = project.id
+  })
+
+  it('rejects project without name', async () => {
+    const { status, body } = await api('/api/projects', {
+      method: 'POST',
+      body: JSON.stringify({ description: 'no name' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"name"/)
+  })
+
+  it('rejects project with invalid status', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'bogus' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"status"/)
+  })
+
+  it('rejects issue without title', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'task' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"title"/)
+  })
+
+  it('rejects issue without type', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'No type' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"type"/)
+  })
+
+  it('rejects issue with invalid type', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Bad', type: 'invalid' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"type"/)
+  })
+
+  it('rejects issue with non-numeric storyPoints', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Bad pts', type: 'task', storyPoints: 'five' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/storyPoints/)
+  })
+
+  it('rejects sprint without name', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/sprints`, {
+      method: 'POST',
+      body: JSON.stringify({ goal: 'no name' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"name"/)
+  })
+
+  it('rejects page without title', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/pages`, {
+      method: 'POST',
+      body: JSON.stringify({ content: 'no title' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"title"/)
+  })
+
+  it('allows valid update without required fields', async () => {
+    const { body: issue } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Orig', type: 'task' }),
+    })
+    const { status } = await api(`/api/projects/${projectId}/issues/${issue.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ description: 'added desc' }),
+    })
+    expect(status).toBe(200)
+  })
+})

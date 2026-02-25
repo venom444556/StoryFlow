@@ -7,6 +7,8 @@ import {
   buildBezierPath,
   getConnectionColor,
   executeWorkflow,
+  normalizeConnection,
+  validateConnections,
 } from './workflow'
 
 describe('workflow utilities', () => {
@@ -482,5 +484,53 @@ describe('workflow utilities', () => {
       )
       expect(completionLogs.length).toBeGreaterThan(0)
     }, 10000)
+  })
+
+  describe('normalizeConnection', () => {
+    it('passes through valid {id, from, to}', () => {
+      const conn = { id: '1', from: 'a', to: 'b' }
+      expect(normalizeConnection(conn)).toEqual(conn)
+    })
+
+    it('normalizes source/target to from/to', () => {
+      const conn = { id: '1', source: 'a', target: 'b' }
+      expect(normalizeConnection(conn)).toEqual({ id: '1', from: 'a', to: 'b' })
+    })
+
+    it('returns null for missing id', () => {
+      expect(normalizeConnection({ from: 'a', to: 'b' })).toBeNull()
+    })
+
+    it('returns null for missing from and source', () => {
+      expect(normalizeConnection({ id: '1', to: 'b' })).toBeNull()
+    })
+
+    it('returns null for null input', () => {
+      expect(normalizeConnection(null)).toBeNull()
+    })
+
+    it('strips extra fields', () => {
+      const conn = { id: '1', from: 'a', to: 'b', extra: 'junk' }
+      expect(normalizeConnection(conn)).toEqual({ id: '1', from: 'a', to: 'b' })
+    })
+  })
+
+  describe('validateConnections', () => {
+    it('returns empty array for non-array input', () => {
+      expect(validateConnections(null)).toEqual([])
+      expect(validateConnections('bad')).toEqual([])
+    })
+
+    it('filters out invalid connections', () => {
+      const conns = [
+        { id: '1', from: 'a', to: 'b' },
+        { id: '2' }, // invalid — no from/to
+        { id: '3', source: 'c', target: 'd' }, // legacy — should normalize
+      ]
+      const result = validateConnections(conns)
+      expect(result).toHaveLength(2)
+      expect(result[0]).toEqual({ id: '1', from: 'a', to: 'b' })
+      expect(result[1]).toEqual({ id: '3', from: 'c', to: 'd' })
+    })
   })
 })

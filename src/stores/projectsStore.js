@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { generateId, generateProjectId } from '../utils/ids'
+import { validateConnections } from '../utils/workflow'
 import indexedDbStorage from '../db/indexedDbStorage'
 import { broadcastUpdate, onCrossTabUpdate, setRehydrating } from '../utils/crossTabSync'
 import { createDefaultProject } from '../data/defaultProject'
@@ -713,7 +714,11 @@ export const useProjectsStore = create(
             const project = state.projects.find((p) => p.id === projectId)
             if (!project) return
 
-            project.workflow = { ...project.workflow, ...workflowData }
+            const sanitized = { ...workflowData }
+            if (sanitized.connections) {
+              sanitized.connections = validateConnections(sanitized.connections)
+            }
+            project.workflow = { ...project.workflow, ...sanitized }
             project.updatedAt = new Date().toISOString()
           })
         },

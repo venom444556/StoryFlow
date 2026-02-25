@@ -50,6 +50,51 @@ export function setNodesAtLevel(workflow, viewStack, updatedData) {
   return { ...workflow, nodes: newNodes, connections: workflow.connections }
 }
 
+// ---------------------------------------------------------------------------
+// Connection validation & normalization
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a connection object so that it always uses { id, from, to }.
+ * Accepts legacy field names (source/target) and maps them to from/to.
+ * Returns the normalized connection, or null if required fields are missing.
+ *
+ * @param {object} conn - Raw connection object
+ * @returns {object|null} Normalized connection or null if invalid
+ */
+export function normalizeConnection(conn) {
+  if (!conn || typeof conn !== 'object') return null
+
+  const id = conn.id
+  const from = conn.from || conn.source
+  const to = conn.to || conn.target
+
+  if (!id || !from || !to) return null
+  return { id, from, to }
+}
+
+/**
+ * Validate and normalize an array of connections.
+ * Drops invalid entries and logs a warning for each one.
+ *
+ * @param {Array} connections - Raw connections array
+ * @returns {Array} Array of valid, normalized connections
+ */
+export function validateConnections(connections) {
+  if (!Array.isArray(connections)) return []
+
+  const results = []
+  for (const conn of connections) {
+    const normalized = normalizeConnection(conn)
+    if (normalized) {
+      results.push(normalized)
+    } else {
+      console.warn('[StoryFlow] Dropped invalid connection — missing id, from, or to:', conn)
+    }
+  }
+  return results
+}
+
 /**
  * Find all direct child nodes of a given node (downstream).
  *
