@@ -6,6 +6,7 @@
 import express from 'express'
 import { timingSafeEqual } from 'node:crypto'
 import * as db from './db.js'
+import { withProjectLock } from './db.js'
 import { notifyClients } from './ws.js'
 
 const app = express()
@@ -218,10 +219,12 @@ app.get('/api/projects/:id', (req, res) => {
 app.put('/api/projects/:id', (req, res) => {
   const err = validateProjectBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  const project = db.updateProject(req.params.id, req.body)
-  if (!project) return res.status(404).json({ error: 'Project not found' })
-  notifyClients()
-  res.json(project)
+  withProjectLock(req.params.id, () => {
+    const project = db.updateProject(req.params.id, req.body)
+    if (!project) return res.status(404).json({ error: 'Project not found' })
+    notifyClients()
+    res.json(project)
+  })
 })
 
 // --- Board summary ---
@@ -241,28 +244,34 @@ app.get('/api/projects/:id/issues', (req, res) => {
 app.post('/api/projects/:id/issues', (req, res) => {
   const err = validateIssueBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  const issue = db.addIssue(req.params.id, req.body)
-  if (!issue) return res.status(404).json({ error: 'Project not found' })
-  if (issue.error) return res.status(400).json({ error: issue.error })
-  notifyClients()
-  res.status(201).json(issue)
+  withProjectLock(req.params.id, () => {
+    const issue = db.addIssue(req.params.id, req.body)
+    if (!issue) return res.status(404).json({ error: 'Project not found' })
+    if (issue.error) return res.status(400).json({ error: issue.error })
+    notifyClients()
+    res.status(201).json(issue)
+  })
 })
 
 app.put('/api/projects/:id/issues/:issueId', (req, res) => {
   const err = validateIssueBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
-  if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
-  if (issue.error) return res.status(400).json({ error: issue.error })
-  notifyClients()
-  res.json(issue)
+  withProjectLock(req.params.id, () => {
+    const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
+    if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+    if (issue.error) return res.status(400).json({ error: issue.error })
+    notifyClients()
+    res.json(issue)
+  })
 })
 
 app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
-  const ok = db.deleteIssue(req.params.id, req.params.issueId)
-  if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
-  notifyClients()
-  res.json({ success: true })
+  withProjectLock(req.params.id, () => {
+    const ok = db.deleteIssue(req.params.id, req.params.issueId)
+    if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
+    notifyClients()
+    res.json({ success: true })
+  })
 })
 
 // --- Sprints ---
@@ -275,10 +284,12 @@ app.get('/api/projects/:id/sprints', (req, res) => {
 app.post('/api/projects/:id/sprints', (req, res) => {
   const err = validateSprintBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  const sprint = db.addSprint(req.params.id, req.body)
-  if (!sprint) return res.status(404).json({ error: 'Project not found' })
-  notifyClients()
-  res.status(201).json(sprint)
+  withProjectLock(req.params.id, () => {
+    const sprint = db.addSprint(req.params.id, req.body)
+    if (!sprint) return res.status(404).json({ error: 'Project not found' })
+    notifyClients()
+    res.status(201).json(sprint)
+  })
 })
 
 // --- Pages ---
@@ -291,34 +302,42 @@ app.get('/api/projects/:id/pages', (req, res) => {
 app.post('/api/projects/:id/pages', (req, res) => {
   const err = validatePageBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  const page = db.addPage(req.params.id, req.body)
-  if (!page) return res.status(404).json({ error: 'Project not found' })
-  notifyClients()
-  res.status(201).json(page)
+  withProjectLock(req.params.id, () => {
+    const page = db.addPage(req.params.id, req.body)
+    if (!page) return res.status(404).json({ error: 'Project not found' })
+    notifyClients()
+    res.status(201).json(page)
+  })
 })
 
 app.put('/api/projects/:id/pages/:pageId', (req, res) => {
   const err = validatePageBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  const page = db.updatePage(req.params.id, req.params.pageId, req.body)
-  if (!page) return res.status(404).json({ error: 'Page or project not found' })
-  notifyClients()
-  res.json(page)
+  withProjectLock(req.params.id, () => {
+    const page = db.updatePage(req.params.id, req.params.pageId, req.body)
+    if (!page) return res.status(404).json({ error: 'Page or project not found' })
+    notifyClients()
+    res.json(page)
+  })
 })
 
 app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
-  const ok = db.deletePage(req.params.id, req.params.pageId)
-  if (!ok) return res.status(404).json({ error: 'Page or project not found' })
-  notifyClients()
-  res.json({ success: true })
+  withProjectLock(req.params.id, () => {
+    const ok = db.deletePage(req.params.id, req.params.pageId)
+    if (!ok) return res.status(404).json({ error: 'Page or project not found' })
+    notifyClients()
+    res.json({ success: true })
+  })
 })
 
 // --- Sprint deletion ---
 app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
-  const ok = db.deleteSprint(req.params.id, req.params.sprintId)
-  if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
-  notifyClients()
-  res.json({ success: true })
+  withProjectLock(req.params.id, () => {
+    const ok = db.deleteSprint(req.params.id, req.params.sprintId)
+    if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
+    notifyClients()
+    res.json({ success: true })
+  })
 })
 
 // --- Catch-all for production SPA serving ---

@@ -4,7 +4,8 @@
 // ---------------------------------------------------------------------------
 
 import initSqlJs from 'sql.js'
-import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
+import { readFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
+import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const DATA_DIR = join(process.cwd(), 'data')
@@ -57,7 +58,7 @@ export async function initDb() {
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_deleted ON projects(deleted_at)')
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_updated ON projects(updated_at DESC)')
 
-  saveToDisk()
+  await saveToDisk()
 
   // Auto-migrate from JSON if DB is empty and JSON exists
   if (countProjects() === 0 && existsSync(JSON_PATH)) {
@@ -66,11 +67,11 @@ export async function initDb() {
   }
 }
 
-/** Persist database to disk (debounced — called after writes) */
-function saveToDisk() {
+/** Persist database to disk asynchronously (non-blocking) */
+async function saveToDisk() {
   if (!db) return
   const data = db.export()
-  writeFileSync(DB_PATH, Buffer.from(data))
+  await writeFile(DB_PATH, Buffer.from(data))
 }
 
 /** Schedule a save (debounced 100ms to batch rapid writes) */
@@ -80,9 +81,32 @@ function scheduleSave() {
 }
 
 /** Force immediate save (for shutdown) */
-export function flushToDisk() {
+export async function flushToDisk() {
   clearTimeout(_saveTimer)
-  saveToDisk()
+  await saveToDisk()
+}
+
+// ---------------------------------------------------------------------------
+// Write lock — serializes read→modify→write operations per project to prevent
+// concurrent requests from overwriting each other's changes (#12).
+// ---------------------------------------------------------------------------
+const _projectLocks = new Map()
+
+/**
+ * Acquire a per-project lock, execute fn(), then release.
+ * Concurrent callers for the same projectId queue up and run sequentially.
+ */
+export function withProjectLock(projectId, fn) {
+  const prev = _projectLocks.get(projectId) || Promise.resolve()
+  const next = prev.then(fn, fn) // run fn even if prior rejects
+  _projectLocks.set(projectId, next)
+  // Clean up the map entry when the chain settles to avoid unbounded growth
+  next.finally(() => {
+    if (_projectLocks.get(projectId) === next) {
+      _projectLocks.delete(projectId)
+    }
+  })
+  return next
 }
 
 // ---------------------------------------------------------------------------
@@ -225,14 +249,14 @@ export function deleteProject(id) {
 }
 
 /** Sync: replace all projects (called by client on load) */
-export function syncAll(projects) {
+export async function syncAll(projects) {
   // Clear existing and re-insert all
   db.run('DELETE FROM projects')
   for (const p of projects) {
     upsertProject(p.id, p)
   }
   // upsertProject already schedules saves, but force one for the DELETE
-  saveToDisk()
+  await saveToDisk()
 }
 
 // ---------------------------------------------------------------------------
