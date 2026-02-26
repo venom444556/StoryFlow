@@ -65,6 +65,8 @@ StoryFlow includes a **storyflow-agent** — an autonomous AI project manager th
 | "I finished the login page" | Moves issue to Done, checks sprint progress |
 | "what's left?" | Pulls board summary, reports burndown |
 | "we decided to use JWT" | Creates architecture decision wiki page |
+| "the login crashes on empty email" | Files a bug issue with reproduction steps |
+| *(test failure or error)* | Creates bug issue automatically |
 | *(commits code)* | Matches commit to issues, marks Done |
 | *(session ending)* | Reconciles entire board, flags drift |
 
@@ -76,6 +78,7 @@ StoryFlow includes a **storyflow-agent** — an autonomous AI project manager th
 4. **Wiki & Documentation** — Architecture decisions, API docs, retro notes
 5. **Progress Reporting** — Board summary, burndown, blocked items, "what's next?"
 6. **Board Hygiene** — Duplicate detection, stale issue alerts, orphan cleanup
+7. **Bug & Issue Reporting** — Automatically files bugs when errors, crashes, or test failures are encountered
 
 ### Development Cadence (Closed Loop)
 
@@ -102,6 +105,7 @@ You can also invoke the agent directly:
 - "create an epic for user auth" — plans and creates issues
 - "what's our sprint progress?" — pulls a summary report
 - "document the API decisions" — writes wiki pages
+- "the search is broken" — files a bug issue with context from the session
 
 ## Data Model Quick Reference
 

@@ -127,7 +127,7 @@ These hooks are non-blocking — if StoryFlow is unreachable or unconfigured, th
 
 ## Agents
 
-- **storyflow-agent** — Autonomous AI project manager. Interprets casual developer language into professional PM structure — planning features, syncing the board, managing sprints, writing wiki docs, and reporting progress. Dispatched automatically by hooks or invoked manually ("plan auth", "what's left?", "sync the board").
+- **storyflow-agent** — Autonomous AI project manager. Interprets casual developer language into professional PM structure — planning features, syncing the board, managing sprints, writing wiki docs, filing bugs, and reporting progress. Automatically detects bugs, errors, and test failures during your session and creates tracked issues. Dispatched automatically by hooks or invoked manually ("plan auth", "what's left?", "the login is broken", "sync the board").
 
 ## Configuration
 
