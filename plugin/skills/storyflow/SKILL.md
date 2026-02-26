@@ -53,7 +53,25 @@ Configuration is stored globally at `~/.config/storyflow/config.json` and persis
 5. **Assign to sprint**: Set `sprint_id` on each issue
 6. **Track progress**: Update `status` as work progresses
 
-## Workflow: During Development
+## Development Cadence (Closed Loop)
+
+StoryFlow enforces a board-sync cadence via plugin hooks. The board stays in sync automatically:
+
+```
+Plan → Plan Approved → Board Updated (In Progress) → Work Executed → Work Complete → Board Updated (Done)
+```
+
+| Phase | Trigger | Board Action |
+|-------|---------|--------------|
+| Plan approved | `ExitPlanMode` hook fires | Related issues → **In Progress** |
+| Code committed | `Bash` hook detects `git commit` | Completed issues → **Done** |
+| Session ending | `Stop` hook fires | Reconcile all issues, create any missing |
+
+**You do not need to remember to update the board** — the hooks will remind you. When prompted by a hook, use the MCP tools to update issue statuses.
+
+### Manual sync during development
+
+If working without the hooks (or need a mid-session sync):
 
 1. **Find your issue**: `storyflow_list_issues` with status filter
 2. **Move to In Progress**: `storyflow_update_issue` with `status: "In Progress"`

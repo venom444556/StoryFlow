@@ -149,9 +149,11 @@ export default function DashboardPage() {
                       <p className="truncate text-sm font-medium text-[var(--color-fg-default)]">
                         {project.name}
                       </p>
-                      <p className="text-xs text-[var(--color-fg-subtle)]">
-                        Deleted {formatRelative(project.deletedAt)}
-                      </p>
+                      {project.deletedAt && (
+                        <p className="text-xs text-[var(--color-fg-subtle)]">
+                          Deleted {formatRelative(project.deletedAt)}
+                        </p>
+                      )}
                     </div>
                     <div className="ml-3 flex shrink-0 gap-1">
                       <button
@@ -248,9 +250,11 @@ export default function DashboardPage() {
                   </p>
 
                   {/* Last updated */}
-                  <p className="text-xs text-[var(--color-fg-subtle)]">
-                    Updated {formatRelative(project.updatedAt)}
-                  </p>
+                  {project.updatedAt && (
+                    <p className="text-xs text-[var(--color-fg-subtle)]">
+                      Updated {formatRelative(project.updatedAt)}
+                    </p>
+                  )}
                 </div>
               </GlassCard>
             )

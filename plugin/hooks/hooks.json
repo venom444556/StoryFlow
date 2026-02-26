@@ -1,0 +1,39 @@
+{
+  "description": "StoryFlow closed-loop board sync — keeps the board in sync with actual work automatically",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A plan was just approved. If there is an active StoryFlow project with issues related to this plan, update their status to 'In Progress' using storyflow_update_issue. First call storyflow_list_projects to check connectivity, then storyflow_list_issues to find matching issues. Only update issues that are currently 'To Do' and clearly relate to the approved plan. If StoryFlow is not configured or unreachable, skip silently.",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); cmd=$(echo \"$input\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"$//'); if echo \"$cmd\" | grep -qE 'git commit'; then echo '{\"systemMessage\": \"STORYFLOW BOARD SYNC: You just committed code. Check if any StoryFlow issues relate to this commit and update them — move completed work to Done, in-progress work to In Progress. Use storyflow_list_issues to find relevant issues, then storyflow_update_issue to update status. Skip silently if StoryFlow is not configured.\"}'; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before ending this session, reconcile the StoryFlow board if a StoryFlow project is active. Call storyflow_list_projects — if reachable and a project relates to this session's work, call storyflow_list_issues and check: (1) Are any issues still 'To Do' that were actually worked on? Move to 'In Progress' or 'Done'. (2) Are any issues 'In Progress' that are now complete? Move to 'Done'. (3) Was unplanned work done that has no issue? Consider creating one marked 'Done'. Report what you updated. If StoryFlow is not configured or unreachable, approve the stop and skip silently.",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

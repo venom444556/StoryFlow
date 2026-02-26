@@ -5,6 +5,7 @@ import { format, formatDistanceToNow, isPast, parseISO } from 'date-fns'
  * Accepts Date instances, ISO strings, and timestamps.
  */
 const toDate = (value) => {
+  if (value === null || value === undefined) return null
   if (value instanceof Date) return value
   if (typeof value === 'string') return parseISO(value)
   if (typeof value === 'number') return new Date(value)
@@ -30,7 +31,11 @@ export const formatDateTime = (date) => format(toDate(date), 'MMM d, yyyy h:mm a
  * @param {Date|string|number} date
  * @returns {string}
  */
-export const formatRelative = (date) => formatDistanceToNow(toDate(date), { addSuffix: true })
+export const formatRelative = (date) => {
+  const d = toDate(date)
+  if (!d) return 'Unknown'
+  return formatDistanceToNow(d, { addSuffix: true })
+}
 
 /**
  * Format a date as a short label, e.g. "Jan 5".

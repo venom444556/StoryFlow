@@ -108,6 +108,20 @@ The plugin provides full CRUD access to all StoryFlow resources:
 | **Pages** | list, create, update, delete |
 | **Utilities** | board-summary, check-connection |
 
+## Automatic Board Sync (Hooks)
+
+StoryFlow includes plugin hooks that keep the board in sync with your actual work — no manual updates needed:
+
+| Hook | Fires When | Board Action |
+|------|-----------|--------------|
+| **PostToolUse** → `ExitPlanMode` | Plan is approved | Related issues move to **In Progress** |
+| **PostToolUse** → `Bash` | `git commit` detected | Completed issues move to **Done** |
+| **Stop** | Session is ending | Reconciles all issues, creates missing ones |
+
+The cadence is: **Plan → Approved → Board updated → Work done → Commit → Board updated → Session ends → Final reconciliation.**
+
+These hooks are non-blocking — if StoryFlow is unreachable or unconfigured, they skip silently and never interrupt your workflow.
+
 ## Agents
 
 - **project-planner** -- Decomposes feature requests into structured epics, stories, and tasks with story point estimates. Triggered when you ask Claude to "plan a feature" or "break down work into issues."
