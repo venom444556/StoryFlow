@@ -108,24 +108,26 @@ The plugin provides full CRUD access to all StoryFlow resources:
 | **Pages** | list, create, update, delete |
 | **Utilities** | board-summary, check-connection |
 
-## Automatic Board Sync (Hooks)
+## Automatic Board Sync (Hooks + Agent)
 
-StoryFlow includes plugin hooks that keep the board in sync with your actual work — no manual updates needed:
+StoryFlow includes plugin hooks that dispatch the **storyflow-agent** to keep the board in sync with your actual work — no manual updates needed:
 
-| Hook | Fires When | Board Action |
+| Hook | Fires When | Agent Action |
 |------|-----------|--------------|
 | **PostToolUse** → `ExitPlanMode` | Plan is approved | Creates issues from plan, sets **In Progress** |
 | **PostToolUse** → `TodoWrite` | Todos created/updated | Syncs new todos as issues, matches status changes |
 | **PostToolUse** → `Bash` | `git commit` detected | Completed issues move to **Done** |
-| **Stop** | Session is ending | Reconciles all issues, creates missing ones |
+| **Stop** | Session is ending | Full reconciliation — fixes stale statuses, creates missing items |
 
 The cadence is: **Plan → Approved → Board updated → Work done → Commit → Board updated → Session ends → Final reconciliation.**
+
+The storyflow-agent also handles sprint management, wiki documentation, progress reporting, and board hygiene — all triggered by casual developer language, no PM jargon required.
 
 These hooks are non-blocking — if StoryFlow is unreachable or unconfigured, they skip silently and never interrupt your workflow.
 
 ## Agents
 
-- **project-planner** -- Decomposes feature requests into structured epics, stories, and tasks with story point estimates. Triggered when you ask Claude to "plan a feature" or "break down work into issues."
+- **storyflow-agent** — Autonomous AI project manager. Interprets casual developer language into professional PM structure — planning features, syncing the board, managing sprints, writing wiki docs, and reporting progress. Dispatched automatically by hooks or invoked manually ("plan auth", "what's left?", "sync the board").
 
 ## Configuration
 

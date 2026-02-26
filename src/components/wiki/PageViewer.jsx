@@ -38,10 +38,12 @@ export default function PageViewer({ page, onEdit, onDelete, onTogglePin, onShow
                 </Badge>
               ))}
 
-              <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
-                <Clock size={12} />
-                Updated {formatRelative(page.updatedAt)}
-              </span>
+              {page.updatedAt && (
+                <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
+                  <Clock size={12} />
+                  Updated {formatRelative(page.updatedAt)}
+                </span>
+              )}
             </div>
           </div>
 

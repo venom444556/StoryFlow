@@ -53,31 +53,55 @@ Configuration is stored globally at `~/.config/storyflow/config.json` and persis
 5. **Assign to sprint**: Set `sprint_id` on each issue
 6. **Track progress**: Update `status` as work progresses
 
-## Development Cadence (Closed Loop)
+## The StoryFlow Agent — Autonomous AI PM
 
-StoryFlow enforces a board-sync cadence via plugin hooks. The board stays in sync automatically:
+StoryFlow includes a **storyflow-agent** — an autonomous AI project manager that keeps the board in sync with your actual work. You don't need to speak PM jargon; the agent interprets casual developer language into professional PM structure.
+
+### What the Agent Does
+
+| You say | Agent does |
+|---------|-----------|
+| "let's work on auth" | Creates epic + stories, starts sprint, assigns issues |
+| "I finished the login page" | Moves issue to Done, checks sprint progress |
+| "what's left?" | Pulls board summary, reports burndown |
+| "we decided to use JWT" | Creates architecture decision wiki page |
+| *(commits code)* | Matches commit to issues, marks Done |
+| *(session ending)* | Reconciles entire board, flags drift |
+
+### Agent Capabilities
+
+1. **Feature Planning** — Epics, stories, tasks, story points, priorities, acceptance criteria
+2. **Board Lifecycle Sync** — Automatic status updates from hooks (plan approved, todos changed, commits, session end)
+3. **Sprint Management** — Auto-create sprints, assign issues, close completed sprints
+4. **Wiki & Documentation** — Architecture decisions, API docs, retro notes
+5. **Progress Reporting** — Board summary, burndown, blocked items, "what's next?"
+6. **Board Hygiene** — Duplicate detection, stale issue alerts, orphan cleanup
+
+### Development Cadence (Closed Loop)
+
+The board stays in sync automatically via plugin hooks that dispatch the storyflow-agent:
 
 ```
 Plan → Plan Approved → Board Updated (In Progress) → Work Executed → Work Complete → Board Updated (Done)
 ```
 
-| Phase | Trigger | Board Action |
+| Phase | Trigger | Agent Action |
 |-------|---------|--------------|
-| Plan approved | `ExitPlanMode` hook fires | Creates issues from plan, sets **In Progress** |
-| Todos updated | `TodoWrite` hook fires | Syncs new/changed todos as issues |
-| Code committed | `Bash` hook detects `git commit` | Completed issues → **Done** |
-| Session ending | `Stop` hook fires | Reconcile all issues, create any missing |
+| Plan approved | `ExitPlanMode` hook dispatches agent | Creates issues from plan, sets **In Progress** |
+| Todos updated | `TodoWrite` hook dispatches agent | Syncs new/changed todos as issues |
+| Code committed | `Bash` hook dispatches agent | Completed issues → **Done** |
+| Session ending | `Stop` hook dispatches agent | Full reconciliation sweep |
 
-**You do not need to remember to update the board** — the hooks will remind you. When prompted by a hook, use the MCP tools to update issue statuses.
+**You do not need to remember to update the board** — the hooks dispatch the agent automatically. If StoryFlow is unreachable, the agent skips silently and never blocks your workflow.
 
-### Manual sync during development
+### Manual Operations
 
-If working without the hooks (or need a mid-session sync):
+You can also invoke the agent directly:
 
-1. **Find your issue**: `storyflow_list_issues` with status filter
-2. **Move to In Progress**: `storyflow_update_issue` with `status: "In Progress"`
-3. **Add notes**: Update the issue description with implementation details
-4. **Mark Done**: `storyflow_update_issue` with `status: "Done"`
+- "sync the board" — triggers a full reconciliation
+- "create an epic for user auth" — plans and creates issues
+- "what's our sprint progress?" — pulls a summary report
+- "document the API decisions" — writes wiki pages
 
 ## Data Model Quick Reference
 
