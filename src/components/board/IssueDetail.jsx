@@ -174,8 +174,8 @@ export default function IssueDetail({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="fixed right-0 top-0 z-40 flex h-full w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
-          style={{ backgroundColor: 'var(--th-panel-solid)' }}
+          className="fixed right-0 top-0 flex h-full w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
+          style={{ backgroundColor: 'var(--th-panel-solid)', zIndex: 'var(--z-drawer)' }}
         >
           {/* Header */}
           <div className="flex shrink-0 items-start gap-3 border-b border-[var(--color-border-default)] px-5 py-4">
