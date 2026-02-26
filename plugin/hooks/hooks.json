@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "A plan was just approved. If there is an active StoryFlow project with issues related to this plan, update their status to 'In Progress' using storyflow_update_issue. First call storyflow_list_projects to check connectivity, then storyflow_list_issues to find matching issues. Only update issues that are currently 'To Do' and clearly relate to the approved plan. If StoryFlow is not configured or unreachable, skip silently.",
+            "prompt": "A plan was just approved. Sync it to StoryFlow: (1) Call storyflow_list_projects to check connectivity. If unreachable or unconfigured, skip silently. (2) Find or pick the relevant project. (3) Call storyflow_list_issues to see what already exists. (4) For each planned work item that does NOT have a matching issue, CREATE one using storyflow_create_issue (type: story or task, status: 'In Progress'). Group under an epic if the plan is large — create the epic first, then child issues with epicId. (5) For existing issues that match planned work and are 'To Do', move them to 'In Progress' via storyflow_update_issue. The board should fully reflect the approved plan before work begins.",
             "timeout": 30
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); cmd=$(echo \"$input\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"$//'); if echo \"$cmd\" | grep -qE 'git commit'; then echo '{\"systemMessage\": \"STORYFLOW BOARD SYNC: You just committed code. Check if any StoryFlow issues relate to this commit and update them — move completed work to Done, in-progress work to In Progress. Use storyflow_list_issues to find relevant issues, then storyflow_update_issue to update status. Skip silently if StoryFlow is not configured.\"}'; fi",
+            "command": "input=$(cat); cmd=$(echo \"$input\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"$//'); if echo \"$cmd\" | grep -qE 'git commit'; then echo '{\"systemMessage\": \"STORYFLOW BOARD SYNC: You just committed code. Update the board: (1) Use storyflow_list_issues to find issues related to this commit. (2) Move completed issues to Done. (3) If this commit represents work with NO matching issue, create one via storyflow_create_issue with status Done so the board reflects reality. Skip silently if StoryFlow is not configured.\"}'; fi",
             "timeout": 5
           }
         ]
