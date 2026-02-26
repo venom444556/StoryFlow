@@ -1072,9 +1072,15 @@ useProjectsStore.subscribe(
 // Listen for external writes via WebSocket (replaces Vite HMR)
 // Also called on startup when IndexedDB is empty (no browser tab was open during
 // prior MCP / REST writes), so the client hydrates from the server on first load.
+let _reloadPromise = null
+
 export function reloadFromServer() {
+  // Coalesce concurrent calls — if a reload is already in-flight, return its
+  // promise so callers share the same result and we never race two fetches.
+  if (_reloadPromise) return _reloadPromise
+
   _isSyncing = true
-  fetch('/api/projects')
+  _reloadPromise = fetch('/api/projects')
     .then((res) => (res.ok ? res.json() : null))
     .then(async (summaries) => {
       if (!summaries || summaries.length === 0) return
@@ -1089,6 +1095,7 @@ export function reloadFromServer() {
       const projects = fullProjects.filter(Boolean)
       if (projects.length > 0) {
         // Merge: keep client-only projects, update/add server projects
+        // Re-read state at resolution time (not capture time) to avoid stale merge
         const currentProjects = useProjectsStore.getState().projects
         const serverIds = new Set(projects.map((p) => p.id))
         const clientOnly = currentProjects.filter((p) => !serverIds.has(p.id))
@@ -1105,7 +1112,10 @@ export function reloadFromServer() {
     })
     .finally(() => {
       _isSyncing = false
+      _reloadPromise = null
     })
+
+  return _reloadPromise
 }
 
 let _ws = null
