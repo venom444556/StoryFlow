@@ -163,7 +163,8 @@ describe('SettingsPanel', () => {
 
     it('shows grid size options (10px, 20px, 40px)', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
-      const select = screen.getByRole('combobox')
+      const selects = screen.getAllByRole('combobox')
+      const select = selects.find((s) => s.querySelector('option[value="20"]'))
       expect(select).toBeInTheDocument()
 
       // Check options
@@ -244,7 +245,8 @@ describe('SettingsPanel', () => {
     it('changing grid size updates the value', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
 
-      const select = screen.getByRole('combobox')
+      const selects = screen.getAllByRole('combobox')
+      const select = selects.find((s) => s.querySelector('option[value="20"]'))
 
       // Default should be 20px
       expect(select.value).toBe('20')

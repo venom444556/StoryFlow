@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
@@ -13,8 +13,10 @@ import {
   Sparkles,
   Navigation,
   LayoutGrid,
+  RefreshCw,
 } from 'lucide-react'
 import { useSettings } from '../../contexts/SettingsContext'
+import { useProjectsStore, reloadFromServer } from '../../stores/projectsStore'
 
 const ACCENT_COLORS = [
   { id: 'purple', label: 'Purple', color: '#8b5cf6' },
@@ -69,6 +71,69 @@ function SectionLabel({ children }) {
     <div className="mb-1 mt-4 first:mt-0 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-faint)]">
       {children}
     </div>
+  )
+}
+
+const REFRESH_INTERVALS = [
+  { label: 'Off', ms: 0 },
+  { label: '5s', ms: 5_000 },
+  { label: '10s', ms: 10_000 },
+  { label: '30s', ms: 30_000 },
+  { label: '1m', ms: 60_000 },
+  { label: '5m', ms: 300_000 },
+]
+
+function formatRelative(iso) {
+  if (!iso) return 'Never'
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (diff < 5) return 'Just now'
+  if (diff < 60) return `${diff}s ago`
+  const mins = Math.floor(diff / 60)
+  if (mins < 60) return `${mins}m ago`
+  return `${Math.floor(mins / 60)}h ago`
+}
+
+function AutoRefreshSetting() {
+  const interval = useProjectsStore((s) => s.autoRefreshInterval)
+  const setInterval_ = useProjectsStore((s) => s.setAutoRefreshInterval)
+  const lastRefreshed = useProjectsStore((s) => s.lastRefreshed)
+  const [relativeTime, setRelativeTime] = useState(null)
+
+  useEffect(() => {
+    setRelativeTime(formatRelative(lastRefreshed))
+    const id = window.setInterval(() => setRelativeTime(formatRelative(lastRefreshed)), 1000)
+    return () => window.clearInterval(id)
+  }, [lastRefreshed])
+
+  const handleManualRefresh = useCallback(() => {
+    reloadFromServer()
+  }, [])
+
+  return (
+    <>
+      <SettingRow icon={RefreshCw} label="Refresh Interval" description="Poll server for changes">
+        <select
+          value={interval}
+          onChange={(e) => setInterval_(Number(e.target.value))}
+          className="glass-input rounded-md px-2 py-1 text-xs text-[var(--color-fg-default)]"
+        >
+          {REFRESH_INTERVALS.map(({ label, ms }) => (
+            <option key={ms} value={ms}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </SettingRow>
+      <div className="flex items-center justify-between py-2 pl-11">
+        <span className="text-xs text-[var(--color-fg-faint)]">Last refreshed: {relativeTime}</span>
+        <button
+          onClick={handleManualRefresh}
+          className="rounded-md px-2 py-1 text-xs font-medium text-[var(--interactive-default)] transition-colors hover:bg-[var(--color-bg-glass-hover)]"
+        >
+          Refresh now
+        </button>
+      </div>
+    </>
   )
 }
 
@@ -201,6 +266,11 @@ export default function SettingsPanel({ isOpen, onClose }) {
                   onChange={(v) => setSetting('showConfirmOnDelete', v)}
                 />
               </SettingRow>
+
+              {/* Auto-Refresh */}
+              <SectionLabel>Auto-Refresh</SectionLabel>
+
+              <AutoRefreshSetting />
 
               {/* Workflow */}
               <SectionLabel>Workflow Canvas</SectionLabel>
