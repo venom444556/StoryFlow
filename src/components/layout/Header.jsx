@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Search, Upload, Download, Settings, Menu } from 'lucide-react'
+import RefreshIndicator from './RefreshIndicator'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useProjects } from '../../hooks/useProjects'
 import {
@@ -264,6 +265,9 @@ export default function Header({
         >
           <Download size={16} />
         </button>
+
+        {/* Auto-refresh */}
+        <RefreshIndicator />
 
         {/* Settings */}
         <button

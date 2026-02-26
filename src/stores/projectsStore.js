@@ -112,6 +112,8 @@ export const useProjectsStore = create(
       immer((set, get) => ({
         // State
         projects: [],
+        lastRefreshed: null,
+        autoRefreshInterval: 0, // ms; 0 = off
 
         // Computed selectors (use these for memoized reads)
         getProject: (id) => {
@@ -128,6 +130,7 @@ export const useProjectsStore = create(
 
         // Actions
         setProjects: (projects) => set({ projects }),
+        setAutoRefreshInterval: (ms) => set({ autoRefreshInterval: ms }),
 
         addProject: (name) => {
           const trimmed = (name || '').trim()
@@ -1089,7 +1092,12 @@ export function reloadFromServer() {
         const currentProjects = useProjectsStore.getState().projects
         const serverIds = new Set(projects.map((p) => p.id))
         const clientOnly = currentProjects.filter((p) => !serverIds.has(p.id))
-        useProjectsStore.setState({ projects: [...clientOnly, ...projects] })
+        useProjectsStore.setState({
+          projects: [...clientOnly, ...projects],
+          lastRefreshed: new Date().toISOString(),
+        })
+      } else {
+        useProjectsStore.setState({ lastRefreshed: new Date().toISOString() })
       }
     })
     .catch(() => {
@@ -1151,3 +1159,19 @@ function connectWebSocket() {
     unsub()
   })
 }
+
+// ---------------------------------------------------------------------------
+// Auto-refresh interval manager (Grafana-style polling fallback)
+// ---------------------------------------------------------------------------
+let _autoRefreshTimer = null
+
+useProjectsStore.subscribe(
+  (state) => state.autoRefreshInterval,
+  (interval) => {
+    clearInterval(_autoRefreshTimer)
+    _autoRefreshTimer = null
+    if (interval > 0) {
+      _autoRefreshTimer = setInterval(() => reloadFromServer(), interval)
+    }
+  }
+)
