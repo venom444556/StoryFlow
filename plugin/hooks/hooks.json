@@ -13,6 +13,16 @@
         ]
       },
       {
+        "matcher": "TodoWrite",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "The todo list was just updated. Sync it to StoryFlow: (1) Call storyflow_list_projects to check connectivity. If unreachable or unconfigured, skip silently. (2) Call storyflow_list_issues on the relevant project. (3) For each NEW todo that has no matching StoryFlow issue, CREATE one via storyflow_create_issue — use type 'task' for small items, 'story' for features, 'bug' for fixes. If todos are grouped under a theme, create an epic first and link children with epicId. Set status to match the todo: pending → 'To Do', in_progress → 'In Progress', completed → 'Done'. (4) For each todo whose status CHANGED, find the matching StoryFlow issue and update its status to match (To Do / In Progress / Done). (5) For any todo that was REMOVED from the list, leave its StoryFlow issue as-is (do not delete). Keep the board in sync with the todo list at all times.",
+            "timeout": 30
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {

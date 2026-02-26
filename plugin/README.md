@@ -114,7 +114,8 @@ StoryFlow includes plugin hooks that keep the board in sync with your actual wor
 
 | Hook | Fires When | Board Action |
 |------|-----------|--------------|
-| **PostToolUse** → `ExitPlanMode` | Plan is approved | Related issues move to **In Progress** |
+| **PostToolUse** → `ExitPlanMode` | Plan is approved | Creates issues from plan, sets **In Progress** |
+| **PostToolUse** → `TodoWrite` | Todos created/updated | Syncs new todos as issues, matches status changes |
 | **PostToolUse** → `Bash` | `git commit` detected | Completed issues move to **Done** |
 | **Stop** | Session is ending | Reconciles all issues, creates missing ones |
 

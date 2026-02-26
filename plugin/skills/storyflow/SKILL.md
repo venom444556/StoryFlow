@@ -63,7 +63,8 @@ Plan → Plan Approved → Board Updated (In Progress) → Work Executed → Wor
 
 | Phase | Trigger | Board Action |
 |-------|---------|--------------|
-| Plan approved | `ExitPlanMode` hook fires | Related issues → **In Progress** |
+| Plan approved | `ExitPlanMode` hook fires | Creates issues from plan, sets **In Progress** |
+| Todos updated | `TodoWrite` hook fires | Syncs new/changed todos as issues |
 | Code committed | `Bash` hook detects `git commit` | Completed issues → **Done** |
 | Session ending | `Stop` hook fires | Reconcile all issues, create any missing |
 
