@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Trash2, Plus, Check, MessageSquare, Clock, ListChecks, Send } from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
@@ -165,7 +166,7 @@ export default function IssueDetail({
   const subtasksTotal = (issue.subtasks || []).length
   const subtasksDone = (issue.subtasks || []).filter((s) => s.completed).length
 
-  return (
+  return createPortal(
     <>
       <AnimatePresence>
         <motion.div
@@ -566,7 +567,8 @@ export default function IssueDetail({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            style={{ zIndex: 'var(--z-drawer)' }}
             onClick={onClose}
           />
         )}
@@ -584,6 +586,7 @@ export default function IssueDetail({
         message={`Are you sure you want to delete "${issue.key} - ${issue.title}"? This action cannot be undone.`}
         confirmLabel="Delete"
       />
-    </>
+    </>,
+    document.body
   )
 }

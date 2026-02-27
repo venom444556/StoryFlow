@@ -154,7 +154,8 @@ export default function SettingsPanel({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            style={{ zIndex: 'var(--z-modal)' }}
             onClick={onClose}
           />
 
@@ -164,7 +165,8 @@ export default function SettingsPanel({ isOpen, onClose }) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 z-50 flex h-full w-[380px] max-w-[90vw] flex-col border-l border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] shadow-2xl"
+            className="fixed right-0 top-0 flex h-full w-[380px] max-w-[90vw] flex-col border-l border-[var(--color-border-default)] bg-[var(--color-bg-subtle)] shadow-2xl"
+            style={{ zIndex: 'var(--z-modal)' }}
           >
             {/* Header */}
             <div className="flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-border-default)] px-5">

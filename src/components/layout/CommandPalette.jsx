@@ -200,7 +200,8 @@ export default function CommandPalette({ isOpen, onClose }) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh]"
+          className="fixed inset-0 flex items-start justify-center pt-[12vh]"
+          style={{ zIndex: 'var(--z-popover)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

@@ -41,7 +41,7 @@ describe('SettingsPanel', () => {
 
     it('renders backdrop when open', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
-      const backdrop = document.querySelector('.fixed.inset-0.z-50')
+      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/40')
       expect(backdrop).toBeInTheDocument()
     })
   })
@@ -66,7 +66,7 @@ describe('SettingsPanel', () => {
       const onClose = vi.fn()
       renderWithProvider(<SettingsPanel isOpen={true} onClose={onClose} />)
 
-      const backdrop = document.querySelector('.fixed.inset-0.z-50.bg-black\\/40')
+      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/40')
       if (backdrop) {
         fireEvent.click(backdrop)
         expect(onClose).toHaveBeenCalledTimes(1)
