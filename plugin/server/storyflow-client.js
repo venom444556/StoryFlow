@@ -161,6 +161,33 @@ export function deleteIssue(projectId, issueId) {
   )
 }
 
+// --- Issues by key ---
+
+export function getIssueByKey(projectId, key) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}`
+  )
+}
+
+export function updateIssueByKey(projectId, key, data) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }
+  )
+}
+
+export function deleteIssueByKey(projectId, key) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}`,
+    {
+      method: 'DELETE',
+    }
+  )
+}
+
 // --- Board ---
 
 export function getBoardSummary(projectId) {

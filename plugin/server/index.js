@@ -226,10 +226,14 @@ server.registerTool(
   'storyflow_update_issue',
   {
     description:
-      'Update an existing issue in a StoryFlow project. Only provided fields are changed.',
+      'Update an existing issue in a StoryFlow project. Provide either issue_id (UUID) or issue_key (e.g. "SCA-43"). Only provided fields are changed.',
     inputSchema: {
       project_id: z.string().describe('Project ID'),
-      issue_id: z.string().describe('Issue ID (UUID)'),
+      issue_id: z.string().optional().describe('Issue ID (UUID) — provide this OR issue_key'),
+      issue_key: z
+        .string()
+        .optional()
+        .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
       title: z.string().optional().describe('New title'),
       status: z.enum(['To Do', 'In Progress', 'Done']).optional().describe('New status'),
       priority: z.enum(['critical', 'high', 'medium', 'low']).optional().describe('New priority'),
@@ -244,6 +248,7 @@ server.registerTool(
   async ({
     project_id,
     issue_id,
+    issue_key,
     title,
     status,
     priority,
@@ -254,6 +259,12 @@ server.registerTool(
     assignee,
     labels,
   }) => {
+    if (!issue_id && !issue_key) {
+      return {
+        content: [{ type: 'text', text: 'Error: provide either issue_id or issue_key' }],
+        isError: true,
+      }
+    }
     const data = {}
     if (title !== undefined) data.title = title
     if (status !== undefined) data.status = status
@@ -264,7 +275,34 @@ server.registerTool(
     if (sprint_id !== undefined) data.sprintId = sprint_id
     if (assignee !== undefined) data.assignee = assignee
     if (labels !== undefined) data.labels = labels
-    const issue = await sf.updateIssue(project_id, issue_id, data)
+    const issue = issue_key
+      ? await sf.updateIssueByKey(project_id, issue_key, data)
+      : await sf.updateIssue(project_id, issue_id, data)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(issue, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Issue by Key
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_issue_by_key',
+  {
+    description: 'Look up an issue by its human-readable key (e.g. "SCA-43") instead of UUID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      issue_key: z.string().describe('Issue key (e.g. "SCA-43")'),
+    },
+  },
+  async ({ project_id, issue_key }) => {
+    const issue = await sf.getIssueByKey(project_id, issue_key)
     return {
       content: [
         {
@@ -282,19 +320,35 @@ server.registerTool(
 server.registerTool(
   'storyflow_delete_issue',
   {
-    description: 'Delete an issue from a StoryFlow project board.',
+    description:
+      'Delete an issue from a StoryFlow project board. Provide either issue_id (UUID) or issue_key (e.g. "SCA-43").',
     inputSchema: {
       project_id: z.string().describe('Project ID'),
-      issue_id: z.string().describe('Issue ID to delete'),
+      issue_id: z.string().optional().describe('Issue ID (UUID) — provide this OR issue_key'),
+      issue_key: z
+        .string()
+        .optional()
+        .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
     },
   },
-  async ({ project_id, issue_id }) => {
-    await sf.deleteIssue(project_id, issue_id)
+  async ({ project_id, issue_id, issue_key }) => {
+    if (!issue_id && !issue_key) {
+      return {
+        content: [{ type: 'text', text: 'Error: provide either issue_id or issue_key' }],
+        isError: true,
+      }
+    }
+    const identifier = issue_key || issue_id
+    if (issue_key) {
+      await sf.deleteIssueByKey(project_id, issue_key)
+    } else {
+      await sf.deleteIssue(project_id, issue_id)
+    }
     return {
       content: [
         {
           type: 'text',
-          text: `Issue ${issue_id} deleted successfully.`,
+          text: `Issue ${identifier} deleted successfully.`,
         },
       ],
     }

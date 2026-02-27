@@ -166,6 +166,74 @@ describe('Issues API', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Issues by key
+// ---------------------------------------------------------------------------
+
+describe('Issues by Key API', () => {
+  let projectId
+
+  beforeEach(async () => {
+    const project = await seedProject({ name: 'Key Test' })
+    projectId = project.id
+  })
+
+  it('GET by key returns the issue', async () => {
+    const { body: issue } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Auth flow', type: 'story' }),
+    })
+    const { status, body } = await api(`/api/projects/${projectId}/issues/by-key/${issue.key}`)
+    expect(status).toBe(200)
+    expect(body.id).toBe(issue.id)
+    expect(body.title).toBe('Auth flow')
+  })
+
+  it('GET by key is case-insensitive', async () => {
+    const { body: issue } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Case test', type: 'task' }),
+    })
+    const lowerKey = issue.key.toLowerCase()
+    const { status, body } = await api(`/api/projects/${projectId}/issues/by-key/${lowerKey}`)
+    expect(status).toBe(200)
+    expect(body.id).toBe(issue.id)
+  })
+
+  it('GET by key returns 404 for unknown key', async () => {
+    const { status } = await api(`/api/projects/${projectId}/issues/by-key/NOPE-999`)
+    expect(status).toBe(404)
+  })
+
+  it('PUT by key updates the issue', async () => {
+    const { body: issue } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Update me', type: 'bug' }),
+    })
+    const { status, body } = await api(`/api/projects/${projectId}/issues/by-key/${issue.key}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'Done' }),
+    })
+    expect(status).toBe(200)
+    expect(body.status).toBe('Done')
+    expect(body.doneAt).toBeTruthy()
+  })
+
+  it('DELETE by key removes the issue', async () => {
+    const { body: issue } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Delete me', type: 'task' }),
+    })
+    const { status } = await api(`/api/projects/${projectId}/issues/by-key/${issue.key}`, {
+      method: 'DELETE',
+    })
+    expect(status).toBe(200)
+
+    const { body: issues } = await api(`/api/projects/${projectId}/issues`)
+    expect(issues.find((i) => i.id === issue.id)).toBeUndefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Sprints
 // ---------------------------------------------------------------------------
 

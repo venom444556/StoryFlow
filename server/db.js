@@ -369,6 +369,27 @@ export function updateIssue(projectId, issueId, updates) {
   return issue
 }
 
+export function getIssueByKey(projectId, key) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const issue = (project.board?.issues || []).find(
+    (i) => i.key && i.key.toLowerCase() === key.toLowerCase()
+  )
+  return issue || null
+}
+
+export function updateIssueByKey(projectId, key, updates) {
+  const issue = getIssueByKey(projectId, key)
+  if (!issue) return null
+  return updateIssue(projectId, issue.id, updates)
+}
+
+export function deleteIssueByKey(projectId, key) {
+  const issue = getIssueByKey(projectId, key)
+  if (!issue) return false
+  return deleteIssue(projectId, issue.id)
+}
+
 export function deleteIssue(projectId, issueId) {
   const project = getProject(projectId)
   if (!project || !project.board?.issues) return false

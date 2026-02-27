@@ -274,6 +274,34 @@ app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
   })
 })
 
+// --- Issues by key (e.g. SCA-43) ---
+app.get('/api/projects/:id/issues/by-key/:key', (req, res) => {
+  const issue = db.getIssueByKey(req.params.id, req.params.key)
+  if (!issue) return res.status(404).json({ error: 'Issue not found' })
+  res.json(issue)
+})
+
+app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
+  const err = validateIssueBody(req.body, true)
+  if (err) return res.status(400).json({ error: err })
+  withProjectLock(req.params.id, () => {
+    const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
+    if (!issue) return res.status(404).json({ error: 'Issue not found' })
+    if (issue.error) return res.status(400).json({ error: issue.error })
+    notifyClients()
+    res.json(issue)
+  })
+})
+
+app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const ok = db.deleteIssueByKey(req.params.id, req.params.key)
+    if (!ok) return res.status(404).json({ error: 'Issue not found' })
+    notifyClients()
+    res.json({ success: true })
+  })
+})
+
 // --- Sprints ---
 app.get('/api/projects/:id/sprints', (req, res) => {
   const sprints = db.listSprints(req.params.id)
