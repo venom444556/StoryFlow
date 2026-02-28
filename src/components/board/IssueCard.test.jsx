@@ -10,6 +10,11 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }))
 
+// Mock SettingsContext — IssueCard uses useSettings for staleness threshold
+vi.mock('../../contexts/SettingsContext', () => ({
+  useSettings: () => ({ settings: { staleThresholdMinutes: 120 } }),
+}))
+
 describe('IssueCard', () => {
   const mockIssue = {
     id: 'issue-1',
