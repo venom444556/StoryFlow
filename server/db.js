@@ -521,6 +521,18 @@ export function getBoardSummary(projectId) {
     }
   }
 
+  // Detect stale "In Progress" issues (>2 hours since last update)
+  const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000
+  const now = Date.now()
+  const staleIssues = issues
+    .filter(
+      (i) =>
+        i.status === 'In Progress' &&
+        i.updatedAt &&
+        now - new Date(i.updatedAt).getTime() > STALE_THRESHOLD_MS
+    )
+    .map((i) => ({ id: i.id, key: i.key, title: i.title, updatedAt: i.updatedAt }))
+
   return {
     projectName: project.name,
     projectStatus: project.status,
@@ -531,6 +543,8 @@ export function getBoardSummary(projectId) {
     donePoints,
     sprintCount: sprints.length,
     activeSprint: sprints.find((s) => s.status === 'active') || null,
+    staleIssues,
+    staleCount: staleIssues.length,
   }
 }
 

@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
-import { Tag } from 'lucide-react'
+import { Clock, Tag } from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
+import { getStaleInfo } from '../../utils/staleness'
+import { useSettings } from '../../contexts/SettingsContext'
 
 const PRIORITY_BADGE_VARIANT = {
   critical: 'red',
@@ -12,7 +14,9 @@ const PRIORITY_BADGE_VARIANT = {
 }
 
 export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDragging = false }) {
+  const { settings } = useSettings()
   const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
+  const { isStale, agoText } = getStaleInfo(issue, settings.staleThresholdMinutes * 60 * 1000)
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', issue.id)
@@ -44,7 +48,10 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         isDragging
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
-      ].join(' ')}
+        isStale && 'border-l-2 border-l-amber-400/60',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={
         isDragging
           ? {
@@ -64,6 +71,14 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
       <p className="mb-2.5 line-clamp-2 text-sm font-medium leading-snug text-[var(--color-fg-default)] group-hover:text-[var(--color-fg-default)]">
         {issue.title}
       </p>
+
+      {/* Staleness indicator */}
+      {isStale && (
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] text-amber-400/80">
+          <Clock size={12} />
+          <span>Updated {agoText} ago</span>
+        </div>
+      )}
 
       {/* Bottom row: priority, points, assignee, labels */}
       <div className="flex items-center gap-2">

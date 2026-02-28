@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
   defaultProjectStatus: 'planning',
   compactCards: false,
   showBreadcrumbs: true,
+  staleThresholdMinutes: 120,
 }
 
 function loadSettings() {

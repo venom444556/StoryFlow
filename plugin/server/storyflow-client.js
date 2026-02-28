@@ -248,6 +248,28 @@ export function deleteSprint(projectId, sprintId) {
   )
 }
 
+// --- Nudge (reset staleness) ---
+
+export function nudgeIssue(projectId, issueId, data = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}/nudge`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  )
+}
+
+export function nudgeIssueByKey(projectId, key, data = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}/nudge`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  )
+}
+
 // --- Health check ---
 
 export async function checkConnection() {

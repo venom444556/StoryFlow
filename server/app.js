@@ -302,6 +302,35 @@ app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
   })
 })
 
+// --- Nudge (reset staleness) ---
+app.post('/api/projects/:id/issues/:issueId/nudge', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const updates = {}
+    if (req.body.message) {
+      updates.lastNudgeMessage = req.body.message
+      updates.lastNudgeAuthor = req.body.author || 'system'
+    }
+    const issue = db.updateIssue(req.params.id, req.params.issueId, updates)
+    if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+    notifyClients()
+    res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
+  })
+})
+
+app.post('/api/projects/:id/issues/by-key/:key/nudge', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const updates = {}
+    if (req.body.message) {
+      updates.lastNudgeMessage = req.body.message
+      updates.lastNudgeAuthor = req.body.author || 'system'
+    }
+    const issue = db.updateIssueByKey(req.params.id, req.params.key, updates)
+    if (!issue) return res.status(404).json({ error: 'Issue not found' })
+    notifyClients()
+    res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
+  })
+})
+
 // --- Sprints ---
 app.get('/api/projects/:id/sprints', (req, res) => {
   const sprints = db.listSprints(req.params.id)

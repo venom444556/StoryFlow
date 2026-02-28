@@ -381,6 +381,49 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Nudge Issue (reset staleness)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_nudge_issue',
+  {
+    description:
+      'Nudge a stale issue to reset its updatedAt timestamp, clearing the staleness indicator. Use after milestones (test pass, deploy, build) to signal progress. Accepts issue_id (UUID) or issue_key (e.g. "SCA-43").',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      issue_id: z.string().optional().describe('Issue ID (UUID) — provide this OR issue_key'),
+      issue_key: z
+        .string()
+        .optional()
+        .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
+      message: z.string().optional().describe('Optional nudge message (e.g. "Tests passed")'),
+      author: z.string().optional().describe('Who triggered the nudge (default: "system")'),
+    },
+  },
+  async ({ project_id, issue_id, issue_key, message, author }) => {
+    if (!issue_id && !issue_key) {
+      return {
+        content: [{ type: 'text', text: 'Error: provide either issue_id or issue_key' }],
+        isError: true,
+      }
+    }
+    const data = {}
+    if (message) data.message = message
+    if (author) data.author = author
+    const result = issue_key
+      ? await sf.nudgeIssueByKey(project_id, issue_key, data)
+      : await sf.nudgeIssue(project_id, issue_id, data)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: List Sprints
 // ---------------------------------------------------------------------------
 server.registerTool(
