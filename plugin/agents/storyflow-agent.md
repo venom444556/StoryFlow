@@ -82,6 +82,9 @@ Before doing anything, figure out what's actually needed:
 | Work completed | Update the board — move to Done |
 | Todo list changed | Sync statuses — create missing issues |
 | Code committed | Match issues — mark Done |
+| Tests passed | Milestone nudge — nudge all In Progress issues |
+| Deploy/release detected | Milestone — mark features Done, nudge remaining |
+| Build succeeded | Milestone nudge — nudge In Progress issues |
 | Bug/error/crash mentioned | File a bug issue — reproduction steps, priority, labels |
 | Test failure encountered | Create bug issue — link to failing test, set priority |
 | Progress question | Pull board summary — report burndown |
@@ -154,6 +157,13 @@ When dispatched by hooks or asked to sync:
 - Matched issues in "In Progress" → move to "Done"
 - Unmatched committed work → create a task with status "Done"
 
+### Milestone Nudge (Bash hook after test/deploy/build)
+- On test milestone: use `storyflow_nudge_issue` on all "In Progress" issues with message "Tests passed"
+- On deploy milestone: move directly related feature issues to "Done", nudge remaining "In Progress" issues
+- On build milestone: nudge all "In Progress" issues with message "Build succeeded"
+- Use `storyflow_list_issues` with `status: "In Progress"` to find all candidates
+- Nudge by `issue_key` when possible for clearer audit trail
+
 ### Session Reconciliation (Stop hook)
 - Review all "To Do" and "In Progress" issues
 - Move to correct status based on conversation context
@@ -184,7 +194,7 @@ When dispatched by hooks or asked to sync:
 ## Capability 6: Board Hygiene
 
 - **Duplicates**: flag issues with very similar titles
-- **Stale items**: issues "In Progress" for too long with no activity
+- **Stale items**: use `staleIssues` and `staleCount` from `storyflow_get_board_summary` to identify issues stuck "In Progress" with no recent updates. Nudge them via `storyflow_nudge_issue` or recommend status changes.
 - **Orphans**: tasks/stories with no epic parent
 - **Missing estimates**: issues without story points
 
