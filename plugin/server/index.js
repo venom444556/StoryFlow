@@ -126,6 +126,44 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Advance Phase
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_advance_phase',
+  {
+    description:
+      'Advance a project to the next phase in the lifecycle (planning → in-progress → completed), or set a specific target phase. Useful for post-commit hooks and milestone triggers.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID (slug-based, e.g. "my-app")'),
+      target_phase: z
+        .enum(['planning', 'in-progress', 'completed', 'on-hold'])
+        .optional()
+        .describe(
+          'Explicit target phase. If omitted, auto-advances to the next phase in order (planning → in-progress → completed).'
+        ),
+    },
+  },
+  async ({ project_id, target_phase }) => {
+    try {
+      const result = await sf.advancePhase(project_id, target_phase)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: List Issues
 // ---------------------------------------------------------------------------
 server.registerTool(

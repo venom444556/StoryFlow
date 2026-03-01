@@ -41,9 +41,8 @@ let _isSyncing = false
 
 /** Push all projects to the server-side JSON store */
 function syncToServer(projects) {
-  // Don't sync during rehydration (prevents loops)
-  if (_isSyncing) return
-  clearTimeout(_syncTimer)
+  clearTimeout(_syncTimer) // Always cancel stale timer first (#20)
+  if (_isSyncing) return // Don't schedule new sync during rehydration
   _syncTimer = setTimeout(async () => {
     try {
       await fetch('/api/sync', {

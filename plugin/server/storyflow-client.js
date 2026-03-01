@@ -124,6 +124,48 @@ export function updateProject(id, data) {
   })
 }
 
+// --- Phase advancement ---
+
+const PHASE_ORDER = ['planning', 'in-progress', 'completed']
+
+export async function advancePhase(projectId, targetPhase) {
+  const project = await getProject(projectId)
+  const currentPhase = project.status || 'planning'
+
+  let nextPhase
+  if (targetPhase) {
+    // Explicit target — validate it
+    const validStatuses = ['planning', 'in-progress', 'completed', 'on-hold']
+    if (!validStatuses.includes(targetPhase)) {
+      throw new Error(
+        `Invalid target phase "${targetPhase}". Valid phases: ${validStatuses.join(', ')}`
+      )
+    }
+    nextPhase = targetPhase
+  } else {
+    // Auto-advance to next phase in order
+    const currentIndex = PHASE_ORDER.indexOf(currentPhase)
+    if (currentIndex === -1) {
+      throw new Error(
+        `Cannot auto-advance from "${currentPhase}". Set target_phase explicitly or move project to a standard phase first.`
+      )
+    }
+    if (currentIndex >= PHASE_ORDER.length - 1) {
+      throw new Error(
+        `Project is already in "${currentPhase}" — no next phase. Use target_phase to set a specific phase.`
+      )
+    }
+    nextPhase = PHASE_ORDER[currentIndex + 1]
+  }
+
+  if (nextPhase === currentPhase) {
+    return { project, changed: false, phase: currentPhase }
+  }
+
+  const updated = await updateProject(projectId, { status: nextPhase })
+  return { project: updated, changed: true, previousPhase: currentPhase, phase: nextPhase }
+}
+
 // --- Issues ---
 
 export function listIssues(projectId, filters = {}) {

@@ -350,6 +350,52 @@ describe('Board Summary API', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Phase advancement
+// ---------------------------------------------------------------------------
+
+describe('Phase advancement', () => {
+  it('advances project from planning to in-progress', async () => {
+    const project = await seedProject({ name: 'Phase Test', status: 'planning' })
+    const { status, body } = await api(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'in-progress' }),
+    })
+    expect(status).toBe(200)
+    expect(body.status).toBe('in-progress')
+  })
+
+  it('advances project from in-progress to completed', async () => {
+    const project = await seedProject({ name: 'Phase Test 2', status: 'in-progress' })
+    const { status, body } = await api(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'completed' }),
+    })
+    expect(status).toBe(200)
+    expect(body.status).toBe('completed')
+  })
+
+  it('allows setting project to on-hold', async () => {
+    const project = await seedProject({ name: 'Hold Test', status: 'in-progress' })
+    const { status, body } = await api(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'on-hold' }),
+    })
+    expect(status).toBe(200)
+    expect(body.status).toBe('on-hold')
+  })
+
+  it('rejects invalid status values', async () => {
+    const project = await seedProject({ name: 'Invalid Test' })
+    const { status, body } = await api(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'banana' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"status"/)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Sync
 // ---------------------------------------------------------------------------
 
