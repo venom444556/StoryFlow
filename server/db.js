@@ -299,6 +299,28 @@ function normalizeStatus(status) {
   return normalized || null // null = unknown status
 }
 
+/**
+ * Auto-advance project phase based on issue statuses.
+ * planning → in-progress: any issue is "In Progress"
+ * in-progress → completed: all issues are "Done" (with ≥1 issue)
+ * Never advances from on-hold or completed (manual overrides).
+ */
+function maybeAdvanceProjectPhase(project) {
+  const issues = project.board?.issues || []
+  if (issues.length === 0) return
+  const current = project.status || 'planning'
+
+  if (current === 'planning' && issues.some((i) => i.status === 'In Progress')) {
+    project.status = 'in-progress'
+    return
+  }
+
+  if (current === 'in-progress' && issues.every((i) => i.status === 'Done')) {
+    project.status = 'completed'
+    return
+  }
+}
+
 export function addIssue(projectId, issue) {
   const project = getProject(projectId)
   if (!project) return null
@@ -337,6 +359,7 @@ export function addIssue(projectId, issue) {
   project.board.issues.push(newIssue)
   project.board.nextIssueNumber = nextNumber + 1
   project.updatedAt = now
+  maybeAdvanceProjectPhase(project)
   upsertProject(projectId, project)
   return newIssue
 }
@@ -365,6 +388,7 @@ export function updateIssue(projectId, issueId, updates) {
 
   Object.assign(issue, updates, { updatedAt: now })
   project.updatedAt = now
+  maybeAdvanceProjectPhase(project)
   upsertProject(projectId, project)
   return issue
 }

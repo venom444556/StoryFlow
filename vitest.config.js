@@ -21,6 +21,7 @@ export default defineConfig({
           globals: true,
           environment: 'node',
           include: ['server/**/*.{test,spec}.{js,ts}'],
+          env: { STORYFLOW_RATE_LIMIT_MAX: '500' },
         },
       },
     ],

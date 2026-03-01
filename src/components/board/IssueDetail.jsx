@@ -168,6 +168,21 @@ export default function IssueDetail({
 
   return createPortal(
     <>
+      {/* Backdrop — must render before panel so it layers underneath */}
+      <AnimatePresence>
+        {issue && (
+          <motion.div
+            key="issue-detail-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40"
+            style={{ zIndex: 'var(--z-drawer)' }}
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         <motion.div
           key="issue-detail-panel"
@@ -175,7 +190,7 @@ export default function IssueDetail({
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          className="fixed right-0 top-0 flex h-full w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
+          className="fixed right-0 top-0 flex h-full w-[480px] max-w-full flex-col border-l border-[var(--color-border-default)]"
           style={{ backgroundColor: 'var(--th-panel-solid)', zIndex: 'var(--z-drawer)' }}
         >
           {/* Header */}
@@ -557,21 +572,6 @@ export default function IssueDetail({
             </button>
           </div>
         </motion.div>
-      </AnimatePresence>
-
-      {/* Backdrop */}
-      <AnimatePresence>
-        {issue && (
-          <motion.div
-            key="issue-detail-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-            style={{ zIndex: 'var(--z-drawer)' }}
-            onClick={onClose}
-          />
-        )}
       </AnimatePresence>
 
       {/* Confirm delete */}

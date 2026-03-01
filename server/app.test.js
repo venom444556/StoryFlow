@@ -396,6 +396,96 @@ describe('Phase advancement', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Auto phase advancement (#22)
+// ---------------------------------------------------------------------------
+
+describe('Auto phase advancement (#22)', () => {
+  it('advances from planning to in-progress when issue moves to In Progress', async () => {
+    const project = await seedProject({ name: 'Auto Phase 1' })
+    // Create an issue (defaults to To Do)
+    const { body: issue } = await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Task A', type: 'task' }),
+    })
+    // Verify still planning (new projects may omit status in JSON, defaulting to 'planning')
+    const { body: before } = await api(`/api/projects/${project.id}`)
+    expect(before.status || 'planning').toBe('planning')
+
+    // Move issue to In Progress
+    await api(`/api/projects/${project.id}/issues/${issue.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'In Progress' }),
+    })
+    const { body: after } = await api(`/api/projects/${project.id}`)
+    expect(after.status).toBe('in-progress')
+  })
+
+  it('advances from in-progress to completed when all issues are Done', async () => {
+    const project = await seedProject({ name: 'Auto Phase 2' })
+    // Create two issues
+    const { body: i1 } = await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Task 1', type: 'task', status: 'In Progress' }),
+    })
+    const { body: i2 } = await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Task 2', type: 'task', status: 'In Progress' }),
+    })
+    // Project should now be in-progress
+    const { body: mid } = await api(`/api/projects/${project.id}`)
+    expect(mid.status).toBe('in-progress')
+
+    // Mark first issue Done — not all done yet
+    await api(`/api/projects/${project.id}/issues/${i1.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'Done' }),
+    })
+    const { body: partial } = await api(`/api/projects/${project.id}`)
+    expect(partial.status).toBe('in-progress')
+
+    // Mark second issue Done — now all done
+    await api(`/api/projects/${project.id}/issues/${i2.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'Done' }),
+    })
+    const { body: done } = await api(`/api/projects/${project.id}`)
+    expect(done.status).toBe('completed')
+  })
+
+  it('does NOT auto-advance from on-hold', async () => {
+    const project = await seedProject({ name: 'On Hold Test' })
+    // Manually set to on-hold
+    await api(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'on-hold' }),
+    })
+    // Create an In Progress issue — should NOT advance
+    await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Blocked task', type: 'task', status: 'In Progress' }),
+    })
+    const { body: after } = await api(`/api/projects/${project.id}`)
+    expect(after.status).toBe('on-hold')
+  })
+
+  it('creating an issue as In Progress triggers advancement', async () => {
+    const project = await seedProject({ name: 'Create In Progress' })
+
+    // Verify starts as planning via GET (POST response may omit default status)
+    const { body: before } = await api(`/api/projects/${project.id}`)
+    expect(before.status || 'planning').toBe('planning')
+
+    // Create issue directly as In Progress
+    await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'Hot task', type: 'task', status: 'In Progress' }),
+    })
+    const { body: after } = await api(`/api/projects/${project.id}`)
+    expect(after.status).toBe('in-progress')
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Sync
 // ---------------------------------------------------------------------------
 
