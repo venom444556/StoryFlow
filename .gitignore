@@ -45,6 +45,10 @@ workflow-execution-engine.jsx
 # Serena / local tooling
 .serena/
 
+# MCP plugin state
+.chaos/
+.playwright-mcp/
+
 # Internal planning docs
 docs/plans/
 
