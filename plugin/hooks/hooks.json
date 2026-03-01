@@ -3,22 +3,22 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "ExitPlanMode",
+        "matcher": "TaskUpdate",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Plan approved. Use the storyflow-agent to create issues from the plan and set them to In Progress. Pass it the plan details.",
-            "timeout": 30
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -q '\"completed\"'; then echo 'Task completed. Invoke the storyflow-agent to move the corresponding issue to Done on the StoryFlow board. Pass it the task subject and completion details.'; elif echo \"$input\" | grep -q '\"in_progress\"'; then echo 'Task started. Invoke the storyflow-agent to ensure this task has a corresponding issue on the StoryFlow board and set it to In Progress.'; fi",
+            "timeout": 5
           }
         ]
       },
       {
-        "matcher": "TodoWrite",
+        "matcher": "ExitPlanMode",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Todos updated. Use the storyflow-agent to sync the todo list to the StoryFlow board. Pass it the current todos with their statuses.",
-            "timeout": 30
+            "type": "command",
+            "command": "echo 'Plan approved. Invoke the storyflow-agent to create issues from the plan on the StoryFlow board and set them to In Progress. Pass it the plan details.'",
+            "timeout": 5
           }
         ]
       },
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); cmd=$(echo \"$input\" | grep -o '\"command\":\"[^\"]*\"' | head -1 | sed 's/\"command\":\"//;s/\"$//'); out=$(echo \"$input\" | grep -o '\"stdout\":\"[^\"]*\"' | head -1 | sed 's/\"stdout\":\"//;s/\"$//'); if echo \"$cmd\" | grep -qE 'git commit'; then echo '{\"systemMessage\": \"Commit detected. Use the storyflow-agent to update the StoryFlow board — pass it the commit message so it can mark completed issues Done.\"}'; elif echo \"$out\" | grep -qiE 'passed|tests passed|all tests'; then echo '{\"systemMessage\": \"Test milestone detected. Use the storyflow-agent to nudge all related In Progress issues via storyflow_nudge_issue with message: Tests passed.\"}'; elif echo \"$out\" | grep -qiE 'deployed|build complete|published to|released'; then echo '{\"systemMessage\": \"Deploy milestone detected. Use the storyflow-agent to mark related feature issues Done and nudge remaining In Progress issues.\"}'; elif echo \"$cmd\" | grep -qE 'npm run build|yarn build|pnpm build|make build|cargo build|go build'; then if ! echo \"$out\" | grep -qiE 'error|failed|ERR!'; then echo '{\"systemMessage\": \"Build milestone detected (no errors). Use the storyflow-agent to nudge all In Progress issues via storyflow_nudge_issue with message: Build succeeded.\"}'; fi; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board — pass it the commit message so it can mark completed issues as Done.'; fi",
             "timeout": 5
           }
         ]
@@ -38,9 +38,9 @@
         "matcher": "*",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Session ending. Use the storyflow-agent to reconcile the StoryFlow board before stopping. If StoryFlow is not configured or unreachable, skip silently and approve the stop.",
-            "timeout": 30
+            "type": "command",
+            "command": "echo 'Session ending. Invoke the storyflow-agent to reconcile the StoryFlow board before stopping. If StoryFlow is not configured or unreachable, skip silently.'",
+            "timeout": 5
           }
         ]
       }
