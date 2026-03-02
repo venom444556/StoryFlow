@@ -23,8 +23,8 @@ const EMPTY_FILTERS = {
   search: '',
 }
 
-// Generate sample burndown / velocity data from current issues
-function computeChartData(issues) {
+// Generate chart data from current issues and real sprints
+function computeChartData(issues, sprints) {
   // Burndown: simulate from total points for a default 10-day sprint
   const totalPoints = issues.reduce((sum, i) => sum + (i.storyPoints ?? 0), 0)
   const donePoints = issues
@@ -50,18 +50,15 @@ function computeChartData(issues) {
     })
   }
 
-  // Velocity: group completed issues by a simple mock sprint model
-  const doneIssues = issues.filter((i) => i.status === 'Done')
+  // Velocity: compute from real sprints by summing done issues per sprint
   const velocity = []
-  if (doneIssues.length > 0) {
-    // Create a couple mock sprints from done issues
-    const chunkSize = Math.max(1, Math.ceil(doneIssues.length / 3))
-    for (let s = 0; s < 3; s++) {
-      const chunk = doneIssues.slice(s * chunkSize, (s + 1) * chunkSize)
-      if (chunk.length > 0) {
+  if (sprints.length > 0) {
+    for (const sprint of sprints) {
+      const sprintIssues = issues.filter((i) => i.sprintId === sprint.id && i.status === 'Done')
+      if (sprintIssues.length > 0) {
         velocity.push({
-          name: `Sprint ${s + 1}`,
-          points: chunk.reduce((sum, i) => sum + (i.storyPoints ?? 1), 0),
+          name: sprint.name || 'Sprint',
+          points: sprintIssues.reduce((sum, i) => sum + (i.storyPoints ?? 1), 0),
         })
       }
     }
@@ -149,7 +146,10 @@ export default function BoardTab({
   }, [allIssues, filters, activeEpicId])
 
   // Chart data
-  const chartData = useMemo(() => computeChartData(allIssues), [allIssues])
+  const chartData = useMemo(
+    () => computeChartData(allIssues, board?.sprints ?? []),
+    [allIssues, board?.sprints]
+  )
 
   // Handlers
   const handleIssueClick = useCallback((issue) => {

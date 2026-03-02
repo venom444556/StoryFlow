@@ -486,6 +486,107 @@ describe('Auto phase advancement (#22)', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Issue & Sprint defaults (#25)
+// ---------------------------------------------------------------------------
+
+describe('Issue & Sprint defaults (#25)', () => {
+  let projectId
+
+  beforeEach(async () => {
+    const project = await seedProject({ name: 'Defaults Test' })
+    projectId = project.id
+  })
+
+  it('issue without status defaults to To Do', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'No status', type: 'task' }),
+    })
+    expect(status).toBe(201)
+    expect(body.status).toBe('To Do')
+  })
+
+  it('sprint without status defaults to planning', async () => {
+    const { status, body } = await api(`/api/projects/${projectId}/sprints`, {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Sprint A' }),
+    })
+    expect(status).toBe(201)
+    expect(body.status).toBe('planning')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Sprint update (#25)
+// ---------------------------------------------------------------------------
+
+describe('Sprint update (#25)', () => {
+  let projectId
+
+  beforeEach(async () => {
+    const project = await seedProject({ name: 'Sprint Update Test' })
+    projectId = project.id
+  })
+
+  it('PUT updates sprint fields', async () => {
+    const { body: sprint } = await api(`/api/projects/${projectId}/sprints`, {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Sprint 1', goal: 'Ship v1' }),
+    })
+    const { status, body } = await api(`/api/projects/${projectId}/sprints/${sprint.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name: 'Sprint 1 (renamed)', status: 'active' }),
+    })
+    expect(status).toBe(200)
+    expect(body.name).toBe('Sprint 1 (renamed)')
+    expect(body.status).toBe('active')
+    expect(body.updatedAt).toBeTruthy()
+  })
+
+  it('PUT to nonexistent sprint returns 404', async () => {
+    const { status } = await api(`/api/projects/${projectId}/sprints/nonexistent-id`, {
+      method: 'PUT',
+      body: JSON.stringify({ name: 'Nope' }),
+    })
+    expect(status).toBe(404)
+  })
+
+  it('PUT with invalid status returns 400', async () => {
+    const { body: sprint } = await api(`/api/projects/${projectId}/sprints`, {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Sprint X' }),
+    })
+    const { status, body } = await api(`/api/projects/${projectId}/sprints/${sprint.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'banana' }),
+    })
+    expect(status).toBe(400)
+    expect(body.error).toMatch(/"status"/)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Board summary with undefined status (#25)
+// ---------------------------------------------------------------------------
+
+describe('Board summary handles undefined status (#25)', () => {
+  it('byStatus never contains undefined key', async () => {
+    const project = await seedProject({ name: 'Undefined Status Test' })
+    // Directly insert an issue without status via the db layer to simulate legacy data
+    // We use the API which now defaults, but we verify the summary is clean
+    await api(`/api/projects/${project.id}/issues`, {
+      method: 'POST',
+      body: JSON.stringify({ title: 'No explicit status', type: 'task' }),
+    })
+
+    const { status, body } = await api(`/api/projects/${project.id}/board-summary`)
+    expect(status).toBe(200)
+    expect(body.byStatus).not.toHaveProperty('undefined')
+    expect(body.byStatus['To Do']).toBeGreaterThanOrEqual(1)
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Sync
 // ---------------------------------------------------------------------------
 
