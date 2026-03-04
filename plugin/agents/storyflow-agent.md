@@ -97,6 +97,7 @@ Before doing anything, figure out what's actually needed:
 | Sprint/timeline mention | Sprint management |
 | Markdown file written | Check if wiki sync needed |
 | PR created | Link issues, update statuses |
+| Session start / board stale | Sync from git — catch missed commits and PRs |
 
 The user may say "let's do the API next" — that means plan it, create issues, assign to a sprint.
 "We're done with auth" means close those issues and report progress.
@@ -132,7 +133,12 @@ After bootstrap succeeds, restore agent memory:
    - If directives exist, adjust plan accordingly
 4. **Check gates**: `storyflow_check_gates`
    - If pending/rejected gates exist, respect them before proceeding
-5. **Signal start**: `storyflow_update_ai_status` with `status: 'working'`
+5. **Sync from git**: `storyflow_sync_from_git` — catch commits and PRs that happened outside StoryFlow-aware sessions
+   - Review `matchedCommits` — issues with commits that may need status updates
+   - Review `unmatchedCommits` — work done that has no board issue yet
+   - Review `merges` — PRs merged that may close issues
+   - Act on `suggestions` — the tool generates reconciliation recommendations
+6. **Signal start**: `storyflow_update_ai_status` with `status: 'working'`
 
 On first run (no wiki pages exist yet), create the "Agent:" pages from what you learn during the session.
 
@@ -269,6 +275,21 @@ or a runtime error appears — automatically create a bug issue on the board.
 ### Dedup
 - Check existing issues for matching bugs before creating
 - If a similar bug already exists, update it with new context instead of creating a duplicate
+
+## Capability 8: Git Reconciliation
+
+When dispatched at session start or when the board seems stale:
+
+1. Call `storyflow_sync_from_git` with the project ID
+2. Review the report:
+   - **Matched commits with In Progress issues** → move to "Done" (or nudge if partially done)
+   - **Unmatched commits** → create task issues with status "Done" for tracking
+   - **Merged PRs** → close related issues, record completion events
+   - **Hot files** → understand what areas were worked on for context
+3. Use `storyflow_batch_update_issues` for efficient bulk status changes
+4. Record a `storyflow_record_event` with category 'system' summarizing the reconciliation
+
+This capability closes the loop when work happens outside StoryFlow-aware sessions — different machines, direct GitHub merges, CI/CD pipelines, or sessions where StoryFlow was offline.
 
 ## Self-Knowledge Protocol
 

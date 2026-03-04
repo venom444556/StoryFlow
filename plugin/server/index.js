@@ -7,8 +7,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import * as sf from './storyflow-client.js'
 import { buildProvenanceHeaders } from './storyflow-client.js'
+
+const execFileAsync = promisify(execFile)
 
 // Shared provenance params for all mutating tools
 const provenanceParams = {
@@ -854,6 +858,211 @@ server.registerTool(
           text: JSON.stringify(status, null, 2),
         },
       ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Sync from Git (inspect local repo history)
+// ---------------------------------------------------------------------------
+
+/** Run a git command safely and return stdout, or null on error */
+async function git(args, cwd) {
+  try {
+    const { stdout } = await execFileAsync('git', args, {
+      cwd,
+      timeout: 10_000,
+      maxBuffer: 1024 * 1024,
+    })
+    return stdout.trim()
+  } catch {
+    return null
+  }
+}
+
+server.registerTool(
+  'storyflow_sync_from_git',
+  {
+    description:
+      'Inspect the local git repository to find commits, branches, and PRs that StoryFlow may have missed. Use on session start to catch up on work done outside StoryFlow-aware sessions, or when the board seems out of date. Returns recent commits, current branch, and any merged PRs. Read-only — does not modify the repo.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID to reconcile against'),
+      since: z
+        .string()
+        .optional()
+        .describe(
+          'Only show commits after this ISO date or relative time (e.g. "2024-01-15", "3 days ago"). Defaults to 7 days ago.'
+        ),
+      branch: z.string().optional().describe('Branch to inspect (default: current branch)'),
+      cwd: z
+        .string()
+        .optional()
+        .describe('Working directory of the git repo (default: process.cwd())'),
+    },
+  },
+  async ({ project_id, since, branch, cwd: userCwd }) => {
+    try {
+      const repoDir = userCwd || process.cwd()
+
+      // Verify this is a git repo
+      const isRepo = await git(['rev-parse', '--is-inside-work-tree'], repoDir)
+      if (isRepo !== 'true') {
+        return {
+          content: [{ type: 'text', text: 'Error: Not inside a git repository' }],
+          isError: true,
+        }
+      }
+
+      const sinceDate = since || '7 days ago'
+      const targetBranch = branch || (await git(['branch', '--show-current'], repoDir)) || 'HEAD'
+
+      // 1. Recent commits with message, author, date, files changed
+      const logFormat = '%H||%s||%an||%aI'
+      const logOutput = await git(
+        [
+          'log',
+          targetBranch,
+          `--since=${sinceDate}`,
+          `--format=${logFormat}`,
+          '--no-merges',
+          '-50',
+        ],
+        repoDir
+      )
+      const commits = (logOutput || '')
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+          const [hash, message, author, date] = line.split('||')
+          return { hash: hash?.slice(0, 8), message, author, date }
+        })
+
+      // 2. Merge commits (PRs merged) in the same period
+      const mergeOutput = await git(
+        [
+          'log',
+          targetBranch,
+          `--since=${sinceDate}`,
+          '--format=%H||%s||%an||%aI',
+          '--merges',
+          '-20',
+        ],
+        repoDir
+      )
+      const merges = (mergeOutput || '')
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+          const [hash, message, author, date] = line.split('||')
+          return { hash: hash?.slice(0, 8), message, author, date }
+        })
+
+      // 3. Current branch and status
+      const currentBranch = await git(['branch', '--show-current'], repoDir)
+      const status = await git(['status', '--porcelain', '-uno'], repoDir)
+      const uncommittedChanges = (status || '').split('\n').filter(Boolean).length
+
+      // 4. Files changed in the period (for context on what was worked on)
+      const filesChanged = await git(
+        [
+          'log',
+          targetBranch,
+          `--since=${sinceDate}`,
+          '--format=',
+          '--name-only',
+          '--no-merges',
+          '-50',
+        ],
+        repoDir
+      )
+      const fileFrequency = new Map()
+      for (const f of (filesChanged || '').split('\n').filter(Boolean)) {
+        fileFrequency.set(f, (fileFrequency.get(f) || 0) + 1)
+      }
+      const hotFiles = [...fileFrequency.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 15)
+        .map(([file, count]) => ({ file, commits: count }))
+
+      // 5. Get existing issues for cross-reference suggestions
+      let boardIssues = []
+      try {
+        boardIssues = await sf.listIssues(project_id)
+      } catch {
+        // Board unavailable — continue with git data only
+      }
+
+      // 6. Match commits to issues by scanning commit messages for issue keys
+      const issueKeys = boardIssues
+        .filter((i) => i.key)
+        .map((i) => ({ key: i.key, id: i.id, title: i.title, status: i.status }))
+      const matchedCommits = []
+      const unmatchedCommits = []
+
+      for (const commit of commits) {
+        const matched = issueKeys.find(
+          (ik) =>
+            commit.message.toLowerCase().includes(ik.key.toLowerCase()) ||
+            commit.message.toLowerCase().includes(ik.title.toLowerCase().slice(0, 30))
+        )
+        if (matched) {
+          matchedCommits.push({ ...commit, issue: matched })
+        } else {
+          unmatchedCommits.push(commit)
+        }
+      }
+
+      const report = {
+        repo: repoDir,
+        branch: currentBranch,
+        period: sinceDate,
+        uncommittedChanges,
+        commits: {
+          total: commits.length,
+          matched: matchedCommits.length,
+          unmatched: unmatchedCommits.length,
+        },
+        matchedCommits,
+        unmatchedCommits: unmatchedCommits.slice(0, 20),
+        merges,
+        hotFiles,
+        suggestions: [],
+      }
+
+      // Generate reconciliation suggestions
+      for (const mc of matchedCommits) {
+        if (mc.issue.status === 'In Progress') {
+          report.suggestions.push(
+            `Issue ${mc.issue.key} "${mc.issue.title}" has commits but is still "In Progress" — consider moving to "Done"`
+          )
+        }
+      }
+      if (unmatchedCommits.length > 0) {
+        report.suggestions.push(
+          `${unmatchedCommits.length} commit(s) don't match any board issues — consider creating tasks for untracked work`
+        )
+      }
+      for (const merge of merges) {
+        if (merge.message.includes('Merge pull request')) {
+          report.suggestions.push(
+            `Merged PR detected: "${merge.message}" — check if related issues should be closed`
+          )
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(report, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
     }
   }
 )
