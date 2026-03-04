@@ -421,6 +421,53 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Batch Update Issues
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_batch_update_issues',
+  {
+    description:
+      'Update multiple issues in a single call. Efficient for sprint closes, bulk status changes, or reassignments. Max 50 updates per call.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      updates: z
+        .array(
+          z.object({
+            issue_id: z.string().optional().describe('Issue ID (UUID) — provide this OR issue_key'),
+            issue_key: z
+              .string()
+              .optional()
+              .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
+            title: z.string().optional(),
+            status: z.enum(['To Do', 'In Progress', 'Done']).optional(),
+            priority: z.enum(['critical', 'high', 'medium', 'low']).optional(),
+            description: z.string().optional(),
+            story_points: z.number().optional(),
+            epic_id: z.string().optional(),
+            sprint_id: z.string().optional(),
+            assignee: z.string().optional(),
+            labels: z.array(z.string()).optional(),
+          })
+        )
+        .describe('Array of issue updates (each must include issue_id or issue_key)'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, updates, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const result = await sf.batchUpdateIssues(project_id, updates, headers)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Board Summary
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -706,6 +753,56 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Update Sprint
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_sprint',
+  {
+    description:
+      'Update an existing sprint in a StoryFlow project. Use to change sprint status (planning → active → completed), rename, or adjust dates.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      sprint_id: z.string().describe('Sprint ID to update'),
+      name: z.string().optional().describe('New sprint name'),
+      goal: z.string().optional().describe('New sprint goal'),
+      start_date: z.string().optional().describe('New start date (ISO format or YYYY-MM-DD)'),
+      end_date: z.string().optional().describe('New end date (ISO format or YYYY-MM-DD)'),
+      status: z.enum(['planning', 'active', 'completed']).optional().describe('New sprint status'),
+      ...provenanceParams,
+    },
+  },
+  async ({
+    project_id,
+    sprint_id,
+    name,
+    goal,
+    start_date,
+    end_date,
+    status,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
+    const data = {}
+    if (name !== undefined) data.name = name
+    if (goal !== undefined) data.goal = goal
+    if (start_date !== undefined) data.startDate = start_date
+    if (end_date !== undefined) data.endDate = end_date
+    if (status !== undefined) data.status = status
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const sprint = await sf.updateSprint(project_id, sprint_id, data, headers)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(sprint, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Check Connection
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -724,6 +821,115 @@ server.registerTool(
           text: JSON.stringify(status, null, 2),
         },
       ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Run Board Hygiene
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_run_hygiene',
+  {
+    description:
+      'Analyze the project board for hygiene issues: stale "In Progress" items, orphan stories/tasks without an epic, duplicate titles, and missing estimates/priorities. Optionally auto-fix stale issues by nudging them.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      auto_fix: z
+        .boolean()
+        .optional()
+        .describe(
+          'If true, auto-nudge stale issues. Other fixes require human judgment and are report-only. Default: false.'
+        ),
+    },
+  },
+  async ({ project_id, auto_fix }) => {
+    try {
+      // 1. Get board summary for stale issues
+      const summary = await sf.getBoardSummary(project_id)
+      // 2. Get all issues for deeper analysis
+      const issues = await sf.listIssues(project_id)
+
+      const report = {
+        stale: summary.staleIssues || [],
+        orphans: [],
+        duplicates: [],
+        missingEstimates: [],
+        missingPriority: [],
+        autoFixed: { nudged: 0 },
+      }
+
+      // 3. Detect orphans — stories/tasks/bugs with no epicId (exclude epics)
+      for (const issue of issues) {
+        if (issue.type !== 'epic' && !issue.epicId) {
+          report.orphans.push({
+            id: issue.id,
+            key: issue.key,
+            title: issue.title,
+            type: issue.type,
+          })
+        }
+      }
+
+      // 4. Detect duplicates — group by lowercase title
+      const titleMap = new Map()
+      for (const issue of issues) {
+        const lower = (issue.title || '').toLowerCase().trim()
+        if (!lower) continue
+        if (!titleMap.has(lower)) titleMap.set(lower, [])
+        titleMap.get(lower).push({ id: issue.id, key: issue.key, title: issue.title })
+      }
+      for (const [, group] of titleMap) {
+        if (group.length > 1) report.duplicates.push(group)
+      }
+
+      // 5. Detect missing estimates and priorities (exclude epics)
+      for (const issue of issues) {
+        if (issue.type === 'epic') continue
+        if (!issue.storyPoints) {
+          report.missingEstimates.push({ id: issue.id, key: issue.key, title: issue.title })
+        }
+        if (!issue.priority) {
+          report.missingPriority.push({ id: issue.id, key: issue.key, title: issue.title })
+        }
+      }
+
+      // 6. Auto-fix: nudge stale issues
+      if (auto_fix && report.stale.length > 0) {
+        for (const stale of report.stale) {
+          try {
+            const identifier = stale.key || stale.id
+            if (stale.key) {
+              await sf.nudgeIssueByKey(project_id, stale.key, {
+                message: 'Hygiene: auto-nudged',
+                author: 'hygiene-bot',
+              })
+            } else {
+              await sf.nudgeIssue(project_id, stale.id, {
+                message: 'Hygiene: auto-nudged',
+                author: 'hygiene-bot',
+              })
+            }
+            report.autoFixed.nudged++
+          } catch {
+            // Continue on individual nudge failure
+          }
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(report, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
     }
   }
 )
@@ -972,6 +1178,62 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Escalate to Human
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_escalate',
+  {
+    description:
+      'Escalate a decision to the human when confidence is low (<0.5), conflicting directives exist, or a gate is pending for a prerequisite. Sets AI status to "blocked" and records an escalation event visible in the transparency dashboard.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      severity: z.enum(['low', 'medium', 'high', 'critical']).describe('Escalation severity'),
+      context: z.string().describe('What the agent is trying to do and why it needs help'),
+      options: z.array(z.string()).optional().describe('Choices for the human to pick from'),
+      reasoning: z.string().describe('Why this is being escalated instead of acted on'),
+    },
+  },
+  async ({ project_id, severity, context, options, reasoning }) => {
+    try {
+      // 1. Set AI status to blocked
+      await sf.updateAiStatus(project_id, 'blocked', context)
+
+      // 2. Record escalation event
+      await sf.recordEvent(project_id, {
+        actor: 'ai',
+        category: 'system',
+        action: 'info',
+        entity_type: 'escalation',
+        entity_title: context.slice(0, 120),
+        reasoning,
+        data: { severity, options: options || [] },
+      })
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              {
+                escalated: true,
+                message: 'Blocked — waiting for human input via the transparency dashboard',
+              },
+              null,
+              2
+            ),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Check Approval Gates
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -1016,6 +1278,107 @@ server.registerTool(
           {
             type: 'text',
             text: JSON.stringify({ summary, ...gates }, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Save Session Summary
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_save_session_summary',
+  {
+    description:
+      'Save a session summary capturing what the agent did, decisions made, learnings, and planned next steps. Call this at session end to maintain continuity across conversations.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      summary: z.string().describe('Brief summary of the session'),
+      work_done: z.string().optional().describe('Narrative of what was accomplished'),
+      issues_created: z.number().optional().describe('Number of issues created'),
+      issues_updated: z.number().optional().describe('Number of issues updated'),
+      key_decisions: z.string().optional().describe('Decisions made and why'),
+      learnings: z.string().optional().describe('New knowledge gained about the codebase/project'),
+      wiki_pages_updated: z.string().optional().describe('Which Agent: wiki pages were updated'),
+      next_steps: z.string().optional().describe('What should happen in the next session'),
+    },
+  },
+  async ({
+    project_id,
+    summary,
+    work_done,
+    issues_created,
+    issues_updated,
+    key_decisions,
+    learnings,
+    wiki_pages_updated,
+    next_steps,
+  }) => {
+    try {
+      const session = await sf.saveSessionSummary(project_id, {
+        summary,
+        work_done,
+        issues_created,
+        issues_updated,
+        key_decisions,
+        learnings,
+        wiki_pages_updated,
+        next_steps,
+      })
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(session, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Last Session
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_last_session',
+  {
+    description:
+      'Retrieve the most recent agent session for a project. Use on session start to recall what happened last time and what was planned next. Returns session summary, decisions, learnings, and next steps.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    try {
+      const session = await sf.getLastSession(project_id)
+      if (!session || session.message) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'No previous sessions found. This is likely a first session — read the project board and wiki to build initial context, then create Agent: wiki pages.',
+            },
+          ],
+        }
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(session, null, 2),
           },
         ],
       }

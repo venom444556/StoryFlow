@@ -377,6 +377,75 @@ app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
   })
 })
 
+// --- Batch issue update ---
+app.post('/api/projects/:id/issues/batch-update', (req, res) => {
+  const { updates } = req.body
+  if (!Array.isArray(updates) || updates.length === 0) {
+    return res.status(400).json({ error: '"updates" must be a non-empty array' })
+  }
+  if (updates.length > 50) {
+    return res.status(400).json({ error: 'Maximum 50 updates per batch' })
+  }
+  withProjectLock(req.params.id, () => {
+    const provenance = extractProvenance(req)
+    const results = { updated: [], errors: [] }
+
+    for (const entry of updates) {
+      const { issue_id, issue_key, ...fields } = entry
+      if (!issue_id && !issue_key) {
+        results.errors.push({ entry, error: 'Missing issue_id or issue_key' })
+        continue
+      }
+      // Map snake_case MCP fields to camelCase DB fields
+      const data = {}
+      if (fields.title !== undefined) data.title = fields.title
+      if (fields.status !== undefined) data.status = fields.status
+      if (fields.priority !== undefined) data.priority = fields.priority
+      if (fields.description !== undefined) data.description = fields.description
+      if (fields.story_points !== undefined) data.storyPoints = fields.story_points
+      if (fields.storyPoints !== undefined) data.storyPoints = fields.storyPoints
+      if (fields.epic_id !== undefined) data.epicId = fields.epic_id
+      if (fields.epicId !== undefined) data.epicId = fields.epicId
+      if (fields.sprint_id !== undefined) data.sprintId = fields.sprint_id
+      if (fields.sprintId !== undefined) data.sprintId = fields.sprintId
+      if (fields.assignee !== undefined) data.assignee = fields.assignee
+      if (fields.labels !== undefined) data.labels = fields.labels
+
+      const issue = issue_key
+        ? db.updateIssueByKey(req.params.id, issue_key, data)
+        : db.updateIssue(req.params.id, issue_id, data)
+
+      if (!issue) {
+        results.errors.push({
+          identifier: issue_key || issue_id,
+          error: 'Issue not found',
+        })
+      } else if (issue.error) {
+        results.errors.push({ identifier: issue_key || issue_id, error: issue.error })
+      } else {
+        results.updated.push({ id: issue.id, key: issue.key, title: issue.title })
+      }
+    }
+
+    // Emit one summary mutation event
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'update',
+      entityType: 'batch',
+      entityTitle: `Batch update: ${results.updated.length} issues`,
+      data: {
+        updatedCount: results.updated.length,
+        errorCount: results.errors.length,
+      },
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(results)
+  })
+})
+
 // --- Issues by key (e.g. SCA-43) ---
 app.get('/api/projects/:id/issues/by-key/:key', (req, res) => {
   const issue = db.getIssueByKey(req.params.id, req.params.key)
@@ -563,6 +632,39 @@ app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
   })
 })
 
+// --- Sprint update ---
+app.put('/api/projects/:id/sprints/:sprintId', (req, res) => {
+  if (req.body.status !== undefined && !VALID_SPRINT_STATUSES.includes(req.body.status)) {
+    return res
+      .status(400)
+      .json({ error: `"status" must be one of: ${VALID_SPRINT_STATUSES.join(', ')}` })
+  }
+  withProjectLock(req.params.id, () => {
+    const data = {}
+    if (req.body.name !== undefined) data.name = req.body.name
+    if (req.body.goal !== undefined) data.goal = req.body.goal
+    if (req.body.startDate !== undefined) data.startDate = req.body.startDate
+    if (req.body.endDate !== undefined) data.endDate = req.body.endDate
+    if (req.body.status !== undefined) data.status = req.body.status
+    const sprint = db.updateSprint(req.params.id, req.params.sprintId, data)
+    if (!sprint) return res.status(404).json({ error: 'Sprint or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: req.body.status ? 'status_change' : 'update',
+      entityType: 'sprint',
+      entityId: sprint.id,
+      entityTitle: sprint.name,
+      changes: Object.keys(data).map((k) => ({ field: k, to: data[k] })),
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(sprint)
+  })
+})
+
 // --- Sprint deletion ---
 app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
   withProjectLock(req.params.id, () => {
@@ -581,6 +683,35 @@ app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
     notifyClients()
     res.json({ success: true })
   })
+})
+
+// --- Agent Sessions ---
+app.post('/api/projects/:id/sessions', (req, res) => {
+  const session = db.saveSessionSummary(req.params.id, req.body)
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'system',
+    action: 'create',
+    entityType: 'session',
+    entityId: session.id,
+    entityTitle: (req.body.summary || 'Agent session').slice(0, 120),
+  })
+  broadcastEvent(event)
+  res.status(201).json(session)
+})
+
+app.get('/api/projects/:id/sessions/latest', (req, res) => {
+  const session = db.getLastSession(req.params.id)
+  if (!session) return res.json({ message: 'No previous sessions found' })
+  res.json(session)
+})
+
+app.get('/api/projects/:id/sessions', (req, res) => {
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10
+  const sessions = db.listSessions(req.params.id, limit)
+  res.json(sessions)
 })
 
 // --- Events API ---

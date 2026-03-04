@@ -219,6 +219,16 @@ export function deleteIssue(projectId, issueId, extraHeaders = {}) {
   )
 }
 
+// --- Batch issue update ---
+
+export function batchUpdateIssues(projectId, updates, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/issues/batch-update`, {
+    method: 'POST',
+    body: JSON.stringify({ updates }),
+    headers: extraHeaders,
+  })
+}
+
 // --- Issues by key ---
 
 export function getIssueByKey(projectId, key) {
@@ -303,6 +313,17 @@ export function deletePage(projectId, pageId, extraHeaders = {}) {
   )
 }
 
+export function updateSprint(projectId, sprintId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
 export function deleteSprint(projectId, sprintId, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
@@ -333,6 +354,19 @@ export function nudgeIssueByKey(projectId, key, data = {}) {
       body: JSON.stringify(data),
     }
   )
+}
+
+// --- Agent Sessions ---
+
+export function saveSessionSummary(projectId, data) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getLastSession(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions/latest`)
 }
 
 // --- Events ---
