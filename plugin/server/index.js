@@ -192,7 +192,10 @@ server.registerTool(
       'List issues in a StoryFlow project. Can filter by status, type, epicId, sprintId, or assignee.',
     inputSchema: {
       project_id: z.string().describe('Project ID'),
-      status: z.enum(['To Do', 'In Progress', 'Done']).optional().describe('Filter by status'),
+      status: z
+        .enum(['To Do', 'In Progress', 'Done', 'Blocked'])
+        .optional()
+        .describe('Filter by status'),
       type: z.enum(['epic', 'story', 'task', 'bug']).optional().describe('Filter by issue type'),
       epic_id: z.string().optional().describe('Filter by parent epic ID'),
       sprint_id: z.string().optional().describe('Filter by sprint ID'),
@@ -230,7 +233,7 @@ server.registerTool(
       title: z.string().describe('Issue title'),
       type: z.enum(['epic', 'story', 'task', 'bug']).describe('Issue type'),
       status: z
-        .enum(['To Do', 'In Progress', 'Done'])
+        .enum(['To Do', 'In Progress', 'Done', 'Blocked'])
         .optional()
         .describe('Initial status (default: To Do)'),
       priority: z.enum(['critical', 'high', 'medium', 'low']).optional().describe('Priority level'),
@@ -297,7 +300,7 @@ server.registerTool(
         .optional()
         .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
       title: z.string().optional().describe('New title'),
-      status: z.enum(['To Do', 'In Progress', 'Done']).optional().describe('New status'),
+      status: z.enum(['To Do', 'In Progress', 'Done', 'Blocked']).optional().describe('New status'),
       priority: z.enum(['critical', 'high', 'medium', 'low']).optional().describe('New priority'),
       description: z.string().optional().describe('New description'),
       story_points: z.number().optional().describe('New story points'),
@@ -443,7 +446,7 @@ server.registerTool(
               .optional()
               .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
             title: z.string().optional(),
-            status: z.enum(['To Do', 'In Progress', 'Done']).optional(),
+            status: z.enum(['To Do', 'In Progress', 'Done', 'Blocked']).optional(),
             priority: z.enum(['critical', 'high', 'medium', 'low']).optional(),
             description: z.string().optional(),
             story_points: z.number().optional(),
@@ -528,6 +531,52 @@ server.registerTool(
     const result = issue_key
       ? await sf.nudgeIssueByKey(project_id, issue_key, data)
       : await sf.nudgeIssue(project_id, issue_id, data)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result, null, 2),
+        },
+      ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Add Comment to Issue
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_add_comment',
+  {
+    description:
+      'Add a comment to an issue — the agent\'s way to leave notes, questions, status updates, or context on any issue. Like a PM writing a comment in Jira. Accepts issue_id (UUID) or issue_key (e.g. "SCA-43").',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      issue_id: z.string().optional().describe('Issue ID (UUID) — provide this OR issue_key'),
+      issue_key: z
+        .string()
+        .optional()
+        .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
+      body: z.string().describe('The comment text (supports markdown)'),
+      author: z
+        .string()
+        .optional()
+        .describe('Who is commenting (default: "agent"). Use "agent", "system", or a human name.'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, issue_id, issue_key, body, author, ...prov }) => {
+    if (!issue_id && !issue_key) {
+      return {
+        content: [{ type: 'text', text: 'Error: provide either issue_id or issue_key' }],
+        isError: true,
+      }
+    }
+    const headers = sf.buildProvenanceHeaders(prov)
+    const data = { body, author }
+    const result = issue_key
+      ? await sf.addCommentByKey(project_id, issue_key, data, headers)
+      : await sf.addComment(project_id, issue_id, data, headers)
     return {
       content: [
         {
@@ -1057,6 +1106,215 @@ server.registerTool(
             text: JSON.stringify(report, null, 2),
           },
         ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Sprint Metrics (velocity, cycle time, burndown, scope creep)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_sprint_metrics',
+  {
+    description:
+      'Compute sprint and project metrics: velocity per sprint, average velocity, cycle time, lead time, throughput, scope creep, and sprint completion rates. Essential for sprint planning, retros, and progress tracking. All data is computed from existing issue timestamps and sprint data.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      sprint_id: z
+        .string()
+        .optional()
+        .describe(
+          'Specific sprint to analyze. If omitted, analyzes all sprints + overall project metrics.'
+        ),
+    },
+  },
+  async ({ project_id, sprint_id }) => {
+    try {
+      const issues = await sf.listIssues(project_id)
+      const sprints = await sf.listSprints(project_id)
+
+      const metrics = {
+        project: { totalIssues: issues.length, totalPoints: 0, donePoints: 0, blockedCount: 0 },
+        velocity: { perSprint: [], average: 0, trend: 'stable' },
+        cycleTime: { average: null, median: null, samples: 0 },
+        leadTime: { average: null, median: null, samples: 0 },
+        throughput: { issuesPerDay: 0, pointsPerDay: 0 },
+        sprintAnalysis: [],
+        scopeCreep: [],
+      }
+
+      // --- Project-level metrics ---
+      const cycleTimes = []
+      const leadTimes = []
+      let earliestDone = null
+      let latestDone = null
+
+      for (const issue of issues) {
+        if (issue.storyPoints) metrics.project.totalPoints += issue.storyPoints
+        if (issue.status === 'Done' && issue.storyPoints)
+          metrics.project.donePoints += issue.storyPoints
+        if (issue.status === 'Blocked') metrics.project.blockedCount++
+
+        // Cycle time: In Progress → Done
+        if (issue.inProgressAt && issue.doneAt) {
+          const ct = (new Date(issue.doneAt) - new Date(issue.inProgressAt)) / (1000 * 60 * 60)
+          cycleTimes.push(ct)
+        }
+        // Lead time: To Do → Done
+        if (issue.todoAt && issue.doneAt) {
+          const lt = (new Date(issue.doneAt) - new Date(issue.todoAt)) / (1000 * 60 * 60)
+          leadTimes.push(lt)
+        }
+        // Throughput date range
+        if (issue.doneAt) {
+          const d = new Date(issue.doneAt)
+          if (!earliestDone || d < earliestDone) earliestDone = d
+          if (!latestDone || d > latestDone) latestDone = d
+        }
+      }
+
+      // Cycle time stats
+      if (cycleTimes.length > 0) {
+        cycleTimes.sort((a, b) => a - b)
+        metrics.cycleTime.average = +(
+          cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length
+        ).toFixed(1)
+        metrics.cycleTime.median = +cycleTimes[Math.floor(cycleTimes.length / 2)].toFixed(1)
+        metrics.cycleTime.samples = cycleTimes.length
+        metrics.cycleTime.unit = 'hours'
+      }
+
+      // Lead time stats
+      if (leadTimes.length > 0) {
+        leadTimes.sort((a, b) => a - b)
+        metrics.leadTime.average = +(
+          leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length
+        ).toFixed(1)
+        metrics.leadTime.median = +leadTimes[Math.floor(leadTimes.length / 2)].toFixed(1)
+        metrics.leadTime.samples = leadTimes.length
+        metrics.leadTime.unit = 'hours'
+      }
+
+      // Throughput
+      if (earliestDone && latestDone && latestDone > earliestDone) {
+        const daySpan = (latestDone - earliestDone) / (1000 * 60 * 60 * 24) || 1
+        const doneIssues = issues.filter((i) => i.status === 'Done')
+        metrics.throughput.issuesPerDay = +(doneIssues.length / daySpan).toFixed(2)
+        metrics.throughput.pointsPerDay = +(metrics.project.donePoints / daySpan).toFixed(2)
+      }
+
+      // --- Per-sprint analysis ---
+      for (const sprint of sprints) {
+        const sprintIssues = issues.filter((i) => i.sprintId === sprint.id)
+        const doneInSprint = sprintIssues.filter((i) => i.status === 'Done')
+        const points = doneInSprint.reduce((sum, i) => sum + (i.storyPoints || 0), 0)
+        const totalSprintPoints = sprintIssues.reduce((sum, i) => sum + (i.storyPoints || 0), 0)
+
+        const analysis = {
+          sprintId: sprint.id,
+          name: sprint.name,
+          status: sprint.status,
+          goal: sprint.goal || null,
+          issueCount: sprintIssues.length,
+          doneCount: doneInSprint.length,
+          blockedCount: sprintIssues.filter((i) => i.status === 'Blocked').length,
+          completionRate:
+            sprintIssues.length > 0
+              ? +((doneInSprint.length / sprintIssues.length) * 100).toFixed(1)
+              : 0,
+          pointsCompleted: points,
+          pointsTotal: totalSprintPoints,
+          pointsRemaining: totalSprintPoints - points,
+        }
+
+        // Scope creep: issues created after sprint started
+        if (sprint.startDate) {
+          const sprintStart = new Date(sprint.startDate)
+          const addedAfterStart = sprintIssues.filter(
+            (i) => i.createdAt && new Date(i.createdAt) > sprintStart
+          )
+          analysis.scopeCreep = {
+            issuesAdded: addedAfterStart.length,
+            pointsAdded: addedAfterStart.reduce((sum, i) => sum + (i.storyPoints || 0), 0),
+            items: addedAfterStart.map((i) => ({
+              key: i.key,
+              title: i.title,
+              points: i.storyPoints || 0,
+            })),
+          }
+          if (addedAfterStart.length > 0) {
+            metrics.scopeCreep.push({
+              sprint: sprint.name,
+              issuesAdded: addedAfterStart.length,
+              pointsAdded: analysis.scopeCreep.pointsAdded,
+            })
+          }
+        }
+
+        // Days remaining (if active sprint with endDate)
+        if (sprint.status === 'active' && sprint.endDate) {
+          const remaining = (new Date(sprint.endDate) - new Date()) / (1000 * 60 * 60 * 24)
+          analysis.daysRemaining = +Math.max(0, remaining).toFixed(1)
+          if (analysis.daysRemaining > 0 && analysis.pointsRemaining > 0) {
+            analysis.requiredVelocity = +(
+              analysis.pointsRemaining / analysis.daysRemaining
+            ).toFixed(2)
+          }
+        }
+
+        metrics.sprintAnalysis.push(analysis)
+
+        // Velocity tracking (completed sprints only)
+        if (sprint.status === 'completed') {
+          metrics.velocity.perSprint.push({ sprint: sprint.name, points })
+        }
+      }
+
+      // If requested specific sprint, filter
+      if (sprint_id) {
+        const target = metrics.sprintAnalysis.find((s) => s.sprintId === sprint_id)
+        if (!target) {
+          return {
+            content: [{ type: 'text', text: `Sprint ${sprint_id} not found` }],
+            isError: true,
+          }
+        }
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                { sprint: target, cycleTime: metrics.cycleTime, leadTime: metrics.leadTime },
+                null,
+                2
+              ),
+            },
+          ],
+        }
+      }
+
+      // Velocity average and trend
+      const velocities = metrics.velocity.perSprint.map((v) => v.points)
+      if (velocities.length > 0) {
+        metrics.velocity.average = +(
+          velocities.reduce((a, b) => a + b, 0) / velocities.length
+        ).toFixed(1)
+        if (velocities.length >= 3) {
+          const recent = velocities.slice(-2).reduce((a, b) => a + b, 0) / 2
+          const older = velocities.slice(0, -2).reduce((a, b) => a + b, 0) / (velocities.length - 2)
+          metrics.velocity.trend =
+            recent > older * 1.1 ? 'improving' : recent < older * 0.9 ? 'declining' : 'stable'
+        }
+      }
+
+      return {
+        content: [{ type: 'text', text: JSON.stringify(metrics, null, 2) }],
       }
     } catch (err) {
       return {

@@ -319,12 +319,15 @@ const STATUS_ALIASES = {
   done: 'Done',
   completed: 'Done',
   closed: 'Done',
+  blocked: 'Blocked',
+  'on hold': 'Blocked',
+  'on-hold': 'Blocked',
 }
 
 function normalizeStatus(status) {
   if (!status) return 'To Do'
   // Already canonical
-  if (['To Do', 'In Progress', 'Done'].includes(status)) return status
+  if (['To Do', 'In Progress', 'Done', 'Blocked'].includes(status)) return status
   // Try case-insensitive alias lookup
   const normalized = STATUS_ALIASES[status.toLowerCase().trim()]
   return normalized || null // null = unknown status
@@ -443,6 +446,33 @@ export function deleteIssueByKey(projectId, key) {
   const issue = getIssueByKey(projectId, key)
   if (!issue) return false
   return deleteIssue(projectId, issue.id)
+}
+
+export function addComment(projectId, issueId, comment) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const issue = project.board?.issues?.find((i) => i.id === issueId)
+  if (!issue) return null
+
+  if (!issue.comments) issue.comments = []
+  const now = new Date().toISOString()
+  const newComment = {
+    id: crypto.randomUUID(),
+    author: comment.author || 'agent',
+    body: comment.body,
+    createdAt: now,
+  }
+  issue.comments.push(newComment)
+  issue.updatedAt = now
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newComment
+}
+
+export function addCommentByKey(projectId, key, comment) {
+  const issue = getIssueByKey(projectId, key)
+  if (!issue) return null
+  return addComment(projectId, issue.id, comment)
 }
 
 export function deleteIssue(projectId, issueId) {
@@ -585,7 +615,7 @@ export function getBoardSummary(projectId) {
   const issues = project.board?.issues || []
   const sprints = project.board?.sprints || []
 
-  const byStatus = { 'To Do': 0, 'In Progress': 0, Done: 0 }
+  const byStatus = { 'To Do': 0, 'In Progress': 0, Done: 0, Blocked: 0 }
   const byType = {}
   let totalPoints = 0
   let donePoints = 0

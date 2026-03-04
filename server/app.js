@@ -498,6 +498,53 @@ app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
   })
 })
 
+// --- Comments ---
+app.post('/api/projects/:id/issues/:issueId/comments', (req, res) => {
+  if (!req.body.body || typeof req.body.body !== 'string') {
+    return res.status(400).json({ error: '"body" is required and must be a non-empty string' })
+  }
+  withProjectLock(req.params.id, () => {
+    const comment = db.addComment(req.params.id, req.params.issueId, req.body)
+    if (!comment) return res.status(404).json({ error: 'Issue or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'comment',
+      entityType: 'issue',
+      entityId: req.params.issueId,
+      entityTitle: req.body.body.slice(0, 120),
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(comment)
+  })
+})
+
+app.post('/api/projects/:id/issues/by-key/:key/comments', (req, res) => {
+  if (!req.body.body || typeof req.body.body !== 'string') {
+    return res.status(400).json({ error: '"body" is required and must be a non-empty string' })
+  }
+  withProjectLock(req.params.id, () => {
+    const comment = db.addCommentByKey(req.params.id, req.params.key, req.body)
+    if (!comment) return res.status(404).json({ error: 'Issue not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'comment',
+      entityType: 'issue',
+      entityId: req.params.key,
+      entityTitle: req.body.body.slice(0, 120),
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(comment)
+  })
+})
+
 // --- Nudge (reset staleness) ---
 app.post('/api/projects/:id/issues/:issueId/nudge', (req, res) => {
   withProjectLock(req.params.id, () => {

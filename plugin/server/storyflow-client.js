@@ -340,6 +340,30 @@ export function deleteSprint(projectId, sprintId, extraHeaders = {}) {
   )
 }
 
+// --- Comments ---
+
+export function addComment(projectId, issueId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function addCommentByKey(projectId, key, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
 // --- Nudge (reset staleness) ---
 
 export function nudgeIssue(projectId, issueId, data = {}) {
