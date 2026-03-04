@@ -284,6 +284,12 @@ export function listPages(projectId) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/pages`)
 }
 
+export function getPage(projectId, pageId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`
+  )
+}
+
 export function createPage(projectId, data, extraHeaders = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/pages`, {
     method: 'POST',
@@ -369,7 +375,21 @@ export function getLastSession(projectId) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/sessions/latest`)
 }
 
+export function listSessions(projectId, limit = 10) {
+  const qs = limit !== 10 ? `?limit=${limit}` : ''
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions${qs}`)
+}
+
 // --- Events ---
+
+export function queryEvents(projectId, filters = {}) {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== null) params.set(key, String(value))
+  }
+  const qs = params.toString()
+  return request(`/api/projects/${encodeURIComponent(projectId)}/events${qs ? `?${qs}` : ''}`)
+}
 
 export function recordEvent(projectId, event) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/events`, {

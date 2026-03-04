@@ -494,6 +494,12 @@ export function listPages(projectId) {
   }))
 }
 
+export function getPage(projectId, pageId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return (project.pages || []).find((p) => p.id === pageId) || null
+}
+
 export function addPage(projectId, page) {
   const project = getProject(projectId)
   if (!project) return null

@@ -563,6 +563,12 @@ app.get('/api/projects/:id/pages', (req, res) => {
   res.json(pages)
 })
 
+app.get('/api/projects/:id/pages/:pageId', (req, res) => {
+  const page = db.getPage(req.params.id, req.params.pageId)
+  if (!page) return res.status(404).json({ error: 'Page or project not found' })
+  res.json(page)
+})
+
 app.post('/api/projects/:id/pages', (req, res) => {
   const err = validatePageBody(req.body)
   if (err) return res.status(400).json({ error: err })

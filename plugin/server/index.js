@@ -633,6 +633,39 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Get Page (read wiki page content)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_page',
+  {
+    description:
+      'Read the full content of a wiki page by ID. Use this to read Agent: knowledge pages on session start, review documentation, or check page content before updating.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      page_id: z.string().describe('Page ID to read'),
+    },
+  },
+  async ({ project_id, page_id }) => {
+    try {
+      const page = await sf.getPage(project_id, page_id)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(page, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Create Page
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -922,6 +955,79 @@ server.registerTool(
           {
             type: 'text',
             text: JSON.stringify(report, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Query Events (search activity history)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_query_events',
+  {
+    description:
+      'Search the transparency event log. Use to review past AI actions, decision history, escalations, or audit what happened in previous sessions. Supports filtering by category, actor, entity, time range, and action type.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      category: z
+        .enum([
+          'board',
+          'wiki',
+          'architecture',
+          'workflow',
+          'timeline',
+          'decisions',
+          'project',
+          'system',
+        ])
+        .optional()
+        .describe('Filter by event category'),
+      actor: z
+        .enum(['ai', 'human', 'system'])
+        .optional()
+        .describe('Filter by who triggered the event'),
+      entity_type: z
+        .string()
+        .optional()
+        .describe('Filter by entity type (e.g. "issue", "page", "escalation")'),
+      entity_id: z.string().optional().describe('Filter by specific entity ID'),
+      action: z
+        .enum(['create', 'update', 'delete', 'status_change', 'analyze', 'info'])
+        .optional()
+        .describe('Filter by action type'),
+      since: z.string().optional().describe('Only events after this ISO timestamp'),
+      before: z.string().optional().describe('Only events before this ISO timestamp'),
+      limit: z.number().optional().describe('Max events to return (default: 50)'),
+    },
+  },
+  async ({ project_id, category, actor, entity_type, entity_id, action, since, before, limit }) => {
+    try {
+      const filters = {}
+      if (category) filters.category = category
+      if (actor) filters.actor = actor
+      if (entity_type) filters.entity_type = entity_type
+      if (entity_id) filters.entity_id = entity_id
+      if (action) filters.action = action
+      if (since) filters.since = since
+      if (before) filters.before = before
+      if (limit) filters.limit = limit
+      const events = await sf.queryEvents(project_id, filters)
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              events.length > 0
+                ? JSON.stringify(events, null, 2)
+                : 'No events found matching the query.',
           },
         ],
       }
@@ -1379,6 +1485,44 @@ server.registerTool(
           {
             type: 'text',
             text: JSON.stringify(session, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: List Sessions
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_sessions',
+  {
+    description:
+      'List recent agent sessions for a project. Returns session summaries ordered by most recent first. Use to review session history, track patterns, or find when a specific decision was made.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      limit: z.number().optional().describe('Max sessions to return (default: 10)'),
+    },
+  },
+  async ({ project_id, limit }) => {
+    try {
+      const sessions = await sf.listSessions(project_id, limit || 10)
+      if (sessions.length === 0) {
+        return {
+          content: [{ type: 'text', text: 'No previous sessions found.' }],
+        }
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(sessions, null, 2),
           },
         ],
       }

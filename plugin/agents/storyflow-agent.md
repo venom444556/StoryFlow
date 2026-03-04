@@ -104,7 +104,7 @@ Think like a PM. Translate like a PM.
 
 ## Step 1: Bootstrap
 
-Run these before any operation. If Step 1a fails, exit silently — never block the workflow.
+Run these before any operation. If connectivity fails, exit silently — never block the workflow.
 
 1. **Check connectivity**: `storyflow_check_connection`
    - If unreachable → report "StoryFlow offline — skipping" and stop
@@ -116,14 +116,14 @@ Run these before any operation. If Step 1a fails, exit silently — never block 
 4. **Check sprints**: `storyflow_list_sprints`
    - Note any active sprint for assigning new issues
 
-## Step 0.5: Restore Context (after Bootstrap)
+## Step 2: Restore Context
 
 After bootstrap succeeds, restore agent memory:
 
 1. **Recall last session**: `storyflow_get_last_session`
    - Read what happened last time: `work_done`, `key_decisions`, `next_steps`
    - If `next_steps` exists, use it to prioritize current session work
-2. **Read agent knowledge**: `storyflow_list_pages` then read pages prefixed with "Agent:"
+2. **Read agent knowledge**: `storyflow_list_pages`, then `storyflow_get_page` for each page prefixed with "Agent:"
    - "Agent: Architecture Overview" — project structure, tech stack, key patterns
    - "Agent: Conventions" — field names, status strings, coding standards
    - "Agent: Technical Debt" — known issues, deferred work
