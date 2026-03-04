@@ -12,6 +12,7 @@ import {
   FileText,
   Layers,
   Zap,
+  Clock,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useEventStore, selectEvents, selectAiStatus } from '../../stores/eventStore'
@@ -62,6 +63,7 @@ const AI_STATUS_STYLES = {
 function EventItem({ event }) {
   const respondToEvent = useEventStore((s) => s.respondToEvent)
   const Icon = ACTION_ICONS[event.action] || FileText
+  const isPendingGate = event.status === 'pending'
   const isPendingAi = event.actor === 'ai' && !event.human_response
 
   const timeAgo = useMemo(() => {
@@ -100,7 +102,12 @@ function EventItem({ event }) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.2 }}
-      className="border-b border-[var(--color-border-default)] px-4 py-3 last:border-b-0"
+      className={[
+        'border-b border-[var(--color-border-default)] px-4 py-3 last:border-b-0',
+        isPendingGate && 'border-l-2 border-l-amber-400/60 bg-amber-400/5',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       <div className="flex items-start gap-2.5">
         {/* Icon */}
@@ -119,9 +126,22 @@ function EventItem({ event }) {
             </p>
           )}
 
+          {/* Pending gate label */}
+          {isPendingGate && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-medium text-amber-400">
+              <Clock size={11} />
+              <span>Awaiting Approval</span>
+            </div>
+          )}
+
           {/* Meta row */}
           <div className="mt-1.5 flex items-center gap-2">
-            <ProvenanceBadge actor={event.actor} size="xs" />
+            <ProvenanceBadge
+              actor={event.actor}
+              confidence={event.confidence}
+              reasoning={event.reasoning}
+              size="xs"
+            />
             <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
           </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Bot, User, Cpu, ChevronDown, ChevronUp } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
+import { getConfidenceLevel, CONFIDENCE_STYLES } from '../../utils/confidence'
 
 const ACTOR_CONFIG = {
   ai: {
@@ -40,6 +41,8 @@ export default function ProvenanceBadge({
   const [expanded, setExpanded] = useState(false)
   const config = ACTOR_CONFIG[actor] || ACTOR_CONFIG.human
   const Icon = config.icon
+  const confidenceLevel = getConfidenceLevel(confidence)
+  const confidenceStyle = confidenceLevel ? CONFIDENCE_STYLES[confidenceLevel] : null
 
   const sizeClasses = {
     xs: 'px-1 py-px text-[9px] gap-0.5',
@@ -60,7 +63,10 @@ export default function ProvenanceBadge({
           config.borderClass,
           sizeClasses[size] || sizeClasses.sm,
           hasDetails ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
-        ].join(' ')}
+          confidenceLevel === 'low' && 'ring-1 ring-[var(--color-confidence-low)]/30',
+        ]
+          .filter(Boolean)
+          .join(' ')}
         title={
           timestamp
             ? `${config.label} · ${formatDistanceToNow(new Date(timestamp), { addSuffix: true })}`
@@ -70,6 +76,13 @@ export default function ProvenanceBadge({
       >
         <Icon size={size === 'xs' ? 8 : 10} />
         <span>{config.label}</span>
+        {/* Confidence dot indicator */}
+        {confidenceStyle && (
+          <span
+            className="inline-block h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: confidenceStyle.color }}
+          />
+        )}
         {hasDetails && (expanded ? <ChevronUp size={8} /> : <ChevronDown size={8} />)}
       </button>
 
@@ -96,8 +109,11 @@ export default function ProvenanceBadge({
                 </p>
               )}
               {confidence !== undefined && confidence !== null && (
-                <p className="mt-1 text-[var(--color-fg-subtle)]">
+                <p className="mt-1" style={{ color: confidenceStyle?.color }}>
                   Confidence: {Math.round(confidence * 100)}%
+                  {confidenceStyle && (
+                    <span className="ml-1 text-[10px] opacity-80">({confidenceStyle.label})</span>
+                  )}
                 </p>
               )}
             </div>

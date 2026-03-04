@@ -68,7 +68,12 @@ function ChainEvent({ event, isFirst, isLast }) {
       <div className="min-w-0 flex-1 pb-3">
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-medium text-[var(--color-fg-default)]">{label}</span>
-          <ProvenanceBadge actor={event.actor} size="xs" />
+          <ProvenanceBadge
+            actor={event.actor}
+            confidence={event.confidence}
+            reasoning={event.reasoning}
+            size="xs"
+          />
           <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
         </div>
 

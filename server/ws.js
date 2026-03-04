@@ -135,3 +135,12 @@ export function broadcastAiStatus(status) {
     if (client.readyState === 1) client.send(msg)
   })
 }
+
+/** Broadcast gate status update to all connected clients */
+export function broadcastGateUpdate({ projectId, eventId, status }) {
+  if (!wss) return
+  const msg = JSON.stringify({ type: 'gate_update', projectId, eventId, status })
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) client.send(msg)
+  })
+}

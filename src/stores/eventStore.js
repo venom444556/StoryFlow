@@ -138,6 +138,14 @@ export const useEventStore = create((set, get) => ({
                 events: [msg.event, ...state.events].slice(0, 500),
               }))
             }
+          } else if (msg.type === 'gate_update') {
+            if (msg.projectId === get().projectId) {
+              set((state) => ({
+                events: state.events.map((e) =>
+                  e.id === msg.eventId ? { ...e, status: msg.status } : e
+                ),
+              }))
+            }
           } else if (msg.type === 'ai_status') {
             if (msg.projectId === get().projectId) {
               set({
@@ -207,3 +215,9 @@ export const selectRecentAiEvents =
 
 export const selectPendingAiEvents = (state) =>
   state.events.filter((e) => e.actor === 'ai' && !e.human_response)
+
+export const selectPendingGates = (state) => state.events.filter((e) => e.status === 'pending')
+
+export const selectRejectedEvents = (state) => state.events.filter((e) => e.status === 'rejected')
+
+export const selectGateCount = (state) => state.events.filter((e) => e.status === 'pending').length

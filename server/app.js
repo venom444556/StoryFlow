@@ -7,13 +7,16 @@ import express from 'express'
 import { timingSafeEqual } from 'node:crypto'
 import * as db from './db.js'
 import { withProjectLock } from './db.js'
-import { notifyClients, broadcastEvent, broadcastAiStatus } from './ws.js'
+import { notifyClients, broadcastEvent, broadcastAiStatus, broadcastGateUpdate } from './ws.js'
 import {
   recordEvent,
   queryEvents,
   respondToEvent,
   extractProvenance,
   emitMutationEvent,
+  cleanupOldEvents,
+  checkApprovalGates,
+  getRejectedEvents,
 } from './events.js'
 import {
   addSteeringDirective,
@@ -305,6 +308,9 @@ app.post('/api/projects/:id/issues', (req, res) => {
     if (provenance.actor !== 'human') {
       issueData.createdBy = provenance.actor
       issueData.createdByReasoning = provenance.reasoning
+      if (provenance.confidence !== null && provenance.confidence !== undefined) {
+        issueData.createdByConfidence = provenance.confidence
+      }
     }
     const issue = db.addIssue(req.params.id, issueData)
     if (!issue) return res.status(404).json({ error: 'Project not found' })
@@ -607,7 +613,32 @@ app.post('/api/projects/:id/events/:eventId/respond', (req, res) => {
   const event = respondToEvent(req.params.eventId, req.body)
   if (!event) return res.status(404).json({ error: 'Event not found' })
   broadcastEvent(event)
+  // Broadcast gate status change for real-time UI updates
+  if (event.status) {
+    broadcastGateUpdate({
+      projectId: req.params.id,
+      eventId: req.params.eventId,
+      status: event.status,
+    })
+  }
   res.json(event)
+})
+
+// --- Approval Gates ---
+app.get('/api/projects/:id/gates', (req, res) => {
+  const pending = checkApprovalGates(req.params.id)
+  const rejected = getRejectedEvents(req.params.id, req.query.since)
+  res.json({ pending, rejected })
+})
+
+// --- Event Cleanup ---
+app.delete('/api/projects/:id/events/cleanup', (req, res) => {
+  const days = parseInt(req.query.retention_days, 10) || 90
+  if (days < 1 || days > 3650) {
+    return res.status(400).json({ error: 'retention_days must be between 1 and 3650' })
+  }
+  const result = cleanupOldEvents(req.params.id, days)
+  res.json(result)
 })
 
 // --- AI Status ---

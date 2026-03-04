@@ -4,6 +4,7 @@
 // ---------------------------------------------------------------------------
 
 import crypto from 'node:crypto'
+import { scheduleSave } from './db.js'
 
 let db = null
 
@@ -69,6 +70,15 @@ export function initEvents(database) {
     'CREATE INDEX IF NOT EXISTS idx_events_entity ON events(project_id, entity_type, entity_id)'
   )
 
+  // Migration: add status column for approval gates (idempotent)
+  try {
+    db.run('ALTER TABLE events ADD COLUMN status TEXT DEFAULT NULL')
+  } catch {
+    // Column already exists — ignore
+  }
+
+  db.run('CREATE INDEX IF NOT EXISTS idx_events_status ON events(project_id, status)')
+
   console.log('[Events] Events table ready')
 }
 
@@ -122,6 +132,7 @@ export function recordEvent(event) {
     confidence: event.confidence ?? null,
     triggered_by: event.triggered_by || null,
     human_response: event.human_response ? JSON.stringify(event.human_response) : null,
+    status: event.status || null,
     data: JSON.stringify(event.data || {}),
   }
 
@@ -129,8 +140,8 @@ export function recordEvent(event) {
     `INSERT INTO events
       (id, project_id, timestamp, actor, agent_id, session_id, category, action,
        entity_type, entity_id, entity_title, changes, reasoning, confidence,
-       triggered_by, human_response, data)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       triggered_by, human_response, status, data)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       record.id,
       record.project_id,
@@ -148,6 +159,7 @@ export function recordEvent(event) {
       record.confidence,
       record.triggered_by,
       record.human_response,
+      record.status,
       record.data,
     ]
   )
@@ -251,12 +263,16 @@ export function respondToEvent(eventId, response) {
     comment: response.comment || null,
   }
 
-  db.run('UPDATE events SET human_response = ? WHERE id = ?', [
+  const newStatus =
+    response.action === 'approve' ? 'approved' : response.action === 'reject' ? 'rejected' : null
+
+  db.run('UPDATE events SET human_response = ?, status = COALESCE(?, status) WHERE id = ?', [
     JSON.stringify(humanResponse),
+    newStatus,
     eventId,
   ])
 
-  return { ...event, human_response: humanResponse }
+  return { ...event, human_response: humanResponse, status: newStatus || event.status }
 }
 
 // ---------------------------------------------------------------------------
@@ -288,6 +304,7 @@ export function emitMutationEvent({
   changes,
   data,
   triggeredBy,
+  requiresApproval,
 }) {
   const event = recordEvent({
     project_id: projectId,
@@ -303,10 +320,119 @@ export function emitMutationEvent({
     reasoning: provenance.reasoning,
     confidence: provenance.confidence,
     triggered_by: triggeredBy,
+    status: requiresApproval ? 'pending' : null,
     data,
   })
 
   return event
+}
+
+// ---------------------------------------------------------------------------
+// Approval Gates
+// ---------------------------------------------------------------------------
+
+/** Get events with pending approval status for a project */
+export function checkApprovalGates(projectId) {
+  if (!db) throw new Error('Events not initialized')
+
+  const results = db.exec(
+    `SELECT * FROM events WHERE project_id = ? AND status = 'pending' ORDER BY timestamp DESC`,
+    [projectId]
+  )
+
+  if (results.length === 0) return []
+
+  const columns = results[0].columns
+  return results[0].values.map((row) => {
+    const obj = {}
+    columns.forEach((col, i) => {
+      obj[col] = row[i]
+    })
+    if (obj.changes) obj.changes = JSON.parse(obj.changes)
+    if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
+    if (obj.data) obj.data = JSON.parse(obj.data)
+    return obj
+  })
+}
+
+/** Get recently rejected events for a project */
+export function getRejectedEvents(projectId, since) {
+  if (!db) throw new Error('Events not initialized')
+
+  const conditions = ['project_id = ?', "status = 'rejected'"]
+  const params = [projectId]
+  if (since) {
+    conditions.push('timestamp > ?')
+    params.push(since)
+  }
+
+  const results = db.exec(
+    `SELECT * FROM events WHERE ${conditions.join(' AND ')} ORDER BY timestamp DESC LIMIT 50`,
+    params
+  )
+
+  if (results.length === 0) return []
+
+  const columns = results[0].columns
+  return results[0].values.map((row) => {
+    const obj = {}
+    columns.forEach((col, i) => {
+      obj[col] = row[i]
+    })
+    if (obj.changes) obj.changes = JSON.parse(obj.changes)
+    if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
+    if (obj.data) obj.data = JSON.parse(obj.data)
+    return obj
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Retention / Cleanup
+// ---------------------------------------------------------------------------
+
+/** Delete old events for a project, preserving human-reviewed decisions forever. */
+export function cleanupOldEvents(projectId, retentionDays = 90) {
+  if (!db) throw new Error('Events not initialized')
+
+  const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000).toISOString()
+
+  const countResult = db.exec(
+    `SELECT COUNT(*) FROM events
+     WHERE project_id = ? AND timestamp < ? AND human_response IS NULL`,
+    [projectId, cutoff]
+  )
+  const toDelete = countResult.length > 0 ? countResult[0].values[0][0] : 0
+
+  if (toDelete > 0) {
+    db.run(
+      `DELETE FROM events
+       WHERE project_id = ? AND timestamp < ? AND human_response IS NULL`,
+      [projectId, cutoff]
+    )
+    scheduleSave()
+  }
+
+  return { deleted: toDelete, cutoff }
+}
+
+/** Delete old events across all projects. */
+export function cleanupAllEvents(retentionDays = 90) {
+  if (!db) throw new Error('Events not initialized')
+
+  const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000).toISOString()
+
+  const countResult = db.exec(
+    'SELECT COUNT(*) FROM events WHERE timestamp < ? AND human_response IS NULL',
+    [cutoff]
+  )
+  const toDelete = countResult.length > 0 ? countResult[0].values[0][0] : 0
+
+  if (toDelete > 0) {
+    db.run('DELETE FROM events WHERE timestamp < ? AND human_response IS NULL', [cutoff])
+    scheduleSave()
+  }
+
+  return { deleted: toDelete, cutoff }
 }
 
 /** Count events for a project (for metrics) */

@@ -9,13 +9,38 @@
 
 import { recordEvent } from './events.js'
 import { broadcastEvent } from './ws.js'
+import { scheduleSave } from './db.js'
 
 // ---------------------------------------------------------------------------
 // Steering Queue — human directives for the AI to process
+// Persisted to SQLite so directives survive server restarts
 // ---------------------------------------------------------------------------
 
-// In-memory steering queue per project (directives persist until consumed)
-const steeringQueues = new Map()
+let db = null
+
+/** Initialize the steering_directives table (called from db.js) */
+export function initSteering(database) {
+  db = database
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS steering_directives (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      text TEXT NOT NULL,
+      priority TEXT DEFAULT 'normal',
+      context TEXT,
+      created_at TEXT NOT NULL,
+      consumed INTEGER DEFAULT 0,
+      consumed_at TEXT
+    )
+  `)
+
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_steering_project_consumed ON steering_directives(project_id, consumed)'
+  )
+
+  console.log('[Steering] Steering directives table ready')
+}
 
 /**
  * Add a steering directive from a human.
@@ -24,18 +49,24 @@ const steeringQueues = new Map()
  * @returns {object} The stored directive with id and timestamp
  */
 export function addSteeringDirective(projectId, directive) {
-  if (!steeringQueues.has(projectId)) {
-    steeringQueues.set(projectId, [])
-  }
+  const id = `steer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  const now = new Date().toISOString()
+
+  db.run(
+    `INSERT INTO steering_directives (id, project_id, text, priority, context, created_at)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [id, projectId, directive.text, directive.priority || 'normal', directive.context || null, now]
+  )
+  scheduleSave()
+
   const entry = {
-    id: `steer-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    id,
     text: directive.text,
     priority: directive.priority || 'normal',
     context: directive.context || null,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
     consumed: false,
   }
-  steeringQueues.get(projectId).push(entry)
 
   // Record as an event for the activity stream
   const event = recordEvent({
@@ -60,14 +91,43 @@ export function addSteeringDirective(projectId, directive) {
  * @param {object} options - { consume?: boolean }
  */
 export function getSteeringDirectives(projectId, { consume = false } = {}) {
-  const queue = steeringQueues.get(projectId) || []
-  const pending = queue.filter((d) => !d.consumed)
+  const results = db.exec(
+    `SELECT id, project_id, text, priority, context, created_at, consumed, consumed_at
+     FROM steering_directives
+     WHERE project_id = ? AND consumed = 0
+     ORDER BY created_at ASC`,
+    [projectId]
+  )
+
+  if (results.length === 0) return []
+
+  const columns = results[0].columns
+  const pending = results[0].values.map((row) => {
+    const obj = {}
+    columns.forEach((col, i) => {
+      obj[col] = row[i]
+    })
+    return {
+      id: obj.id,
+      text: obj.text,
+      priority: obj.priority,
+      context: obj.context,
+      createdAt: obj.created_at,
+      consumed: !!obj.consumed,
+    }
+  })
 
   if (consume && pending.length > 0) {
-    pending.forEach((d) => {
+    const now = new Date().toISOString()
+    for (const d of pending) {
+      db.run('UPDATE steering_directives SET consumed = 1, consumed_at = ? WHERE id = ?', [
+        now,
+        d.id,
+      ])
       d.consumed = true
-      d.consumedAt = new Date().toISOString()
-    })
+      d.consumedAt = now
+    }
+    scheduleSave()
   }
 
   return pending
@@ -77,13 +137,30 @@ export function getSteeringDirectives(projectId, { consume = false } = {}) {
  * Acknowledge a specific steering directive.
  */
 export function acknowledgeDirective(projectId, directiveId) {
-  const queue = steeringQueues.get(projectId) || []
-  const directive = queue.find((d) => d.id === directiveId)
-  if (directive) {
-    directive.consumed = true
-    directive.consumedAt = new Date().toISOString()
+  const results = db.exec(
+    'SELECT id, text, priority, context, created_at FROM steering_directives WHERE id = ? AND project_id = ?',
+    [directiveId, projectId]
+  )
+
+  if (results.length === 0 || results[0].values.length === 0) return null
+
+  const now = new Date().toISOString()
+  db.run('UPDATE steering_directives SET consumed = 1, consumed_at = ? WHERE id = ?', [
+    now,
+    directiveId,
+  ])
+  scheduleSave()
+
+  const row = results[0].values[0]
+  return {
+    id: row[0],
+    text: row[1],
+    priority: row[2],
+    context: row[3],
+    createdAt: row[4],
+    consumed: true,
+    consumedAt: now,
   }
-  return directive || null
 }
 
 // ---------------------------------------------------------------------------

@@ -373,6 +373,15 @@ export function respondToHuman(projectId, eventId, { action, comment } = {}) {
   )
 }
 
+// --- Approval Gates ---
+
+export function checkGates(projectId, { since } = {}) {
+  const params = new URLSearchParams()
+  if (since) params.set('since', since)
+  const qs = params.toString()
+  return request(`/api/projects/${encodeURIComponent(projectId)}/gates${qs ? `?${qs}` : ''}`)
+}
+
 // --- Health check ---
 
 export async function checkConnection() {

@@ -11,6 +11,7 @@ import {
   Zap,
   Layers,
   Filter,
+  Clock,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
@@ -62,6 +63,7 @@ function FeedItem({ event }) {
   const respondToEvent = useEventStore((s) => s.respondToEvent)
   const Icon = ACTION_ICONS[event.action] || FileText
   const categoryColor = CATEGORY_COLORS[event.category] || 'var(--color-fg-muted)'
+  const isPendingGate = event.status === 'pending'
   const isPendingAi = event.actor === 'ai' && !event.human_response
 
   const timeAgo = useMemo(() => {
@@ -99,7 +101,12 @@ function FeedItem({ event }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15 }}
-      className="group flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--color-bg-glass)]"
+      className={[
+        'group flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--color-bg-glass)]',
+        isPendingGate && 'border-l-2 border-l-amber-400/60 bg-amber-400/5',
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       {/* Category-colored icon */}
       <div
@@ -119,9 +126,22 @@ function FeedItem({ event }) {
           </p>
         )}
 
+        {/* Pending gate label */}
+        {isPendingGate && (
+          <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-amber-400">
+            <Clock size={11} />
+            <span>Awaiting Approval</span>
+          </div>
+        )}
+
         {/* Meta row */}
         <div className="mt-1 flex items-center gap-2">
-          <ProvenanceBadge actor={event.actor} size="xs" />
+          <ProvenanceBadge
+            actor={event.actor}
+            confidence={event.confidence}
+            reasoning={event.reasoning}
+            size="xs"
+          />
           <span
             className="rounded-full px-1.5 py-px text-[9px] font-medium"
             style={{

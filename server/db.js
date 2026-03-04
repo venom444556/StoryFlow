@@ -8,6 +8,7 @@ import { readFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { initEvents } from './events.js'
+import { initSteering } from './intelligence.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -62,6 +63,9 @@ export async function initDb() {
   // Initialize event stream table
   initEvents(db)
 
+  // Initialize steering directives table
+  initSteering(db)
+
   await saveToDisk()
 
   // Auto-migrate from JSON if DB is empty and JSON exists
@@ -79,7 +83,7 @@ async function saveToDisk() {
 }
 
 /** Schedule a save (debounced 100ms to batch rapid writes) */
-function scheduleSave() {
+export function scheduleSave() {
   clearTimeout(_saveTimer)
   _saveTimer = setTimeout(saveToDisk, 100)
 }

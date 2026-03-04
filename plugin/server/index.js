@@ -972,6 +972,63 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Check Approval Gates
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_check_gates',
+  {
+    description:
+      'Check for pending approval gates and recently rejected actions. Call this before significant mutations to respect human oversight. Returns pending gates that need human approval and rejected actions the AI should not retry.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      since: z
+        .string()
+        .optional()
+        .describe('ISO timestamp — only return rejected events after this time'),
+    },
+  },
+  async ({ project_id, since }) => {
+    try {
+      const gates = await sf.checkGates(project_id, { since })
+      const pendingCount = gates.pending?.length || 0
+      const rejectedCount = gates.rejected?.length || 0
+
+      let summary = ''
+      if (pendingCount === 0 && rejectedCount === 0) {
+        summary = 'No pending gates or rejected actions. You are clear to proceed.'
+      } else {
+        const parts = []
+        if (pendingCount > 0) {
+          parts.push(
+            `${pendingCount} action(s) awaiting human approval — do NOT proceed with related mutations until approved.`
+          )
+        }
+        if (rejectedCount > 0) {
+          parts.push(
+            `${rejectedCount} action(s) were rejected by the human — review before retrying similar actions.`
+          )
+        }
+        summary = parts.join(' ')
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({ summary, ...gates }, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Start server
 // ---------------------------------------------------------------------------
 async function main() {

@@ -4,6 +4,7 @@ import IssueTypeIcon from './IssueTypeIcon'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
+import { getConfidenceLevel } from '../../utils/confidence'
 import { getStaleInfo } from '../../utils/staleness'
 import { useSettings } from '../../contexts/SettingsContext'
 
@@ -19,6 +20,14 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
   const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
   const { isStale, agoText } = getStaleInfo(issue, settings.staleThresholdMinutes * 60 * 1000)
   const isAiCreated = issue.createdBy === 'ai'
+  const confidenceLevel = isAiCreated ? getConfidenceLevel(issue.createdByConfidence) : null
+
+  const AI_GLOW_MAP = {
+    high: 'var(--color-ai-glow-high)',
+    medium: 'var(--color-ai-glow-medium)',
+    low: 'var(--color-ai-glow-low)',
+  }
+  const aiGlow = isAiCreated ? AI_GLOW_MAP[confidenceLevel] || 'var(--color-ai-glow)' : undefined
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', issue.id)
@@ -50,8 +59,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         isDragging
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
-        isAiCreated &&
-          'border-l-2 border-l-[var(--color-ai-accent)] shadow-[0_0_12px_var(--color-ai-glow)]',
+        isAiCreated && 'border-l-2 border-l-[var(--color-ai-accent)]',
         isStale && !isAiCreated && 'border-l-2 border-l-amber-400/60',
       ]
         .filter(Boolean)
@@ -62,7 +70,9 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
               borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
               '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
             }
-          : undefined
+          : aiGlow
+            ? { boxShadow: `0 0 12px ${aiGlow}` }
+            : undefined
       }
     >
       {/* Top row: type icon + key + provenance */}
@@ -74,6 +84,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
           <ProvenanceBadge
             actor={issue.createdBy}
             reasoning={issue.createdByReasoning}
+            confidence={issue.createdByConfidence}
             timestamp={issue.createdAt}
             size="xs"
           />

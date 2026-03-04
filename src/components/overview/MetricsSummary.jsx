@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Bot, User, CheckCircle2, AlertTriangle, TrendingUp, Activity } from 'lucide-react'
+import { Bot, User, CheckCircle2, AlertTriangle, TrendingUp, Activity, Gauge } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
 
@@ -41,6 +41,25 @@ export default function MetricsSummary({ project }) {
     const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
     const donePoints = doneIssues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
 
+    // Average AI confidence from events with confidence scores
+    const aiWithConfidence = aiEvents.filter(
+      (e) => e.confidence !== null && e.confidence !== undefined
+    )
+    const avgConfidence =
+      aiWithConfidence.length > 0
+        ? Math.round(
+            (aiWithConfidence.reduce((s, e) => s + e.confidence, 0) / aiWithConfidence.length) * 100
+          )
+        : null
+
+    // Determine confidence color
+    let confidenceColor = 'var(--color-fg-muted)'
+    if (avgConfidence !== null) {
+      if (avgConfidence >= 80) confidenceColor = 'var(--color-confidence-high)'
+      else if (avgConfidence >= 50) confidenceColor = 'var(--color-confidence-medium)'
+      else confidenceColor = 'var(--color-confidence-low)'
+    }
+
     return {
       aiActions: aiEvents.length,
       humanActions: humanEvents.length,
@@ -50,6 +69,8 @@ export default function MetricsSummary({ project }) {
       totalIssues: issues.length,
       velocity: donePoints,
       totalPoints,
+      avgConfidence,
+      confidenceColor,
     }
   }, [events, project])
 
@@ -98,6 +119,15 @@ export default function MetricsSummary({ project }) {
           subtext={`of ${metrics.totalPoints} total`}
           color="var(--color-info, #3b82f6)"
         />
+        {metrics.avgConfidence !== null && (
+          <MetricTile
+            icon={Gauge}
+            label="Avg AI Confidence"
+            value={`${metrics.avgConfidence}%`}
+            subtext={`across ${metrics.aiActions} actions`}
+            color={metrics.confidenceColor}
+          />
+        )}
       </div>
     </GlassCard>
   )

@@ -1,7 +1,12 @@
-import { Bot, Wifi, WifiOff } from 'lucide-react'
+import { Bot, Wifi, WifiOff, ShieldAlert } from 'lucide-react'
 import { motion } from 'framer-motion'
 import GlassCard from '../ui/GlassCard'
-import { useEventStore, selectAiStatus, selectConnected } from '../../stores/eventStore'
+import {
+  useEventStore,
+  selectAiStatus,
+  selectConnected,
+  selectGateCount,
+} from '../../stores/eventStore'
 
 const STATUS_CONFIG = {
   working: {
@@ -27,6 +32,7 @@ const STATUS_CONFIG = {
 export default function AIStatusCard() {
   const aiStatus = useEventStore(selectAiStatus)
   const connected = useEventStore(selectConnected)
+  const gateCount = useEventStore(selectGateCount)
   const config = STATUS_CONFIG[aiStatus.status] || STATUS_CONFIG.idle
 
   return (
@@ -73,6 +79,12 @@ export default function AIStatusCard() {
             >
               {config.label}
             </span>
+            {gateCount > 0 && (
+              <span className="flex items-center gap-1 rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                <ShieldAlert size={10} />
+                {gateCount} pending
+              </span>
+            )}
           </div>
 
           {aiStatus.detail ? (

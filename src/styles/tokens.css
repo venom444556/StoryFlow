@@ -382,6 +382,20 @@
   --color-ai-idle: #64748b; /* muted — AI is idle */
   --color-ai-blocked: #f59e0b; /* yellow — AI needs input */
 
+  /* Confidence level tokens */
+  --color-confidence-high: #22c55e;
+  --color-confidence-high-bg: rgba(34, 197, 94, 0.12);
+  --color-confidence-high-border: rgba(34, 197, 94, 0.3);
+  --color-confidence-medium: #f59e0b;
+  --color-confidence-medium-bg: rgba(245, 158, 11, 0.12);
+  --color-confidence-medium-border: rgba(245, 158, 11, 0.3);
+  --color-confidence-low: #ef4444;
+  --color-confidence-low-bg: rgba(239, 68, 68, 0.12);
+  --color-confidence-low-border: rgba(239, 68, 68, 0.3);
+  --color-ai-glow-high: rgba(6, 182, 212, 0.15);
+  --color-ai-glow-medium: rgba(6, 182, 212, 0.08);
+  --color-ai-glow-low: rgba(239, 68, 68, 0.12);
+
   /* -------------------------------------------------
      BADGE COLORS
      Pastel text for dark backgrounds
@@ -570,6 +584,20 @@
   --color-ai-working: #15803d;
   --color-ai-idle: #8a8279;
   --color-ai-blocked: #c2410c;
+
+  /* Confidence level tokens (light) */
+  --color-confidence-high: #15803d;
+  --color-confidence-high-bg: rgba(22, 163, 74, 0.1);
+  --color-confidence-high-border: rgba(22, 163, 74, 0.3);
+  --color-confidence-medium: #c2410c;
+  --color-confidence-medium-bg: rgba(202, 138, 4, 0.1);
+  --color-confidence-medium-border: rgba(202, 138, 4, 0.3);
+  --color-confidence-low: #dc2626;
+  --color-confidence-low-bg: rgba(220, 38, 38, 0.1);
+  --color-confidence-low-border: rgba(220, 38, 38, 0.3);
+  --color-ai-glow-high: rgba(8, 145, 178, 0.1);
+  --color-ai-glow-medium: rgba(8, 145, 178, 0.05);
+  --color-ai-glow-low: rgba(220, 38, 38, 0.08);
 
   /* -------------------------------------------------
      BADGE COLORS
