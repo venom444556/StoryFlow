@@ -7,13 +7,27 @@ import express from 'express'
 import { timingSafeEqual } from 'node:crypto'
 import * as db from './db.js'
 import { withProjectLock } from './db.js'
-import { notifyClients } from './ws.js'
+import { notifyClients, broadcastEvent, broadcastAiStatus } from './ws.js'
+import {
+  recordEvent,
+  queryEvents,
+  respondToEvent,
+  extractProvenance,
+  emitMutationEvent,
+} from './events.js'
+import {
+  addSteeringDirective,
+  getSteeringDirectives,
+  acknowledgeDirective,
+  checkTitleDuplication,
+  emitHygieneEvents,
+} from './intelligence.js'
 
 const app = express()
 
 // --- Request body validation helpers ---
 const VALID_ISSUE_TYPES = ['epic', 'story', 'task', 'bug', 'subtask']
-const VALID_ISSUE_STATUSES = ['To Do', 'In Progress', 'Done']
+// const VALID_ISSUE_STATUSES = ['To Do', 'In Progress', 'Done']
 const VALID_PROJECT_STATUSES = ['planning', 'in-progress', 'completed', 'on-hold']
 const VALID_SPRINT_STATUSES = ['planning', 'active', 'completed']
 
@@ -133,7 +147,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.header(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, X-StoryFlow-Token, X-Confirm'
+    'Content-Type, Authorization, X-StoryFlow-Token, X-Confirm, X-StoryFlow-Actor, X-StoryFlow-Reasoning, X-StoryFlow-Confidence, X-StoryFlow-Agent-Id, X-StoryFlow-Session-Id'
   )
   res.header('Access-Control-Max-Age', '600')
   if (req.method === 'OPTIONS') return res.sendStatus(204)
@@ -206,6 +220,17 @@ app.post('/api/projects', (req, res) => {
   const err = validateProjectBody(req.body)
   if (err) return res.status(400).json({ error: err })
   const project = db.addProject(req.body)
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: project.id,
+    provenance,
+    category: 'project',
+    action: 'create',
+    entityType: 'project',
+    entityId: project.id,
+    entityTitle: project.name,
+  })
+  broadcastEvent(event)
   notifyClients()
   res.status(201).json(project)
 })
@@ -222,6 +247,18 @@ app.put('/api/projects/:id', (req, res) => {
   withProjectLock(req.params.id, () => {
     const project = db.updateProject(req.params.id, req.body)
     if (!project) return res.status(404).json({ error: 'Project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'update',
+      entityType: 'project',
+      entityId: req.params.id,
+      entityTitle: project.name,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json(project)
   })
@@ -245,11 +282,47 @@ app.post('/api/projects/:id/issues', (req, res) => {
   const err = validateIssueBody(req.body)
   if (err) return res.status(400).json({ error: err })
   withProjectLock(req.params.id, () => {
-    const issue = db.addIssue(req.params.id, req.body)
+    const provenance = extractProvenance(req)
+
+    // Server-side dedup check — warn on near-matches but don't block
+    const project = db.getProject(req.params.id)
+    if (project) {
+      const existingIssues = project.board?.issues || []
+      const dedup = checkTitleDuplication(req.body.title, existingIssues)
+      if (dedup.isDuplicate) {
+        const topMatch = dedup.matches[0]
+        // Include a dedup_warning in the response (non-blocking)
+        req._dedupWarning = {
+          similar_to: topMatch.issue.key || topMatch.issue.id,
+          similar_title: topMatch.issue.title,
+          score: Math.round(topMatch.score * 100),
+        }
+      }
+    }
+
+    // Stamp provenance onto the entity itself so the UI can show badges
+    const issueData = { ...req.body }
+    if (provenance.actor !== 'human') {
+      issueData.createdBy = provenance.actor
+      issueData.createdByReasoning = provenance.reasoning
+    }
+    const issue = db.addIssue(req.params.id, issueData)
     if (!issue) return res.status(404).json({ error: 'Project not found' })
     if (issue.error) return res.status(400).json({ error: issue.error })
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'create',
+      entityType: 'issue',
+      entityId: issue.id,
+      entityTitle: issue.title,
+      data: { key: issue.key, type: issue.type, status: issue.status },
+    })
+    broadcastEvent(event)
     notifyClients()
-    res.status(201).json(issue)
+    const response = req._dedupWarning ? { ...issue, _dedup_warning: req._dedupWarning } : issue
+    res.status(201).json(response)
   })
 })
 
@@ -260,6 +333,20 @@ app.put('/api/projects/:id/issues/:issueId', (req, res) => {
     const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
     if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
     if (issue.error) return res.status(400).json({ error: issue.error })
+    const provenance = extractProvenance(req)
+    const action = req.body.status ? 'status_change' : 'update'
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action,
+      entityType: 'issue',
+      entityId: issue.id,
+      entityTitle: issue.title,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+      data: { key: issue.key, type: issue.type, status: issue.status },
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json(issue)
   })
@@ -269,6 +356,16 @@ app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
   withProjectLock(req.params.id, () => {
     const ok = db.deleteIssue(req.params.id, req.params.issueId)
     if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'delete',
+      entityType: 'issue',
+      entityId: req.params.issueId,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json({ success: true })
   })
@@ -288,6 +385,20 @@ app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
     const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
     if (!issue) return res.status(404).json({ error: 'Issue not found' })
     if (issue.error) return res.status(400).json({ error: issue.error })
+    const provenance = extractProvenance(req)
+    const action = req.body.status ? 'status_change' : 'update'
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action,
+      entityType: 'issue',
+      entityId: issue.id,
+      entityTitle: issue.title,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+      data: { key: issue.key, type: issue.type, status: issue.status },
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json(issue)
   })
@@ -297,6 +408,16 @@ app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
   withProjectLock(req.params.id, () => {
     const ok = db.deleteIssueByKey(req.params.id, req.params.key)
     if (!ok) return res.status(404).json({ error: 'Issue not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'delete',
+      entityType: 'issue',
+      entityId: req.params.key,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json({ success: true })
   })
@@ -344,6 +465,17 @@ app.post('/api/projects/:id/sprints', (req, res) => {
   withProjectLock(req.params.id, () => {
     const sprint = db.addSprint(req.params.id, req.body)
     if (!sprint) return res.status(404).json({ error: 'Project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'create',
+      entityType: 'sprint',
+      entityId: sprint.id,
+      entityTitle: sprint.name,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.status(201).json(sprint)
   })
@@ -360,8 +492,24 @@ app.post('/api/projects/:id/pages', (req, res) => {
   const err = validatePageBody(req.body)
   if (err) return res.status(400).json({ error: err })
   withProjectLock(req.params.id, () => {
-    const page = db.addPage(req.params.id, req.body)
+    const provenance = extractProvenance(req)
+    const pageData = { ...req.body }
+    if (provenance.actor !== 'human') {
+      pageData.createdBy = provenance.actor
+      pageData.createdByReasoning = provenance.reasoning
+    }
+    const page = db.addPage(req.params.id, pageData)
     if (!page) return res.status(404).json({ error: 'Project not found' })
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'wiki',
+      action: 'create',
+      entityType: 'page',
+      entityId: page.id,
+      entityTitle: page.title,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.status(201).json(page)
   })
@@ -373,6 +521,18 @@ app.put('/api/projects/:id/pages/:pageId', (req, res) => {
   withProjectLock(req.params.id, () => {
     const page = db.updatePage(req.params.id, req.params.pageId, req.body)
     if (!page) return res.status(404).json({ error: 'Page or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'wiki',
+      action: 'update',
+      entityType: 'page',
+      entityId: page.id,
+      entityTitle: page.title,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json(page)
   })
@@ -382,6 +542,16 @@ app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
   withProjectLock(req.params.id, () => {
     const ok = db.deletePage(req.params.id, req.params.pageId)
     if (!ok) return res.status(404).json({ error: 'Page or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'wiki',
+      action: 'delete',
+      entityType: 'page',
+      entityId: req.params.pageId,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json({ success: true })
   })
@@ -392,9 +562,116 @@ app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
   withProjectLock(req.params.id, () => {
     const ok = db.deleteSprint(req.params.id, req.params.sprintId)
     if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action: 'delete',
+      entityType: 'sprint',
+      entityId: req.params.sprintId,
+    })
+    broadcastEvent(event)
     notifyClients()
     res.json({ success: true })
   })
+})
+
+// --- Events API ---
+app.get('/api/projects/:id/events', (req, res) => {
+  const events = queryEvents(req.params.id, {
+    category: req.query.category,
+    actor: req.query.actor,
+    entity_type: req.query.entity_type,
+    entity_id: req.query.entity_id,
+    since: req.query.since,
+    before: req.query.before,
+    action: req.query.action,
+    limit: req.query.limit ? parseInt(req.query.limit, 10) : undefined,
+    offset: req.query.offset ? parseInt(req.query.offset, 10) : undefined,
+  })
+  res.json(events)
+})
+
+app.post('/api/projects/:id/events', (req, res) => {
+  const event = recordEvent({ ...req.body, project_id: req.params.id })
+  if (event.error) return res.status(400).json({ error: event.error })
+  broadcastEvent(event)
+  res.status(201).json(event)
+})
+
+app.post('/api/projects/:id/events/:eventId/respond', (req, res) => {
+  if (!req.body.action || !['approve', 'reject', 'redirect'].includes(req.body.action)) {
+    return res.status(400).json({ error: '"action" must be approve, reject, or redirect' })
+  }
+  const event = respondToEvent(req.params.eventId, req.body)
+  if (!event) return res.status(404).json({ error: 'Event not found' })
+  broadcastEvent(event)
+  res.json(event)
+})
+
+// --- AI Status ---
+const aiStatus = {}
+
+app.get('/api/projects/:id/ai-status', (req, res) => {
+  res.json(aiStatus[req.params.id] || { status: 'idle', detail: '', updatedAt: null })
+})
+
+app.post('/api/projects/:id/ai-status', (req, res) => {
+  const { status, detail } = req.body
+  if (!status || !['working', 'idle', 'blocked'].includes(status)) {
+    return res.status(400).json({ error: '"status" must be working, idle, or blocked' })
+  }
+  aiStatus[req.params.id] = {
+    status,
+    detail: detail || '',
+    updatedAt: new Date().toISOString(),
+  }
+  broadcastAiStatus({ projectId: req.params.id, ...aiStatus[req.params.id] })
+  res.json(aiStatus[req.params.id])
+})
+
+// --- Steering ---
+app.post('/api/projects/:id/steer', (req, res) => {
+  if (!req.body.text || typeof req.body.text !== 'string' || !req.body.text.trim()) {
+    return res.status(400).json({ error: '"text" is required and must be a non-empty string' })
+  }
+  const directive = addSteeringDirective(req.params.id, {
+    text: req.body.text.trim(),
+    priority: req.body.priority,
+    context: req.body.context,
+  })
+  res.status(201).json(directive)
+})
+
+app.get('/api/projects/:id/steering-queue', (req, res) => {
+  const consume = req.query.consume === 'true'
+  const directives = getSteeringDirectives(req.params.id, { consume })
+  res.json(directives)
+})
+
+app.post('/api/projects/:id/steering-queue/:directiveId/acknowledge', (req, res) => {
+  const directive = acknowledgeDirective(req.params.id, req.params.directiveId)
+  if (!directive) return res.status(404).json({ error: 'Directive not found' })
+  res.json(directive)
+})
+
+// --- Board Hygiene ---
+app.get('/api/projects/:id/hygiene', (req, res) => {
+  const project = db.getProject(req.params.id)
+  if (!project) return res.status(404).json({ error: 'Project not found' })
+  const events = emitHygieneEvents(req.params.id, project)
+  res.json({ findings: events.length, events })
+})
+
+// --- Title dedup check ---
+app.post('/api/projects/:id/check-duplicate', (req, res) => {
+  if (!req.body.title) return res.status(400).json({ error: '"title" is required' })
+  const project = db.getProject(req.params.id)
+  if (!project) return res.status(404).json({ error: 'Project not found' })
+  const issues = project.board?.issues || []
+  const result = checkTitleDuplication(req.body.title, issues, req.body.threshold)
+  res.json(result)
 })
 
 // --- Catch-all for production SPA serving ---

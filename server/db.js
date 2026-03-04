@@ -7,6 +7,7 @@ import initSqlJs from 'sql.js'
 import { readFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { initEvents } from './events.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -57,6 +58,9 @@ export async function initDb() {
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_status ON projects(status)')
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_deleted ON projects(deleted_at)')
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_updated ON projects(updated_at DESC)')
+
+  // Initialize event stream table
+  initEvents(db)
 
   await saveToDisk()
 

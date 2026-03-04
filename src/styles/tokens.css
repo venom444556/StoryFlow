@@ -229,6 +229,17 @@
   --interactive-active: #4338ca;
   --interactive-disabled: #94a3b8;
   --interactive-rgb: var(--accent-indigo-rgb);
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY TOKENS
+     Colors for distinguishing AI vs human activity
+     ------------------------------------------------- */
+  --color-ai-accent: #06b6d4; /* cyan — AI-authored content */
+  --color-ai-accent-rgb: 6, 182, 212;
+  --color-human-accent: #8b5cf6; /* purple — human-authored content */
+  --color-human-accent-rgb: 139, 92, 246;
+  --color-system-accent: #64748b; /* slate — system-generated */
+  --color-system-accent-rgb: 100, 116, 139;
 }
 
 /* =====================================================
@@ -357,6 +368,19 @@
   --th-text-muted: #94a3b8;
   --th-text-faint: #475569;
   --th-text-secondary: #94a3b8;
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY (themed)
+     ------------------------------------------------- */
+  --color-ai-glow: rgba(6, 182, 212, 0.15); /* subtle glow on AI-created items */
+  --color-ai-border: rgba(6, 182, 212, 0.3);
+  --color-ai-bg: rgba(6, 182, 212, 0.08);
+  --color-human-glow: rgba(139, 92, 246, 0.15);
+  --color-human-border: rgba(139, 92, 246, 0.3);
+  --color-human-bg: rgba(139, 92, 246, 0.08);
+  --color-ai-working: #22c55e; /* green — AI is actively working */
+  --color-ai-idle: #64748b; /* muted — AI is idle */
+  --color-ai-blocked: #f59e0b; /* yellow — AI needs input */
 
   /* -------------------------------------------------
      BADGE COLORS
@@ -533,6 +557,19 @@
   --th-text-muted: #6b6560;
   --th-text-faint: #b0a89e;
   --th-text-secondary: #8a8279;
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY (themed)
+     ------------------------------------------------- */
+  --color-ai-glow: rgba(8, 145, 178, 0.1);
+  --color-ai-border: rgba(8, 145, 178, 0.3);
+  --color-ai-bg: rgba(8, 145, 178, 0.06);
+  --color-human-glow: rgba(124, 58, 237, 0.1);
+  --color-human-border: rgba(124, 58, 237, 0.3);
+  --color-human-bg: rgba(124, 58, 237, 0.06);
+  --color-ai-working: #15803d;
+  --color-ai-idle: #8a8279;
+  --color-ai-blocked: #c2410c;
 
   /* -------------------------------------------------
      BADGE COLORS

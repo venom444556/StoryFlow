@@ -3,6 +3,7 @@ import { Clock, Tag } from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
+import ProvenanceBadge from '../ui/ProvenanceBadge'
 import { getStaleInfo } from '../../utils/staleness'
 import { useSettings } from '../../contexts/SettingsContext'
 
@@ -17,6 +18,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
   const { settings } = useSettings()
   const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
   const { isStale, agoText } = getStaleInfo(issue, settings.staleThresholdMinutes * 60 * 1000)
+  const isAiCreated = issue.createdBy === 'ai'
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', issue.id)
@@ -48,7 +50,9 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         isDragging
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
-        isStale && 'border-l-2 border-l-amber-400/60',
+        isAiCreated &&
+          'border-l-2 border-l-[var(--color-ai-accent)] shadow-[0_0_12px_var(--color-ai-glow)]',
+        isStale && !isAiCreated && 'border-l-2 border-l-amber-400/60',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -61,10 +65,19 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
           : undefined
       }
     >
-      {/* Top row: type icon + key */}
+      {/* Top row: type icon + key + provenance */}
       <div className="mb-2 flex items-center gap-2">
         <IssueTypeIcon type={issue.type} size={14} />
         <span className="text-xs font-medium text-[var(--color-fg-muted)]">{issue.key}</span>
+        <div className="flex-1" />
+        {issue.createdBy && (
+          <ProvenanceBadge
+            actor={issue.createdBy}
+            reasoning={issue.createdByReasoning}
+            timestamp={issue.createdAt}
+            size="xs"
+          />
+        )}
       </div>
 
       {/* Title */}

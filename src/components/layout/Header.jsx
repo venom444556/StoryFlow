@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Search, Upload, Download, Settings, Menu } from 'lucide-react'
+import { Search, Upload, Download, Settings, Menu, Activity } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useProjects } from '../../hooks/useProjects'
 import {
@@ -57,6 +57,8 @@ export default function Header({
   onSearchClick,
   onSettingsClick,
   onHamburgerClick,
+  onActivityClick,
+  showActivityButton = false,
 }) {
   const params = useParams()
   const { projects, getProject, importProject } = useProjects()
@@ -264,6 +266,19 @@ export default function Header({
         >
           <Download size={16} />
         </button>
+
+        {/* Activity sidebar toggle */}
+        {showActivityButton && (
+          <button
+            onClick={onActivityClick}
+            aria-label="Activity feed"
+            title="Activity feed"
+            className={iconButtonClasses}
+            style={{ transitionDuration: 'var(--duration-fast)' }}
+          >
+            <Activity size={16} />
+          </button>
+        )}
 
         {/* Settings */}
         <button

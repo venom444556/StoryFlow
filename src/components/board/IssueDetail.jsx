@@ -1,12 +1,24 @@
 import { useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Trash2, Plus, Check, MessageSquare, Clock, ListChecks, Send } from 'lucide-react'
+import {
+  X,
+  Trash2,
+  Plus,
+  Check,
+  MessageSquare,
+  Clock,
+  ListChecks,
+  Send,
+  History,
+} from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
+import EventChainPanel from './EventChainPanel'
 import Select from '../ui/Select'
 import TextArea from '../ui/TextArea'
 import TagInput from '../ui/TagInput'
 import Avatar from '../ui/Avatar'
+import ProvenanceBadge from '../ui/ProvenanceBadge'
 import ConfirmDialog from '../ui/ConfirmDialog'
 import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
 import { generateId } from '../../utils/ids'
@@ -197,9 +209,19 @@ export default function IssueDetail({
           <div className="flex shrink-0 items-start gap-3 border-b border-[var(--color-border-default)] px-5 py-4">
             <IssueTypeIcon type={issue.type} size={20} />
             <div className="min-w-0 flex-1">
-              <span className="mb-0.5 block text-xs font-medium text-[var(--color-fg-muted)]">
-                {issue.key}
-              </span>
+              <div className="mb-0.5 flex items-center gap-2">
+                <span className="text-xs font-medium text-[var(--color-fg-muted)]">
+                  {issue.key}
+                </span>
+                {issue.createdBy && (
+                  <ProvenanceBadge
+                    actor={issue.createdBy}
+                    reasoning={issue.createdByReasoning}
+                    timestamp={issue.createdAt}
+                    size="xs"
+                  />
+                )}
+              </div>
               {editingTitle ? (
                 <input
                   type="text"
@@ -488,6 +510,12 @@ export default function IssueDetail({
                     <Send size={14} />
                   </button>
                 </div>
+              </div>
+
+              {/* Event History */}
+              <div>
+                <SectionHeader icon={History}>Event History</SectionHeader>
+                <EventChainPanel entityType="issue" entityId={issue.id} />
               </div>
 
               {/* Timestamps */}

@@ -79,7 +79,7 @@ export function initWs(server) {
     // --- Per-client rate limiter ---
     ws._messageTimestamps = []
 
-    ws.on('message', (data) => {
+    ws.on('message', (_data) => {
       const now = Date.now()
 
       // Prune timestamps outside the window
@@ -116,4 +116,22 @@ export function notifyClients() {
   if (sent > 0) {
     console.log(`[WS] Notified ${sent} client(s)`)
   }
+}
+
+/** Broadcast a structured event to all connected clients */
+export function broadcastEvent(event) {
+  if (!wss) return
+  const msg = JSON.stringify({ type: 'event', event })
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) client.send(msg)
+  })
+}
+
+/** Broadcast AI status change to all connected clients */
+export function broadcastAiStatus(status) {
+  if (!wss) return
+  const msg = JSON.stringify({ type: 'ai_status', ...status })
+  wss.clients.forEach((client) => {
+    if (client.readyState === 1) client.send(msg)
+  })
 }

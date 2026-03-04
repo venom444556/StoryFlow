@@ -8,6 +8,17 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
 import * as sf from './storyflow-client.js'
+import { buildProvenanceHeaders } from './storyflow-client.js'
+
+// Shared provenance params for all mutating tools
+const provenanceParams = {
+  reasoning: z
+    .string()
+    .optional()
+    .describe('WHY this action is being taken (shown to the human in the transparency dashboard)'),
+  confidence: z.number().min(0).max(1).optional().describe('Confidence level (0-1) in this action'),
+  session_id: z.string().optional().describe('Current session ID for event correlation'),
+}
 
 const server = new McpServer({
   name: 'storyflow',
@@ -76,10 +87,12 @@ server.registerTool(
         .enum(['planning', 'in-progress', 'completed', 'on-hold'])
         .optional()
         .describe('Project status (default: planning)'),
+      ...provenanceParams,
     },
   },
-  async ({ name, description, status }) => {
-    const project = await sf.createProject({ name, description, status })
+  async ({ name, description, status, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const project = await sf.createProject({ name, description, status }, headers)
     return {
       content: [
         {
@@ -106,14 +119,16 @@ server.registerTool(
         .enum(['planning', 'in-progress', 'completed', 'on-hold'])
         .optional()
         .describe('New project status'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, name, description, status }) => {
+  async ({ project_id, name, description, status, reasoning, confidence, session_id }) => {
     const data = {}
     if (name !== undefined) data.name = name
     if (description !== undefined) data.description = description
     if (status !== undefined) data.status = status
-    const project = await sf.updateProject(project_id, data)
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const project = await sf.updateProject(project_id, data, headers)
     return {
       content: [
         {
@@ -221,6 +236,7 @@ server.registerTool(
       sprint_id: z.string().optional().describe('Sprint ID to assign to'),
       assignee: z.string().optional().describe('Assignee name'),
       labels: z.array(z.string()).optional().describe('Labels/tags'),
+      ...provenanceParams,
     },
   },
   async ({
@@ -235,6 +251,9 @@ server.registerTool(
     sprint_id,
     assignee,
     labels,
+    reasoning,
+    confidence,
+    session_id,
   }) => {
     const data = { title, type }
     if (status) data.status = status
@@ -245,7 +264,8 @@ server.registerTool(
     if (sprint_id) data.sprintId = sprint_id
     if (assignee) data.assignee = assignee
     if (labels) data.labels = labels
-    const issue = await sf.createIssue(project_id, data)
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const issue = await sf.createIssue(project_id, data, headers)
     return {
       content: [
         {
@@ -281,6 +301,7 @@ server.registerTool(
       sprint_id: z.string().optional().describe('New sprint ID'),
       assignee: z.string().optional().describe('New assignee'),
       labels: z.array(z.string()).optional().describe('New labels'),
+      ...provenanceParams,
     },
   },
   async ({
@@ -296,6 +317,9 @@ server.registerTool(
     sprint_id,
     assignee,
     labels,
+    reasoning,
+    confidence,
+    session_id,
   }) => {
     if (!issue_id && !issue_key) {
       return {
@@ -313,9 +337,10 @@ server.registerTool(
     if (sprint_id !== undefined) data.sprintId = sprint_id
     if (assignee !== undefined) data.assignee = assignee
     if (labels !== undefined) data.labels = labels
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
     const issue = issue_key
-      ? await sf.updateIssueByKey(project_id, issue_key, data)
-      : await sf.updateIssue(project_id, issue_id, data)
+      ? await sf.updateIssueByKey(project_id, issue_key, data, headers)
+      : await sf.updateIssue(project_id, issue_id, data, headers)
     return {
       content: [
         {
@@ -367,9 +392,10 @@ server.registerTool(
         .string()
         .optional()
         .describe('Issue key (e.g. "SCA-43") — provide this OR issue_id'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, issue_id, issue_key }) => {
+  async ({ project_id, issue_id, issue_key, reasoning, confidence, session_id }) => {
     if (!issue_id && !issue_key) {
       return {
         content: [{ type: 'text', text: 'Error: provide either issue_id or issue_key' }],
@@ -377,10 +403,11 @@ server.registerTool(
       }
     }
     const identifier = issue_key || issue_id
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
     if (issue_key) {
-      await sf.deleteIssueByKey(project_id, issue_key)
+      await sf.deleteIssueByKey(project_id, issue_key, headers)
     } else {
-      await sf.deleteIssue(project_id, issue_id)
+      await sf.deleteIssue(project_id, issue_id, headers)
     }
     return {
       content: [
@@ -502,15 +529,27 @@ server.registerTool(
         .enum(['planning', 'active', 'completed'])
         .optional()
         .describe('Sprint status (default: planning)'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, name, goal, start_date, end_date, status }) => {
+  async ({
+    project_id,
+    name,
+    goal,
+    start_date,
+    end_date,
+    status,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
     const data = { name }
     if (goal) data.goal = goal
     if (start_date) data.startDate = start_date
     if (end_date) data.endDate = end_date
     if (status) data.status = status
-    const sprint = await sf.createSprint(project_id, data)
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const sprint = await sf.createSprint(project_id, data, headers)
     return {
       content: [
         {
@@ -558,13 +597,15 @@ server.registerTool(
       title: z.string().describe('Page title'),
       content: z.string().optional().describe('Page content (markdown)'),
       parent_id: z.string().optional().describe('Parent page ID for nesting'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, title, content, parent_id }) => {
+  async ({ project_id, title, content, parent_id, reasoning, confidence, session_id }) => {
     const data = { title }
     if (content) data.content = content
     if (parent_id) data.parentId = parent_id
-    const page = await sf.createPage(project_id, data)
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const page = await sf.createPage(project_id, data, headers)
     return {
       content: [
         {
@@ -589,14 +630,16 @@ server.registerTool(
       title: z.string().optional().describe('New title'),
       content: z.string().optional().describe('New content (markdown)'),
       parent_id: z.string().optional().describe('New parent page ID'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, page_id, title, content, parent_id }) => {
+  async ({ project_id, page_id, title, content, parent_id, reasoning, confidence, session_id }) => {
     const data = {}
     if (title !== undefined) data.title = title
     if (content !== undefined) data.content = content
     if (parent_id !== undefined) data.parentId = parent_id
-    const page = await sf.updatePage(project_id, page_id, data)
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const page = await sf.updatePage(project_id, page_id, data, headers)
     return {
       content: [
         {
@@ -618,10 +661,12 @@ server.registerTool(
     inputSchema: {
       project_id: z.string().describe('Project ID'),
       page_id: z.string().describe('Page ID to delete'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, page_id }) => {
-    await sf.deletePage(project_id, page_id)
+  async ({ project_id, page_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deletePage(project_id, page_id, headers)
     return {
       content: [
         {
@@ -643,10 +688,12 @@ server.registerTool(
     inputSchema: {
       project_id: z.string().describe('Project ID'),
       sprint_id: z.string().describe('Sprint ID to delete'),
+      ...provenanceParams,
     },
   },
-  async ({ project_id, sprint_id }) => {
-    await sf.deleteSprint(project_id, sprint_id)
+  async ({ project_id, sprint_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deleteSprint(project_id, sprint_id, headers)
     return {
       content: [
         {
@@ -677,6 +724,249 @@ server.registerTool(
           text: JSON.stringify(status, null, 2),
         },
       ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Record Event (AI transparency)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_record_event',
+  {
+    description:
+      'Record an AI activity event for transparency. Use this for actions that don\'t map to entity CRUD — e.g. "analyzed codebase structure", "read file to understand patterns", "evaluated alternatives". Every significant AI action should be recorded.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      category: z
+        .enum([
+          'board',
+          'wiki',
+          'architecture',
+          'workflow',
+          'timeline',
+          'decisions',
+          'project',
+          'system',
+        ])
+        .describe('Which domain this event belongs to'),
+      action: z
+        .enum(['create', 'update', 'delete', 'status_change', 'analyze', 'info'])
+        .describe('What type of action occurred'),
+      entity_type: z
+        .string()
+        .optional()
+        .describe('Entity type (e.g. "issue", "file", "component")'),
+      entity_id: z.string().optional().describe('Entity identifier'),
+      entity_title: z.string().optional().describe('Human-readable title for the entity'),
+      reasoning: z.string().describe('WHY this action was taken'),
+      confidence: z.number().min(0).max(1).optional().describe('Confidence level (0-1)'),
+      session_id: z.string().optional().describe('Session ID for correlation'),
+      data: z.record(z.unknown()).optional().describe('Additional structured data'),
+    },
+  },
+  async ({
+    project_id,
+    category,
+    action,
+    entity_type,
+    entity_id,
+    entity_title,
+    reasoning,
+    confidence,
+    session_id,
+    data,
+  }) => {
+    try {
+      const event = await sf.recordEvent(project_id, {
+        actor: 'ai',
+        category,
+        action,
+        entity_type,
+        entity_id,
+        entity_title,
+        reasoning,
+        confidence,
+        session_id,
+        data: data || {},
+      })
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(event, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update AI Status
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_ai_status',
+  {
+    description:
+      'Report what the AI is currently working on. The human sees this in the transparency dashboard. Call this when starting work, switching focus, or when blocked and needing input.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      status: z.enum(['working', 'idle', 'blocked']).describe('Current AI status'),
+      detail: z
+        .string()
+        .optional()
+        .describe('What the AI is currently doing (e.g. "Implementing authentication middleware")'),
+    },
+  },
+  async ({ project_id, status, detail }) => {
+    try {
+      const result = await sf.updateAiStatus(project_id, status, detail)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Steering Inputs
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_steering_inputs',
+  {
+    description:
+      'Check for pending human steering directives. The human can type natural language instructions like "focus on the API next" or "stop auth work, prioritize bugfixes". Call this periodically to see if the human wants to redirect your work. Use consume=true to mark directives as read.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      consume: z
+        .boolean()
+        .optional()
+        .describe(
+          'If true, marks returned directives as consumed so they are not returned again. Default false (peek only).'
+        ),
+    },
+  },
+  async ({ project_id, consume }) => {
+    try {
+      const directives = await sf.getSteeringInputs(project_id, { consume: !!consume })
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              directives.length > 0
+                ? JSON.stringify(directives, null, 2)
+                : 'No pending steering directives.',
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Respond to Human
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_respond_to_human',
+  {
+    description:
+      'Acknowledge or respond to a human steering directive or event. Use this to confirm you received a directive, explain what you plan to do about it, or mark it as addressed.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      directive_id: z
+        .string()
+        .optional()
+        .describe('The directive ID to acknowledge (from storyflow_get_steering_inputs)'),
+      event_id: z
+        .string()
+        .optional()
+        .describe('The event ID to respond to (alternative to directive_id)'),
+      action: z
+        .enum(['approve', 'reject', 'redirect'])
+        .optional()
+        .describe('Response action for event-based responses'),
+      comment: z.string().optional().describe('Response message to the human'),
+      ...provenanceParams,
+    },
+  },
+  async ({
+    project_id,
+    directive_id,
+    event_id,
+    action,
+    comment,
+    reasoning,
+    confidence: _confidence,
+    session_id: _session_id,
+  }) => {
+    try {
+      const results = []
+
+      // Acknowledge a steering directive
+      if (directive_id) {
+        const ack = await sf.acknowledgeDirective(project_id, directive_id)
+        results.push({ type: 'directive_acknowledged', directive: ack })
+      }
+
+      // Respond to an event
+      if (event_id && action) {
+        const resp = await sf.respondToHuman(project_id, event_id, { action, comment })
+        results.push({ type: 'event_responded', event: resp })
+      }
+
+      // Record acknowledgment as an event for transparency
+      if (comment) {
+        await sf.recordEvent(project_id, {
+          actor: 'ai',
+          category: 'steering',
+          action: 'info',
+          entity_type: 'response',
+          entity_id: directive_id || event_id || null,
+          entity_title: comment.slice(0, 120),
+          reasoning: reasoning || null,
+          data: { directive_id, event_id, action, comment },
+        })
+      }
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              results.length > 0 ? results : { acknowledged: true, comment },
+              null,
+              2
+            ),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
     }
   }
 )
