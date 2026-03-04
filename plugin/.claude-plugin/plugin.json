@@ -1,7 +1,7 @@
 {
   "name": "storyflow",
-  "version": "1.0.0",
-  "description": "Integrate Claude Code with StoryFlow project management — create issues, track sprints, update boards, and manage wiki docs from any codebase.",
+  "version": "2.0.0",
+  "description": "Integrate Claude Code with StoryFlow project management — 37 MCP tools for issues, sprints, wiki, AI transparency, agent autonomy, and git reconciliation.",
   "author": {
     "name": "StoryFlow",
     "url": "https://github.com/venom444556/StoryFlow"
@@ -9,5 +9,14 @@
   "repository": "https://github.com/venom444556/StoryFlow",
   "homepage": "https://github.com/venom444556/StoryFlow",
   "license": "Apache-2.0",
-  "keywords": ["project-management", "kanban", "issues", "sprints", "wiki", "mcp"]
+  "keywords": [
+    "project-management",
+    "kanban",
+    "issues",
+    "sprints",
+    "wiki",
+    "mcp",
+    "ai-transparency",
+    "agent-autonomy"
+  ]
 }

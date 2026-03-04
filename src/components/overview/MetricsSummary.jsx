@@ -1,9 +1,18 @@
 import { useMemo } from 'react'
-import { Bot, User, CheckCircle2, AlertTriangle, TrendingUp, Activity, Gauge } from 'lucide-react'
+import {
+  Bot,
+  User,
+  CheckCircle2,
+  AlertTriangle,
+  TrendingUp,
+  Activity,
+  Gauge,
+  ShieldAlert,
+} from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
 
-function MetricTile({ icon: Icon, label, value, subtext, color }) {
+export function MetricTile({ icon: Icon, label, value, subtext, color }) {
   return (
     <div className="flex items-start gap-3 rounded-xl bg-[var(--color-bg-glass)] p-3">
       <div
@@ -38,6 +47,7 @@ export default function MetricsSummary({ project }) {
     const issues = project?.board?.issues || []
     const doneIssues = issues.filter((i) => i.status === 'Done')
     const inProgressIssues = issues.filter((i) => i.status === 'In Progress')
+    const blockedIssues = issues.filter((i) => i.status === 'Blocked')
     const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
     const donePoints = doneIssues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
 
@@ -66,6 +76,7 @@ export default function MetricsSummary({ project }) {
       overrideRate,
       issuesDone: doneIssues.length,
       issuesInProgress: inProgressIssues.length,
+      issuesBlocked: blockedIssues.length,
       totalIssues: issues.length,
       velocity: donePoints,
       totalPoints,
@@ -111,6 +122,13 @@ export default function MetricsSummary({ project }) {
           value={metrics.issuesDone}
           subtext={`of ${metrics.totalIssues} total`}
           color="var(--color-success, #22c55e)"
+        />
+        <MetricTile
+          icon={ShieldAlert}
+          label="Blocked"
+          value={metrics.issuesBlocked}
+          subtext={metrics.issuesBlocked > 0 ? 'need attention' : 'none'}
+          color="var(--color-warning, #eab308)"
         />
         <MetricTile
           icon={TrendingUp}

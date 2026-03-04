@@ -200,18 +200,31 @@ function validateProjectId(req, res, next) {
 app.param('id', validateProjectId)
 
 // --- Sync endpoint (destructive: replaces all projects) ---
-app.post('/api/sync', (req, res) => {
+// Global sync lock prevents concurrent sync + mutation races
+let _syncInProgress = false
+
+app.post('/api/sync', async (req, res) => {
   // Require explicit confirmation header for this destructive operation
   if (req.headers['x-confirm'] !== 'overwrite-all') {
     return res.status(400).json({
       error: 'Sync replaces all data. Set header X-Confirm: overwrite-all to proceed.',
     })
   }
-  if (req.body.projects) {
-    db.syncAll(req.body.projects)
-    return res.json({ success: true, count: req.body.projects.length })
+  if (!req.body.projects) {
+    return res.status(400).json({ error: 'Missing projects array' })
   }
-  res.status(400).json({ error: 'Missing projects array' })
+  if (_syncInProgress) {
+    return res.status(409).json({ error: 'Sync already in progress' })
+  }
+  _syncInProgress = true
+  try {
+    await db.syncAll(req.body.projects)
+    res.json({ success: true, count: req.body.projects.length })
+  } catch (err) {
+    res.status(500).json({ error: 'Sync failed' })
+  } finally {
+    _syncInProgress = false
+  }
 })
 
 // --- Projects ---

@@ -281,13 +281,20 @@ export function deleteProject(id) {
 
 /** Sync: replace all projects (called by client on load) */
 export async function syncAll(projects) {
-  // Clear existing and re-insert all
-  db.run('DELETE FROM projects')
-  for (const p of projects) {
-    upsertProject(p.id, p)
+  if (!Array.isArray(projects) || projects.length === 0) {
+    console.warn('[DB] syncAll called with empty/invalid projects — skipping to prevent data wipe')
+    return
   }
-  // upsertProject already schedules saves, but force one for the DELETE
-  await saveToDisk()
+  try {
+    db.run('DELETE FROM projects')
+    for (const p of projects) {
+      upsertProject(p.id, p)
+    }
+    await saveToDisk()
+  } catch (err) {
+    console.error('[DB] CRITICAL: syncAll failed during re-insert:', err.message)
+    throw err
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -364,7 +371,7 @@ export function addIssue(projectId, issue) {
   if (issue.status) {
     const normalized = normalizeStatus(issue.status)
     if (!normalized)
-      return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Done` }
+      return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Blocked, Done` }
     issue.status = normalized
   }
 
@@ -388,6 +395,7 @@ export function addIssue(projectId, issue) {
 
   if (newIssue.status === 'To Do' && !newIssue.todoAt) newIssue.todoAt = now
   else if (newIssue.status === 'In Progress' && !newIssue.inProgressAt) newIssue.inProgressAt = now
+  else if (newIssue.status === 'Blocked' && !newIssue.blockedAt) newIssue.blockedAt = now
   else if (newIssue.status === 'Done' && !newIssue.doneAt) newIssue.doneAt = now
 
   project.board.issues.push(newIssue)
@@ -408,7 +416,9 @@ export function updateIssue(projectId, issueId, updates) {
   if (updates.status) {
     const normalized = normalizeStatus(updates.status)
     if (!normalized)
-      return { error: `Unknown status "${updates.status}". Valid: To Do, In Progress, Done` }
+      return {
+        error: `Unknown status "${updates.status}". Valid: To Do, In Progress, Blocked, Done`,
+      }
     updates.status = normalized
   }
 
@@ -417,6 +427,7 @@ export function updateIssue(projectId, issueId, updates) {
   if (updates.status && updates.status !== issue.status) {
     if (updates.status === 'To Do' && !issue.todoAt) updates.todoAt = now
     else if (updates.status === 'In Progress' && !issue.inProgressAt) updates.inProgressAt = now
+    else if (updates.status === 'Blocked' && !issue.blockedAt) updates.blockedAt = now
     else if (updates.status === 'Done' && !issue.doneAt) updates.doneAt = now
   }
 
@@ -629,8 +640,8 @@ export function getBoardSummary(projectId) {
     }
   }
 
-  // Detect stale "In Progress" issues (>2 hours since last update)
-  const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000
+  // Detect stale "In Progress" issues (>4 hours since last update)
+  const STALE_THRESHOLD_MS = 4 * 60 * 60 * 1000
   const now = Date.now()
   const staleIssues = issues
     .filter(

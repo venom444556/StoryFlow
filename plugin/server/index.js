@@ -26,7 +26,7 @@ const provenanceParams = {
 
 const server = new McpServer({
   name: 'storyflow',
-  version: '1.0.0',
+  version: '2.0.0',
 })
 
 // ---------------------------------------------------------------------------

@@ -21,10 +21,12 @@ Status: <project status>
 Issues: <total>
   To Do:        <count>
   In Progress:  <count>
+  Blocked:      <count>
   Done:         <count>
 
 Story Points: <done>/<total> (<percent>%)
 Active Sprint: <name> (<start> -> <end>)
+Stale Issues: <staleCount>
 ```
 
 ## Arguments
@@ -41,9 +43,11 @@ Status: in-progress
 
 Issues: 47
   To Do:        12
-  In Progress:   8
+  In Progress:   6
+  Blocked:       2
   Done:         27
 
 Story Points: 89/134 (66%)
 Active Sprint: Sprint 3 — Auth & Roles (Feb 10 -> Feb 17)
+Stale Issues: 3
 ```
