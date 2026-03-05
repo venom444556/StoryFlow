@@ -10,7 +10,15 @@ Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud s
 
 ### Why StoryFlow is Different
 
-Most AI agent frameworks focus on the model -- better prompts, chain-of-thought, tool use. StoryFlow focuses on the infrastructure around the model -- persistence, transparency, human-in-the-loop steering, and session chaining. The insight that "the agent's brain should be the same data store the human sees" eliminates the black-box problem that plagues most autonomous agents. The human can literally read the agent's wiki pages to understand what it knows and correct it.
+Most AI agent frameworks focus on the model — better prompts, chain-of-thought, tool use. StoryFlow focuses on the **infrastructure around the model** — persistence, transparency, human-in-the-loop steering, and session chaining.
+
+The core insight: **the agent's brain should be the same data store the human sees.** Wiki pages are the agent's memory. Events are the audit trail. Gates are the guardrails. There is no hidden state — if the agent knows it, you can read it; if you correct it, the agent sees the correction immediately.
+
+This eliminates the three problems that plague autonomous coding agents:
+
+1. **The black-box problem** — you can't see what the agent knows or why it made a decision. StoryFlow records every action with actor, reasoning, and confidence score.
+2. **The context-loss problem** — agents forget everything between sessions. StoryFlow chains sessions through persistent wiki pages and session summaries the agent reads on startup.
+3. **The steering problem** — you can't redirect an agent mid-task without restarting it. StoryFlow's steering queue and gate approvals let you course-correct in real time.
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
@@ -122,13 +130,13 @@ In production, only the Express server runs (on port 3001) and serves both the A
 
 ![System Architecture](docs/diagrams/architecture.svg)
 
-The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
+The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync — changes from one source propagate to the other automatically. The AI agent reads and writes through the **same data store** the human sees — there is no separate agent memory.
 
 ### AI Transparency Loop
 
 ![AI Transparency Loop](docs/diagrams/ai-loop.svg)
 
-The transparency layer records every AI action as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue.
+Every AI action is recorded as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue. The result: **full auditability with zero overhead** — the agent's normal workflow produces the audit trail automatically.
 
 ## Project Structure
 
