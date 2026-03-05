@@ -12,7 +12,7 @@ We expect all participants to be respectful, constructive, and professional in a
 
 ## Enforcement
 
-Instances of unacceptable behavior may be reported to the project maintainers at **conduct@storyflow.dev**.
+Instances of unacceptable behavior may be reported to the project maintainers at **sasdevworks@gmail.com**.
 
 Maintainers will review and respond to all reports promptly and fairly.
 

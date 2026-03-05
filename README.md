@@ -120,22 +120,13 @@ In production, only the Express server runs (on port 3001) and serves both the A
 
 ## Architecture
 
-```
-Development:
-  Vite (:3000) ──proxy /api──> Express (:3001) ──> SQLite (data/storyflow.db)
-       ↑                            ↕ WebSocket
-       └── Browser (React + Zustand + IndexedDB)
-
-Production:
-  Express (:3001) ──> serves dist/ + API + WebSocket ──> SQLite
-
-Data Flow (AI Transparency):
-  Agent ──MCP tools──> Express API ──> SQLite + Event Stream
-       ↑                    ↓ WebSocket broadcast
-       └── Steering  <── Browser (gates, events, metrics, sessions)
-```
+![System Architecture](docs/diagrams/architecture.svg)
 
 The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
+
+### AI Transparency Loop
+
+![AI Transparency Loop](docs/diagrams/ai-loop.svg)
 
 The transparency layer records every AI action as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue.
 
