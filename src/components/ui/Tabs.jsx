@@ -96,8 +96,7 @@ export default function Tabs({
                 layoutId={`${layoutId}-underline`}
                 className="absolute bottom-0 left-[var(--space-2)] right-[var(--space-2)] h-0.5 rounded-full"
                 style={{
-                  backgroundImage:
-                    'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                  background: 'var(--accent-default)',
                 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />

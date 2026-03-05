@@ -72,7 +72,7 @@ export const NODE_TYPES = [
   { type: 'phase', label: 'Phase', icon: 'Layers', color: '#6366f1' },
   { type: 'task', label: 'Task', icon: 'CheckSquare', color: '#3b82f6' },
   { type: 'milestone', label: 'Milestone', icon: 'Flag', color: '#f59e0b' },
-  { type: 'decision', label: 'Decision', icon: 'GitBranch', color: '#8b5cf6' },
+  { type: 'decision', label: 'Decision', icon: 'GitBranch', color: '#f59e0b' },
   { type: 'start', label: 'Start', icon: 'Play', color: '#22c55e' },
   { type: 'end', label: 'End', icon: 'Square', color: '#ef4444' },
   { type: 'api', label: 'API Call', icon: 'Globe', color: '#0ea5e9' },
@@ -83,7 +83,7 @@ export const NODE_TYPES = [
 // ---------------------------------------------------------------------------
 // Default board columns
 // ---------------------------------------------------------------------------
-export const DEFAULT_STATUS_COLUMNS = ['To Do', 'In Progress', 'Done']
+export const DEFAULT_STATUS_COLUMNS = ['To Do', 'In Progress', 'Done', 'Blocked']
 
 // ---------------------------------------------------------------------------
 // Point estimation scales

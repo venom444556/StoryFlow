@@ -7,7 +7,7 @@
 
 export const LABEL_CATEGORIES = {
   area: { name: 'Feature Area', color: '#3b82f6' },
-  type: { name: 'Work Type', color: '#8b5cf6' },
+  type: { name: 'Work Type', color: '#f59e0b' },
   quality: { name: 'Quality', color: '#22c55e' },
   technical: { name: 'Technical', color: '#f59e0b' },
   process: { name: 'Process', color: '#ec4899' },

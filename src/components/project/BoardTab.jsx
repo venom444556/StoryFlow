@@ -255,9 +255,7 @@ export default function BoardTab({
               : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
           ].join(' ')}
           style={
-            showCharts
-              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)' }
-              : undefined
+            showCharts ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)' } : undefined
           }
           title="Toggle charts panel"
         >

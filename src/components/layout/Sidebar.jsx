@@ -63,11 +63,11 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         <div
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-lg)]"
           style={{
-            backgroundImage:
-              'linear-gradient(to bottom right, var(--accent-active, #8b5cf6), #3b82f6)',
+            background: 'var(--accent-default)',
+            boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
           }}
         >
-          <Zap size={16} className="text-[var(--color-fg-default)]" />
+          <Zap size={16} className="text-white" />
         </div>
         {(!collapsed || mobileMenuOpen) && (
           <motion.span
@@ -243,8 +243,8 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
               ].join(' ')}
               style={{
-                backgroundImage:
-                  'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                background: 'var(--accent-default)',
+                boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
                 transitionDuration: 'var(--duration-fast)',
               }}
             >
@@ -258,11 +258,12 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
             className={[
               'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
               'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
-              'text-[var(--color-fg-default)] transition-all hover:brightness-110',
+              'text-white transition-all hover:brightness-110',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
             ].join(' ')}
             style={{
-              backgroundImage: 'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+              background: 'var(--accent-default)',
+              boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
               transitionDuration: 'var(--duration-fast)',
             }}
           >

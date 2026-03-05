@@ -46,7 +46,7 @@ const NODE_TYPES = [
     type: 'decision',
     label: 'Decision',
     icon: 'GitBranch',
-    color: '#8b5cf6',
+    color: '#f59e0b',
     description: 'Conditional branching point with if/else logic.',
   },
   {

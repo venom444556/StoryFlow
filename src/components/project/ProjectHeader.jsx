@@ -54,11 +54,7 @@ function StatusDropdown({ status, onChange }) {
                 {opt.label}
               </Badge>
               {status === opt.value && (
-                <Check
-                  size={14}
-                  className="ml-auto"
-                  style={{ color: 'var(--accent-active, #8b5cf6)' }}
-                />
+                <Check size={14} className="ml-auto" style={{ color: 'var(--accent-default)' }} />
               )}
             </button>
           ))}
@@ -136,7 +132,7 @@ export default function ProjectHeader({ project, onUpdate }) {
           <button
             onClick={() => setEditing(true)}
             className="truncate text-lg font-semibold text-[var(--color-fg-default)] transition-colors"
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)')}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-default)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = '')}
           >
             {project.name}

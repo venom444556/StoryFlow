@@ -13,19 +13,19 @@ const STATUS_CONFIG = {
     label: 'Working',
     color: 'var(--color-ai-working)',
     pulse: true,
-    ringClass: 'ring-green-400/20',
+    ringClass: 'ring-[var(--color-ai-working)]/20',
   },
   idle: {
     label: 'Idle',
     color: 'var(--color-ai-idle)',
     pulse: false,
-    ringClass: 'ring-gray-400/10',
+    ringClass: 'ring-[var(--color-ai-idle)]/10',
   },
   blocked: {
     label: 'Needs Input',
     color: 'var(--color-ai-blocked)',
     pulse: true,
-    ringClass: 'ring-yellow-400/20',
+    ringClass: 'ring-[var(--color-ai-blocked)]/20',
   },
 }
 
@@ -45,18 +45,29 @@ export default function AIStatusCard() {
         />
       )}
 
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-4 right-4 h-px"
+        style={{
+          background: `linear-gradient(to right, transparent, rgba(var(--accent-default-rgb), 0.2), transparent)`,
+        }}
+      />
+
       <div className="flex items-start gap-4">
         {/* AI avatar with status ring */}
         <div className="relative shrink-0">
-          <div
+          <motion.div
             className={[
               'flex h-12 w-12 items-center justify-center rounded-xl',
               'bg-[var(--color-ai-bg)] ring-2',
               config.ringClass,
             ].join(' ')}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
             <Bot size={24} className="text-[var(--color-ai-accent)]" />
-          </div>
+          </motion.div>
           {/* Status dot */}
           <motion.span
             className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-[var(--color-bg-base)]"
@@ -69,9 +80,11 @@ export default function AIStatusCard() {
         {/* Status info */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">AI Agent</h3>
+            <h3 className="text-base font-semibold tracking-tight text-[var(--color-fg-default)]">
+              AI Agent
+            </h3>
             <span
-              className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+              className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
               style={{
                 backgroundColor: `color-mix(in srgb, ${config.color} 15%, transparent)`,
                 color: config.color,
@@ -88,13 +101,13 @@ export default function AIStatusCard() {
           </div>
 
           {aiStatus.detail ? (
-            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-[var(--color-fg-muted)]">
+            <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-[var(--color-fg-muted)]">
               {aiStatus.detail}
             </p>
           ) : (
-            <p className="mt-1 text-sm text-[var(--color-fg-subtle)]">
+            <p className="mt-1.5 text-sm text-[var(--color-fg-subtle)]">
               {aiStatus.status === 'idle'
-                ? 'Waiting for tasks — use the steering bar below to direct the agent'
+                ? 'Waiting for tasks \u2014 use the steering bar below to direct the agent'
                 : 'Processing...'}
             </p>
           )}
@@ -103,9 +116,9 @@ export default function AIStatusCard() {
         {/* Connection indicator */}
         <div className="shrink-0" title={connected ? 'Connected' : 'Disconnected'}>
           {connected ? (
-            <Wifi size={14} className="text-green-400/60" />
+            <Wifi size={14} className="text-[var(--color-success)]/60" />
           ) : (
-            <WifiOff size={14} className="text-red-400/60" />
+            <WifiOff size={14} className="text-[var(--color-danger)]/60" />
           )}
         </div>
       </div>

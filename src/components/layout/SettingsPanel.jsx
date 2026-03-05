@@ -19,6 +19,7 @@ import { useSettings } from '../../contexts/SettingsContext'
 import { useProjectsStore, reloadFromServer } from '../../stores/projectsStore'
 
 const ACCENT_COLORS = [
+  { id: 'amber', label: 'Amber', color: '#f59e0b' },
   { id: 'purple', label: 'Purple', color: '#8b5cf6' },
   { id: 'blue', label: 'Blue', color: '#3b82f6' },
   { id: 'cyan', label: 'Cyan', color: '#06b6d4' },
@@ -53,7 +54,7 @@ function Toggle({ checked, onChange }) {
       onClick={() => onChange(!checked)}
       className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out"
       style={{
-        backgroundColor: checked ? 'var(--accent-active, #8b5cf6)' : 'var(--color-bg-emphasis)',
+        backgroundColor: checked ? 'var(--accent-default)' : 'var(--color-bg-emphasis)',
       }}
     >
       <span
@@ -309,7 +310,7 @@ export default function SettingsPanel({ isOpen, onClose }) {
                     resetSettings()
                     onClose()
                   }}
-                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/10"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-subtle)]"
                 >
                   <RotateCcw size={14} />
                   Reset All Settings

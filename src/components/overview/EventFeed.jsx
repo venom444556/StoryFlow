@@ -47,7 +47,7 @@ const CATEGORY_COLORS = {
   architecture: 'var(--badge-purple-fg, #a78bfa)',
   workflow: 'var(--badge-cyan-fg, #22d3ee)',
   steering: 'var(--color-warning, #eab308)',
-  project: 'var(--accent-active, #8b5cf6)',
+  project: 'var(--accent-default)',
   system: 'var(--color-fg-muted)',
 }
 
@@ -198,7 +198,7 @@ export default function EventFeed() {
     <div className="glass-card flex flex-col overflow-hidden">
       {/* Header with filters */}
       <div className="flex items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-3">
-        <Zap size={14} style={{ color: 'var(--accent-active, #8b5cf6)' }} />
+        <Zap size={14} style={{ color: 'var(--accent-default)' }} />
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
           Activity Feed
         </h3>

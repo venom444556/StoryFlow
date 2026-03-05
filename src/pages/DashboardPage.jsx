@@ -21,10 +21,10 @@ const STATUS_BADGE_VARIANT = {
 }
 
 const STATUS_ACCENT_COLOR = {
-  planning: 'bg-blue-500',
-  'in-progress': 'bg-yellow-500',
-  completed: 'bg-green-500',
-  archived: 'bg-gray-500',
+  planning: 'bg-[var(--color-info)]',
+  'in-progress': 'bg-[var(--color-warning)]',
+  completed: 'bg-[var(--color-success)]',
+  archived: 'bg-[var(--color-fg-muted)]',
 }
 
 const TECH_BADGE_VARIANTS = ['purple', 'blue', 'cyan', 'green', 'pink']
@@ -75,8 +75,8 @@ export default function DashboardPage() {
   return (
     <div className="h-full overflow-auto p-6">
       {/* Title section */}
-      <div className="mb-6">
-        <h1 className="gradient-text text-2xl font-bold">Projects</h1>
+      <div className="mb-6 animate-entrance">
+        <h1 className="gradient-text text-3xl font-bold tracking-tight">Projects</h1>
         <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
           {projects.length} project{projects.length !== 1 ? 's' : ''}
           {trashedProjects.length > 0 && (
@@ -89,7 +89,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Action bar */}
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-3 animate-entrance stagger-1">
         <SearchBar
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -120,10 +120,10 @@ export default function DashboardPage() {
             transition={{ duration: 0.2 }}
             className="mb-6 overflow-hidden"
           >
-            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+            <div className="rounded-xl border border-[var(--color-danger)]/20 bg-[var(--color-danger-subtle)] p-4">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Trash2 size={16} className="text-red-400" />
+                  <Trash2 size={16} className="text-[var(--color-danger)]" />
                   <h2 className="text-sm font-semibold text-[var(--color-fg-default)]">Trash</h2>
                   <span className="text-xs text-[var(--color-fg-muted)]">
                     {trashedProjects.length} project{trashedProjects.length !== 1 ? 's' : ''}
@@ -133,7 +133,7 @@ export default function DashboardPage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowEmptyTrashConfirm(true)}
-                  className="text-red-400 hover:text-red-300"
+                  className="text-[var(--color-danger)] hover:text-[var(--color-danger-fg)]"
                 >
                   Empty Trash
                 </Button>
@@ -158,14 +158,14 @@ export default function DashboardPage() {
                     <div className="ml-3 flex shrink-0 gap-1">
                       <button
                         onClick={() => restoreProject(project.id)}
-                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-green-500/10 hover:text-green-400"
+                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-success-subtle)] hover:text-[var(--color-success)]"
                         title="Restore project"
                       >
                         <RotateCcw size={14} />
                       </button>
                       <button
                         onClick={() => setPermanentDeleteTarget(project)}
-                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/10 hover:text-red-400"
+                        className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger)]"
                         title="Permanently delete"
                       >
                         <Trash2 size={14} />
@@ -182,7 +182,7 @@ export default function DashboardPage() {
       {/* Project grid */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((project) => {
+          {filtered.map((project, index) => {
             const statusVariant = STATUS_BADGE_VARIANT[project.status] || 'default'
             const accentColor = STATUS_ACCENT_COLOR[project.status] || 'bg-gray-500'
             const issues = project.board?.issues || []
@@ -194,6 +194,7 @@ export default function DashboardPage() {
                 hover
                 padding="none"
                 onClick={() => navigate(`/project/${project.id}`)}
+                className={`animate-entrance-scale stagger-${Math.min(index + 2, 8)}`}
               >
                 {/* Color accent bar */}
                 <div className={`h-1 w-full ${accentColor}`} />
@@ -209,7 +210,7 @@ export default function DashboardPage() {
                         e.stopPropagation()
                         setTrashTarget(project)
                       }}
-                      className="shrink-0 rounded-md p-1 text-[var(--color-fg-subtle)] transition-colors hover:bg-red-500/10 hover:text-red-400"
+                      className="shrink-0 rounded-md p-1 text-[var(--color-fg-subtle)] transition-colors hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger-fg)]"
                       title="Move to trash"
                     >
                       <Trash2 size={14} />

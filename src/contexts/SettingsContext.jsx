@@ -4,7 +4,7 @@ const STORAGE_KEY = 'storyflow-settings'
 
 const DEFAULT_SETTINGS = {
   theme: 'dark', // 'dark' | 'light'
-  accentColor: 'purple', // 'purple' | 'blue' | 'cyan' | 'green' | 'pink'
+  accentColor: 'amber', // 'amber' | 'purple' | 'blue' | 'cyan' | 'green' | 'pink'
   sidebarCollapsed: false,
   animationsEnabled: true,
   autoSave: true,
@@ -75,13 +75,14 @@ export function SettingsProvider({ children }) {
   useEffect(() => {
     const root = document.documentElement
     const accentMap = {
+      amber: { hex: '#f59e0b', rgb: '245, 158, 11' },
       purple: { hex: '#8b5cf6', rgb: '139, 92, 246' },
       blue: { hex: '#3b82f6', rgb: '59, 130, 246' },
       cyan: { hex: '#06b6d4', rgb: '6, 182, 212' },
       green: { hex: '#10b981', rgb: '16, 185, 129' },
       pink: { hex: '#ec4899', rgb: '236, 72, 153' },
     }
-    const accent = accentMap[settings.accentColor] || accentMap.purple
+    const accent = accentMap[settings.accentColor] || accentMap.amber
     root.style.setProperty('--accent-active', accent.hex)
     root.style.setProperty('--accent-active-rgb', accent.rgb)
   }, [settings.accentColor])

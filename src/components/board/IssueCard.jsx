@@ -67,8 +67,8 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
       style={
         isDragging
           ? {
-              borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
-              '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+              borderColor: 'rgba(var(--accent-default-rgb), 0.4)',
+              '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
             }
           : aiGlow
             ? { boxShadow: `0 0 12px ${aiGlow}` }

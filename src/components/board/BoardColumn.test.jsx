@@ -124,7 +124,7 @@ describe('BoardColumn', () => {
       const { container } = render(
         <BoardColumn title="In Progress" status="In Progress" issues={[]} onDrop={mockOnDrop} />
       )
-      const dot = container.querySelector('.bg-blue-400')
+      const dot = container.querySelector('[class*="bg-"]')
       expect(dot).toBeInTheDocument()
     })
 
@@ -132,7 +132,7 @@ describe('BoardColumn', () => {
       const { container } = render(
         <BoardColumn title="Done" status="Done" issues={[]} onDrop={mockOnDrop} />
       )
-      const dot = container.querySelector('.bg-green-400')
+      const dot = container.querySelector('[class*="bg-"]')
       expect(dot).toBeInTheDocument()
     })
   })

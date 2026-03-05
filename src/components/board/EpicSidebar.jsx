@@ -60,7 +60,7 @@ export default function EpicSidebar({
           {/* Header */}
           <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
             <div className="flex items-center gap-2">
-              <Layers size={14} style={{ color: 'var(--accent-active, #8b5cf6)' }} />
+              <Layers size={14} style={{ color: 'var(--accent-default)' }} />
               <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Epics</h3>
               <Badge variant="purple" size="sm">
                 {epicData.length}
@@ -105,8 +105,8 @@ export default function EpicSidebar({
                   style={
                     activeEpicId === epic.id
                       ? {
-                          backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-                          '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+                          backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
+                          '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
                         }
                       : undefined
                   }
@@ -122,9 +122,7 @@ export default function EpicSidebar({
                           : 'text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]',
                       ].join(' ')}
                       style={
-                        activeEpicId === epic.id
-                          ? { color: 'var(--accent-active, #8b5cf6)' }
-                          : undefined
+                        activeEpicId === epic.id ? { color: 'var(--accent-default)' } : undefined
                       }
                     >
                       {epic.title}
@@ -141,7 +139,9 @@ export default function EpicSidebar({
                     </span>
                     <span
                       className={
-                        epic.progress === 100 ? 'text-green-400' : 'text-[var(--color-fg-muted)]'
+                        epic.progress === 100
+                          ? 'text-[var(--color-success)]'
+                          : 'text-[var(--color-fg-muted)]'
                       }
                     >
                       {epic.progress}%

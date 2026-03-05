@@ -5,7 +5,7 @@ import TextArea from '../ui/TextArea'
 import Button from '../ui/Button'
 
 const PRESET_COLORS = [
-  '#8b5cf6', // purple
+  '#f59e0b', // amber
   '#3b82f6', // blue
   '#06b6d4', // cyan
   '#10b981', // emerald
@@ -118,15 +118,8 @@ export default function PhaseForm({ isOpen, onClose, onSave, phase = null }) {
               step="1"
               value={form.progress}
               onChange={handleProgressChange}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--color-bg-glass)]
-                         [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4
-                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full
-                         [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:shadow-lg
-                         [&::-webkit-slider-thumb]:shadow-purple-500/30 [&::-webkit-slider-thumb]:transition-transform
-                         [&::-webkit-slider-thumb]:hover:scale-110
-                         [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4
-                         [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0
-                         [&::-moz-range-thumb]:bg-purple-500 [&::-moz-range-thumb]:shadow-lg"
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--color-bg-glass)]"
+              style={{ accentColor: 'var(--accent-default)' }}
             />
             <span className="w-12 shrink-0 text-right text-sm font-medium text-[var(--color-fg-default)]">
               {form.progress}%

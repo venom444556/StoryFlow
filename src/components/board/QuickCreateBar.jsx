@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Plus, ChevronDown } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import IssueTypeIcon from './IssueTypeIcon'
-import { ISSUE_TYPES } from '../../utils/constants'
+import { ISSUE_TYPES, ISSUE_STATUSES } from '../../utils/constants'
 
 const TYPE_OPTIONS = [
   { value: ISSUE_TYPES.TASK, label: 'Task' },
@@ -13,9 +13,10 @@ const TYPE_OPTIONS = [
 ]
 
 const STATUS_DOT = {
-  'To Do': 'bg-[var(--color-fg-faint)]',
-  'In Progress': 'bg-blue-400',
-  Done: 'bg-green-400',
+  [ISSUE_STATUSES.TODO]: 'bg-[var(--color-fg-faint)]',
+  [ISSUE_STATUSES.IN_PROGRESS]: 'bg-[var(--color-info)]',
+  [ISSUE_STATUSES.DONE]: 'bg-[var(--color-success)]',
+  [ISSUE_STATUSES.BLOCKED]: 'bg-[var(--color-warning)]',
 }
 
 export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do', statusColumns }) {
@@ -98,13 +99,13 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do',
       style={
         showError
           ? {
-              borderColor: 'rgba(239, 68, 68, 0.5)',
-              boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.1)',
+              borderColor: 'rgba(var(--accent-red-rgb, 239, 68, 68), 0.5)',
+              boxShadow: '0 0 0 3px rgba(var(--accent-red-rgb, 239, 68, 68), 0.1)',
             }
           : isFocused
             ? {
-                borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.4)',
-                boxShadow: '0 0 0 3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)',
+                borderColor: 'rgba(var(--accent-default-rgb), 0.4)',
+                boxShadow: '0 0 0 3px rgba(var(--accent-default-rgb), 0.1)',
               }
             : undefined
       }
@@ -243,8 +244,8 @@ export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do',
           onClick={handleSubmit}
           className="flex h-5 w-5 items-center justify-center rounded transition-colors"
           style={{
-            backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
-            color: 'var(--accent-active, #8b5cf6)',
+            backgroundColor: 'rgba(var(--accent-default-rgb), 0.2)',
+            color: 'var(--accent-default)',
           }}
         >
           <Plus size={12} />

@@ -157,7 +157,7 @@ export default function SprintMetricsPanel({ project }) {
   return (
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
-        <BarChart3 size={14} style={{ color: 'var(--accent-active, #8b5cf6)' }} />
+        <BarChart3 size={14} style={{ color: 'var(--accent-default)' }} />
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
           Sprint Metrics
         </h3>
@@ -210,7 +210,7 @@ export default function SprintMetricsPanel({ project }) {
                   label={sprint.name}
                   value={sprint.points}
                   max={maxVelocity}
-                  color="var(--accent-active, #8b5cf6)"
+                  color="var(--accent-default)"
                 />
               ))}
             </div>

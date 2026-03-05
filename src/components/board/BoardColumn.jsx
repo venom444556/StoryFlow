@@ -3,19 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import IssueCard from './IssueCard'
 import Badge from '../ui/Badge'
+import { ISSUE_STATUSES } from '../../utils/constants'
 
 const STATUS_ACCENT = {
-  'To Do': {
+  [ISSUE_STATUSES.TODO]: {
     dot: 'bg-[var(--color-fg-faint)]',
     dropGlow: 'ring-[var(--color-fg-faint)]/30 border-[var(--color-fg-faint)]/40',
   },
-  'In Progress': {
-    dot: 'bg-blue-400',
-    dropGlow: 'ring-blue-400/30 border-blue-400/40',
+  [ISSUE_STATUSES.IN_PROGRESS]: {
+    dot: 'bg-[var(--color-info)]',
+    dropGlow: 'ring-[var(--color-info)]/30 border-[var(--color-info)]/40',
   },
-  Done: {
-    dot: 'bg-green-400',
-    dropGlow: 'ring-green-400/30 border-green-400/40',
+  [ISSUE_STATUSES.DONE]: {
+    dot: 'bg-[var(--color-success)]',
+    dropGlow: 'ring-[var(--color-success)]/30 border-[var(--color-success)]/40',
+  },
+  [ISSUE_STATUSES.BLOCKED]: {
+    dot: 'bg-[var(--color-warning)]',
+    dropGlow: 'ring-[var(--color-warning)]/30 border-[var(--color-warning)]/40',
   },
 }
 
@@ -140,11 +145,11 @@ export default function BoardColumn({
             exit={{ opacity: 0, height: 0 }}
             className="flex items-center justify-center rounded-lg border-2 border-dashed"
             style={{
-              borderColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.3)',
-              backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.05)',
+              borderColor: 'rgba(var(--accent-default-rgb), 0.3)',
+              backgroundColor: 'rgba(var(--accent-default-rgb), 0.05)',
             }}
           >
-            <span className="text-xs" style={{ color: 'var(--accent-active, #8b5cf6)' }}>
+            <span className="text-xs" style={{ color: 'var(--accent-default)' }}>
               Drop here
             </span>
           </motion.div>

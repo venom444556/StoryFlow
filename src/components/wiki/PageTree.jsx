@@ -84,9 +84,7 @@ function TreeNode({
           .join(' ')}
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          ...(isSelected
-            ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' }
-            : {}),
+          ...(isSelected ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.2)' } : {}),
         }}
         onClick={() => onSelectPage(node.id)}
       >

@@ -38,17 +38,17 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
         <div
           className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 shadow-lg"
           style={{
-            borderColor: sanitizeColor(phase.color, '#8b5cf6'),
+            borderColor: sanitizeColor(phase.color, '#f59e0b'),
             backgroundColor:
-              phase.progress >= 100 ? sanitizeColor(phase.color, '#8b5cf6') : 'transparent',
-            boxShadow: `0 0 8px ${sanitizeColor(phase.color, '#8b5cf6')}40`,
+              phase.progress >= 100 ? sanitizeColor(phase.color, '#f59e0b') : 'transparent',
+            boxShadow: `0 0 8px ${sanitizeColor(phase.color, '#f59e0b')}40`,
           }}
         />
         {/* Connecting line */}
         {!isLast && (
           <div
             className="mt-0 w-px flex-1"
-            style={{ backgroundColor: `${sanitizeColor(phase.color, '#8b5cf6')}30` }}
+            style={{ backgroundColor: `${sanitizeColor(phase.color, '#f59e0b')}30` }}
           />
         )}
       </div>
@@ -59,7 +59,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
           {/* Color accent bar */}
           <div
             className="h-1 w-full"
-            style={{ backgroundColor: sanitizeColor(phase.color, '#8b5cf6') }}
+            style={{ backgroundColor: sanitizeColor(phase.color, '#f59e0b') }}
           />
 
           <div className="p-4">
@@ -93,7 +93,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                       e.stopPropagation()
                       onDelete?.(phase)
                     }}
-                    className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
+                    className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger)]"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -132,7 +132,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                   <button
                     onClick={() => setExpanded((prev) => !prev)}
                     className="mt-1 inline-flex items-center gap-1 text-xs transition-colors"
-                    style={{ color: 'var(--accent-active, #8b5cf6)' }}
+                    style={{ color: 'var(--accent-default)' }}
                   >
                     {expanded ? (
                       <>

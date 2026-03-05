@@ -91,10 +91,8 @@ export default function SteeringBar({ projectId }) {
           disabled={!text.trim() || sending}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all disabled:pointer-events-none disabled:opacity-30"
           style={{
-            backgroundColor: text.trim()
-              ? 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)'
-              : 'transparent',
-            color: text.trim() ? 'var(--accent-active, #8b5cf6)' : 'var(--color-fg-muted)',
+            backgroundColor: text.trim() ? 'rgba(var(--accent-default-rgb), 0.2)' : 'transparent',
+            color: text.trim() ? 'var(--accent-default)' : 'var(--color-fg-muted)',
           }}
         >
           {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}

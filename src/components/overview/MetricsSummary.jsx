@@ -14,16 +14,24 @@ import { useEventStore, selectEvents } from '../../stores/eventStore'
 
 export function MetricTile({ icon: Icon, label, value, subtext, color }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl bg-[var(--color-bg-glass)] p-3">
+    <div
+      className="group flex items-start gap-3 rounded-xl bg-[var(--color-bg-glass)] p-3 transition-all hover:bg-[var(--color-bg-glass-hover)] hover:scale-[1.02]"
+      style={{ transitionDuration: 'var(--duration-normal)' }}
+    >
       <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-        style={{ backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)` }}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110"
+        style={{
+          backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+          transitionDuration: 'var(--duration-normal)',
+        }}
       >
         <Icon size={18} style={{ color }} />
       </div>
       <div>
-        <p className="text-lg font-bold leading-none text-[var(--color-fg-default)]">{value}</p>
-        <p className="mt-0.5 text-[11px] text-[var(--color-fg-muted)]">{label}</p>
+        <p className="text-xl font-bold leading-none tracking-tight text-[var(--color-fg-default)]">
+          {value}
+        </p>
+        <p className="mt-1 text-[11px] font-medium text-[var(--color-fg-muted)]">{label}</p>
         {subtext && <p className="text-[10px] text-[var(--color-fg-subtle)]">{subtext}</p>}
       </div>
     </div>
@@ -88,7 +96,7 @@ export default function MetricsSummary({ project }) {
   return (
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
-        <Activity size={14} style={{ color: 'var(--accent-active, #8b5cf6)' }} />
+        <Activity size={14} style={{ color: 'var(--accent-default)' }} />
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
           Metrics
         </h3>

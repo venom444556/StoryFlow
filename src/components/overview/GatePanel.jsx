@@ -128,14 +128,16 @@ function EscalationCard({ aiStatus, projectId }) {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-red-400/30 bg-red-400/5 p-4"
+      className="rounded-xl border border-[var(--color-danger)]/30 bg-[var(--color-danger-subtle)] p-4"
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-400/10">
-          <AlertTriangle size={16} className="text-red-400" />
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-danger-subtle)]">
+          <AlertTriangle size={16} className="text-[var(--color-danger)]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-red-400">AI Blocked — Needs Your Input</p>
+          <p className="text-sm font-semibold text-[var(--color-danger)]">
+            AI Blocked — Needs Your Input
+          </p>
           {aiStatus.detail && (
             <p className="mt-1 text-xs leading-relaxed text-[var(--color-fg-muted)]">
               {aiStatus.detail}
@@ -149,12 +151,12 @@ function EscalationCard({ aiStatus, projectId }) {
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Respond to the agent..."
               disabled={sending}
-              className="flex-1 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-1.5 text-xs text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none focus:border-red-400/50 disabled:opacity-50"
+              className="flex-1 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-base)] px-3 py-1.5 text-xs text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none focus:border-[var(--color-danger)]/50 disabled:opacity-50"
             />
             <button
               onClick={handleSend}
               disabled={!response.trim() || sending}
-              className="flex items-center gap-1 rounded-lg bg-red-400/15 px-3 py-1.5 text-xs font-medium text-red-400 transition-colors hover:bg-red-400/25 disabled:opacity-30"
+              className="flex items-center gap-1 rounded-lg bg-[var(--color-danger-subtle)] px-3 py-1.5 text-xs font-medium text-[var(--color-danger)] transition-colors hover:brightness-110 disabled:opacity-30"
             >
               <MessageSquare size={12} /> Send
             </button>

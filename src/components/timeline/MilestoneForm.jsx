@@ -11,7 +11,7 @@ const PRESET_COLORS = [
   '#f59e0b', // amber
   '#ef4444', // red
   '#ec4899', // pink
-  '#8b5cf6', // purple
+  '#f59e0b', // amber
   '#06b6d4', // cyan
 ]
 
@@ -101,7 +101,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
             className={[
               'inline-flex items-center gap-2.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200',
               form.completed
-                ? 'bg-green-500/15 text-green-400 ring-1 ring-green-500/30'
+                ? 'bg-[var(--color-success-subtle)] text-[var(--color-success)] ring-1 ring-[var(--color-success)]/30'
                 : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)] ring-1 ring-[var(--color-border-default)]',
             ].join(' ')}
           >
@@ -109,7 +109,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
               className={[
                 'h-4 w-4 rounded border-2 transition-colors',
                 form.completed
-                  ? 'border-green-400 bg-green-400'
+                  ? 'border-[var(--color-success)] bg-[var(--color-success)]'
                   : 'border-[var(--color-fg-muted)] bg-transparent',
               ].join(' ')}
             >
