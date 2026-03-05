@@ -114,7 +114,8 @@ server.registerTool(
 server.registerTool(
   'storyflow_update_project',
   {
-    description: 'Update an existing StoryFlow project. Only provided fields are changed.',
+    description:
+      'Update an existing StoryFlow project. Only provided fields are changed. Supports name, description, status, techStack, overview, architecture, and timeline.',
     inputSchema: {
       project_id: z.string().describe('Project ID (slug-based, e.g. "my-app")'),
       name: z.string().optional().describe('New project name'),
@@ -123,14 +124,56 @@ server.registerTool(
         .enum(['planning', 'in-progress', 'completed', 'on-hold'])
         .optional()
         .describe('New project status'),
+      techStack: z
+        .array(z.string())
+        .optional()
+        .describe('Technology stack (e.g. ["React", "Node.js", "SQLite"])'),
+      overview: z
+        .object({
+          goals: z.string().optional(),
+          constraints: z.string().optional(),
+          targetAudience: z.string().optional(),
+        })
+        .optional()
+        .describe('Project overview — goals, constraints, target audience'),
+      architecture: z
+        .object({
+          components: z.array(z.any()).optional(),
+          connections: z.array(z.any()).optional(),
+        })
+        .optional()
+        .describe('Architecture diagram data — components and connections'),
+      timeline: z
+        .object({
+          phases: z.array(z.any()).optional(),
+          milestones: z.array(z.any()).optional(),
+        })
+        .optional()
+        .describe('Timeline data — phases and milestones'),
       ...provenanceParams,
     },
   },
-  async ({ project_id, name, description, status, reasoning, confidence, session_id }) => {
+  async ({
+    project_id,
+    name,
+    description,
+    status,
+    techStack,
+    overview,
+    architecture,
+    timeline,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
     const data = {}
     if (name !== undefined) data.name = name
     if (description !== undefined) data.description = description
     if (status !== undefined) data.status = status
+    if (techStack !== undefined) data.techStack = techStack
+    if (overview !== undefined) data.overview = overview
+    if (architecture !== undefined) data.architecture = architecture
+    if (timeline !== undefined) data.timeline = timeline
     const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
     const project = await sf.updateProject(project_id, data, headers)
     return {
@@ -189,7 +232,7 @@ server.registerTool(
   'storyflow_list_issues',
   {
     description:
-      'List issues in a StoryFlow project. Can filter by status, type, epicId, sprintId, or assignee.',
+      'List issues in a StoryFlow project with pagination. Returns {issues, total, page, limit, hasMore}. Use page/limit for large projects to avoid token overflow. Use fields="summary" for compact output.',
     inputSchema: {
       project_id: z.string().describe('Project ID'),
       status: z
@@ -200,21 +243,43 @@ server.registerTool(
       epic_id: z.string().optional().describe('Filter by parent epic ID'),
       sprint_id: z.string().optional().describe('Filter by sprint ID'),
       assignee: z.string().optional().describe('Filter by assignee'),
+      search: z.string().optional().describe('Search title, key, or description'),
+      page: z.number().optional().describe('Page number (default: 1)'),
+      limit: z.number().optional().describe('Items per page (default: 50, max: 100)'),
+      fields: z
+        .enum(['full', 'summary'])
+        .optional()
+        .describe('Field set: "summary" returns only id/key/title/status/type'),
     },
   },
-  async ({ project_id, status, type, epic_id, sprint_id, assignee }) => {
+  async ({
+    project_id,
+    status,
+    type,
+    epic_id,
+    sprint_id,
+    assignee,
+    search,
+    page,
+    limit,
+    fields,
+  }) => {
     const filters = {}
     if (status) filters.status = status
     if (type) filters.type = type
     if (epic_id) filters.epicId = epic_id
     if (sprint_id) filters.sprintId = sprint_id
     if (assignee) filters.assignee = assignee
-    const issues = await sf.listIssues(project_id, filters)
+    if (search) filters.search = search
+    if (page) filters.page = page
+    if (limit) filters.limit = limit
+    if (fields) filters.fields = fields
+    const result = await sf.listIssues(project_id, filters)
     return {
       content: [
         {
           type: 'text',
-          text: JSON.stringify(issues, null, 2),
+          text: JSON.stringify(result, null, 2),
         },
       ],
     }
@@ -884,6 +949,240 @@ server.registerTool(
           text: JSON.stringify(sprint, null, 2),
         },
       ],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Create Decision
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_create_decision',
+  {
+    description:
+      'Create an architectural decision record (ADR) in a StoryFlow project. Decisions appear on the Decisions tab.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      title: z.string().describe('Decision title'),
+      context: z.string().optional().describe('Context and background for the decision'),
+      decision: z.string().optional().describe('The decision that was made'),
+      status: z
+        .enum(['proposed', 'accepted', 'deprecated', 'superseded'])
+        .optional()
+        .describe('Decision status (default: proposed)'),
+      alternatives: z.array(z.string()).optional().describe('Alternative options considered'),
+      consequences: z.string().optional().describe('Consequences of this decision'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const decision = await sf.createDecision(project_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(decision, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update Decision
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_decision',
+  {
+    description: 'Update an existing decision in a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      decision_id: z.string().describe('Decision ID to update'),
+      title: z.string().optional().describe('New title'),
+      context: z.string().optional().describe('Updated context'),
+      decision: z.string().optional().describe('Updated decision text'),
+      status: z
+        .enum(['proposed', 'accepted', 'deprecated', 'superseded'])
+        .optional()
+        .describe('New status'),
+      alternatives: z.array(z.string()).optional().describe('Updated alternatives'),
+      consequences: z.string().optional().describe('Updated consequences'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, decision_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const decision = await sf.updateDecision(project_id, decision_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(decision, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Decision
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_decision',
+  {
+    description: 'Delete a decision from a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      decision_id: z.string().describe('Decision ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, decision_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deleteDecision(project_id, decision_id, headers)
+    return {
+      content: [{ type: 'text', text: `Decision ${decision_id} deleted successfully.` }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Create Phase
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_create_phase',
+  {
+    description:
+      'Create a timeline phase in a StoryFlow project. Phases appear on the Timeline tab as a Gantt-style view.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      name: z.string().describe('Phase name'),
+      description: z.string().optional().describe('Phase description'),
+      startDate: z.string().optional().describe('Start date (YYYY-MM-DD)'),
+      endDate: z.string().optional().describe('End date (YYYY-MM-DD)'),
+      progress: z.number().min(0).max(100).optional().describe('Progress percentage (0-100)'),
+      color: z.string().optional().describe('Phase color (hex, e.g. "#f59e0b")'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const phase = await sf.createPhase(project_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(phase, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update Phase
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_phase',
+  {
+    description: 'Update an existing timeline phase in a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      phase_id: z.string().describe('Phase ID to update'),
+      name: z.string().optional().describe('New phase name'),
+      description: z.string().optional().describe('New description'),
+      startDate: z.string().optional().describe('New start date (YYYY-MM-DD)'),
+      endDate: z.string().optional().describe('New end date (YYYY-MM-DD)'),
+      progress: z.number().min(0).max(100).optional().describe('Progress percentage (0-100)'),
+      color: z.string().optional().describe('Phase color (hex)'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, phase_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const phase = await sf.updatePhase(project_id, phase_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(phase, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Phase
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_phase',
+  {
+    description: 'Delete a timeline phase from a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      phase_id: z.string().describe('Phase ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, phase_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deletePhase(project_id, phase_id, headers)
+    return {
+      content: [{ type: 'text', text: `Phase ${phase_id} deleted successfully.` }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Create Milestone
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_create_milestone',
+  {
+    description:
+      'Create a timeline milestone in a StoryFlow project. Milestones mark key dates on the Timeline tab.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      name: z.string().describe('Milestone name'),
+      targetDate: z.string().optional().describe('Target date (YYYY-MM-DD)'),
+      completed: z.boolean().optional().describe('Whether the milestone is completed'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const milestone = await sf.createMilestone(project_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(milestone, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update Milestone
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_milestone',
+  {
+    description: 'Update an existing milestone in a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      milestone_id: z.string().describe('Milestone ID to update'),
+      name: z.string().optional().describe('New name'),
+      targetDate: z.string().optional().describe('New target date (YYYY-MM-DD)'),
+      completed: z.boolean().optional().describe('Whether completed'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, milestone_id, reasoning, confidence, session_id, ...data }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const milestone = await sf.updateMilestone(project_id, milestone_id, data, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(milestone, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Milestone
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_milestone',
+  {
+    description: 'Delete a milestone from a StoryFlow project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      milestone_id: z.string().describe('Milestone ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, milestone_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deleteMilestone(project_id, milestone_id, headers)
+    return {
+      content: [{ type: 'text', text: `Milestone ${milestone_id} deleted successfully.` }],
     }
   }
 )

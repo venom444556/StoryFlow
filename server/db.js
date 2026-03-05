@@ -310,7 +310,37 @@ export function listIssues(projectId, filters = {}) {
   if (filters.epicId) issues = issues.filter((i) => i.epicId === filters.epicId)
   if (filters.sprintId) issues = issues.filter((i) => i.sprintId === filters.sprintId)
   if (filters.assignee) issues = issues.filter((i) => i.assignee === filters.assignee)
-  return issues
+  if (filters.search) {
+    const q = filters.search.toLowerCase()
+    issues = issues.filter(
+      (i) =>
+        (i.title && i.title.toLowerCase().includes(q)) ||
+        (i.key && i.key.toLowerCase().includes(q)) ||
+        (i.description && i.description.toLowerCase().includes(q))
+    )
+  }
+
+  const total = issues.length
+
+  // Pagination
+  const page = Math.max(1, parseInt(filters.page, 10) || 1)
+  const limit = Math.min(100, Math.max(1, parseInt(filters.limit, 10) || 50))
+  const offset = (page - 1) * limit
+
+  // Fields selection — return summary format when requested
+  if (filters.fields === 'summary') {
+    issues = issues.map((i) => ({
+      id: i.id,
+      key: i.key,
+      title: i.title,
+      status: i.status,
+      type: i.type,
+    }))
+  }
+
+  const paginated = issues.slice(offset, offset + limit)
+
+  return { issues: paginated, total, page, limit, hasMore: offset + limit < total }
 }
 
 // Normalize common status variants to canonical Title Case values
@@ -665,6 +695,164 @@ export function getBoardSummary(projectId) {
     staleIssues,
     staleCount: staleIssues.length,
   }
+}
+
+// ---------------------------------------------------------------------------
+// Decision operations
+// ---------------------------------------------------------------------------
+
+export function listDecisions(projectId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return project.decisions || []
+}
+
+export function addDecision(projectId, decision) {
+  const project = getProject(projectId)
+  if (!project) return null
+  if (!project.decisions) project.decisions = []
+
+  const now = new Date().toISOString()
+  const newDecision = {
+    ...decision,
+    id: decision.id || crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+  }
+  project.decisions.push(newDecision)
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newDecision
+}
+
+export function updateDecision(projectId, decisionId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const decision = (project.decisions || []).find((d) => d.id === decisionId)
+  if (!decision) return null
+
+  const now = new Date().toISOString()
+  Object.assign(decision, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return decision
+}
+
+export function deleteDecision(projectId, decisionId) {
+  const project = getProject(projectId)
+  if (!project || !project.decisions) return false
+  const idx = project.decisions.findIndex((d) => d.id === decisionId)
+  if (idx === -1) return false
+  project.decisions.splice(idx, 1)
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Timeline phase operations
+// ---------------------------------------------------------------------------
+
+export function listPhases(projectId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return project.timeline?.phases || []
+}
+
+export function addPhase(projectId, phase) {
+  const project = getProject(projectId)
+  if (!project) return null
+  if (!project.timeline) project.timeline = { phases: [], milestones: [] }
+
+  const now = new Date().toISOString()
+  const newPhase = {
+    ...phase,
+    id: phase.id || crypto.randomUUID(),
+    progress: phase.progress || 0,
+    createdAt: now,
+    updatedAt: now,
+  }
+  project.timeline.phases.push(newPhase)
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newPhase
+}
+
+export function updatePhase(projectId, phaseId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const phase = (project.timeline?.phases || []).find((p) => p.id === phaseId)
+  if (!phase) return null
+
+  const now = new Date().toISOString()
+  Object.assign(phase, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return phase
+}
+
+export function deletePhase(projectId, phaseId) {
+  const project = getProject(projectId)
+  if (!project || !project.timeline?.phases) return false
+  const idx = project.timeline.phases.findIndex((p) => p.id === phaseId)
+  if (idx === -1) return false
+  project.timeline.phases.splice(idx, 1)
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Timeline milestone operations
+// ---------------------------------------------------------------------------
+
+export function listMilestones(projectId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return project.timeline?.milestones || []
+}
+
+export function addMilestone(projectId, milestone) {
+  const project = getProject(projectId)
+  if (!project) return null
+  if (!project.timeline) project.timeline = { phases: [], milestones: [] }
+
+  const now = new Date().toISOString()
+  const newMilestone = {
+    ...milestone,
+    id: milestone.id || crypto.randomUUID(),
+    completed: milestone.completed || false,
+    createdAt: now,
+    updatedAt: now,
+  }
+  project.timeline.milestones.push(newMilestone)
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newMilestone
+}
+
+export function updateMilestone(projectId, milestoneId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const milestone = (project.timeline?.milestones || []).find((m) => m.id === milestoneId)
+  if (!milestone) return null
+
+  const now = new Date().toISOString()
+  Object.assign(milestone, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return milestone
+}
+
+export function deleteMilestone(projectId, milestoneId) {
+  const project = getProject(projectId)
+  if (!project || !project.timeline?.milestones) return false
+  const idx = project.timeline.milestones.findIndex((m) => m.id === milestoneId)
+  if (idx === -1) return false
+  project.timeline.milestones.splice(idx, 1)
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
 }
 
 // ---------------------------------------------------------------------------
