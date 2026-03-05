@@ -210,22 +210,24 @@ Configuration is saved to `~/.config/storyflow/config.json` and persists across 
 | `/storyflow:open` | Open StoryFlow UI in browser |
 | `/storyflow:board [project]` | Show board summary for a project |
 
-### MCP Tools (37)
+### MCP Tools (46)
 
-The plugin exposes 37 MCP tools across 8 categories that Claude can use automatically during development:
+The plugin exposes 46 MCP tools across 11 categories that Claude can use automatically during development:
 
 | Category | Tools | Examples |
 |----------|-------|---------|
-| **Projects** | 6 | `list_projects`, `create_project`, `advance_phase` |
+| **Projects** | 6 | `list_projects`, `create_project`, `update_project`, `advance_phase` |
 | **Issues** | 7 | `create_issue`, `update_issue`, `batch_update_issues`, `add_comment`, `nudge_issue` |
 | **Sprints** | 5 | `create_sprint`, `update_sprint`, `sprint_metrics` |
 | **Board** | 2 | `get_board_summary`, `run_hygiene` |
 | **Wiki** | 5 | `create_page`, `get_page`, `update_page` |
+| **Decisions** | 3 | `create_decision`, `update_decision`, `delete_decision` |
+| **Timeline** | 6 | `create_phase`, `update_phase`, `delete_phase`, `create_milestone`, `update_milestone`, `delete_milestone` |
 | **Sessions** | 3 | `save_session_summary`, `get_last_session`, `list_sessions` |
 | **Transparency** | 8 | `record_event`, `query_events`, `update_ai_status`, `check_gates`, `escalate` |
 | **Git** | 1 | `sync_from_git` |
 
-All tools are prefixed with `storyflow_`. See [`plugin/skills/storyflow/SKILL.md`](plugin/skills/storyflow/SKILL.md) for the full tool reference.
+All tools are prefixed with `storyflow_`. `list_issues` supports pagination (`page`, `limit`), text search, and a compact `fields=summary` mode for large projects. `update_project` accepts `techStack`, `overview`, `architecture`, and `timeline` fields in addition to name/description/status. See [`plugin/skills/storyflow/SKILL.md`](plugin/skills/storyflow/SKILL.md) for the full tool reference.
 
 ## Security
 
