@@ -37,6 +37,7 @@ nul
 data/*.json
 data/*.db
 data/*.json.backup
+server/data/
 
 # Development scratchpads
 workflow-builder.jsx
@@ -54,3 +55,8 @@ docs/plans/
 
 # Plugin archive (use plugin/ directory instead)
 plugin.zip
+*.zip
+
+# Screenshots / design iteration (use docs/screenshots/ instead)
+*.png
+!docs/screenshots/*.png
