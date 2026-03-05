@@ -57,6 +57,7 @@ docs/plans/
 plugin.zip
 *.zip
 
-# Screenshots / design iteration (use docs/screenshots/ instead)
+# Screenshots / design iteration (use docs/ subdirectories instead)
 *.png
 !docs/screenshots/*.png
+!docs/diagrams/*.png

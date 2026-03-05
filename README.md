@@ -128,13 +128,13 @@ In production, only the Express server runs (on port 3001) and serves both the A
 
 ## Architecture
 
-![System Architecture](docs/diagrams/architecture.svg)
+![System Architecture](docs/diagrams/architecture.png)
 
 The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync — changes from one source propagate to the other automatically. The AI agent reads and writes through the **same data store** the human sees — there is no separate agent memory.
 
 ### AI Transparency Loop
 
-![AI Transparency Loop](docs/diagrams/ai-loop.svg)
+![AI Transparency Loop](docs/diagrams/ai-loop.png)
 
 Every AI action is recorded as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue. The result: **full auditability with zero overhead** — the agent's normal workflow produces the audit trail automatically.
 
