@@ -74,7 +74,7 @@ function DependencyList({ dependencies, allComponents, currentComponentId, onCha
             type="button"
             onClick={() => setAdding(true)}
             className="text-[11px] transition-colors"
-            style={{ color: 'var(--accent-active, #8b5cf6)' }}
+            style={{ color: 'var(--accent-default)' }}
           >
             + Add dependency
           </button>

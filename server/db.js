@@ -7,6 +7,8 @@ import initSqlJs from 'sql.js'
 import { readFileSync, existsSync, mkdirSync, renameSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { initEvents } from './events.js'
+import { initSteering } from './intelligence.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -58,6 +60,35 @@ export async function initDb() {
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_deleted ON projects(deleted_at)')
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_updated ON projects(updated_at DESC)')
 
+  // Agent session memory
+  db.run(`
+    CREATE TABLE IF NOT EXISTS agent_sessions (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      started_at TEXT NOT NULL,
+      ended_at TEXT,
+      summary TEXT,
+      work_done TEXT,
+      issues_created INTEGER DEFAULT 0,
+      issues_updated INTEGER DEFAULT 0,
+      events_recorded INTEGER DEFAULT 0,
+      key_decisions TEXT,
+      learnings TEXT,
+      wiki_pages_updated TEXT,
+      next_steps TEXT,
+      created_at TEXT NOT NULL
+    )
+  `)
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_agent_sessions_project ON agent_sessions(project_id, created_at DESC)'
+  )
+
+  // Initialize event stream table
+  initEvents(db)
+
+  // Initialize steering directives table
+  initSteering(db)
+
   await saveToDisk()
 
   // Auto-migrate from JSON if DB is empty and JSON exists
@@ -75,7 +106,7 @@ async function saveToDisk() {
 }
 
 /** Schedule a save (debounced 100ms to batch rapid writes) */
-function scheduleSave() {
+export function scheduleSave() {
   clearTimeout(_saveTimer)
   _saveTimer = setTimeout(saveToDisk, 100)
 }
@@ -250,13 +281,20 @@ export function deleteProject(id) {
 
 /** Sync: replace all projects (called by client on load) */
 export async function syncAll(projects) {
-  // Clear existing and re-insert all
-  db.run('DELETE FROM projects')
-  for (const p of projects) {
-    upsertProject(p.id, p)
+  if (!Array.isArray(projects) || projects.length === 0) {
+    console.warn('[DB] syncAll called with empty/invalid projects — skipping to prevent data wipe')
+    return
   }
-  // upsertProject already schedules saves, but force one for the DELETE
-  await saveToDisk()
+  try {
+    db.run('DELETE FROM projects')
+    for (const p of projects) {
+      upsertProject(p.id, p)
+    }
+    await saveToDisk()
+  } catch (err) {
+    console.error('[DB] CRITICAL: syncAll failed during re-insert:', err.message)
+    throw err
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -288,12 +326,15 @@ const STATUS_ALIASES = {
   done: 'Done',
   completed: 'Done',
   closed: 'Done',
+  blocked: 'Blocked',
+  'on hold': 'Blocked',
+  'on-hold': 'Blocked',
 }
 
 function normalizeStatus(status) {
   if (!status) return 'To Do'
   // Already canonical
-  if (['To Do', 'In Progress', 'Done'].includes(status)) return status
+  if (['To Do', 'In Progress', 'Done', 'Blocked'].includes(status)) return status
   // Try case-insensitive alias lookup
   const normalized = STATUS_ALIASES[status.toLowerCase().trim()]
   return normalized || null // null = unknown status
@@ -326,13 +367,11 @@ export function addIssue(projectId, issue) {
   if (!project) return null
   if (!project.board) project.board = { issues: [], sprints: [], nextIssueNumber: 1 }
 
-  // Normalize status — reject unknown values
-  if (issue.status) {
-    const normalized = normalizeStatus(issue.status)
-    if (!normalized)
-      return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Done` }
-    issue.status = normalized
-  }
+  // Normalize status — reject unknown values, default to 'To Do'
+  const normalized = normalizeStatus(issue.status)
+  if (!normalized)
+    return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Blocked, Done` }
+  issue.status = normalized
 
   const nextNumber = project.board.nextIssueNumber || 1
   const prefix =
@@ -354,6 +393,7 @@ export function addIssue(projectId, issue) {
 
   if (newIssue.status === 'To Do' && !newIssue.todoAt) newIssue.todoAt = now
   else if (newIssue.status === 'In Progress' && !newIssue.inProgressAt) newIssue.inProgressAt = now
+  else if (newIssue.status === 'Blocked' && !newIssue.blockedAt) newIssue.blockedAt = now
   else if (newIssue.status === 'Done' && !newIssue.doneAt) newIssue.doneAt = now
 
   project.board.issues.push(newIssue)
@@ -374,7 +414,9 @@ export function updateIssue(projectId, issueId, updates) {
   if (updates.status) {
     const normalized = normalizeStatus(updates.status)
     if (!normalized)
-      return { error: `Unknown status "${updates.status}". Valid: To Do, In Progress, Done` }
+      return {
+        error: `Unknown status "${updates.status}". Valid: To Do, In Progress, Blocked, Done`,
+      }
     updates.status = normalized
   }
 
@@ -383,6 +425,7 @@ export function updateIssue(projectId, issueId, updates) {
   if (updates.status && updates.status !== issue.status) {
     if (updates.status === 'To Do' && !issue.todoAt) updates.todoAt = now
     else if (updates.status === 'In Progress' && !issue.inProgressAt) updates.inProgressAt = now
+    else if (updates.status === 'Blocked' && !issue.blockedAt) updates.blockedAt = now
     else if (updates.status === 'Done' && !issue.doneAt) updates.doneAt = now
   }
 
@@ -414,6 +457,33 @@ export function deleteIssueByKey(projectId, key) {
   return deleteIssue(projectId, issue.id)
 }
 
+export function addComment(projectId, issueId, comment) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const issue = project.board?.issues?.find((i) => i.id === issueId)
+  if (!issue) return null
+
+  if (!issue.comments) issue.comments = []
+  const now = new Date().toISOString()
+  const newComment = {
+    id: crypto.randomUUID(),
+    author: comment.author || 'agent',
+    body: comment.body,
+    createdAt: now,
+  }
+  issue.comments.push(newComment)
+  issue.updatedAt = now
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newComment
+}
+
+export function addCommentByKey(projectId, key, comment) {
+  const issue = getIssueByKey(projectId, key)
+  if (!issue) return null
+  return addComment(projectId, issue.id, comment)
+}
+
 export function deleteIssue(projectId, issueId) {
   const project = getProject(projectId)
   if (!project || !project.board?.issues) return false
@@ -441,11 +511,29 @@ export function addSprint(projectId, sprint) {
   if (!project.board) project.board = { issues: [], sprints: [], nextIssueNumber: 1 }
 
   const now = new Date().toISOString()
-  const newSprint = { ...sprint, id: sprint.id || crypto.randomUUID(), createdAt: now }
+  const newSprint = {
+    ...sprint,
+    id: sprint.id || crypto.randomUUID(),
+    status: sprint.status || 'planning',
+    createdAt: now,
+  }
   project.board.sprints.push(newSprint)
   project.updatedAt = now
   upsertProject(projectId, project)
   return newSprint
+}
+
+export function updateSprint(projectId, sprintId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const sprint = project.board?.sprints?.find((s) => s.id === sprintId)
+  if (!sprint) return null
+
+  const now = new Date().toISOString()
+  Object.assign(sprint, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return sprint
 }
 
 // ---------------------------------------------------------------------------
@@ -461,6 +549,12 @@ export function listPages(projectId) {
     parentId: p.parentId || null,
     updatedAt: p.updatedAt,
   }))
+}
+
+export function getPage(projectId, pageId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return (project.pages || []).find((p) => p.id === pageId) || null
 }
 
 export function addPage(projectId, page) {
@@ -531,13 +625,14 @@ export function getBoardSummary(projectId) {
   const issues = project.board?.issues || []
   const sprints = project.board?.sprints || []
 
-  const byStatus = { 'To Do': 0, 'In Progress': 0, Done: 0 }
+  const byStatus = { 'To Do': 0, 'In Progress': 0, Done: 0, Blocked: 0 }
   const byType = {}
   let totalPoints = 0
   let donePoints = 0
 
   for (const issue of issues) {
-    byStatus[issue.status] = (byStatus[issue.status] || 0) + 1
+    const status = issue.status || 'To Do'
+    byStatus[status] = (byStatus[status] || 0) + 1
     byType[issue.type] = (byType[issue.type] || 0) + 1
     if (issue.storyPoints) {
       totalPoints += issue.storyPoints
@@ -545,8 +640,8 @@ export function getBoardSummary(projectId) {
     }
   }
 
-  // Detect stale "In Progress" issues (>2 hours since last update)
-  const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000
+  // Detect stale "In Progress" issues (>4 hours since last update)
+  const STALE_THRESHOLD_MS = 4 * 60 * 60 * 1000
   const now = Date.now()
   const staleIssues = issues
     .filter(
@@ -582,4 +677,65 @@ export function addProject(project) {
   const newProject = { ...project, id, createdAt: now, updatedAt: now }
   upsertProject(id, newProject)
   return newProject
+}
+
+// ---------------------------------------------------------------------------
+// Agent session memory
+// ---------------------------------------------------------------------------
+
+export function saveSessionSummary(projectId, session) {
+  const now = new Date().toISOString()
+  const id = session.id || crypto.randomUUID()
+  db.run(
+    `INSERT OR REPLACE INTO agent_sessions
+      (id, project_id, started_at, ended_at, summary, work_done,
+       issues_created, issues_updated, events_recorded,
+       key_decisions, learnings, wiki_pages_updated, next_steps, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id,
+      projectId,
+      session.started_at || now,
+      session.ended_at || now,
+      session.summary || '',
+      session.work_done || '',
+      session.issues_created || 0,
+      session.issues_updated || 0,
+      session.events_recorded || 0,
+      session.key_decisions || '',
+      session.learnings || '',
+      session.wiki_pages_updated || '',
+      session.next_steps || '',
+      now,
+    ]
+  )
+  scheduleSave()
+  return { id, projectId, ...session, created_at: now }
+}
+
+export function getLastSession(projectId) {
+  const results = db.exec(
+    'SELECT * FROM agent_sessions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1',
+    [projectId]
+  )
+  if (results.length === 0 || results[0].values.length === 0) return null
+  const cols = results[0].columns
+  const row = results[0].values[0]
+  const session = {}
+  for (let i = 0; i < cols.length; i++) session[cols[i]] = row[i]
+  return session
+}
+
+export function listSessions(projectId, limit = 10) {
+  const results = db.exec(
+    'SELECT * FROM agent_sessions WHERE project_id = ? ORDER BY created_at DESC LIMIT ?',
+    [projectId, limit]
+  )
+  if (results.length === 0) return []
+  const cols = results[0].columns
+  return results[0].values.map((row) => {
+    const session = {}
+    for (let i = 0; i < cols.length; i++) session[cols[i]] = row[i]
+    return session
+  })
 }

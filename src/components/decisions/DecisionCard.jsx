@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Edit3, Calendar } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import Badge from '../ui/Badge'
+import ProvenanceBadge from '../ui/ProvenanceBadge'
 import { formatRelative } from '../../utils/dates'
 
 const STATUS_CONFIG = {
@@ -51,6 +52,14 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
                 <Badge variant={statusCfg.variant} size="sm" dot>
                   {statusCfg.label}
                 </Badge>
+                {decision.createdBy && (
+                  <ProvenanceBadge
+                    actor={decision.createdBy}
+                    reasoning={decision.createdByReasoning}
+                    timestamp={decision.createdAt}
+                    size="xs"
+                  />
+                )}
               </div>
             </div>
 

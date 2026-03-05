@@ -29,8 +29,9 @@
   --color-glass-hover: var(--color-bg-glass-hover);
   --color-glass-active: var(--color-bg-glass-active);
 
-  /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  /* Typography — Outfit (display) + DM Sans (body) */
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'DM Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
@@ -54,12 +55,15 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   transition: all var(--duration-normal) var(--ease-default);
+  position: relative;
 }
 
 .glass-card:hover {
   background: var(--color-bg-glass-hover);
   border-color: var(--color-border-emphasis);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow:
+    var(--shadow-card-hover),
+    0 0 0 1px rgba(var(--accent-default-rgb), 0.05);
 }
 
 .glass-sidebar {
@@ -142,72 +146,112 @@
    ===================================================== */
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue), var(--accent-cyan));
+  background: linear-gradient(135deg, var(--accent-default), #f97316, #ef4444);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* Display headings use Outfit */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
 /* =====================================================
-   ANIMATED GRADIENT ORBS
+   AMBIENT ATMOSPHERE
+   Subtle warm radial glow instead of floating orbs
    ===================================================== */
 
-@keyframes float-1 {
+@keyframes ambient-breathe {
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(30px, -50px) scale(1.1);
+    opacity: 0.4;
   }
   50% {
-    transform: translate(-20px, 20px) scale(0.95);
-  }
-  75% {
-    transform: translate(50px, 30px) scale(1.05);
+    opacity: 0.7;
   }
 }
 
-@keyframes float-2 {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
+.ambient-glow {
+  animation: ambient-breathe 8s ease-in-out infinite;
+}
+
+/* =====================================================
+   ENTRANCE CHOREOGRAPHY
+   Staggered reveal system for page content
+   ===================================================== */
+
+@keyframes entrance-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-  25% {
-    transform: translate(-40px, 30px) scale(1.05);
-  }
-  50% {
-    transform: translate(30px, -40px) scale(1.1);
-  }
-  75% {
-    transform: translate(-20px, -20px) scale(0.95);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes float-3 {
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
+@keyframes entrance-fade {
+  from {
+    opacity: 0;
   }
-  25% {
-    transform: translate(20px, 40px) scale(0.95);
-  }
-  50% {
-    transform: translate(-50px, -20px) scale(1.05);
-  }
-  75% {
-    transform: translate(40px, -30px) scale(1.1);
+  to {
+    opacity: 1;
   }
 }
 
-.orb-1 {
-  animation: float-1 20s ease-in-out infinite;
+@keyframes entrance-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-.orb-2 {
-  animation: float-2 25s ease-in-out infinite;
+
+.animate-entrance {
+  animation: entrance-up 0.5s var(--ease-spring) both;
 }
-.orb-3 {
-  animation: float-3 30s ease-in-out infinite;
+
+.animate-entrance-fade {
+  animation: entrance-fade 0.4s var(--ease-default) both;
+}
+
+.animate-entrance-scale {
+  animation: entrance-scale 0.4s var(--ease-spring) both;
+}
+
+/* Stagger delay utilities */
+.stagger-1 {
+  animation-delay: 50ms;
+}
+.stagger-2 {
+  animation-delay: 100ms;
+}
+.stagger-3 {
+  animation-delay: 150ms;
+}
+.stagger-4 {
+  animation-delay: 200ms;
+}
+.stagger-5 {
+  animation-delay: 250ms;
+}
+.stagger-6 {
+  animation-delay: 300ms;
+}
+.stagger-7 {
+  animation-delay: 350ms;
+}
+.stagger-8 {
+  animation-delay: 400ms;
 }
 
 /* =====================================================
@@ -253,6 +297,30 @@
 /* Allow components to opt-out of default focus styling */
 .focus-custom:focus-visible {
   outline: none;
+}
+
+/* =====================================================
+   FOCUS UTILITY
+   Universal focus ring for interactive elements
+   ===================================================== */
+
+.focus-interactive:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* =====================================================
+   ACCENT HOVER UTILITY
+   Theme-aware hover for accent-colored interactions
+   ===================================================== */
+
+.hover-accent:hover {
+  color: var(--accent-default);
+}
+
+.hover-accent-bg:hover {
+  background-color: rgba(var(--accent-default-rgb), 0.1);
+  color: var(--accent-default);
 }
 
 /* =====================================================

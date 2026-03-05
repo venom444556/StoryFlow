@@ -229,6 +229,21 @@
   --interactive-active: #4338ca;
   --interactive-disabled: #94a3b8;
   --interactive-rgb: var(--accent-indigo-rgb);
+
+  /* Accent alias — resolves to user-chosen accent (set by SettingsContext) */
+  --accent-default: var(--accent-active, #f59e0b);
+  --accent-default-rgb: var(--accent-active-rgb, 245, 158, 11);
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY TOKENS
+     Colors for distinguishing AI vs human activity
+     ------------------------------------------------- */
+  --color-ai-accent: #06b6d4; /* cyan — AI-authored content */
+  --color-ai-accent-rgb: 6, 182, 212;
+  --color-human-accent: #8b5cf6; /* purple — human-authored content */
+  --color-human-accent-rgb: 139, 92, 246;
+  --color-system-accent: #64748b; /* slate — system-generated */
+  --color-system-accent-rgb: 100, 116, 139;
 }
 
 /* =====================================================
@@ -239,102 +254,102 @@
   color-scheme: dark;
 
   /* -------------------------------------------------
-     BACKGROUND COLORS
+     BACKGROUND COLORS — Warm Obsidian
      ------------------------------------------------- */
-  --color-bg-base: #0f172a;
-  --color-bg-subtle: #1e293b;
-  --color-bg-muted: #334155;
-  --color-bg-emphasis: #475569;
-  --color-bg-inverse: #f8fafc;
-  --color-dropdown-bg: #1e293b;
+  --color-bg-base: #0c0a09;
+  --color-bg-subtle: #1c1917;
+  --color-bg-muted: #292524;
+  --color-bg-emphasis: #44403c;
+  --color-bg-inverse: #fafaf9;
+  --color-dropdown-bg: #1c1917;
 
   /* Glass/translucent backgrounds */
-  --color-bg-glass: rgba(255, 255, 255, 0.05);
-  --color-bg-glass-hover: rgba(255, 255, 255, 0.08);
-  --color-bg-glass-active: rgba(255, 255, 255, 0.12);
-  --color-bg-glass-emphasis: rgba(255, 255, 255, 0.15);
+  --color-bg-glass: rgba(255, 245, 235, 0.04);
+  --color-bg-glass-hover: rgba(255, 245, 235, 0.07);
+  --color-bg-glass-active: rgba(255, 245, 235, 0.11);
+  --color-bg-glass-emphasis: rgba(255, 245, 235, 0.14);
 
   /* Overlay backgrounds */
-  --color-bg-overlay: rgba(15, 23, 42, 0.85);
-  --color-bg-overlay-heavy: rgba(15, 23, 42, 0.92);
-  --color-bg-backdrop: rgba(0, 0, 0, 0.6);
+  --color-bg-overlay: rgba(12, 10, 9, 0.88);
+  --color-bg-overlay-heavy: rgba(12, 10, 9, 0.94);
+  --color-bg-backdrop: rgba(0, 0, 0, 0.65);
 
   /* -------------------------------------------------
      FOREGROUND/TEXT COLORS
      ------------------------------------------------- */
-  --color-fg-default: #f8fafc;
-  --color-fg-muted: #94a3b8;
-  --color-fg-subtle: #64748b;
-  --color-fg-faint: #475569;
-  --color-fg-inverse: #0f172a;
+  --color-fg-default: #fafaf9;
+  --color-fg-muted: #a8a29e;
+  --color-fg-subtle: #78716c;
+  --color-fg-faint: #57534e;
+  --color-fg-inverse: #0c0a09;
   --color-fg-on-accent: #ffffff;
 
   /* -------------------------------------------------
-     BORDER COLORS
+     BORDER COLORS — warm-tinted
      ------------------------------------------------- */
-  --color-border-default: rgba(255, 255, 255, 0.08);
-  --color-border-muted: rgba(255, 255, 255, 0.05);
-  --color-border-emphasis: rgba(255, 255, 255, 0.12);
-  --color-border-strong: rgba(255, 255, 255, 0.2);
+  --color-border-default: rgba(168, 162, 158, 0.12);
+  --color-border-muted: rgba(168, 162, 158, 0.07);
+  --color-border-emphasis: rgba(168, 162, 158, 0.18);
+  --color-border-strong: rgba(168, 162, 158, 0.28);
 
   /* -------------------------------------------------
      STATUS COLORS
      ------------------------------------------------- */
   --color-success: #22c55e;
-  --color-success-subtle: rgba(34, 197, 94, 0.15);
+  --color-success-subtle: rgba(34, 197, 94, 0.12);
   --color-success-fg: #22c55e;
   --color-warning: #f59e0b;
-  --color-warning-subtle: rgba(245, 158, 11, 0.15);
+  --color-warning-subtle: rgba(245, 158, 11, 0.12);
   --color-warning-fg: #f59e0b;
   --color-danger: #ef4444;
-  --color-danger-subtle: rgba(239, 68, 68, 0.15);
+  --color-danger-subtle: rgba(239, 68, 68, 0.12);
   --color-danger-fg: #ef4444;
   --color-info: #3b82f6;
-  --color-info-subtle: rgba(59, 130, 246, 0.15);
+  --color-info-subtle: rgba(59, 130, 246, 0.12);
   --color-info-fg: #3b82f6;
 
   /* Semantic aliases used by board/UI components */
-  --color-accent-emphasis: var(--accent-purple);
+  --color-accent-emphasis: var(--accent-active, var(--accent-purple));
   --color-bg-tertiary: var(--color-bg-muted);
 
   /* -------------------------------------------------
      INPUT COLORS
      ------------------------------------------------- */
-  --color-input-bg: rgba(255, 255, 255, 0.05);
-  --color-input-bg-hover: rgba(255, 255, 255, 0.07);
-  --color-input-bg-focus: rgba(255, 255, 255, 0.08);
-  --color-input-border: rgba(255, 255, 255, 0.1);
-  --color-input-placeholder: #64748b;
+  --color-input-bg: rgba(250, 245, 235, 0.04);
+  --color-input-bg-hover: rgba(250, 245, 235, 0.06);
+  --color-input-bg-focus: rgba(250, 245, 235, 0.07);
+  --color-input-border: rgba(168, 162, 158, 0.15);
+  --color-input-placeholder: #78716c;
 
   /* -------------------------------------------------
      SCROLLBAR
      ------------------------------------------------- */
   --color-scrollbar-track: transparent;
-  --color-scrollbar-thumb: rgba(255, 255, 255, 0.15);
-  --color-scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
+  --color-scrollbar-thumb: rgba(168, 162, 158, 0.2);
+  --color-scrollbar-thumb-hover: rgba(168, 162, 158, 0.35);
 
   /* -------------------------------------------------
      SELECTION
      ------------------------------------------------- */
-  --color-selection-bg: rgba(139, 92, 246, 0.3);
+  --color-selection-bg: rgba(245, 158, 11, 0.3);
   --color-selection-fg: #ffffff;
 
   /* -------------------------------------------------
-     SHADOWS
+     SHADOWS — warm-tinted
      ------------------------------------------------- */
-  --shadow-color: rgba(0, 0, 0, 0.3);
-  --glow-color: rgba(139, 92, 246, 0.3);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --glow-color: rgba(245, 158, 11, 0.2);
 
   /* Card-specific shadow */
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.35), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
 
   /* -------------------------------------------------
-     GRADIENT ORB BACKGROUNDS
+     AMBIENT BACKGROUND
      ------------------------------------------------- */
-  --color-orb-purple: rgba(124, 58, 237, 0.15);
-  --color-orb-blue: rgba(37, 99, 235, 0.1);
-  --color-orb-cyan: rgba(6, 182, 212, 0.1);
+  --color-orb-purple: rgba(245, 158, 11, 0.06);
+  --color-orb-blue: rgba(217, 119, 6, 0.04);
+  --color-orb-cyan: rgba(180, 83, 9, 0.03);
 
   /* -------------------------------------------------
      FOCUS RING
@@ -346,17 +361,44 @@
      Used by charts, graphs, canvas, and panels.
      Maps to semantic tokens for theme-awareness.
      ------------------------------------------------- */
-  --th-bg: #0f172a;
-  --th-panel: rgba(255, 255, 255, 0.06);
-  --th-panel-light: rgba(255, 255, 255, 0.04);
-  --th-panel-medium: rgba(15, 23, 42, 0.6);
-  --th-panel-heavy: rgba(15, 23, 42, 0.85);
-  --th-panel-solid: #1e293b;
-  --th-border: rgba(255, 255, 255, 0.08);
-  --th-border-hover: rgba(255, 255, 255, 0.15);
-  --th-text-muted: #94a3b8;
-  --th-text-faint: #475569;
-  --th-text-secondary: #94a3b8;
+  --th-bg: #0c0a09;
+  --th-panel: rgba(250, 245, 235, 0.05);
+  --th-panel-light: rgba(250, 245, 235, 0.03);
+  --th-panel-medium: rgba(12, 10, 9, 0.6);
+  --th-panel-heavy: rgba(12, 10, 9, 0.88);
+  --th-panel-solid: #1c1917;
+  --th-border: rgba(168, 162, 158, 0.12);
+  --th-border-hover: rgba(168, 162, 158, 0.2);
+  --th-text-muted: #a8a29e;
+  --th-text-faint: #57534e;
+  --th-text-secondary: #a8a29e;
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY (themed)
+     ------------------------------------------------- */
+  --color-ai-glow: rgba(6, 182, 212, 0.15); /* subtle glow on AI-created items */
+  --color-ai-border: rgba(6, 182, 212, 0.3);
+  --color-ai-bg: rgba(6, 182, 212, 0.08);
+  --color-human-glow: rgba(139, 92, 246, 0.15);
+  --color-human-border: rgba(139, 92, 246, 0.3);
+  --color-human-bg: rgba(139, 92, 246, 0.08);
+  --color-ai-working: #22c55e; /* green — AI is actively working */
+  --color-ai-idle: #64748b; /* muted — AI is idle */
+  --color-ai-blocked: #f59e0b; /* yellow — AI needs input */
+
+  /* Confidence level tokens */
+  --color-confidence-high: #22c55e;
+  --color-confidence-high-bg: rgba(34, 197, 94, 0.12);
+  --color-confidence-high-border: rgba(34, 197, 94, 0.3);
+  --color-confidence-medium: #f59e0b;
+  --color-confidence-medium-bg: rgba(245, 158, 11, 0.12);
+  --color-confidence-medium-border: rgba(245, 158, 11, 0.3);
+  --color-confidence-low: #ef4444;
+  --color-confidence-low-bg: rgba(239, 68, 68, 0.12);
+  --color-confidence-low-border: rgba(239, 68, 68, 0.3);
+  --color-ai-glow-high: rgba(6, 182, 212, 0.15);
+  --color-ai-glow-medium: rgba(6, 182, 212, 0.08);
+  --color-ai-glow-low: rgba(239, 68, 68, 0.12);
 
   /* -------------------------------------------------
      BADGE COLORS
@@ -457,7 +499,7 @@
   --color-info-fg: #1e40af;
 
   /* Semantic aliases used by board/UI components */
-  --color-accent-emphasis: var(--accent-purple);
+  --color-accent-emphasis: var(--accent-active, var(--accent-purple));
   --color-bg-tertiary: var(--color-bg-muted);
 
   /* -------------------------------------------------
@@ -533,6 +575,33 @@
   --th-text-muted: #6b6560;
   --th-text-faint: #b0a89e;
   --th-text-secondary: #8a8279;
+
+  /* -------------------------------------------------
+     AI TRANSPARENCY (themed)
+     ------------------------------------------------- */
+  --color-ai-glow: rgba(8, 145, 178, 0.1);
+  --color-ai-border: rgba(8, 145, 178, 0.3);
+  --color-ai-bg: rgba(8, 145, 178, 0.06);
+  --color-human-glow: rgba(124, 58, 237, 0.1);
+  --color-human-border: rgba(124, 58, 237, 0.3);
+  --color-human-bg: rgba(124, 58, 237, 0.06);
+  --color-ai-working: #15803d;
+  --color-ai-idle: #8a8279;
+  --color-ai-blocked: #c2410c;
+
+  /* Confidence level tokens (light) */
+  --color-confidence-high: #15803d;
+  --color-confidence-high-bg: rgba(22, 163, 74, 0.1);
+  --color-confidence-high-border: rgba(22, 163, 74, 0.3);
+  --color-confidence-medium: #c2410c;
+  --color-confidence-medium-bg: rgba(202, 138, 4, 0.1);
+  --color-confidence-medium-border: rgba(202, 138, 4, 0.3);
+  --color-confidence-low: #dc2626;
+  --color-confidence-low-bg: rgba(220, 38, 38, 0.1);
+  --color-confidence-low-border: rgba(220, 38, 38, 0.3);
+  --color-ai-glow-high: rgba(8, 145, 178, 0.1);
+  --color-ai-glow-medium: rgba(8, 145, 178, 0.05);
+  --color-ai-glow-low: rgba(220, 38, 38, 0.08);
 
   /* -------------------------------------------------
      BADGE COLORS

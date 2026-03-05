@@ -6,6 +6,7 @@
 import { createServer } from 'node:http'
 import { initDb, flushToDisk } from './db.js'
 import { initWs } from './ws.js'
+import { cleanupAllEvents } from './events.js'
 import app from './app.js'
 
 const PORT = process.env.STORYFLOW_PORT || 3001
@@ -13,6 +14,31 @@ const PORT = process.env.STORYFLOW_PORT || 3001
 async function main() {
   // Initialize SQLite database (creates schema, auto-migrates from JSON)
   await initDb()
+
+  // Run initial event cleanup (non-fatal)
+  try {
+    const result = cleanupAllEvents(90)
+    if (result.deleted > 0) {
+      console.log(`[Cleanup] Removed ${result.deleted} old events (cutoff: ${result.cutoff})`)
+    }
+  } catch (err) {
+    console.warn('[Cleanup] Startup cleanup failed (non-fatal):', err.message)
+  }
+
+  // Schedule periodic cleanup every 24 hours
+  setInterval(
+    () => {
+      try {
+        const result = cleanupAllEvents(90)
+        if (result.deleted > 0) {
+          console.log(`[Cleanup] Periodic: removed ${result.deleted} old events`)
+        }
+      } catch (err) {
+        console.warn('[Cleanup] Periodic cleanup failed:', err.message)
+      }
+    },
+    24 * 60 * 60 * 1000
+  )
 
   // Create HTTP server from Express app
   const server = createServer(app)

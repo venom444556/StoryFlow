@@ -51,6 +51,17 @@ export function isConfigured() {
 
 const REQUEST_TIMEOUT_MS = parseInt(process.env.STORYFLOW_TIMEOUT_MS, 10) || 15_000
 
+/** Build provenance headers from optional params */
+export function buildProvenanceHeaders({ reasoning, confidence, session_id, agent_id } = {}) {
+  const headers = { 'X-StoryFlow-Actor': 'ai' }
+  if (reasoning) headers['X-StoryFlow-Reasoning'] = reasoning
+  if (confidence !== undefined && confidence !== null)
+    headers['X-StoryFlow-Confidence'] = String(confidence)
+  if (session_id) headers['X-StoryFlow-Session-Id'] = session_id
+  if (agent_id) headers['X-StoryFlow-Agent-Id'] = agent_id
+  return headers
+}
+
 /** Generic fetch wrapper with error handling and timeout */
 async function request(path, options = {}) {
   const base = getBaseUrl()
@@ -110,17 +121,19 @@ export function getProject(id) {
   return request(`/api/projects/${encodeURIComponent(id)}`)
 }
 
-export function createProject(data) {
+export function createProject(data, extraHeaders = {}) {
   return request('/api/projects', {
     method: 'POST',
     body: JSON.stringify(data),
+    headers: extraHeaders,
   })
 }
 
-export function updateProject(id, data) {
+export function updateProject(id, data, extraHeaders = {}) {
   return request(`/api/projects/${encodeURIComponent(id)}`, {
     method: 'PUT',
     body: JSON.stringify(data),
+    headers: extraHeaders,
   })
 }
 
@@ -177,30 +190,43 @@ export function listIssues(projectId, filters = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/issues${qs ? `?${qs}` : ''}`)
 }
 
-export function createIssue(projectId, data) {
+export function createIssue(projectId, data, extraHeaders = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/issues`, {
     method: 'POST',
     body: JSON.stringify(data),
+    headers: extraHeaders,
   })
 }
 
-export function updateIssue(projectId, issueId, data) {
+export function updateIssue(projectId, issueId, data, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: extraHeaders,
     }
   )
 }
 
-export function deleteIssue(projectId, issueId) {
+export function deleteIssue(projectId, issueId, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}`,
     {
       method: 'DELETE',
+      headers: extraHeaders,
     }
   )
+}
+
+// --- Batch issue update ---
+
+export function batchUpdateIssues(projectId, updates, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/issues/batch-update`, {
+    method: 'POST',
+    body: JSON.stringify({ updates }),
+    headers: extraHeaders,
+  })
 }
 
 // --- Issues by key ---
@@ -211,21 +237,23 @@ export function getIssueByKey(projectId, key) {
   )
 }
 
-export function updateIssueByKey(projectId, key, data) {
+export function updateIssueByKey(projectId, key, data, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: extraHeaders,
     }
   )
 }
 
-export function deleteIssueByKey(projectId, key) {
+export function deleteIssueByKey(projectId, key, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}`,
     {
       method: 'DELETE',
+      headers: extraHeaders,
     }
   )
 }
@@ -242,10 +270,11 @@ export function listSprints(projectId) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/sprints`)
 }
 
-export function createSprint(projectId, data) {
+export function createSprint(projectId, data, extraHeaders = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/sprints`, {
     method: 'POST',
     body: JSON.stringify(data),
+    headers: extraHeaders,
   })
 }
 
@@ -255,37 +284,82 @@ export function listPages(projectId) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/pages`)
 }
 
-export function createPage(projectId, data) {
+export function getPage(projectId, pageId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`
+  )
+}
+
+export function createPage(projectId, data, extraHeaders = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/pages`, {
     method: 'POST',
     body: JSON.stringify(data),
+    headers: extraHeaders,
   })
 }
 
-export function updatePage(projectId, pageId, data) {
+export function updatePage(projectId, pageId, data, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: extraHeaders,
     }
   )
 }
 
-export function deletePage(projectId, pageId) {
+export function deletePage(projectId, pageId, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/pages/${encodeURIComponent(pageId)}`,
     {
       method: 'DELETE',
+      headers: extraHeaders,
     }
   )
 }
 
-export function deleteSprint(projectId, sprintId) {
+export function updateSprint(projectId, sprintId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function deleteSprint(projectId, sprintId, extraHeaders = {}) {
   return request(
     `/api/projects/${encodeURIComponent(projectId)}/sprints/${encodeURIComponent(sprintId)}`,
     {
       method: 'DELETE',
+      headers: extraHeaders,
+    }
+  )
+}
+
+// --- Comments ---
+
+export function addComment(projectId, issueId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/${encodeURIComponent(issueId)}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function addCommentByKey(projectId, key, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/issues/by-key/${encodeURIComponent(key)}/comments`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
     }
   )
 }
@@ -310,6 +384,80 @@ export function nudgeIssueByKey(projectId, key, data = {}) {
       body: JSON.stringify(data),
     }
   )
+}
+
+// --- Agent Sessions ---
+
+export function saveSessionSummary(projectId, data) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getLastSession(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions/latest`)
+}
+
+export function listSessions(projectId, limit = 10) {
+  const qs = limit !== 10 ? `?limit=${limit}` : ''
+  return request(`/api/projects/${encodeURIComponent(projectId)}/sessions${qs}`)
+}
+
+// --- Events ---
+
+export function queryEvents(projectId, filters = {}) {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== null) params.set(key, String(value))
+  }
+  const qs = params.toString()
+  return request(`/api/projects/${encodeURIComponent(projectId)}/events${qs ? `?${qs}` : ''}`)
+}
+
+export function recordEvent(projectId, event) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/events`, {
+    method: 'POST',
+    body: JSON.stringify(event),
+  })
+}
+
+export function updateAiStatus(projectId, status, detail) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/ai-status`, {
+    method: 'POST',
+    body: JSON.stringify({ status, detail }),
+  })
+}
+
+export function getSteeringInputs(projectId, { consume = false } = {}) {
+  const qs = consume ? '?consume=true' : ''
+  return request(`/api/projects/${encodeURIComponent(projectId)}/steering-queue${qs}`)
+}
+
+export function acknowledgeDirective(projectId, directiveId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/steering-queue/${encodeURIComponent(directiveId)}/acknowledge`,
+    { method: 'POST' }
+  )
+}
+
+export function respondToHuman(projectId, eventId, { action, comment } = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/events/${encodeURIComponent(eventId)}/respond`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ action, comment }),
+    }
+  )
+}
+
+// --- Approval Gates ---
+
+export function checkGates(projectId, { since } = {}) {
+  const params = new URLSearchParams()
+  if (since) params.set('since', since)
+  const qs = params.toString()
+  return request(`/api/projects/${encodeURIComponent(projectId)}/gates${qs ? `?${qs}` : ''}`)
 }
 
 // --- Health check ---

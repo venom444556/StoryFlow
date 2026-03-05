@@ -1,0 +1,206 @@
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { History, ChevronDown, ChevronUp, Plus, Pencil, BookOpen, Lightbulb } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import GlassCard from '../ui/GlassCard'
+import EmptyState from '../ui/EmptyState'
+
+function SessionCard({ session }) {
+  const [expanded, setExpanded] = useState(false)
+
+  const timeAgo = (() => {
+    try {
+      return formatDistanceToNow(new Date(session.started_at || session.created_at), {
+        addSuffix: true,
+      })
+    } catch {
+      return ''
+    }
+  })()
+
+  return (
+    <div
+      className="cursor-pointer rounded-xl px-3 py-3 transition-colors hover:bg-[var(--color-bg-glass)]"
+      onClick={() => setExpanded((v) => !v)}
+    >
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--color-ai-bg)]">
+          <History size={14} className="text-[var(--color-ai-accent)]" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-[13px] font-medium text-[var(--color-fg-default)]">
+              {session.summary || session.work_done || 'Agent session'}
+            </p>
+            {expanded ? (
+              <ChevronUp size={12} className="shrink-0 text-[var(--color-fg-muted)]" />
+            ) : (
+              <ChevronDown size={12} className="shrink-0 text-[var(--color-fg-muted)]" />
+            )}
+          </div>
+
+          {/* Stat chips */}
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            {session.issues_created > 0 && (
+              <span className="flex items-center gap-1 rounded-full bg-[var(--color-success)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--color-success)]">
+                <Plus size={9} /> {session.issues_created} created
+              </span>
+            )}
+            {session.issues_updated > 0 && (
+              <span className="flex items-center gap-1 rounded-full bg-[var(--color-info)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--color-info)]">
+                <Pencil size={9} /> {session.issues_updated} updated
+              </span>
+            )}
+            <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
+          </div>
+
+          <AnimatePresence>
+            {expanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-3 space-y-2 border-t border-[var(--color-border-default)] pt-3">
+                  {session.work_done && session.summary !== session.work_done && (
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]">
+                        Work Done
+                      </p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-fg-muted)]">
+                        {session.work_done}
+                      </p>
+                    </div>
+                  )}
+                  {session.key_decisions && (
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]">
+                        Key Decisions
+                      </p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-fg-muted)]">
+                        {session.key_decisions}
+                      </p>
+                    </div>
+                  )}
+                  {session.learnings && (
+                    <div className="flex items-start gap-1.5">
+                      <Lightbulb size={11} className="mt-px shrink-0 text-amber-400" />
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]">
+                          Learnings
+                        </p>
+                        <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-fg-muted)]">
+                          {session.learnings}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {session.next_steps && (
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]">
+                        Next Steps
+                      </p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-fg-muted)]">
+                        {session.next_steps}
+                      </p>
+                    </div>
+                  )}
+                  {session.wiki_pages_updated && (
+                    <div className="flex items-center gap-1.5 text-[10px] text-[var(--color-fg-subtle)]">
+                      <BookOpen size={10} />
+                      Wiki: {session.wiki_pages_updated}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function SessionHistory({ projectId }) {
+  const [sessions, setSessions] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!projectId) return
+    let cancelled = false
+    setLoading(true)
+
+    fetch(`/api/projects/${encodeURIComponent(projectId)}/sessions?limit=10`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled) setSessions(data)
+      })
+      .catch(() => {
+        if (!cancelled) setSessions([])
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [projectId])
+
+  if (loading) {
+    return (
+      <GlassCard padding="none" className="overflow-hidden">
+        <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
+          <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
+            Session History
+          </h3>
+        </div>
+        <div className="space-y-3 p-4">
+          {[1, 2].map((i) => (
+            <div key={i} className="flex items-start gap-3 animate-pulse">
+              <div className="h-7 w-7 rounded-lg bg-[var(--color-bg-glass)]" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-3/4 rounded bg-[var(--color-bg-glass)]" />
+                <div className="h-2 w-1/2 rounded bg-[var(--color-bg-glass)]" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
+    )
+  }
+
+  if (sessions.length === 0) {
+    return (
+      <GlassCard padding="none">
+        <EmptyState
+          icon={History}
+          title="No agent sessions yet"
+          description="Session history will appear here after the AI agent completes work on your project"
+        />
+      </GlassCard>
+    )
+  }
+
+  return (
+    <GlassCard padding="none" className="overflow-hidden">
+      <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
+        <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
+          Session History
+        </h3>
+        <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
+          {sessions.length}
+        </span>
+      </div>
+      <div className="max-h-[400px] overflow-y-auto py-1">
+        {sessions.map((session) => (
+          <SessionCard key={session.id} session={session} />
+        ))}
+      </div>
+    </GlassCard>
+  )
+}

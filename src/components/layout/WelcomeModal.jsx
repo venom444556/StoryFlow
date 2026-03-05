@@ -22,7 +22,7 @@ const FEATURES = [
     icon: GitBranch,
     title: 'Workflow',
     description: 'Visual node graph for planning phases, dependencies, and execution flow.',
-    color: '#8b5cf6',
+    color: '#a78bfa',
   },
   {
     icon: Boxes,
@@ -121,10 +121,23 @@ export default function WelcomeModal() {
 
             {/* Header */}
             <div className="px-6 pb-2 pt-6 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-accent-emphasis)]/15">
-                <Sparkles size={24} className="text-[var(--color-accent-emphasis)]" />
+              {/* Accent line at top */}
+              <div
+                className="absolute top-0 left-8 right-8 h-px"
+                style={{
+                  background:
+                    'linear-gradient(to right, transparent, rgba(var(--accent-default-rgb), 0.4), transparent)',
+                }}
+              />
+              <div
+                className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{
+                  backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
+                }}
+              >
+                <Sparkles size={24} style={{ color: 'var(--accent-default)' }} />
               </div>
-              <h2 className="text-lg font-bold text-[var(--color-fg-default)]">
+              <h2 className="text-xl font-bold tracking-tight text-[var(--color-fg-default)]">
                 Welcome to StoryFlow
               </h2>
               <p className="mt-1 text-sm text-[var(--color-fg-muted)]">

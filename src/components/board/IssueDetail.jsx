@@ -1,14 +1,26 @@
 import { useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Trash2, Plus, Check, MessageSquare, Clock, ListChecks, Send } from 'lucide-react'
+import {
+  X,
+  Trash2,
+  Plus,
+  Check,
+  MessageSquare,
+  Clock,
+  ListChecks,
+  Send,
+  History,
+} from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
+import EventChainPanel from './EventChainPanel'
 import Select from '../ui/Select'
 import TextArea from '../ui/TextArea'
 import TagInput from '../ui/TagInput'
 import Avatar from '../ui/Avatar'
+import ProvenanceBadge from '../ui/ProvenanceBadge'
 import ConfirmDialog from '../ui/ConfirmDialog'
-import { ISSUE_TYPES, PRIORITIES } from '../../utils/constants'
+import { ISSUE_TYPES, ISSUE_STATUSES, PRIORITIES } from '../../utils/constants'
 import { generateId } from '../../utils/ids'
 import { getSuggestions } from '../../utils/labelDefinitions'
 import { formatDistanceStrict } from 'date-fns'
@@ -29,9 +41,10 @@ const PRIORITY_OPTIONS = [
 ]
 
 const STATUS_OPTIONS = [
-  { value: 'To Do', label: 'To Do' },
-  { value: 'In Progress', label: 'In Progress' },
-  { value: 'Done', label: 'Done' },
+  { value: ISSUE_STATUSES.TODO, label: 'To Do' },
+  { value: ISSUE_STATUSES.IN_PROGRESS, label: 'In Progress' },
+  { value: ISSUE_STATUSES.DONE, label: 'Done' },
+  { value: ISSUE_STATUSES.BLOCKED, label: 'Blocked' },
 ]
 
 const ASSIGNEE_OPTIONS = [
@@ -197,9 +210,19 @@ export default function IssueDetail({
           <div className="flex shrink-0 items-start gap-3 border-b border-[var(--color-border-default)] px-5 py-4">
             <IssueTypeIcon type={issue.type} size={20} />
             <div className="min-w-0 flex-1">
-              <span className="mb-0.5 block text-xs font-medium text-[var(--color-fg-muted)]">
-                {issue.key}
-              </span>
+              <div className="mb-0.5 flex items-center gap-2">
+                <span className="text-xs font-medium text-[var(--color-fg-muted)]">
+                  {issue.key}
+                </span>
+                {issue.createdBy && (
+                  <ProvenanceBadge
+                    actor={issue.createdBy}
+                    reasoning={issue.createdByReasoning}
+                    timestamp={issue.createdAt}
+                    size="xs"
+                  />
+                )}
+              </div>
               {editingTitle ? (
                 <input
                   type="text"
@@ -213,9 +236,7 @@ export default function IssueDetail({
               ) : (
                 <h2
                   className="cursor-pointer truncate text-base font-semibold text-[var(--color-fg-default)] transition-colors"
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)')
-                  }
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-default)')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                   onClick={() => {
                     setTitleDraft(issue.title)
@@ -356,8 +377,7 @@ export default function IssueDetail({
                       className="h-full rounded-full transition-all duration-300"
                       style={{
                         width: `${(subtasksDone / subtasksTotal) * 100}%`,
-                        backgroundImage:
-                          'linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)',
+                        backgroundColor: 'var(--accent-default)',
                       }}
                     />
                   </div>
@@ -375,7 +395,7 @@ export default function IssueDetail({
                         className={[
                           'flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all',
                           st.completed
-                            ? 'border-green-500/40 bg-green-500/20 text-green-400'
+                            ? 'border-[var(--color-success)]/40 bg-[var(--color-success-subtle)] text-[var(--color-success)]'
                             : 'border-[var(--color-border-emphasis)] text-transparent hover:border-[var(--color-border-emphasis)]',
                         ].join(' ')}
                       >
@@ -393,7 +413,7 @@ export default function IssueDetail({
                       </span>
                       <button
                         onClick={() => handleDeleteSubtask(st.id)}
-                        className="shrink-0 rounded p-0.5 text-[var(--color-fg-subtle)] opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover/st:opacity-100"
+                        className="shrink-0 rounded p-0.5 text-[var(--color-fg-subtle)] opacity-0 transition-all hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger)] group-hover/st:opacity-100"
                       >
                         <X size={12} />
                       </button>
@@ -476,9 +496,8 @@ export default function IssueDetail({
                     disabled={!newComment.trim()}
                     className="rounded-lg p-2 text-[var(--color-fg-muted)] transition-colors disabled:pointer-events-none disabled:opacity-30"
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor =
-                        'rgba(var(--accent-active-rgb, 139, 92, 246), 0.1)'
-                      e.currentTarget.style.color = 'var(--accent-active, #8b5cf6)'
+                      e.currentTarget.style.backgroundColor = 'rgba(var(--accent-default-rgb), 0.1)'
+                      e.currentTarget.style.color = 'var(--accent-default)'
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = ''
@@ -488,6 +507,12 @@ export default function IssueDetail({
                     <Send size={14} />
                   </button>
                 </div>
+              </div>
+
+              {/* Event History */}
+              <div>
+                <SectionHeader icon={History}>Event History</SectionHeader>
+                <EventChainPanel entityType="issue" entityId={issue.id} />
               </div>
 
               {/* Timestamps */}
@@ -515,13 +540,14 @@ export default function IssueDetail({
                       )}
                       {issue.inProgressAt && (
                         <div>
-                          <span className="text-blue-400">In Progress:</span>{' '}
+                          <span className="text-[var(--color-info)]">In Progress:</span>{' '}
                           {formatDate(issue.inProgressAt)}
                         </div>
                       )}
                       {issue.doneAt && (
                         <div>
-                          <span className="text-green-400">Done:</span> {formatDate(issue.doneAt)}
+                          <span className="text-[var(--color-success)]">Done:</span>{' '}
+                          {formatDate(issue.doneAt)}
                         </div>
                       )}
                     </div>
@@ -539,7 +565,7 @@ export default function IssueDetail({
                           </span>
                         )}
                         {issue.inProgressAt && issue.doneAt && (
-                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-blue-400">
+                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-[var(--color-info)]">
                             Active:{' '}
                             {formatDistanceStrict(
                               new Date(issue.inProgressAt),
@@ -548,7 +574,7 @@ export default function IssueDetail({
                           </span>
                         )}
                         {issue.todoAt && issue.doneAt && (
-                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-green-400">
+                          <span className="rounded-md bg-[var(--color-bg-glass-hover)] px-2 py-0.5 text-[10px] text-[var(--color-success)]">
                             Total:{' '}
                             {formatDistanceStrict(new Date(issue.todoAt), new Date(issue.doneAt))}
                           </span>
@@ -565,7 +591,7 @@ export default function IssueDetail({
           <div className="shrink-0 border-t border-[var(--color-border-default)] px-5 py-3">
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-red-400 transition-colors hover:bg-red-500/10"
+              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger-subtle)]"
             >
               <Trash2 size={14} />
               Delete Issue

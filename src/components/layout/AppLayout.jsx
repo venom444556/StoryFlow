@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { Outlet, useLocation, useParams } from 'react-router-dom'
 import GradientBackground from './GradientBackground'
 import Sidebar from './Sidebar'
@@ -6,20 +6,33 @@ import Header from './Header'
 import CommandPalette from './CommandPalette'
 import SettingsPanel from './SettingsPanel'
 import ShortcutsModal from './ShortcutsModal'
+import ActivitySidebar from '../activity/ActivitySidebar'
 import ToastContainer from '../ui/Toast'
 import { useProjects } from '../../hooks/useProjects'
 import { useKeyboardShortcuts, SHORTCUTS } from '../../hooks/useKeyboardShortcuts'
 import { useUIStore } from '../../stores/uiStore'
+import { useEventStore } from '../../stores/eventStore'
 
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false)
   const [showCommandPalette, setShowCommandPalette] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showActivitySidebar, setShowActivitySidebar] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
   const params = useParams()
   const { getProject } = useProjects()
+  const setEventProject = useEventStore((s) => s.setProject)
+
+  // Connect event store to the active project
+  useEffect(() => {
+    if (params.id) {
+      setEventProject(params.id)
+    } else {
+      setEventProject(null)
+    }
+  }, [params.id, setEventProject])
 
   // Toast notifications from UI store
   const toasts = useUIStore((state) => state.toasts)
@@ -98,6 +111,8 @@ export default function AppLayout() {
           onSearchClick={toggleCommandPalette}
           onSettingsClick={() => setShowSettings(true)}
           onHamburgerClick={() => setMobileMenuOpen((prev) => !prev)}
+          onActivityClick={() => setShowActivitySidebar((prev) => !prev)}
+          showActivityButton={!!params.id}
         />
         <main id="main-content" className="relative z-10 flex-1 overflow-hidden">
           <Outlet />
@@ -112,6 +127,9 @@ export default function AppLayout() {
 
       {/* Shortcuts modal */}
       <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+
+      {/* Activity sidebar */}
+      <ActivitySidebar isOpen={showActivitySidebar} onClose={() => setShowActivitySidebar(false)} />
 
       {/* Toast notifications */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />

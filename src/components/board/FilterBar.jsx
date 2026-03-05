@@ -47,8 +47,8 @@ function CheckboxItem({ value, label, isSelected, onToggle }) {
         style={
           isSelected
             ? {
-                borderColor: 'var(--accent-active, #8b5cf6)',
-                backgroundColor: 'var(--accent-active, #8b5cf6)',
+                borderColor: 'var(--accent-default)',
+                backgroundColor: 'var(--accent-default)',
               }
             : undefined
         }
@@ -98,8 +98,8 @@ function MultiSelectDropdown({ label, options, selected = [], onChange }) {
         style={
           hasSelection
             ? {
-                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+                backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
               }
             : undefined
         }
@@ -108,7 +108,7 @@ function MultiSelectDropdown({ label, options, selected = [], onChange }) {
         {hasSelection && (
           <span
             className="flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-[var(--color-fg-default)]"
-            style={{ backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.3)' }}
+            style={{ backgroundColor: 'rgba(var(--accent-default-rgb), 0.3)' }}
           >
             {selected.length}
           </span>
@@ -180,8 +180,8 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
         style={
           hasSelection
             ? {
-                backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.15)',
-                '--tw-ring-color': 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)',
+                backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
+                '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
               }
             : undefined
         }
@@ -190,7 +190,7 @@ function GroupedMultiSelectDropdown({ label, groups, selected = [], onChange }) 
         {hasSelection && (
           <span
             className="flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-[var(--color-fg-default)]"
-            style={{ backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.3)' }}
+            style={{ backgroundColor: 'rgba(var(--accent-default-rgb), 0.3)' }}
           >
             {selected.length}
           </span>

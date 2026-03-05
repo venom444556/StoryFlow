@@ -54,7 +54,7 @@ export default function VelocityChart({ sprints = [] }) {
     return (
       <GlassCard>
         <div className="mb-3 flex items-center gap-2">
-          <BarChart3 size={16} className="text-green-400" />
+          <BarChart3 size={16} className="text-[var(--color-success)]" />
           <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Velocity Chart</h3>
         </div>
         <EmptyState
@@ -70,7 +70,7 @@ export default function VelocityChart({ sprints = [] }) {
     <GlassCard>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <BarChart3 size={16} className="text-green-400" />
+          <BarChart3 size={16} className="text-[var(--color-success)]" />
           <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Velocity Chart</h3>
         </div>
         <span className="text-xs text-[var(--color-fg-muted)]">
@@ -84,13 +84,13 @@ export default function VelocityChart({ sprints = [] }) {
           <div
             className="h-3 w-3 rounded-sm"
             style={{
-              backgroundImage: 'linear-gradient(to top, var(--accent-active, #7c3aed), #3b82f6)',
+              backgroundColor: 'var(--accent-default)',
             }}
           />
           <span className="text-[10px] text-[var(--color-fg-muted)]">Points Completed</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="h-0.5 w-4 rounded bg-green-400" style={{ opacity: 0.6 }} />
+          <div className="h-0.5 w-4 rounded bg-[var(--color-success)]" style={{ opacity: 0.6 }} />
           <span className="text-[10px] text-[var(--color-fg-muted)]">Average</span>
         </div>
       </div>
@@ -102,12 +102,8 @@ export default function VelocityChart({ sprints = [] }) {
       >
         <defs>
           <linearGradient id="vel-bar-grad" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#7c3aed" />
-            <stop offset="100%" stopColor="#3b82f6" />
-          </linearGradient>
-          <linearGradient id="vel-bar-hover" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#8b5cf6" />
-            <stop offset="100%" stopColor="#60a5fa" />
+            <stop offset="0%" style={{ stopColor: 'var(--accent-default)', stopOpacity: 0.6 }} />
+            <stop offset="100%" style={{ stopColor: 'var(--accent-default)', stopOpacity: 1 }} />
           </linearGradient>
         </defs>
 
@@ -200,14 +196,16 @@ export default function VelocityChart({ sprints = [] }) {
           y1={chart.avgY}
           x2={VIEW_WIDTH - PADDING.right}
           y2={chart.avgY}
-          stroke="rgba(52,211,153,0.5)"
+          style={{ stroke: 'var(--color-success)' }}
+          opacity={0.5}
           strokeWidth={1.5}
           strokeDasharray="6 4"
         />
         <text
           x={VIEW_WIDTH - PADDING.right + 4}
           y={chart.avgY + 3}
-          fill="rgba(52,211,153,0.7)"
+          style={{ fill: 'var(--color-success)' }}
+          opacity={0.7}
           fontSize={9}
           fontFamily="Inter, system-ui, sans-serif"
         >

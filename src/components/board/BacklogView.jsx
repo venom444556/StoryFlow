@@ -42,14 +42,15 @@ const SORT_OPTIONS = [
 ]
 
 const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 }
-const STATUS_ORDER = { 'To Do': 0, 'In Progress': 1, Done: 2 }
+const STATUS_ORDER = { 'To Do': 0, 'In Progress': 1, Done: 2, Blocked: 3 }
 
 const STATUS_ACCENT = {
   'To Do': 'bg-[var(--color-fg-faint)]',
-  'In Progress': 'bg-blue-400',
-  Done: 'bg-green-400',
+  'In Progress': 'bg-[var(--color-info)]',
+  Done: 'bg-[var(--color-success)]',
+  Blocked: 'bg-[var(--color-warning)]',
 }
-const STATUS_NAMES = ['To Do', 'In Progress', 'Done']
+const STATUS_NAMES = ['To Do', 'In Progress', 'Done', 'Blocked']
 
 function sortIssues(issues, sortKey, sortDir) {
   const sorted = [...issues]
@@ -460,9 +461,7 @@ export default function BacklogView({
               : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-muted)]',
           ].join(' ')}
           style={
-            groupByEpic
-              ? { backgroundColor: 'rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)' }
-              : undefined
+            groupByEpic ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.2)' } : undefined
           }
         >
           <Layers size={12} />
@@ -519,7 +518,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
               <span className="text-xs font-medium text-[var(--color-fg-muted)]">{epic.key}</span>
               <span
                 className="flex-1 text-sm font-medium"
-                style={{ color: 'var(--accent-active, #8b5cf6)' }}
+                style={{ color: 'var(--accent-default)' }}
               >
                 {epic.title}
               </span>

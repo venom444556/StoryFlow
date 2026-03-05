@@ -1,12 +1,12 @@
 import { formatDistanceToNowStrict } from 'date-fns'
 
-const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+const FOUR_HOURS_MS = 4 * 60 * 60 * 1000
 
 /**
  * Determine if an "In Progress" issue is stale.
  * Returns { isStale: false } for non-qualifying issues.
  */
-export function getStaleInfo(issue, thresholdMs = TWO_HOURS_MS) {
+export function getStaleInfo(issue, thresholdMs = FOUR_HOURS_MS) {
   if (!issue || issue.status !== 'In Progress' || !issue.updatedAt) {
     return { isStale: false, agoText: '' }
   }

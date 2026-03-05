@@ -23,11 +23,33 @@
         ]
       },
       {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE '\\.md\"?$'; then echo 'Markdown file written. Invoke the storyflow-agent to check if this should be synced to the StoryFlow wiki.'; fi",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board — pass it the commit message so it can mark completed issues as Done.'; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board — pass it the commit message so it can mark completed issues as Done.'; elif echo \"$input\" | grep -qE '(npm test|vitest|jest|pytest|cargo test)'; then if echo \"$input\" | grep -qiE '(passed|Tests:.*passed|OK)'; then echo 'Tests passed. Invoke the storyflow-agent to record a milestone nudge for in-progress issues.'; elif echo \"$input\" | grep -qiE '(FAIL|failed|error)'; then echo 'Tests failed. Invoke the storyflow-agent to file bugs for failing tests.'; fi; elif echo \"$input\" | grep -qE 'gh pr create'; then echo 'PR created. Invoke the storyflow-agent to link related issues and update their status.'; fi",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]

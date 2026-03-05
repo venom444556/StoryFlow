@@ -78,8 +78,9 @@ export default function Button({
         transitionTimingFunction: 'var(--ease-default)',
         ...(isPrimary
           ? {
-              backgroundImage: `linear-gradient(to right, var(--accent-active, #8b5cf6), #3b82f6)`,
-              boxShadow: `0 10px 15px -3px rgba(var(--accent-active-rgb, 139, 92, 246), 0.2)`,
+              background: 'var(--accent-default)',
+              boxShadow:
+                '0 8px 20px -4px rgba(var(--accent-default-rgb), 0.35), 0 0 0 1px rgba(var(--accent-default-rgb), 0.1)',
             }
           : {}),
       }}

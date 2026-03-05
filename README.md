@@ -8,6 +8,10 @@ It's also the tool you'd want even without AI: a Kanban board with sprints and b
 
 Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud sync, no telemetry.
 
+### Why StoryFlow is Different
+
+Most AI agent frameworks focus on the model -- better prompts, chain-of-thought, tool use. StoryFlow focuses on the infrastructure around the model -- persistence, transparency, human-in-the-loop steering, and session chaining. The insight that "the agent's brain should be the same data store the human sees" eliminates the black-box problem that plagues most autonomous agents. The human can literally read the agent's wiki pages to understand what it knows and correct it.
+
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?logo=tailwindcss&logoColor=white)
@@ -16,9 +20,19 @@ Your data stays on your machine in SQLite and IndexedDB. No accounts, no cloud s
 ## Features
 
 ### Board
-Full Kanban board with epics, stories, tasks, and bugs. Includes sprint management, backlog grooming, story point estimation, burndown charts, and velocity tracking.
+Full Kanban board with epics, stories, tasks, and bugs. Includes sprint management, backlog grooming, story point estimation, burndown charts, and velocity tracking. Supports Blocked status with `blockedAt` lifecycle timestamps.
 
 ![Board](docs/screenshots/board.gif)
+
+### AI Transparency & Autonomy (v2)
+Real-time visibility into everything the AI agent does:
+
+- **Gate Approvals** -- pending gates surface as prominent action cards; approve or reject with optional comments before the agent proceeds
+- **Escalation Response** -- when the AI is blocked, respond directly with steering directives
+- **Sprint Metrics** -- CSS-only velocity bars, status distribution charts, cycle time and blocked time analytics computed from board data
+- **Session History** -- collapsible timeline of past agent sessions showing work done, decisions, learnings, and next steps
+- **Event Feed** -- live activity stream with provenance badges, confidence scores, and category filters
+- **Steering Bar** -- direct the agent's focus with free-text directives or quick-action chips
 
 ### Wiki
 Nested documentation pages with a markdown editor, live preview, page templates, version history, and table of contents generation.
@@ -42,7 +56,7 @@ Phase-based progress tracking with milestone markers, date ranges, and completio
 Architectural decision records with alternatives analysis, consequences tracking, and status management.
 
 ### Overview
-Project dashboard with goals, constraints, tech stack summary, activity feed, and quick stats.
+Project dashboard with AI status, gate approvals, metrics (AI actions, human overrides, velocity, blocked count), sprint analytics, activity feed, session history, and steering controls.
 
 ## Design
 
@@ -51,7 +65,7 @@ StoryFlow uses a custom design token system with two themes:
 - **Obsidian** -- dark glassmorphic theme with frosted glass panels and depth layering
 - **Warm Linen** -- light theme with a warm bone/eggshell palette
 
-All components use semantic CSS variable tokens (`--color-fg-default`, `--color-bg-panel`, etc.) for consistent theming across 80+ components.
+All components use semantic CSS variable tokens (`--color-fg-default`, `--color-bg-panel`, `--color-ai-accent`, `--color-confidence-*`, etc.) for consistent theming across 80+ components.
 
 ## Quick Start
 
@@ -90,7 +104,7 @@ In production, only the Express server runs (on port 3001) and serves both the A
 | React 18 | UI framework |
 | Vite 6 | Build tool + dev server |
 | Tailwind CSS 4.0 | Styling via `@tailwindcss/vite` |
-| Framer Motion | Animations |
+| Framer Motion | Animations + CSS-only charts |
 | Zustand + Dexie | State management with IndexedDB persistence |
 | Lucide React | Icons |
 | date-fns | Date formatting |
@@ -114,33 +128,41 @@ Development:
 
 Production:
   Express (:3001) ──> serves dist/ + API + WebSocket ──> SQLite
+
+Data Flow (AI Transparency):
+  Agent ──MCP tools──> Express API ──> SQLite + Event Stream
+       ↑                    ↓ WebSocket broadcast
+       └── Steering  <── Browser (gates, events, metrics, sessions)
 ```
 
 The client stores data in IndexedDB for fast access. The Express server persists data in SQLite for durability. WebSocket notifications keep them in sync -- changes from one source propagate to the other automatically.
+
+The transparency layer records every AI action as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue.
 
 ## Project Structure
 
 ```
 plugin/              Claude Code plugin (MCP server, commands, skills)
-server/              Express backend (app.js, db.js, ws.js, index.js)
+server/              Express backend (app.js, db.js, events.js, intelligence.js, ws.js)
 src/
   components/
-    ui/              Shared components (Button, Modal, Badge, Input, etc.)
+    ui/              Shared components (Button, Modal, Badge, GlassCard, ProvenanceBadge, etc.)
     layout/          App shell (Sidebar, Header, Settings, ErrorBoundary)
     project/         Tab components (Board, Wiki, Workflow, Architecture, etc.)
+    overview/        AI dashboard (AIStatusCard, GatePanel, MetricsSummary,
+                     SprintMetricsPanel, EventFeed, SessionHistory, SteeringBar)
     board/           Kanban board (SprintBoard, BacklogView, IssueCard, etc.)
     wiki/            Documentation (PageTree, PageEditor, MarkdownRenderer)
     workflow/        Visual canvas (WorkflowCanvas, WorkflowNode, NodePalette)
     architecture/    Component tree (ComponentDetail, DependencyGraph)
     timeline/        Phase tracking (PhaseCard, MilestoneMarker)
     decisions/       Decision records (DecisionCard, DecisionForm)
-    activity/        Activity feed
   pages/             Dashboard, Project, 404
   hooks/             Custom hooks (useProject, useDragAndDrop, useCanvasPan, etc.)
   contexts/          ProjectsContext (React Context + Zustand)
-  stores/            Zustand stores (projects, activity, UI)
+  stores/            Zustand stores (projects, events, UI)
   styles/            Design tokens (tokens.css)
-  utils/             Helpers (markdown, sanitize, graph, colors, export/import)
+  utils/             Helpers (markdown, sanitize, graph, colors, staleness, export/import)
   data/              Seed data, defaults, templates, node types
 data/                SQLite database (auto-created on first run, gitignored)
 ```
@@ -152,10 +174,12 @@ Projects are persisted in both IndexedDB (client) and SQLite (server). The serve
 - **Overview** -- goals, constraints, tech stack, target audience
 - **Architecture** -- component tree with types and dependencies
 - **Workflow** -- visual node graph with execution engine
-- **Board** -- issues (epics/stories/tasks/bugs), sprints, status columns
+- **Board** -- issues (epics/stories/tasks/bugs), sprints, status columns (To Do, In Progress, Blocked, Done)
 - **Wiki** -- nested pages with markdown content and version history
 - **Timeline** -- phases with progress tracking and milestones
 - **Decisions** -- architectural decisions with alternatives and consequences
+
+Issue lifecycle timestamps: `todoAt`, `inProgressAt`, `blockedAt`, `doneAt` -- enabling cycle time and blocked time analytics.
 
 ## Claude Code Plugin
 
@@ -186,24 +210,22 @@ Configuration is saved to `~/.config/storyflow/config.json` and persists across 
 | `/storyflow:open` | Open StoryFlow UI in browser |
 | `/storyflow:board [project]` | Show board summary for a project |
 
-### MCP Tools
+### MCP Tools (37)
 
-The plugin exposes MCP tools that Claude can use automatically during development:
+The plugin exposes 37 MCP tools across 8 categories that Claude can use automatically during development:
 
-| Tool | Purpose |
-|------|---------|
-| `storyflow_list_projects` | List all projects |
-| `storyflow_create_project` | Create new project |
-| `storyflow_list_issues` | List/filter issues |
-| `storyflow_create_issue` | Create issue (epic/story/task/bug) |
-| `storyflow_update_issue` | Update issue fields |
-| `storyflow_get_board_summary` | Board overview with counts and progress |
-| `storyflow_list_sprints` | List sprints |
-| `storyflow_create_sprint` | Create sprint |
-| `storyflow_list_pages` | List wiki pages |
-| `storyflow_create_page` | Create wiki page |
-| `storyflow_update_page` | Update page content |
-| `storyflow_check_connection` | Verify connectivity |
+| Category | Tools | Examples |
+|----------|-------|---------|
+| **Projects** | 6 | `list_projects`, `create_project`, `advance_phase` |
+| **Issues** | 7 | `create_issue`, `update_issue`, `batch_update_issues`, `add_comment`, `nudge_issue` |
+| **Sprints** | 5 | `create_sprint`, `update_sprint`, `sprint_metrics` |
+| **Board** | 2 | `get_board_summary`, `run_hygiene` |
+| **Wiki** | 5 | `create_page`, `get_page`, `update_page` |
+| **Sessions** | 3 | `save_session_summary`, `get_last_session`, `list_sessions` |
+| **Transparency** | 8 | `record_event`, `query_events`, `update_ai_status`, `check_gates`, `escalate` |
+| **Git** | 1 | `sync_from_git` |
+
+All tools are prefixed with `storyflow_`. See [`plugin/skills/storyflow/SKILL.md`](plugin/skills/storyflow/SKILL.md) for the full tool reference.
 
 ## Security
 
@@ -217,6 +239,8 @@ The primary threat StoryFlow guards against is **unauthorized tool access** — 
 
 - MCP tool calls require a shared secret (`MCP_AUTH_TOKEN`) passed as a Bearer token. Without it, all tool requests are rejected with `401 Unauthorized`.
 - The token is validated using constant-time comparison to prevent timing attacks.
+- The `/api/sync` endpoint requires an explicit `X-Confirm: overwrite-all` header and rejects empty payloads to prevent accidental data wipes.
+- A write lock on sync prevents concurrent sync + mutation races.
 
 **What's NOT in scope:**
 
