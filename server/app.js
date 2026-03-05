@@ -78,9 +78,11 @@ function validateProjectBody(body, isUpdate = false) {
   return null
 }
 
-function validateSprintBody(body) {
-  const nameErr = requireString(body, 'name')
-  if (nameErr) return nameErr
+function validateSprintBody(body, isUpdate = false) {
+  if (!isUpdate) {
+    const nameErr = requireString(body, 'name')
+    if (nameErr) return nameErr
+  }
   if (body.status !== undefined && !VALID_SPRINT_STATUSES.includes(body.status)) {
     return `"status" must be one of: ${VALID_SPRINT_STATUSES.join(', ')}`
   }

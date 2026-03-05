@@ -367,13 +367,11 @@ export function addIssue(projectId, issue) {
   if (!project) return null
   if (!project.board) project.board = { issues: [], sprints: [], nextIssueNumber: 1 }
 
-  // Normalize status — reject unknown values
-  if (issue.status) {
-    const normalized = normalizeStatus(issue.status)
-    if (!normalized)
-      return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Blocked, Done` }
-    issue.status = normalized
-  }
+  // Normalize status — reject unknown values, default to 'To Do'
+  const normalized = normalizeStatus(issue.status)
+  if (!normalized)
+    return { error: `Unknown status "${issue.status}". Valid: To Do, In Progress, Blocked, Done` }
+  issue.status = normalized
 
   const nextNumber = project.board.nextIssueNumber || 1
   const prefix =
@@ -513,11 +511,29 @@ export function addSprint(projectId, sprint) {
   if (!project.board) project.board = { issues: [], sprints: [], nextIssueNumber: 1 }
 
   const now = new Date().toISOString()
-  const newSprint = { ...sprint, id: sprint.id || crypto.randomUUID(), createdAt: now }
+  const newSprint = {
+    ...sprint,
+    id: sprint.id || crypto.randomUUID(),
+    status: sprint.status || 'planning',
+    createdAt: now,
+  }
   project.board.sprints.push(newSprint)
   project.updatedAt = now
   upsertProject(projectId, project)
   return newSprint
+}
+
+export function updateSprint(projectId, sprintId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const sprint = project.board?.sprints?.find((s) => s.id === sprintId)
+  if (!sprint) return null
+
+  const now = new Date().toISOString()
+  Object.assign(sprint, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return sprint
 }
 
 // ---------------------------------------------------------------------------
@@ -584,23 +600,6 @@ export function deletePage(projectId, pageId) {
 }
 
 // ---------------------------------------------------------------------------
-// Sprint update
-// ---------------------------------------------------------------------------
-
-export function updateSprint(projectId, sprintId, updates) {
-  const project = getProject(projectId)
-  if (!project) return null
-  const sprint = project.board?.sprints?.find((s) => s.id === sprintId)
-  if (!sprint) return null
-
-  const now = new Date().toISOString()
-  Object.assign(sprint, updates, { updatedAt: now })
-  project.updatedAt = now
-  upsertProject(projectId, project)
-  return sprint
-}
-
-// ---------------------------------------------------------------------------
 // Sprint deletion
 // ---------------------------------------------------------------------------
 
@@ -632,7 +631,8 @@ export function getBoardSummary(projectId) {
   let donePoints = 0
 
   for (const issue of issues) {
-    byStatus[issue.status] = (byStatus[issue.status] || 0) + 1
+    const status = issue.status || 'To Do'
+    byStatus[status] = (byStatus[status] || 0) + 1
     byType[issue.type] = (byType[issue.type] || 0) + 1
     if (issue.storyPoints) {
       totalPoints += issue.storyPoints
