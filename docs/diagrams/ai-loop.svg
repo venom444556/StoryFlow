@@ -1,161 +1,210 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" fill="none">
   <defs>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
       text { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-      .title { font-size: 20px; font-weight: 700; fill: #1a1a1a; }
-      .node-label { font-size: 12px; font-weight: 600; }
-      .node-sub { font-size: 9.5px; font-weight: 400; fill: #6b7280; }
-      .step-num { font-size: 10px; font-weight: 700; fill: #fff; }
-      .conn-label { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; }
     </style>
-    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
-      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000" flood-opacity="0.06"/>
+    <filter id="card-shadow" x="-8%" y="-8%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.25"/>
     </filter>
-    <marker id="arr-gray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#9ca3af" stroke-width="1.2"/>
+    <filter id="step-glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
+    </filter>
+    <!-- Ambient orbs -->
+    <radialGradient id="orb-left" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.07"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-center" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-right" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Glass -->
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,245,235,0.06)"/>
+      <stop offset="100%" stop-color="rgba(255,245,235,0.02)"/>
+    </linearGradient>
+    <!-- Arrows -->
+    <marker id="arr-amber" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
-    <marker id="arr-amber" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+    <marker id="arr-purple" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#8b5cf6" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
-    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#10b981" stroke-width="1.2"/>
-    </marker>
-    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#ef4444" stroke-width="1.2"/>
-    </marker>
-    <marker id="arr-purple" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#8b5cf6" stroke-width="1.2"/>
+    <marker id="arr-green" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect width="960" height="480" rx="16" fill="#fafaf9"/>
-  <rect x="0.5" y="0.5" width="959" height="479" rx="16" fill="none" stroke="#e5e7eb"/>
+  <!-- ============================================================ -->
+  <!-- BACKGROUND -->
+  <!-- ============================================================ -->
+  <rect width="960" height="500" rx="16" fill="#0c0a09"/>
+  <rect x="0.5" y="0.5" width="959" height="499" rx="16" fill="none" stroke="rgba(168,162,158,0.10)"/>
+  <circle cx="140" cy="240" r="260" fill="url(#orb-left)"/>
+  <circle cx="480" cy="220" r="320" fill="url(#orb-center)"/>
+  <circle cx="820" cy="240" r="260" fill="url(#orb-right)"/>
 
-  <!-- Title -->
-  <text x="480" y="42" text-anchor="middle" class="title">AI Transparency Loop</text>
+  <!-- ============================================================ -->
+  <!-- TITLE -->
+  <!-- ============================================================ -->
+  <text x="480" y="42" text-anchor="middle" style="font-size:22px;font-weight:700;fill:#fafaf9;letter-spacing:-0.02em;">AI Transparency Loop</text>
+  <text x="480" y="62" text-anchor="middle" style="font-size:11px;font-weight:500;fill:#78716c;letter-spacing:0.06em;">EVERY ACTION RECORDED · EVERY DECISION AUDITABLE</text>
 
-  <!-- ================================================================== -->
-  <!-- HUMAN (left) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="50" y="140" width="180" height="200" rx="14" fill="#fff" stroke="#e5e7eb"/>
+  <!-- ============================================================ -->
+  <!-- CARD 1 — HUMAN (left) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="40" y="110" width="210" height="260" rx="16" fill="url(#glass)"/>
+    <rect x="40" y="110" width="210" height="260" rx="16" fill="none" stroke="rgba(139,92,246,0.18)"/>
   </g>
-  <rect x="50" y="140" width="180" height="40" rx="14" fill="#8b5cf6"/>
-  <rect x="50" y="166" width="180" height="14" fill="#8b5cf6"/>
+  <!-- Header -->
+  <rect x="40" y="110" width="210" height="44" rx="16" fill="rgba(139,92,246,0.12)"/>
+  <rect x="40" y="138" width="210" height="16" fill="rgba(139,92,246,0.12)"/>
+  <line x1="40" y1="154" x2="250" y2="154" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
   <!-- Person icon -->
-  <circle cx="110" cy="160" r="8" fill="none" stroke="#fff" stroke-width="1.5"/>
-  <path d="M96,174 Q110,182 124,174" fill="none" stroke="#fff" stroke-width="1.5"/>
-  <text x="152" y="165" style="font-size:13px;font-weight:700;fill:#fff;">Human</text>
+  <circle cx="102" cy="132" r="7" fill="none" stroke="#c4b5fd" stroke-width="1.4"/>
+  <path d="M90,145 Q102,152 114,145" fill="none" stroke="#c4b5fd" stroke-width="1.4"/>
+  <text x="138" y="137" style="font-size:14px;font-weight:700;fill:#c4b5fd;">Human</text>
 
-  <text x="140" y="206" text-anchor="middle" class="node-sub">Reviews events</text>
-  <text x="140" y="222" text-anchor="middle" class="node-sub">Approves / rejects gates</text>
-  <text x="140" y="238" text-anchor="middle" class="node-sub">Sends steering directives</text>
-  <text x="140" y="254" text-anchor="middle" class="node-sub">Reads agent wiki pages</text>
-  <text x="140" y="270" text-anchor="middle" class="node-sub">Edits board directly</text>
-
-  <!-- Purple badge -->
-  <rect x="82" y="296" width="116" height="24" rx="12" fill="#f5f3ff" stroke="#c4b5fd"/>
-  <circle cx="96" cy="308" r="4" fill="#8b5cf6"/>
-  <text x="152" y="312" text-anchor="end" style="font-size:9px;font-weight:600;fill:#6d28d9;">PROVENANCE: HUMAN</text>
-
-  <!-- ================================================================== -->
-  <!-- STORYFLOW (center) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="340" y="100" width="280" height="280" rx="14" fill="#fff" stroke="#e5e7eb"/>
+  <!-- Actions -->
+  <g style="font-size:10.5px;font-weight:400;fill:#a8a29e;">
+    <text x="60" y="180">Reviews events</text>
+    <text x="60" y="202">Approves / rejects gates</text>
+    <text x="60" y="224">Sends steering directives</text>
+    <text x="60" y="246">Reads agent wiki pages</text>
+    <text x="60" y="268">Edits board directly</text>
   </g>
-  <rect x="340" y="100" width="280" height="44" rx="14" fill="#1e293b"/>
-  <text x="480" y="128" text-anchor="middle" style="font-size:14px;font-weight:700;fill:#f8fafc;">StoryFlow</text>
 
-  <!-- Inner boxes -->
-  <rect x="362" y="160" width="120" height="42" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
-  <text x="422" y="178" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#1e40af;">Board</text>
-  <text x="422" y="192" text-anchor="middle" class="node-sub">Issues + Sprints</text>
+  <!-- Provenance badge -->
+  <rect x="58" y="330" width="174" height="28" rx="14" fill="rgba(139,92,246,0.10)" stroke="rgba(139,92,246,0.22)"/>
+  <circle cx="76" cy="344" r="5" fill="#8b5cf6"/>
+  <text x="155" y="349" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#a78bfa;letter-spacing:0.03em;">PROVENANCE: HUMAN</text>
 
-  <rect x="498" y="160" width="108" height="42" rx="8" fill="#ecfdf5" stroke="#a7f3d0"/>
-  <text x="552" y="178" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#065f46;">Wiki</text>
-  <text x="552" y="192" text-anchor="middle" class="node-sub">Agent memory</text>
-
-  <rect x="362" y="214" width="120" height="42" rx="8" fill="#fdf4ff" stroke="#e9d5ff"/>
-  <text x="422" y="232" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#7e22ce;">Event Stream</text>
-  <text x="422" y="246" text-anchor="middle" class="node-sub">Full audit trail</text>
-
-  <rect x="498" y="214" width="108" height="42" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
-  <text x="552" y="232" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#9a3412;">Gates</text>
-  <text x="552" y="246" text-anchor="middle" class="node-sub">Approval required</text>
-
-  <rect x="362" y="268" width="120" height="42" rx="8" fill="#fefce8" stroke="#fde68a"/>
-  <text x="422" y="286" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#854d0e;">Steering</text>
-  <text x="422" y="300" text-anchor="middle" class="node-sub">Human directives</text>
-
-  <rect x="498" y="268" width="108" height="42" rx="8" fill="#f3f4f6" stroke="#e5e7eb"/>
-  <text x="552" y="286" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#374151;">Sessions</text>
-  <text x="552" y="300" text-anchor="middle" class="node-sub">Memory chain</text>
-
-  <!-- Shared data badge -->
-  <rect x="402" y="326" width="156" height="24" rx="12" fill="#fffbeb" stroke="#fcd34d"/>
-  <text x="480" y="342" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#92400e;">SINGLE SOURCE OF TRUTH</text>
-
-  <!-- ================================================================== -->
-  <!-- AI AGENT (right) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="730" y="140" width="180" height="200" rx="14" fill="#fff" stroke="#e5e7eb"/>
+  <!-- ============================================================ -->
+  <!-- CARD 2 — STORYFLOW (center) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="325" y="86" width="310" height="300" rx="16" fill="url(#glass)"/>
+    <rect x="325" y="86" width="310" height="300" rx="16" fill="none" stroke="rgba(168,162,158,0.12)"/>
   </g>
-  <rect x="730" y="140" width="180" height="40" rx="14" fill="#f59e0b"/>
-  <rect x="730" y="166" width="180" height="14" fill="#f59e0b"/>
+  <!-- Header -->
+  <rect x="325" y="86" width="310" height="44" rx="16" fill="rgba(255,245,235,0.07)"/>
+  <rect x="325" y="114" width="310" height="16" fill="rgba(255,245,235,0.07)"/>
+  <line x1="325" y1="130" x2="635" y2="130" stroke="rgba(168,162,158,0.12)" stroke-width="1"/>
+  <text x="480" y="115" text-anchor="middle" style="font-size:15px;font-weight:700;fill:#fafaf9;">StoryFlow</text>
+
+  <!-- 2×3 grid -->
+  <!-- Board -->
+  <rect x="343" y="144" width="138" height="44" rx="10" fill="rgba(59,130,246,0.07)" stroke="rgba(59,130,246,0.18)"/>
+  <text x="412" y="163" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#60a5fa;">Board</text>
+  <text x="412" y="179" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Issues + Sprints</text>
+
+  <!-- Wiki -->
+  <rect x="491" y="144" width="138" height="44" rx="10" fill="rgba(16,185,129,0.07)" stroke="rgba(16,185,129,0.18)"/>
+  <text x="560" y="163" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#34d399;">Wiki</text>
+  <text x="560" y="179" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Agent memory</text>
+
+  <!-- Event Stream -->
+  <rect x="343" y="198" width="138" height="44" rx="10" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.18)"/>
+  <text x="412" y="217" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#22d3ee;">Event Stream</text>
+  <text x="412" y="233" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Full audit trail</text>
+
+  <!-- Gates -->
+  <rect x="491" y="198" width="138" height="44" rx="10" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.18)"/>
+  <text x="560" y="217" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#fbbf24;">Gates</text>
+  <text x="560" y="233" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Approval required</text>
+
+  <!-- Steering -->
+  <rect x="343" y="252" width="138" height="44" rx="10" fill="rgba(139,92,246,0.07)" stroke="rgba(139,92,246,0.18)"/>
+  <text x="412" y="271" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#c4b5fd;">Steering</text>
+  <text x="412" y="287" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Human directives</text>
+
+  <!-- Sessions -->
+  <rect x="491" y="252" width="138" height="44" rx="10" fill="rgba(255,245,235,0.04)" stroke="rgba(168,162,158,0.10)"/>
+  <text x="560" y="271" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#a8a29e;">Sessions</text>
+  <text x="560" y="287" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Memory chain</text>
+
+  <!-- Source of truth badge -->
+  <rect x="390" y="310" width="180" height="28" rx="14" fill="rgba(245,158,11,0.10)" stroke="rgba(245,158,11,0.22)"/>
+  <text x="480" y="328" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#fbbf24;letter-spacing:0.04em;">SINGLE SOURCE OF TRUTH</text>
+
+  <!-- ============================================================ -->
+  <!-- CARD 3 — AI AGENT (right) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="710" y="110" width="210" height="260" rx="16" fill="url(#glass)"/>
+    <rect x="710" y="110" width="210" height="260" rx="16" fill="none" stroke="rgba(6,182,212,0.18)"/>
+  </g>
+  <!-- Header -->
+  <rect x="710" y="110" width="210" height="44" rx="16" fill="rgba(6,182,212,0.10)"/>
+  <rect x="710" y="138" width="210" height="16" fill="rgba(6,182,212,0.10)"/>
+  <line x1="710" y1="154" x2="920" y2="154" stroke="rgba(6,182,212,0.25)" stroke-width="1"/>
   <!-- Robot icon -->
-  <rect x="770" y="150" width="16" height="14" rx="3" fill="none" stroke="#fff" stroke-width="1.5"/>
-  <circle cx="775" cy="156" r="2" fill="#fff"/>
-  <circle cx="783" cy="156" r="2" fill="#fff"/>
-  <line x1="778" y1="147" x2="778" y2="150" stroke="#fff" stroke-width="1.5"/>
-  <text x="798" y="163" style="font-size:13px;font-weight:700;fill:#fff;">AI Agent</text>
+  <rect x="770" y="123" width="14" height="12" rx="3" fill="none" stroke="#22d3ee" stroke-width="1.3"/>
+  <circle cx="775" cy="129" r="1.5" fill="#22d3ee"/>
+  <circle cx="781" cy="129" r="1.5" fill="#22d3ee"/>
+  <line x1="777" y1="120" x2="777" y2="123" stroke="#22d3ee" stroke-width="1.3"/>
+  <text x="794" y="137" style="font-size:14px;font-weight:700;fill:#22d3ee;">AI Agent</text>
 
-  <text x="820" y="206" text-anchor="middle" class="node-sub">Reads board + wiki</text>
-  <text x="820" y="222" text-anchor="middle" class="node-sub">Creates/updates issues</text>
-  <text x="820" y="238" text-anchor="middle" class="node-sub">Writes wiki pages</text>
-  <text x="820" y="254" text-anchor="middle" class="node-sub">Records events + reasoning</text>
-  <text x="820" y="270" text-anchor="middle" class="node-sub">Requests gate approval</text>
-
-  <!-- Cyan badge -->
-  <rect x="752" y="296" width="116" height="24" rx="12" fill="#ecfeff" stroke="#a5f3fc"/>
-  <circle cx="766" cy="308" r="4" fill="#06b6d4"/>
-  <text x="882" y="312" text-anchor="end" style="font-size:9px;font-weight:600;fill:#0e7490;">PROVENANCE: AI (0.85)</text>
-
-  <!-- ================================================================== -->
-  <!-- FLOW ARROWS -->
-  <!-- ================================================================== -->
-
-  <!-- Step 1: Agent → StoryFlow (writes) -->
-  <path d="M730,200 L624,200" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arr-amber)"/>
-  <circle cx="677" cy="186" r="10" fill="#f59e0b"/>
-  <text x="677" y="190" text-anchor="middle" class="step-num">1</text>
-  <text x="677" y="178" text-anchor="middle" class="conn-label" fill="#f59e0b">WRITES</text>
-
-  <!-- Step 2: StoryFlow → Human (notifies) -->
-  <path d="M340,230 L234,230" stroke="#8b5cf6" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arr-purple)"/>
-  <circle cx="287" cy="216" r="10" fill="#8b5cf6"/>
-  <text x="287" y="220" text-anchor="middle" class="step-num">2</text>
-  <text x="287" y="208" text-anchor="middle" class="conn-label" fill="#8b5cf6">NOTIFIES</text>
-
-  <!-- Step 3: Human → StoryFlow (approves/steers) -->
-  <path d="M230,280 L340,280" stroke="#10b981" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arr-green)"/>
-  <circle cx="285" cy="266" r="10" fill="#10b981"/>
-  <text x="285" y="270" text-anchor="middle" class="step-num">3</text>
-  <text x="285" y="258" text-anchor="middle" class="conn-label" fill="#10b981">APPROVES / STEERS</text>
-
-  <!-- Step 4: StoryFlow → Agent (reads directives) -->
-  <path d="M620,270 L730,270" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arr-amber)"/>
-  <circle cx="675" cy="256" r="10" fill="#f59e0b"/>
-  <text x="675" y="260" text-anchor="middle" class="step-num">4</text>
-  <text x="675" y="248" text-anchor="middle" class="conn-label" fill="#f59e0b">READS DIRECTIVES</text>
-
-  <!-- Bottom annotation -->
-  <g transform="translate(120, 410)">
-    <rect x="0" y="0" width="720" height="48" rx="10" fill="#f5f3ff" stroke="#c4b5fd"/>
-    <text x="360" y="20" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#5b21b6;">The agent's brain IS the project data</text>
-    <text x="360" y="36" text-anchor="middle" class="node-sub">Every action is recorded with actor, reasoning, and confidence. Humans see exactly what the AI knows and can correct it in real time.</text>
+  <!-- Actions -->
+  <g style="font-size:10.5px;font-weight:400;fill:#a8a29e;">
+    <text x="730" y="180">Reads board + wiki</text>
+    <text x="730" y="202">Creates / updates issues</text>
+    <text x="730" y="224">Writes wiki pages</text>
+    <text x="730" y="246">Records events + reasoning</text>
+    <text x="730" y="268">Requests gate approval</text>
   </g>
+
+  <!-- Provenance badge -->
+  <rect x="728" y="330" width="174" height="28" rx="14" fill="rgba(6,182,212,0.10)" stroke="rgba(6,182,212,0.22)"/>
+  <circle cx="746" cy="344" r="5" fill="#06b6d4"/>
+  <text x="825" y="349" text-anchor="middle" style="font-size:10px;font-weight:600;fill:#22d3ee;letter-spacing:0.03em;">PROVENANCE: AI (0.85)</text>
+
+  <!-- ============================================================ -->
+  <!-- FLOW ARROWS — Clean lines + glowing step circles -->
+  <!-- ============================================================ -->
+
+  <!-- Step 1: Agent → StoryFlow (WRITES) -->
+  <line x1="710" y1="170" x2="635" y2="170" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-amber)"/>
+  <!-- Glowing step circle -->
+  <circle cx="672" cy="150" r="14" fill="#f59e0b" filter="url(#step-glow)" opacity="0.25"/>
+  <circle cx="672" cy="150" r="14" fill="#f59e0b"/>
+  <text x="672" y="155" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#0c0a09;">1</text>
+  <text x="672" y="137" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#fbbf24;letter-spacing:0.05em;">WRITES</text>
+
+  <!-- Step 2: StoryFlow → Human (NOTIFIES) -->
+  <line x1="325" y1="200" x2="250" y2="200" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-purple)"/>
+  <circle cx="288" cy="180" r="14" fill="#8b5cf6" filter="url(#step-glow)" opacity="0.25"/>
+  <circle cx="288" cy="180" r="14" fill="#8b5cf6"/>
+  <text x="288" y="185" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#fff;">2</text>
+  <text x="288" y="167" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#c4b5fd;letter-spacing:0.05em;">NOTIFIES</text>
+
+  <!-- Step 3: Human → StoryFlow (APPROVES) -->
+  <line x1="250" y1="260" x2="325" y2="260" stroke="#22c55e" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-green)"/>
+  <circle cx="288" cy="240" r="14" fill="#22c55e" filter="url(#step-glow)" opacity="0.25"/>
+  <circle cx="288" cy="240" r="14" fill="#22c55e"/>
+  <text x="288" y="245" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#0c0a09;">3</text>
+  <text x="288" y="227" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#4ade80;letter-spacing:0.05em;">APPROVES</text>
+
+  <!-- Step 4: StoryFlow → Agent (DIRECTIVES) -->
+  <line x1="635" y1="270" x2="710" y2="270" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-amber)"/>
+  <circle cx="672" cy="250" r="14" fill="#f59e0b" filter="url(#step-glow)" opacity="0.25"/>
+  <circle cx="672" cy="250" r="14" fill="#f59e0b"/>
+  <text x="672" y="255" text-anchor="middle" style="font-size:11px;font-weight:700;fill:#0c0a09;">4</text>
+  <text x="672" y="237" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#fbbf24;letter-spacing:0.05em;">DIRECTIVES</text>
+
+  <!-- ============================================================ -->
+  <!-- BOTTOM BANNER -->
+  <!-- ============================================================ -->
+  <rect x="80" y="414" width="800" height="62" rx="14" fill="rgba(255,245,235,0.03)" stroke="rgba(168,162,158,0.10)"/>
+  <!-- Accent line -->
+  <rect x="80" y="414" width="800" height="2" rx="1" fill="rgba(245,158,11,0.25)"/>
+  <text x="480" y="442" text-anchor="middle" style="font-size:13px;font-weight:700;fill:#fafaf9;">The agent's brain IS the project data</text>
+  <text x="480" y="462" text-anchor="middle" style="font-size:10px;font-weight:400;fill:#78716c;">Every action is recorded with actor, reasoning, and confidence. Humans see exactly what the AI knows and can correct it in real time.</text>
 </svg>

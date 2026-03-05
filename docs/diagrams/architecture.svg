@@ -1,186 +1,226 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" fill="none">
   <defs>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
       text { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-      .title { font-size: 20px; font-weight: 700; fill: #1a1a1a; }
-      .subtitle { font-size: 11px; font-weight: 500; fill: #6b7280; letter-spacing: 0.05em; }
-      .node-label { font-size: 13px; font-weight: 600; fill: #1a1a1a; }
-      .node-sub { font-size: 10px; font-weight: 400; fill: #6b7280; }
-      .conn-label { font-size: 9px; font-weight: 600; fill: #9ca3af; letter-spacing: 0.08em; }
-      .port-label { font-size: 9px; font-weight: 500; fill: #9ca3af; }
     </style>
-    <!-- Shadows -->
-    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
-      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000" flood-opacity="0.06"/>
+    <filter id="card-shadow" x="-8%" y="-8%" width="116%" height="124%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.25"/>
     </filter>
-    <filter id="shadow-sm" x="-4%" y="-4%" width="108%" height="112%">
-      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#000" flood-opacity="0.05"/>
+    <filter id="glow-sm" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5"/>
     </filter>
-    <!-- Arrowhead -->
-    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#d1d5db" stroke-width="1.2"/>
+    <!-- Ambient orbs -->
+    <radialGradient id="orb-amber" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-purple" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Glass panel -->
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,245,235,0.06)"/>
+      <stop offset="100%" stop-color="rgba(255,245,235,0.02)"/>
+    </linearGradient>
+    <!-- Arrows -->
+    <marker id="arr-blue" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
-    <marker id="arrow-amber" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+    <marker id="arr-green" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
-    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#3b82f6" stroke-width="1.2"/>
+    <marker id="arr-amber" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arr-muted" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,1 L9,4 L0,7" fill="none" stroke="#57534e" stroke-width="1.5" stroke-linejoin="round"/>
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect width="960" height="620" rx="16" fill="#fafaf9"/>
-  <rect x="0.5" y="0.5" width="959" height="619" rx="16" fill="none" stroke="#e5e7eb" stroke-width="1"/>
+  <!-- ============================================================ -->
+  <!-- BACKGROUND — Warm Obsidian -->
+  <!-- ============================================================ -->
+  <rect width="960" height="560" rx="16" fill="#0c0a09"/>
+  <rect x="0.5" y="0.5" width="959" height="559" rx="16" fill="none" stroke="rgba(168,162,158,0.10)"/>
+  <!-- Ambient orbs -->
+  <circle cx="160" cy="260" r="280" fill="url(#orb-purple)"/>
+  <circle cx="800" cy="280" r="300" fill="url(#orb-amber)"/>
 
-  <!-- Title -->
-  <text x="480" y="42" text-anchor="middle" class="title">System Architecture</text>
+  <!-- ============================================================ -->
+  <!-- TITLE -->
+  <!-- ============================================================ -->
+  <text x="480" y="44" text-anchor="middle" style="font-size:22px;font-weight:700;fill:#fafaf9;letter-spacing:-0.02em;">System Architecture</text>
+  <text x="480" y="64" text-anchor="middle" style="font-size:11px;font-weight:500;fill:#78716c;letter-spacing:0.06em;">HOW THE PIECES CONNECT</text>
 
-  <!-- ================================================================== -->
-  <!-- BROWSER (left) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="40" y="180" width="220" height="260" rx="14" fill="#fff"/>
-    <rect x="40" y="180" width="220" height="260" rx="14" fill="none" stroke="#e5e7eb"/>
+  <!-- ============================================================ -->
+  <!-- CARD 1 — BROWSER (left) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="40" y="110" width="220" height="290" rx="16" fill="url(#glass)"/>
+    <rect x="40" y="110" width="220" height="290" rx="16" fill="none" stroke="rgba(139,92,246,0.18)"/>
   </g>
-  <!-- Browser chrome -->
-  <rect x="40" y="180" width="220" height="36" rx="14" fill="#f9fafb"/>
-  <rect x="40" y="202" width="220" height="14" fill="#f9fafb"/>
-  <line x1="40" y1="216" x2="260" y2="216" stroke="#e5e7eb"/>
-  <circle cx="60" cy="198" r="4" fill="#fca5a5"/>
-  <circle cx="74" cy="198" r="4" fill="#fcd34d"/>
-  <circle cx="88" cy="198" r="4" fill="#86efac"/>
-  <text x="150" y="202" text-anchor="middle" class="node-label">Browser</text>
+  <!-- Header -->
+  <rect x="40" y="110" width="220" height="44" rx="16" fill="rgba(139,92,246,0.12)"/>
+  <rect x="40" y="138" width="220" height="16" fill="rgba(139,92,246,0.12)"/>
+  <line x1="40" y1="154" x2="260" y2="154" stroke="rgba(139,92,246,0.25)" stroke-width="1"/>
+  <!-- Browser dots -->
+  <circle cx="62" cy="132" r="4" fill="#ef4444" opacity="0.7"/>
+  <circle cx="76" cy="132" r="4" fill="#f59e0b" opacity="0.7"/>
+  <circle cx="90" cy="132" r="4" fill="#22c55e" opacity="0.7"/>
+  <text x="155" y="137" text-anchor="middle" style="font-size:14px;font-weight:700;fill:#c4b5fd;">Browser</text>
 
-  <!-- Browser contents -->
-  <text x="150" y="244" text-anchor="middle" class="node-sub">React 18 + Vite 6</text>
-  <text x="150" y="260" text-anchor="middle" class="node-sub">Zustand State</text>
+  <!-- Stack items -->
+  <rect x="58" y="168" width="184" height="34" rx="10" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.18)"/>
+  <text x="150" y="189" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#c4b5fd;">React 18 + Vite 6</text>
 
-  <!-- IndexedDB box -->
-  <rect x="62" y="280" width="176" height="44" rx="8" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
-  <text x="150" y="300" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#92400e;">IndexedDB</text>
-  <text x="150" y="314" text-anchor="middle" class="node-sub">Client cache</text>
+  <rect x="58" y="212" width="184" height="34" rx="10" fill="rgba(255,245,235,0.04)" stroke="rgba(168,162,158,0.10)"/>
+  <text x="150" y="233" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#a8a29e;">Zustand State</text>
 
-  <!-- UI Components -->
-  <rect x="62" y="338" width="176" height="44" rx="8" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="150" y="358" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#374151;">80+ Components</text>
-  <text x="150" y="372" text-anchor="middle" class="node-sub">Glassmorphic UI + tokens.css</text>
+  <rect x="58" y="256" width="184" height="40" rx="10" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.18)"/>
+  <text x="150" y="274" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#fbbf24;">IndexedDB</text>
+  <text x="150" y="288" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Client cache</text>
 
-  <!-- Port label -->
-  <text x="150" y="456" text-anchor="middle" class="port-label">:3000 (dev) / :3001 (prod)</text>
+  <rect x="58" y="306" width="184" height="40" rx="10" fill="rgba(255,245,235,0.04)" stroke="rgba(168,162,158,0.10)"/>
+  <text x="150" y="324" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#a8a29e;">80+ Components</text>
+  <text x="150" y="338" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Glassmorphic UI + tokens.css</text>
 
-  <!-- ================================================================== -->
-  <!-- EXPRESS SERVER (center) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="370" y="140" width="220" height="340" rx="14" fill="#fff"/>
-    <rect x="370" y="140" width="220" height="340" rx="14" fill="none" stroke="#e5e7eb"/>
+  <!-- Port badge -->
+  <rect x="92" y="360" width="116" height="24" rx="12" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.20)"/>
+  <text x="150" y="376" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#a78bfa;letter-spacing:0.04em;">:3000 / :3001</text>
+
+  <!-- ============================================================ -->
+  <!-- CARD 2 — EXPRESS SERVER (center) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="350" y="90" width="260" height="340" rx="16" fill="url(#glass)"/>
+    <rect x="350" y="90" width="260" height="340" rx="16" fill="none" stroke="rgba(168,162,158,0.12)"/>
   </g>
-  <!-- Server header -->
-  <rect x="370" y="140" width="220" height="40" rx="14" fill="#1e293b"/>
-  <rect x="370" y="166" width="220" height="14" fill="#1e293b"/>
-  <text x="480" y="166" text-anchor="middle" style="font-size:13px;font-weight:600;fill:#f8fafc;">Express Server</text>
+  <!-- Header -->
+  <rect x="350" y="90" width="260" height="44" rx="16" fill="rgba(255,245,235,0.07)"/>
+  <rect x="350" y="118" width="260" height="16" fill="rgba(255,245,235,0.07)"/>
+  <line x1="350" y1="134" x2="610" y2="134" stroke="rgba(168,162,158,0.12)" stroke-width="1"/>
+  <!-- Server icon -->
+  <rect x="430" y="102" width="14" height="12" rx="2" fill="none" stroke="#fafaf9" stroke-width="1.3"/>
+  <line x1="433" y1="108" x2="441" y2="108" stroke="#fafaf9" stroke-width="1" opacity="0.5"/>
+  <text x="456" y="115" style="font-size:14px;font-weight:700;fill:#fafaf9;">Express Server</text>
 
   <!-- REST API -->
-  <rect x="392" y="198" width="176" height="48" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-  <text x="480" y="218" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#1e40af;">REST API</text>
-  <text x="480" y="232" text-anchor="middle" class="node-sub">CRUD + validation + auth</text>
+  <rect x="370" y="148" width="220" height="44" rx="10" fill="rgba(59,130,246,0.08)" stroke="rgba(59,130,246,0.22)"/>
+  <text x="480" y="167" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#60a5fa;">REST API</text>
+  <text x="480" y="183" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">57 routes · CRUD + auth + validation</text>
 
-  <!-- Event System -->
-  <rect x="392" y="258" width="176" height="48" rx="8" fill="#fdf4ff" stroke="#e9d5ff" stroke-width="1"/>
-  <text x="480" y="278" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#7e22ce;">Event Stream</text>
-  <text x="480" y="292" text-anchor="middle" class="node-sub">Provenance + gates + steering</text>
+  <!-- Event Stream -->
+  <rect x="370" y="202" width="220" height="44" rx="10" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.22)"/>
+  <text x="480" y="221" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#22d3ee;">Event Stream</text>
+  <text x="480" y="237" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Provenance · gates · steering</text>
 
   <!-- WebSocket -->
-  <rect x="392" y="318" width="176" height="48" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
-  <text x="480" y="338" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#065f46;">WebSocket</text>
-  <text x="480" y="352" text-anchor="middle" class="node-sub">Real-time sync + broadcast</text>
+  <rect x="370" y="256" width="220" height="44" rx="10" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.22)"/>
+  <text x="480" y="275" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#34d399;">WebSocket</text>
+  <text x="480" y="291" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Real-time sync · broadcast</text>
 
-  <!-- Write Lock -->
-  <rect x="392" y="378" width="176" height="48" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1"/>
-  <text x="480" y="398" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#9a3412;">Project Lock</text>
-  <text x="480" y="412" text-anchor="middle" class="node-sub">Per-project write serialization</text>
+  <!-- Project Lock -->
+  <rect x="370" y="310" width="220" height="44" rx="10" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.22)"/>
+  <!-- Lock icon -->
+  <rect x="446" y="324" width="8" height="6" rx="1" fill="none" stroke="#fbbf24" stroke-width="1.2"/>
+  <path d="M447,324 L447,321 a3,3 0 0 1 6,0 L453,324" fill="none" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="464" y="334" style="font-size:11px;font-weight:600;fill:#fbbf24;">Project Lock</text>
+  <text x="480" y="348" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Per-project write serialization</text>
 
-  <!-- Port label -->
-  <text x="480" y="500" text-anchor="middle" class="port-label">:3001</text>
+  <!-- Port badge -->
+  <rect x="430" y="372" width="100" height="24" rx="12" fill="rgba(255,245,235,0.05)" stroke="rgba(168,162,158,0.12)"/>
+  <text x="480" y="388" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#a8a29e;letter-spacing:0.04em;">:3001</text>
 
-  <!-- ================================================================== -->
-  <!-- SQLITE (bottom center) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow-sm)">
-    <rect x="410" y="520" width="140" height="64" rx="12" fill="#fff"/>
-    <rect x="410" y="520" width="140" height="64" rx="12" fill="none" stroke="#e5e7eb"/>
+  <!-- ============================================================ -->
+  <!-- CARD 3 — CLAUDE CODE (right) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="700" y="110" width="220" height="290" rx="16" fill="url(#glass)"/>
+    <rect x="700" y="110" width="220" height="290" rx="16" fill="none" stroke="rgba(245,158,11,0.18)"/>
   </g>
-  <!-- DB icon -->
-  <ellipse cx="480" cy="540" rx="20" ry="8" fill="#f59e0b" opacity="0.2" stroke="#f59e0b" stroke-width="1"/>
-  <rect x="460" y="540" width="40" height="16" fill="#fff"/>
-  <line x1="460" y1="540" x2="460" y2="556" stroke="#f59e0b" stroke-width="1"/>
-  <line x1="500" y1="540" x2="500" y2="556" stroke="#f59e0b" stroke-width="1"/>
-  <ellipse cx="480" cy="556" rx="20" ry="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
-  <text x="480" y="578" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#92400e;">SQLite</text>
-
-  <!-- ================================================================== -->
-  <!-- CLAUDE CODE / MCP (right) -->
-  <!-- ================================================================== -->
-  <g filter="url(#shadow)">
-    <rect x="700" y="180" width="220" height="260" rx="14" fill="#fff"/>
-    <rect x="700" y="180" width="220" height="260" rx="14" fill="none" stroke="#e5e7eb"/>
-  </g>
-  <!-- MCP header -->
-  <rect x="700" y="180" width="220" height="40" rx="14" fill="#f59e0b"/>
-  <rect x="700" y="206" width="220" height="14" fill="#f59e0b"/>
-  <text x="810" y="206" text-anchor="middle" style="font-size:13px;font-weight:700;fill:#fff;">Claude Code</text>
+  <!-- Header -->
+  <rect x="700" y="110" width="220" height="44" rx="16" fill="rgba(245,158,11,0.12)"/>
+  <rect x="700" y="138" width="220" height="16" fill="rgba(245,158,11,0.12)"/>
+  <line x1="700" y1="154" x2="920" y2="154" stroke="rgba(245,158,11,0.25)" stroke-width="1"/>
+  <!-- Robot icon -->
+  <rect x="762" y="123" width="14" height="12" rx="3" fill="none" stroke="#fbbf24" stroke-width="1.3"/>
+  <circle cx="767" cy="129" r="1.5" fill="#fbbf24"/>
+  <circle cx="773" cy="129" r="1.5" fill="#fbbf24"/>
+  <line x1="769" y1="120" x2="769" y2="123" stroke="#fbbf24" stroke-width="1.3"/>
+  <text x="786" y="136" style="font-size:14px;font-weight:700;fill:#fbbf24;">Claude Code</text>
 
   <!-- MCP Server -->
-  <rect x="722" y="238" width="176" height="48" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-  <text x="810" y="258" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#92400e;">MCP Server (stdio)</text>
-  <text x="810" y="272" text-anchor="middle" class="node-sub">46 tools + Zod schemas</text>
+  <rect x="718" y="168" width="184" height="44" rx="10" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.18)"/>
+  <text x="810" y="187" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#fbbf24;">MCP Server (stdio)</text>
+  <text x="810" y="203" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">46 tools · Zod schemas</text>
 
   <!-- Agent Prompt -->
-  <rect x="722" y="298" width="176" height="48" rx="8" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="810" y="318" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#374151;">Agent Prompt</text>
-  <text x="810" y="332" text-anchor="middle" class="node-sub">Self-documenting via wiki</text>
+  <rect x="718" y="222" width="184" height="44" rx="10" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.18)"/>
+  <text x="810" y="241" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#22d3ee;">Agent Prompt</text>
+  <text x="810" y="257" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Self-documenting via wiki</text>
 
   <!-- Hooks -->
-  <rect x="722" y="358" width="176" height="48" rx="8" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="810" y="378" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#374151;">Hooks</text>
-  <text x="810" y="392" text-anchor="middle" class="node-sub">Pre/post commit triggers</text>
+  <rect x="718" y="276" width="184" height="44" rx="10" fill="rgba(255,245,235,0.04)" stroke="rgba(168,162,158,0.10)"/>
+  <text x="810" y="295" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#a8a29e;">Hooks</text>
+  <text x="810" y="311" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#57534e;">Pre/post commit triggers</text>
 
-  <!-- ================================================================== -->
-  <!-- CONNECTIONS -->
-  <!-- ================================================================== -->
+  <!-- Sessions -->
+  <rect x="718" y="330" width="184" height="40" rx="10" fill="rgba(139,92,246,0.07)" stroke="rgba(139,92,246,0.18)"/>
+  <text x="810" y="349" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#c4b5fd;">Sessions</text>
+  <text x="810" y="363" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">Memory chain</text>
 
-  <!-- Browser → Server (REST) -->
-  <line x1="260" y1="222" x2="370" y2="222" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-blue)"/>
-  <text x="315" y="214" text-anchor="middle" class="conn-label" fill="#3b82f6">REST /api</text>
-
-  <!-- Server → Browser (WebSocket) -->
-  <line x1="370" y1="342" x2="260" y2="342" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
-  <text x="315" y="334" text-anchor="middle" class="conn-label" fill="#10b981">WEBSOCKET</text>
-
-  <!-- MCP → Server (HTTP) -->
-  <line x1="700" y1="262" x2="590" y2="222" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-amber)"/>
-  <text x="652" y="230" text-anchor="middle" class="conn-label" fill="#f59e0b">HTTP</text>
-
-  <!-- Server → SQLite -->
-  <line x1="480" y1="480" x2="480" y2="520" stroke="#d1d5db" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="500" y="506" text-anchor="start" class="conn-label">READ/WRITE</text>
-
-  <!-- Legend -->
-  <g transform="translate(40, 540)">
-    <text x="0" y="0" class="subtitle">CONNECTIONS</text>
-    <line x1="0" y1="16" x2="24" y2="16" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6,4"/>
-    <text x="30" y="20" class="node-sub">REST API</text>
-    <line x1="100" y1="16" x2="124" y2="16" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,4"/>
-    <text x="130" y="20" class="node-sub">WebSocket</text>
-    <line x1="210" y1="16" x2="234" y2="16" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6,4"/>
-    <text x="240" y="20" class="node-sub">MCP (via HTTP)</text>
+  <!-- ============================================================ -->
+  <!-- CARD 4 — SQLITE (bottom center) -->
+  <!-- ============================================================ -->
+  <g filter="url(#card-shadow)">
+    <rect x="415" y="450" width="130" height="66" rx="14" fill="url(#glass)"/>
+    <rect x="415" y="450" width="130" height="66" rx="14" fill="none" stroke="rgba(245,158,11,0.18)"/>
   </g>
+  <!-- DB icon -->
+  <ellipse cx="480" cy="470" rx="14" ry="5" fill="rgba(245,158,11,0.15)" stroke="#f59e0b" stroke-width="1"/>
+  <rect x="466" y="470" width="28" height="10" fill="#0c0a09" opacity="0.9"/>
+  <line x1="466" y1="470" x2="466" y2="480" stroke="#f59e0b" stroke-width="1"/>
+  <line x1="494" y1="470" x2="494" y2="480" stroke="#f59e0b" stroke-width="1"/>
+  <ellipse cx="480" cy="480" rx="14" ry="5" fill="rgba(245,158,11,0.10)" stroke="#f59e0b" stroke-width="1"/>
+  <text x="480" y="504" text-anchor="middle" style="font-size:12px;font-weight:700;fill:#fbbf24;">SQLite</text>
 
-  <!-- Data flow annotation -->
-  <g transform="translate(40, 76)">
-    <rect x="0" y="0" width="880" height="48" rx="10" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
-    <text x="440" y="20" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#92400e;">How it works</text>
-    <text x="440" y="36" text-anchor="middle" class="node-sub">The AI agent reads and writes through the same data store the human sees. Wiki pages are the agent's memory. Events are the audit trail. Gates are the guardrails.</text>
+  <!-- ============================================================ -->
+  <!-- CONNECTIONS — Clean crisp lines, no blur -->
+  <!-- ============================================================ -->
+
+  <!-- Browser → Server (REST API) — horizontal -->
+  <line x1="260" y1="170" x2="350" y2="170" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-blue)"/>
+  <!-- Label pill -->
+  <rect x="276" y="148" width="58" height="22" rx="11" fill="rgba(59,130,246,0.12)" stroke="rgba(59,130,246,0.30)"/>
+  <text x="305" y="163" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#60a5fa;letter-spacing:0.04em;">REST</text>
+
+  <!-- Server → Browser (WebSocket) — horizontal -->
+  <line x1="350" y1="278" x2="260" y2="278" stroke="#10b981" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-green)"/>
+  <rect x="272" y="284" width="66" height="22" rx="11" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.30)"/>
+  <text x="305" y="299" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#34d399;letter-spacing:0.04em;">WS SYNC</text>
+
+  <!-- Claude Code → Server (HTTP/MCP) — horizontal -->
+  <line x1="700" y1="190" x2="610" y2="190" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-amber)"/>
+  <rect x="624" y="168" width="66" height="22" rx="11" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.30)"/>
+  <text x="657" y="183" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#fbbf24;letter-spacing:0.04em;">MCP HTTP</text>
+
+  <!-- Server → SQLite — vertical, tighter -->
+  <line x1="480" y1="430" x2="480" y2="450" stroke="#57534e" stroke-width="2" marker-end="url(#arr-muted)"/>
+  <rect x="496" y="431" width="54" height="20" rx="10" fill="rgba(255,245,235,0.04)" stroke="rgba(168,162,158,0.12)"/>
+  <text x="523" y="445" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#78716c;letter-spacing:0.04em;">R / W</text>
+
+  <!-- ============================================================ -->
+  <!-- LEGEND -->
+  <!-- ============================================================ -->
+  <g transform="translate(120, 534)">
+    <line x1="0" y1="6" x2="24" y2="6" stroke="#3b82f6" stroke-width="2" stroke-dasharray="8,5"/>
+    <text x="32" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">REST API</text>
+    <line x1="110" y1="6" x2="134" y2="6" stroke="#10b981" stroke-width="2" stroke-dasharray="8,5"/>
+    <text x="142" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">WebSocket</text>
+    <line x1="230" y1="6" x2="254" y2="6" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5"/>
+    <text x="262" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">MCP (via HTTP)</text>
   </g>
 </svg>
