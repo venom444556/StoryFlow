@@ -340,6 +340,90 @@ export function deleteSprint(projectId, sprintId, extraHeaders = {}) {
   )
 }
 
+// --- Decisions ---
+
+export function listDecisions(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/decisions`)
+}
+
+export function createDecision(projectId, data, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/decisions`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: extraHeaders,
+  })
+}
+
+export function updateDecision(projectId, decisionId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/decisions/${encodeURIComponent(decisionId)}`,
+    { method: 'PUT', body: JSON.stringify(data), headers: extraHeaders }
+  )
+}
+
+export function deleteDecision(projectId, decisionId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/decisions/${encodeURIComponent(decisionId)}`,
+    { method: 'DELETE', headers: extraHeaders }
+  )
+}
+
+// --- Timeline Phases ---
+
+export function listPhases(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/phases`)
+}
+
+export function createPhase(projectId, data, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/phases`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: extraHeaders,
+  })
+}
+
+export function updatePhase(projectId, phaseId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/phases/${encodeURIComponent(phaseId)}`,
+    { method: 'PUT', body: JSON.stringify(data), headers: extraHeaders }
+  )
+}
+
+export function deletePhase(projectId, phaseId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/phases/${encodeURIComponent(phaseId)}`,
+    { method: 'DELETE', headers: extraHeaders }
+  )
+}
+
+// --- Timeline Milestones ---
+
+export function listMilestones(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/milestones`)
+}
+
+export function createMilestone(projectId, data, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/milestones`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: extraHeaders,
+  })
+}
+
+export function updateMilestone(projectId, milestoneId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/milestones/${encodeURIComponent(milestoneId)}`,
+    { method: 'PUT', body: JSON.stringify(data), headers: extraHeaders }
+  )
+}
+
+export function deleteMilestone(projectId, milestoneId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/milestones/${encodeURIComponent(milestoneId)}`,
+    { method: 'DELETE', headers: extraHeaders }
+  )
+}
+
 // --- Comments ---
 
 export function addComment(projectId, issueId, data, extraHeaders = {}) {
