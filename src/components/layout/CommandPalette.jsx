@@ -209,7 +209,7 @@ export default function CommandPalette({ isOpen, onClose }) {
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--color-bg-backdrop)]"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -218,7 +218,8 @@ export default function CommandPalette({ isOpen, onClose }) {
 
           {/* Palette card */}
           <motion.div
-            className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-subtle)]/80 shadow-2xl backdrop-blur-xl"
+            className="relative z-10 w-full max-w-xl overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-subtle)]"
+            style={{ boxShadow: 'var(--shadow-elevated)' }}
             initial={{ opacity: 0, y: -20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.97 }}

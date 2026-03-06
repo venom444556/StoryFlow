@@ -132,13 +132,22 @@ export default function DependencyGraph({
     const minY = Math.min(...ys)
     const maxY = Math.max(...ys) + 80
 
+    const contentW = maxX - minX
+    const contentH = maxY - minY
     const contentCenterX = (minX + maxX) / 2
     const contentCenterY = (minY + maxY) / 2
 
+    // Auto-fit: scale to fill viewport (matches useCanvasViewport behavior)
+    const pad = 60
+    const scaleX = (rect.width - pad * 2) / contentW
+    const scaleY = (rect.height - pad * 2) / contentH
+    const FIT_MAX = 1.5
+    const fitScale = clampZoom(Math.min(FIT_MAX, scaleX, scaleY))
+
     setViewport({
-      scale: 1,
-      offsetX: rect.width / 2 - contentCenterX,
-      offsetY: rect.height / 2 - contentCenterY,
+      scale: fitScale,
+      offsetX: rect.width / 2 - contentCenterX * fitScale,
+      offsetY: rect.height / 2 - contentCenterY * fitScale,
     })
   }, [positionedComponents])
 

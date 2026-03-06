@@ -62,7 +62,7 @@ const Input = forwardRef(function Input(
           placeholder={placeholder}
           disabled={disabled}
           className={[
-            'w-full rounded-[var(--radius-md)] outline-none',
+            'w-full rounded-[var(--radius-lg)] outline-none',
             'bg-[var(--color-input-bg)] border text-[var(--color-fg-default)] placeholder-[var(--color-input-placeholder)]',
             'transition-all',
             SIZES[size] || SIZES.md,

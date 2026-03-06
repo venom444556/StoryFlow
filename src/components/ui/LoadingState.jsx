@@ -44,7 +44,7 @@ export default function LoadingState({
   if (fullScreen) {
     return (
       <div
-        className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-base)]/80 backdrop-blur-sm"
+        className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-base)]/80"
         style={{ zIndex: 'var(--z-overlay)' }}
       >
         {content}

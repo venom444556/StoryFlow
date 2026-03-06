@@ -78,7 +78,7 @@ describe('LoadingState', () => {
 
     it('full screen has backdrop', () => {
       const { container } = render(<LoadingState fullScreen />)
-      expect(container.querySelector('.backdrop-blur-sm')).toBeInTheDocument()
+      expect(container.querySelector('.fixed.inset-0')).toBeInTheDocument()
     })
 
     it('full screen centers content', () => {

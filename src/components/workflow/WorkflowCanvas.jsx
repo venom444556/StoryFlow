@@ -287,7 +287,7 @@ export default function WorkflowCanvas({
   return (
     <div
       ref={canvasRef}
-      className="relative flex-1 overflow-hidden bg-surface-primary"
+      className="relative flex-1 overflow-hidden bg-surface-primary rounded-xl"
       style={{
         cursor: canvasCursor,
         backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.8px, transparent 0.8px)`,

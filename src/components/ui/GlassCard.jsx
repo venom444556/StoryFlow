@@ -1,8 +1,8 @@
 const PADDING = {
   none: '',
-  sm: 'p-[var(--space-3)]',
-  md: 'p-[var(--space-5)]',
-  lg: 'p-[var(--space-8)]',
+  sm: 'p-[var(--space-4)]',
+  md: 'p-[var(--space-7)]',
+  lg: 'p-[var(--space-10)]',
 }
 
 export default function GlassCard({
@@ -19,7 +19,7 @@ export default function GlassCard({
       className={[
         'glass-card',
         PADDING[padding] || PADDING.md,
-        hover && 'transition-all hover:scale-[1.02] hover:brightness-110 cursor-pointer',
+        hover && 'transition-colors cursor-pointer',
         onClick && !hover && 'cursor-pointer',
         className,
       ]

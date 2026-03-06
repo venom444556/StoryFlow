@@ -41,7 +41,8 @@ describe('SettingsPanel', () => {
 
     it('renders backdrop when open', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
-      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/40')
+      // Backdrop uses token-based class; query by structural selector
+      const backdrop = document.querySelector('.fixed.inset-0')
       expect(backdrop).toBeInTheDocument()
     })
   })
@@ -66,7 +67,7 @@ describe('SettingsPanel', () => {
       const onClose = vi.fn()
       renderWithProvider(<SettingsPanel isOpen={true} onClose={onClose} />)
 
-      const backdrop = document.querySelector('.fixed.inset-0.bg-black\\/40')
+      const backdrop = document.querySelector('.fixed.inset-0')
       if (backdrop) {
         fireEvent.click(backdrop)
         expect(onClose).toHaveBeenCalledTimes(1)
@@ -122,12 +123,12 @@ describe('SettingsPanel', () => {
       expect(screen.getByText('Compact Cards')).toBeInTheDocument()
     })
 
-    it('shows all 5 accent color options', () => {
+    it('shows all 6 accent color options', () => {
       renderWithProvider(<SettingsPanel {...defaultProps} />)
       const colorButtons = screen
         .getAllByRole('button')
         .filter((btn) => btn.classList.contains('rounded-full') && btn.classList.contains('h-6'))
-      expect(colorButtons).toHaveLength(5)
+      expect(colorButtons).toHaveLength(6)
     })
   })
 

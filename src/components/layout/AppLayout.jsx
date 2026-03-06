@@ -100,7 +100,7 @@ export default function AppLayout() {
       {/* Mobile backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          className="fixed inset-0 z-30 bg-[var(--color-bg-backdrop)] md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}

@@ -55,7 +55,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
       onClick={() => onClick?.(issue)}
       className={[
         'group cursor-grab rounded-xl border p-3 transition-all duration-200 active:cursor-grabbing',
-        'bg-[var(--color-bg-glass)] backdrop-blur-sm hover:bg-[var(--color-bg-glass-hover)]',
+        'bg-[var(--color-bg-glass)] hover:bg-[var(--color-bg-glass-hover)]',
         isDragging
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',

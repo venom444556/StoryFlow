@@ -98,7 +98,7 @@ export default function WelcomeModal() {
             tabIndex={-1}
             aria-label="Close dialog"
             onKeyDown={(e) => e.key === 'Escape' && handleClose()}
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--color-bg-backdrop)]"
             onClick={handleClose}
           />
 

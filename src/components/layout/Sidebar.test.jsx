@@ -75,7 +75,9 @@ describe('Sidebar', () => {
   describe('Basic rendering', () => {
     it('renders without crashing', () => {
       renderWithProviders(<Sidebar {...defaultProps} />)
-      expect(screen.getByText('StoryFlow')).toBeInTheDocument()
+      // "Story" and "Flow" are in separate elements for accent styling
+      expect(screen.getByText(/Story/)).toBeInTheDocument()
+      expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('renders as an aside element', () => {
@@ -88,7 +90,8 @@ describe('Sidebar', () => {
   describe('Brand section', () => {
     it('shows StoryFlow logo when expanded', () => {
       renderWithProviders(<Sidebar {...defaultProps} collapsed={false} />)
-      expect(screen.getByText('StoryFlow')).toBeInTheDocument()
+      expect(screen.getByText(/Story/)).toBeInTheDocument()
+      expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('hides StoryFlow text when collapsed (desktop)', () => {
@@ -99,7 +102,8 @@ describe('Sidebar', () => {
 
     it('shows StoryFlow text when mobile menu is open even if collapsed', () => {
       renderWithProviders(<Sidebar {...defaultProps} collapsed={true} mobileMenuOpen={true} />)
-      expect(screen.getByText('StoryFlow')).toBeInTheDocument()
+      expect(screen.getByText(/Story/)).toBeInTheDocument()
+      expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('renders Zap icon in brand', () => {
@@ -231,12 +235,12 @@ describe('Sidebar', () => {
       expect(onMobileMenuClose).toHaveBeenCalled()
     })
 
-    it('has gradient background', () => {
+    it('has accent background', () => {
       renderWithProviders(<Sidebar {...defaultProps} />)
       // Use getAllByText to handle possible duplicates from tooltip or project list
       const matches = screen.getAllByText('New Project')
       const newProjectButton = matches[matches.length - 1].closest('button')
-      expect(newProjectButton.style.backgroundImage).toContain('linear-gradient')
+      expect(newProjectButton.style.background).toContain('var(--accent-default)')
     })
   })
 
@@ -413,7 +417,8 @@ describe('Sidebar', () => {
       )
 
       // Should not throw
-      expect(screen.getByText('StoryFlow')).toBeInTheDocument()
+      expect(screen.getByText(/Story/)).toBeInTheDocument()
+      expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
   })
 })

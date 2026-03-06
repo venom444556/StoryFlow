@@ -156,7 +156,7 @@ function EscalationCard({ aiStatus, projectId }) {
             <button
               onClick={handleSend}
               disabled={!response.trim() || sending}
-              className="flex items-center gap-1 rounded-lg bg-[var(--color-danger-subtle)] px-3 py-1.5 text-xs font-medium text-[var(--color-danger)] transition-colors hover:brightness-110 disabled:opacity-30"
+              className="flex items-center gap-1 rounded-lg bg-[var(--color-danger-subtle)] px-3 py-1.5 text-xs font-medium text-[var(--color-danger)] transition-colors hover:opacity-80 disabled:opacity-30"
             >
               <MessageSquare size={12} /> Send
             </button>

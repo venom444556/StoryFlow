@@ -147,7 +147,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
       {/* Mobile backdrop for page tree */}
       {showTree && (
         <div
-          className="fixed inset-0 z-10 bg-black/30 md:hidden"
+          className="fixed inset-0 z-10 bg-[var(--color-bg-backdrop)] md:hidden"
           onClick={() => setShowTree(false)}
         />
       )}

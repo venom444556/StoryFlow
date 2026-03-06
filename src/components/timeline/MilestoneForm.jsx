@@ -145,7 +145,7 @@ export default function MilestoneForm({ isOpen, onClose, onSave, milestone = nul
                   'h-7 w-7 rounded-full transition-all duration-150',
                   form.color === color
                     ? 'ring-2 ring-[var(--color-fg-default)] ring-offset-2 ring-offset-[var(--color-bg-emphasis)] scale-110'
-                    : 'hover:scale-110 hover:brightness-110',
+                    : 'hover:opacity-80',
                 ].join(' ')}
                 style={{ backgroundColor: color }}
               />

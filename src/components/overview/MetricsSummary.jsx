@@ -15,11 +15,11 @@ import { useEventStore, selectEvents } from '../../stores/eventStore'
 export function MetricTile({ icon: Icon, label, value, subtext, color }) {
   return (
     <div
-      className="group flex items-start gap-3 rounded-xl bg-[var(--color-bg-glass)] p-3 transition-all hover:bg-[var(--color-bg-glass-hover)] hover:scale-[1.02]"
+      className="group flex items-start gap-3 rounded-xl bg-[var(--color-bg-glass)] p-4 transition-colors hover:bg-[var(--color-bg-glass-hover)]"
       style={{ transitionDuration: 'var(--duration-normal)' }}
     >
       <div
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-110"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
         style={{
           backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
           transitionDuration: 'var(--duration-normal)',

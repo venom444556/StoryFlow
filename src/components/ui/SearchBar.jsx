@@ -31,7 +31,7 @@ export default function SearchBar({
         onChange={onChange}
         placeholder={placeholder}
         className={[
-          'glass-input w-full rounded-[var(--radius-xl)]',
+          'glass-input w-full rounded-[var(--radius-pill)]',
           'text-[var(--color-fg-default)] placeholder-[var(--color-input-placeholder)]',
           'focus-visible:outline-none',
           sizeClasses[size] || sizeClasses.md,

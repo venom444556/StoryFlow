@@ -5,7 +5,6 @@ import GradientBackground from './GradientBackground'
 describe('GradientBackground', () => {
   it('renders without crashing', () => {
     render(<GradientBackground />)
-    // Component renders a container div
     const container = document.querySelector('.fixed.inset-0')
     expect(container).toBeInTheDocument()
   })
@@ -22,36 +21,31 @@ describe('GradientBackground', () => {
     expect(container).toHaveClass('pointer-events-none')
   })
 
-  it('renders orb-1 with correct classes', () => {
+  it('renders primary glow orb with correct classes', () => {
     render(<GradientBackground />)
-    const orb1 = document.querySelector('.orb-1')
-    expect(orb1).toBeInTheDocument()
-    expect(orb1).toHaveClass('absolute')
-    expect(orb1).toHaveClass('-top-40')
-    expect(orb1).toHaveClass('-right-40')
+    const orb = document.querySelector('.ambient-glow')
+    expect(orb).toBeInTheDocument()
+    expect(orb).toHaveClass('absolute')
+    expect(orb).toHaveClass('rounded-full')
   })
 
-  it('renders orb-2 with correct classes', () => {
-    render(<GradientBackground />)
-    const orb2 = document.querySelector('.orb-2')
-    expect(orb2).toBeInTheDocument()
-    expect(orb2).toHaveClass('absolute')
-    expect(orb2).toHaveClass('top-1/2')
-    expect(orb2).toHaveClass('-left-40')
-  })
-
-  it('renders orb-3 with correct classes', () => {
-    render(<GradientBackground />)
-    const orb3 = document.querySelector('.orb-3')
-    expect(orb3).toBeInTheDocument()
-    expect(orb3).toHaveClass('absolute')
-    expect(orb3).toHaveClass('-bottom-40')
-    expect(orb3).toHaveClass('right-1/3')
+  it('renders secondary glow orb', () => {
+    const { container } = render(<GradientBackground />)
+    const orbs = container.querySelectorAll('.rounded-full')
+    expect(orbs[1]).toBeInTheDocument()
+    expect(orbs[1]).toHaveClass('absolute')
   })
 
   it('has overflow-hidden on container', () => {
     render(<GradientBackground />)
     const container = document.querySelector('.fixed.inset-0')
     expect(container).toHaveClass('overflow-hidden')
+  })
+
+  it('renders subtle noise texture SVG', () => {
+    render(<GradientBackground />)
+    const svg = document.querySelector('svg')
+    expect(svg).toBeInTheDocument()
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
   })
 })

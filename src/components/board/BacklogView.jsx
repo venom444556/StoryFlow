@@ -259,7 +259,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
         return (
           <div
             key={statusName}
-            className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] backdrop-blur-sm"
+            className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]"
           >
             {/* Section header */}
             <button
@@ -324,7 +324,7 @@ function StatusGroupedList({ sortedIssues, onIssueClick, onDeleteIssue }) {
 
       {/* Catch-all for unknown statuses */}
       {other.length > 0 && (
-        <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] backdrop-blur-sm">
+        <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]">
           <button
             onClick={() => toggle('__other')}
             className="flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)] rounded-xl"
@@ -502,7 +502,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
         return (
           <div
             key={epicId}
-            className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] backdrop-blur-sm"
+            className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]"
           >
             {/* Epic header */}
             <button
@@ -561,7 +561,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
 
       {/* Orphan issues (no epic) */}
       {epicGroups.noEpic.length > 0 && (
-        <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] backdrop-blur-sm">
+        <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]">
           <button
             onClick={() => toggle('__noEpic')}
             className="flex w-full items-center gap-2.5 px-4 py-3 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)] rounded-xl"

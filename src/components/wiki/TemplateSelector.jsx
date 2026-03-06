@@ -18,7 +18,7 @@ export default function TemplateSelector({ isOpen, onClose, onSelect }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.04, duration: 0.2 }}
             onClick={() => handleSelect(template)}
-            className="glass-card flex flex-col items-start rounded-xl p-4 text-left transition-all duration-200 hover:scale-[1.03] hover:brightness-110"
+            className="glass-card flex flex-col items-start rounded-xl p-4 text-left transition-colors duration-200"
           >
             <span className="mb-2 text-2xl">{template.icon}</span>
             <span className="text-sm font-medium text-[var(--color-fg-default)]">

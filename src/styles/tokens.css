@@ -108,10 +108,11 @@
   --radius-md: 0.375rem; /* 6px */
   --radius-DEFAULT: 0.5rem; /* 8px */
   --radius-lg: 0.75rem; /* 12px */
-  --radius-xl: 1rem; /* 16px */
+  --radius-xl: 1.25rem; /* 20px */
   --radius-2xl: 1.5rem; /* 24px */
   --radius-3xl: 2rem; /* 32px */
   --radius-full: 9999px;
+  --radius-pill: 9999px;
 
   /* -------------------------------------------------
      SHADOWS (theme-aware, see themed section)
@@ -263,11 +264,14 @@
   --color-bg-inverse: #fafaf9;
   --color-dropdown-bg: #1c1917;
 
-  /* Glass/translucent backgrounds */
-  --color-bg-glass: rgba(255, 245, 235, 0.06);
-  --color-bg-glass-hover: rgba(255, 245, 235, 0.09);
-  --color-bg-glass-active: rgba(255, 245, 235, 0.13);
-  --color-bg-glass-emphasis: rgba(255, 245, 235, 0.16);
+  /* Glass/translucent backgrounds — visible elevation against #0c0a09 */
+  --color-bg-glass: rgba(255, 248, 240, 0.055);
+  --color-bg-glass-hover: rgba(255, 248, 240, 0.085);
+  --color-bg-glass-active: rgba(255, 248, 240, 0.12);
+  --color-bg-glass-emphasis: rgba(255, 248, 240, 0.16);
+
+  /* Card background — elevated above #0c0a09, clearly visible step */
+  --color-bg-card: #1c1917;
 
   /* Overlay backgrounds */
   --color-bg-overlay: rgba(12, 10, 9, 0.88);
@@ -287,10 +291,10 @@
   /* -------------------------------------------------
      BORDER COLORS — warm-tinted
      ------------------------------------------------- */
-  --color-border-default: rgba(168, 162, 158, 0.12);
-  --color-border-muted: rgba(168, 162, 158, 0.07);
-  --color-border-emphasis: rgba(168, 162, 158, 0.18);
-  --color-border-strong: rgba(168, 162, 158, 0.28);
+  --color-border-default: rgba(168, 162, 158, 0.15);
+  --color-border-muted: rgba(168, 162, 158, 0.09);
+  --color-border-emphasis: rgba(168, 162, 158, 0.24);
+  --color-border-strong: rgba(168, 162, 158, 0.35);
 
   /* -------------------------------------------------
      STATUS COLORS
@@ -340,16 +344,35 @@
   --shadow-color: rgba(0, 0, 0, 0.4);
   --glow-color: rgba(245, 158, 11, 0.2);
 
-  /* Card-specific shadow */
-  --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 245, 235, 0.04);
-  --shadow-card-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 245, 235, 0.06);
+  /* Card shadow — dramatic multi-layer with inner highlight */
+  --shadow-card:
+    0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px -2px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 248, 240, 0.08);
+  --shadow-card-hover:
+    0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 40px -8px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(var(--accent-default-rgb), 0.15), inset 0 1px 0 rgba(255, 248, 240, 0.1);
+
+  /* Button glow — accent-colored atmospheric shadow */
+  --shadow-button-primary:
+    0 2px 4px rgba(0, 0, 0, 0.2), 0 8px 24px -4px rgba(var(--accent-default-rgb), 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* Elevated — modals, dropdowns, command palette */
+  --shadow-elevated:
+    0 0 0 1px rgba(255, 248, 240, 0.06), 0 4px 8px rgba(0, 0, 0, 0.3),
+    0 16px 48px -8px rgba(0, 0, 0, 0.6);
+
+  /* Toast — floating notification */
+  --shadow-toast:
+    0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 24px -4px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 248, 240, 0.06);
 
   /* -------------------------------------------------
      AMBIENT BACKGROUND
      ------------------------------------------------- */
-  --color-orb-purple: rgba(245, 158, 11, 0.1);
-  --color-orb-blue: rgba(217, 119, 6, 0.06);
-  --color-orb-cyan: rgba(180, 83, 9, 0.04);
+  --color-orb-purple: rgba(245, 158, 11, 0.18);
+  --color-orb-blue: rgba(217, 119, 6, 0.1);
+  --color-orb-cyan: rgba(180, 83, 9, 0.07);
 
   /* -------------------------------------------------
      FOCUS RING
@@ -448,18 +471,19 @@
   --color-bg-muted: #ebe7e0; /* Linen */
   --color-bg-emphasis: #ddd8cf; /* Warm stone */
   --color-bg-inverse: #2c2825; /* Warm charcoal */
-  --color-dropdown-bg: #fffefa; /* Warm white for dropdown panels */
+  --color-dropdown-bg: #ffffff;
 
-  /* Glass/card backgrounds - warm-tinted translucency */
-  --color-bg-glass: rgba(249, 247, 244, 0.92);
-  --color-bg-glass-hover: rgba(249, 247, 244, 0.96);
-  --color-bg-glass-active: #f9f7f4;
-  --color-bg-glass-emphasis: #f9f7f4;
+  /* Glass/card backgrounds — solid white (no translucency in light mode) */
+  --color-bg-card: #ffffff;
+  --color-bg-glass: #ffffff;
+  --color-bg-glass-hover: #fafaf9;
+  --color-bg-glass-active: #f5f3f0;
+  --color-bg-glass-emphasis: #f3f0eb;
 
-  /* Overlay backgrounds */
-  --color-bg-overlay: rgba(249, 247, 244, 0.95);
-  --color-bg-overlay-heavy: rgba(249, 247, 244, 0.98);
-  --color-bg-backdrop: rgba(44, 40, 37, 0.3);
+  /* Overlay backgrounds — solid for light mode */
+  --color-bg-overlay: #ffffff;
+  --color-bg-overlay-heavy: #ffffff;
+  --color-bg-backdrop: rgba(0, 0, 0, 0.2);
 
   /* -------------------------------------------------
      FOREGROUND/TEXT COLORS
@@ -476,8 +500,8 @@
      BORDER COLORS
      Warm, defined — structured like a well-made book
      ------------------------------------------------- */
-  --color-border-default: #ddd8cf;
-  --color-border-muted: #ebe7e0;
+  --color-border-default: #e0dbd3;
+  --color-border-muted: #e8e4dc;
   --color-border-emphasis: #c7bfb5;
   --color-border-strong: #9e958b;
 
@@ -529,24 +553,32 @@
      SHADOWS
      Warm-tinted, soft depth
      ------------------------------------------------- */
-  --shadow-color: rgba(44, 40, 37, 0.06);
-  --glow-color: rgba(99, 102, 241, 0.12);
+  --shadow-color: rgba(0, 0, 0, 0.04);
+  --glow-color: rgba(99, 102, 241, 0.06);
 
-  /* Card-specific shadow — warm undertone */
-  --shadow-card:
-    0 1px 3px rgba(44, 40, 37, 0.04), 0 4px 12px rgba(44, 40, 37, 0.06),
-    0 0 0 1px rgba(44, 40, 37, 0.03);
+  /* Card-specific shadow — Apple-tight */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.06);
   --shadow-card-hover:
-    0 2px 4px rgba(44, 40, 37, 0.04), 0 8px 24px rgba(44, 40, 37, 0.1),
-    0 0 0 1px rgba(44, 40, 37, 0.04);
+    0 1px 3px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.08);
+
+  /* Button shadow */
+  --shadow-button-primary:
+    0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(var(--accent-default-rgb), 0.15);
+
+  /* Elevated shadow — dropdowns, modals, command palette */
+  --shadow-elevated:
+    0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.05);
+
+  /* Toast shadow */
+  --shadow-toast: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
 
   /* -------------------------------------------------
      GRADIENT ORB BACKGROUNDS
      Warm amber/rose/gold instead of purple/blue/cyan
      ------------------------------------------------- */
-  --color-orb-purple: rgba(180, 130, 80, 0.05);
-  --color-orb-blue: rgba(160, 100, 120, 0.04);
-  --color-orb-cyan: rgba(140, 120, 90, 0.03);
+  --color-orb-purple: rgba(180, 130, 80, 0.015);
+  --color-orb-blue: rgba(160, 100, 120, 0.01);
+  --color-orb-cyan: rgba(140, 120, 90, 0.008);
 
   /* -------------------------------------------------
      FOCUS RING
@@ -562,15 +594,15 @@
 
   /* -------------------------------------------------
      THEME BRIDGE (--th-* aliases)
-     Warm equivalents for light mode
+     Solid white panels for clean light mode
      ------------------------------------------------- */
   --th-bg: #f9f7f4;
-  --th-panel: rgba(44, 40, 37, 0.04);
-  --th-panel-light: rgba(44, 40, 37, 0.03);
-  --th-panel-medium: rgba(249, 247, 244, 0.85);
-  --th-panel-heavy: rgba(249, 247, 244, 0.95);
-  --th-panel-solid: #f3f0eb;
-  --th-border: #ddd8cf;
+  --th-panel: rgba(44, 40, 37, 0.03);
+  --th-panel-light: rgba(44, 40, 37, 0.02);
+  --th-panel-medium: #ffffff;
+  --th-panel-heavy: #ffffff;
+  --th-panel-solid: #ffffff;
+  --th-border: #e0dbd3;
   --th-border-hover: #c7bfb5;
   --th-text-muted: #6b6560;
   --th-text-faint: #b0a89e;
@@ -599,9 +631,9 @@
   --color-confidence-low: #dc2626;
   --color-confidence-low-bg: rgba(220, 38, 38, 0.1);
   --color-confidence-low-border: rgba(220, 38, 38, 0.3);
-  --color-ai-glow-high: rgba(8, 145, 178, 0.1);
-  --color-ai-glow-medium: rgba(8, 145, 178, 0.05);
-  --color-ai-glow-low: rgba(220, 38, 38, 0.08);
+  --color-ai-glow-high: rgba(8, 145, 178, 0.04);
+  --color-ai-glow-medium: rgba(8, 145, 178, 0.02);
+  --color-ai-glow-low: rgba(220, 38, 38, 0.03);
 
   /* -------------------------------------------------
      BADGE COLORS

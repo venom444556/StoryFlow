@@ -69,13 +69,13 @@ describe('GlassCard', () => {
     it('has hover effect when hover prop is true', () => {
       render(<GlassCard hover>Content</GlassCard>)
       const card = screen.getByText('Content')
-      expect(card).toHaveClass('hover:scale-[1.02]', 'hover:brightness-110', 'cursor-pointer')
+      expect(card).toHaveClass('transition-colors', 'cursor-pointer')
     })
 
     it('has transition classes when hover is enabled', () => {
       render(<GlassCard hover>Content</GlassCard>)
       const card = screen.getByText('Content')
-      expect(card).toHaveClass('transition-all')
+      expect(card).toHaveClass('transition-colors')
     })
   })
 
@@ -234,7 +234,7 @@ describe('GlassCard', () => {
       )
 
       const card = screen.getByText('Content')
-      expect(card).toHaveClass('hover:scale-[1.02]', 'cursor-pointer')
+      expect(card).toHaveClass('transition-colors', 'cursor-pointer')
 
       fireEvent.click(card)
       expect(handleClick).toHaveBeenCalledTimes(1)

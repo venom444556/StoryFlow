@@ -64,7 +64,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-lg)]"
           style={{
             background: 'var(--accent-default)',
-            boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
+            boxShadow: 'var(--shadow-button-primary)',
           }}
         >
           <Zap size={16} className="text-white" />
@@ -140,7 +140,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Projects section */}
         {(!collapsed || mobileMenuOpen) && (
           <div className="mb-[var(--space-2)] flex items-center justify-between px-[var(--space-3)]">
-            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] text-[var(--color-fg-subtle)]">
+            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] uppercase tracking-wider text-[var(--color-fg-subtle)]">
               Projects
             </span>
             <span className="rounded-full bg-[var(--color-bg-glass-hover)] px-[var(--space-2)] py-0.5 text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]">
@@ -238,13 +238,14 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
               type="button"
               onClick={handleNewProject}
               className={[
-                'flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)]',
-                'text-[var(--color-fg-default)] transition-all hover:brightness-110',
+                'flex w-full items-center justify-center rounded-full p-[var(--space-2)]',
+                'text-[var(--color-fg-default)] transition-all',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
+                'active:scale-[0.96]',
               ].join(' ')}
               style={{
                 background: 'var(--accent-default)',
-                boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
+                boxShadow: 'var(--shadow-button-primary)',
                 transitionDuration: 'var(--duration-fast)',
               }}
             >
@@ -256,14 +257,15 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
             type="button"
             onClick={handleNewProject}
             className={[
-              'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-lg)]',
+              'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-pill)]',
               'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
-              'text-white transition-all hover:brightness-110',
+              'text-white transition-all',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
+              'active:scale-[0.98]',
             ].join(' ')}
             style={{
               background: 'var(--accent-default)',
-              boxShadow: '0 4px 12px -2px rgba(var(--accent-default-rgb), 0.4)',
+              boxShadow: 'var(--shadow-button-primary)',
               transitionDuration: 'var(--duration-fast)',
             }}
           >
@@ -281,7 +283,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         className={[
           'absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full',
           'border border-[var(--color-border-default)] bg-[var(--color-bg-subtle)]',
-          'text-[var(--color-fg-muted)] shadow-lg transition-colors',
+          'text-[var(--color-fg-muted)] shadow-sm transition-colors',
           'hover:bg-[var(--color-bg-muted)] hover:text-[var(--color-fg-default)]',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
           'md:flex',

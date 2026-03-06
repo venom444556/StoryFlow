@@ -46,7 +46,7 @@ export default function Tabs({
   return (
     <div
       className={[
-        'glass inline-flex gap-[var(--space-1)] rounded-[var(--radius-lg)] p-[var(--space-1)]',
+        'glass inline-flex gap-[var(--space-1)] rounded-[var(--radius-pill)] p-[var(--space-1)]',
         className,
       ]
         .filter(Boolean)
@@ -68,7 +68,7 @@ export default function Tabs({
             aria-controls={`${tab.key}-panel`}
             tabIndex={isActive ? 0 : -1}
             className={[
-              'relative flex items-center gap-[var(--space-2)] rounded-[var(--radius-md)]',
+              'relative flex items-center gap-[var(--space-2)] rounded-[var(--radius-pill)]',
               'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
               'transition-colors outline-none',
               'focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-inset',
@@ -83,7 +83,7 @@ export default function Tabs({
             {isActive && (
               <motion.div
                 layoutId={`${layoutId}-indicator`}
-                className="absolute inset-0 rounded-[var(--radius-md)] bg-[var(--color-bg-glass-active)]"
+                className="absolute inset-0 rounded-[var(--radius-pill)] bg-[var(--color-bg-glass-active)]"
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}

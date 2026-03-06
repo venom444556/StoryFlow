@@ -186,7 +186,7 @@ describe('DashboardPage', () => {
       expect(screen.getByText('React')).toBeInTheDocument()
       expect(screen.getByText('Node.js')).toBeInTheDocument()
       expect(screen.getByText('PostgreSQL')).toBeInTheDocument()
-      expect(screen.getByText('+2 more')).toBeInTheDocument()
+      expect(screen.getByText('+2')).toBeInTheDocument()
     })
 
     it('displays issue count and open count', () => {
@@ -208,7 +208,9 @@ describe('DashboardPage', () => {
       ]
       renderDashboard()
 
-      expect(screen.getByText(/3 issues, 2 open/)).toBeInTheDocument()
+      // Issues text uses nested spans with dot separator
+      expect(screen.getByText(/3 issues/)).toBeInTheDocument()
+      expect(screen.getByText(/2 open/)).toBeInTheDocument()
     })
 
     it('navigates to project when card is clicked', async () => {

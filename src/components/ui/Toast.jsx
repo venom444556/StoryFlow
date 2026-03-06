@@ -5,23 +5,23 @@ import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react'
 const VARIANTS = {
   success: {
     icon: CheckCircle,
-    className: 'border-green-500/30 bg-green-500/10',
-    iconClass: 'text-green-400',
+    className: 'border-[var(--color-success)]/25 bg-[var(--color-success-subtle)]',
+    iconClass: 'text-[var(--color-success)]',
   },
   error: {
     icon: AlertCircle,
-    className: 'border-red-500/30 bg-red-500/10',
-    iconClass: 'text-red-400',
+    className: 'border-[var(--color-danger)]/25 bg-[var(--color-danger-subtle)]',
+    iconClass: 'text-[var(--color-danger)]',
   },
   warning: {
     icon: AlertTriangle,
-    className: 'border-yellow-500/30 bg-yellow-500/10',
-    iconClass: 'text-yellow-400',
+    className: 'border-[var(--color-warning)]/25 bg-[var(--color-warning-subtle)]',
+    iconClass: 'text-[var(--color-warning)]',
   },
   info: {
     icon: Info,
-    className: 'border-blue-500/30 bg-blue-500/10',
-    iconClass: 'text-blue-400',
+    className: 'border-[var(--color-info)]/25 bg-[var(--color-info-subtle)]',
+    iconClass: 'text-[var(--color-info)]',
   },
 }
 
@@ -49,8 +49,8 @@ function ToastItem({ toast, onDismiss }) {
       exit={{ opacity: 0, y: 20, scale: 0.9 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={[
-        'pointer-events-auto flex items-start gap-3 rounded-lg border p-3',
-        'backdrop-blur-xl shadow-lg',
+        'pointer-events-auto flex items-start gap-3 rounded-[var(--radius-xl)] border p-4',
+        'shadow-[var(--shadow-toast)]',
         variant.className,
       ].join(' ')}
     >

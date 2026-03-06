@@ -155,7 +155,7 @@ export default function SettingsPanel({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 bg-[var(--color-bg-backdrop)]"
             style={{ zIndex: 'var(--z-modal)' }}
             onClick={onClose}
           />

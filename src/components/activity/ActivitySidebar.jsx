@@ -150,13 +150,13 @@ function EventItem({ event }) {
             <div className="mt-2 flex gap-2">
               <button
                 onClick={() => respondToEvent(event.id, 'approve')}
-                className="flex items-center gap-1 rounded-md bg-[var(--color-success-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-success)] transition-colors hover:brightness-110"
+                className="flex items-center gap-1 rounded-md bg-[var(--color-success-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-success)] transition-colors hover:opacity-80"
               >
                 <Check size={10} /> Approve
               </button>
               <button
                 onClick={() => respondToEvent(event.id, 'reject')}
-                className="flex items-center gap-1 rounded-md bg-[var(--color-danger-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-danger)] transition-colors hover:brightness-110"
+                className="flex items-center gap-1 rounded-md bg-[var(--color-danger-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-danger)] transition-colors hover:opacity-80"
               >
                 <XCircle size={10} /> Reject
               </button>

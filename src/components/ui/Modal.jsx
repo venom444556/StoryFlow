@@ -112,7 +112,7 @@ export default function Modal({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-[var(--color-bg-backdrop)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--color-bg-backdrop)]"
             onClick={onClose}
             aria-hidden="true"
             initial={{ opacity: 0 }}
@@ -132,7 +132,7 @@ export default function Modal({
               .filter(Boolean)
               .join(' ')}
             style={{
-              boxShadow: 'var(--shadow-xl)',
+              boxShadow: 'var(--shadow-elevated)',
             }}
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

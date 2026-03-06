@@ -2,37 +2,46 @@ import { Loader2 } from 'lucide-react'
 
 const VARIANTS = {
   primary: [
-    'text-[var(--color-fg-on-accent)] hover:brightness-110 shadow-lg',
+    'text-[var(--color-fg-on-accent)]',
+    'hover:shadow-[var(--shadow-button-primary)]',
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--interactive-default)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
+    'active:scale-[0.98]',
   ].join(' '),
   secondary: [
-    'glass text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)] hover:brightness-110',
+    'glass text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
+    'hover:bg-[var(--color-bg-glass-hover)]',
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--interactive-default)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
+    'active:scale-[0.98]',
   ].join(' '),
   danger: [
-    'bg-[var(--color-danger)] text-[var(--color-fg-on-accent)] hover:brightness-110 shadow-lg shadow-red-500/20',
+    'bg-[var(--color-danger)] text-[var(--color-fg-on-accent)]',
+    'hover:opacity-90',
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-danger)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
+    'active:scale-[0.98]',
   ].join(' '),
   ghost: [
-    'bg-transparent text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
+    'bg-transparent text-[var(--color-fg-muted)]',
+    'hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--interactive-default)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
+    'active:scale-[0.98]',
   ].join(' '),
   outline: [
     'bg-transparent border border-[var(--color-border-default)] text-[var(--color-fg-muted)]',
     'hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass)]',
     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--interactive-default)]',
     'focus-visible:ring-offset-[var(--color-bg-base)]',
+    'active:scale-[0.98]',
   ].join(' '),
 }
 
 const SIZES = {
-  sm: 'h-[var(--size-input-sm)] px-[var(--space-3)] text-[var(--text-xs)] gap-[var(--space-2)]',
-  md: 'h-[var(--size-input-md)] px-[var(--space-4)] text-[var(--text-sm)] gap-[var(--space-2)]',
-  lg: 'h-[var(--size-input-lg)] px-[var(--space-6)] text-[var(--text-base)] gap-[var(--space-3)]',
+  sm: 'h-[var(--size-input-sm)] px-[var(--space-4)] text-[var(--text-xs)] gap-[var(--space-2)]',
+  md: 'h-[var(--size-input-md)] px-[var(--space-5)] text-[var(--text-sm)] gap-[var(--space-2)]',
+  lg: 'h-[var(--size-input-lg)] px-[var(--space-7)] text-[var(--text-base)] gap-[var(--space-3)]',
 }
 
 const ICON_SIZES = {
@@ -58,13 +67,18 @@ export default function Button({
   const Tag = Component || 'button'
   const isButton = Tag === 'button'
   const isPrimary = (variant || 'primary') === 'primary'
+  const isDanger = variant === 'danger'
   const isDisabled = disabled || isLoading
+
+  // Primary and danger get pill shape; others get rounded-lg
+  const radiusClass =
+    isPrimary || isDanger ? 'rounded-[var(--radius-pill)]' : 'rounded-[var(--radius-lg)]'
 
   return (
     <Tag
       {...(isButton ? { type } : {})}
       className={[
-        'inline-flex items-center justify-center rounded-[var(--radius-lg)] font-[var(--font-medium)]',
+        `inline-flex items-center justify-center whitespace-nowrap ${radiusClass} font-[var(--font-medium)]`,
         'transition-all outline-none',
         VARIANTS[variant] || VARIANTS.primary,
         SIZES[size] || SIZES.md,
@@ -79,8 +93,7 @@ export default function Button({
         ...(isPrimary
           ? {
               background: 'var(--accent-default)',
-              boxShadow:
-                '0 8px 20px -4px rgba(var(--accent-default-rgb), 0.35), 0 0 0 1px rgba(var(--accent-default-rgb), 0.1)',
+              boxShadow: 'var(--shadow-button-primary)',
             }
           : {}),
       }}

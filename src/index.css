@@ -40,119 +40,362 @@
    Theme-aware glass effects using semantic tokens
    ===================================================== */
 
+/* ----- Glass surface ----- */
 .glass {
   background: var(--color-bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
   border: 1px solid var(--color-border-default);
 }
 
+/* ----- Glass card — the core visual element ----- */
 .glass-card {
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--color-bg-card, var(--color-bg-glass));
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  transition: all var(--duration-normal) var(--ease-default);
+  transition:
+    box-shadow var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default),
+    transform var(--duration-normal) var(--ease-default);
   position: relative;
+  overflow: hidden;
+}
+
+/* Gradient accent border at top of every card */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-default-rgb), 0.5),
+    transparent
+  );
+  z-index: 1;
 }
 
 .glass-card:hover {
-  background: var(--color-bg-glass-hover);
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
-/* Elevated variant for primary cards */
+/* ----- Elevated card — project cards, primary content ----- */
 .glass-card-elevated {
-  background: var(--color-bg-subtle);
+  background: var(--color-bg-card, var(--color-bg-glass));
+  backdrop-filter: blur(24px) saturate(1.3);
+  -webkit-backdrop-filter: blur(24px) saturate(1.3);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  transition: all var(--duration-normal) var(--ease-default);
+  transition:
+    box-shadow var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default),
+    transform var(--duration-normal) var(--ease-default);
   position: relative;
+  overflow: hidden;
+}
+
+.glass-card-elevated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--accent-default-rgb), 0.6),
+    transparent
+  );
+  z-index: 1;
 }
 
 .glass-card-elevated:hover {
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
-  transform: translateY(-1px);
+  transform: translateY(-3px);
 }
 
+/* ----- Sidebar ----- */
 .glass-sidebar {
   background: var(--color-bg-overlay);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(32px) saturate(1.4);
+  -webkit-backdrop-filter: blur(32px) saturate(1.4);
   border-right: 1px solid var(--color-border-muted);
 }
 
+/* ----- Input fields ----- */
 .glass-input {
   background: var(--color-input-bg);
   border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-DEFAULT);
+  border-radius: var(--radius-lg);
   transition: all var(--duration-fast) var(--ease-default);
 }
 
 .glass-input:hover {
   background: var(--color-input-bg-hover);
+  border-color: var(--color-border-emphasis);
 }
 
 .glass-input:focus {
   background: var(--color-input-bg-focus);
   border-color: var(--interactive-default);
-  box-shadow: 0 0 0 3px rgba(var(--interactive-rgb), 0.15);
+  box-shadow:
+    0 0 0 3px rgba(var(--interactive-rgb), 0.15),
+    inset 0 1px 2px rgba(0, 0, 0, 0.06);
   outline: none;
 }
 
 /* =====================================================
-   LIGHT MODE OVERRIDES
-   Less glass effect, more subtle shadows for definition
+   LIGHT MODE OVERRIDES — "Quiet Luxury"
+   Solid surfaces, crisp borders, no glass effects.
+   Inspired by: Orderze, Revior, Flowa, Apple.
    ===================================================== */
 
+/* -------------------------------------------------
+   SURFACES — solid white, no blur, ever
+   ------------------------------------------------- */
+
 .theme-light .glass {
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 1px 3px rgba(44, 40, 37, 0.04);
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border-color: var(--color-border-default);
 }
 
 .theme-light .glass-card {
-  background: var(--color-bg-glass);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-color: var(--color-border-default);
   box-shadow: var(--shadow-card);
 }
 
+/* Hide the gradient accent border in light mode */
+.theme-light .glass-card::before {
+  display: none;
+}
+
 .theme-light .glass-card:hover {
-  background: var(--color-bg-glass-hover);
+  background: #fafaf9;
+  border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
+  transform: none;
+}
+
+.theme-light .glass-card-elevated {
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-card);
+}
+
+/* Hide the gradient accent border in light mode */
+.theme-light .glass-card-elevated::before {
+  display: none;
+}
+
+.theme-light .glass-card-elevated:hover {
+  border-color: var(--color-border-emphasis);
+  box-shadow: var(--shadow-card-hover);
+  transform: none;
 }
 
 .theme-light .glass-sidebar {
-  background: var(--color-bg-overlay);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-color: var(--color-border-default);
-  box-shadow: 1px 0 3px rgba(44, 40, 37, 0.03);
+  box-shadow: none;
 }
 
+/* -------------------------------------------------
+   INPUTS — clean inset, no blur
+   ------------------------------------------------- */
+
 .theme-light .glass-input {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  box-shadow: inset 0 1px 2px rgba(44, 40, 37, 0.04);
+  background: #ffffff;
+  border-color: var(--color-border-default);
+  box-shadow: none;
 }
 
 .theme-light .glass-input:hover {
-  background: var(--color-input-bg-hover);
-  border-color: #a39b91;
+  background: #ffffff;
+  border-color: var(--color-border-emphasis);
 }
 
 .theme-light .glass-input:focus {
-  background: var(--color-input-bg-focus);
+  background: #ffffff;
   border-color: var(--interactive-default);
-  box-shadow: 0 0 0 3px rgba(var(--interactive-rgb), 0.12);
+  box-shadow: 0 0 0 2px rgba(var(--interactive-rgb), 0.08);
+}
+
+/* -------------------------------------------------
+   KILL EFFECTS — no scale, brightness, blur, glow
+   ------------------------------------------------- */
+
+/* Kill hover transforms, filters, and scale in light mode */
+.theme-light .hover\:brightness-110:hover {
+  filter: none !important;
+}
+.theme-light .hover\:scale-\[1\.02\]:hover {
+  transform: none !important;
+}
+.theme-light .hover\:scale-\[1\.03\]:hover {
+  transform: none !important;
+}
+.theme-light .hover\:scale-110:hover {
+  transform: none !important;
+}
+.theme-light .group:hover .group-hover\:scale-110 {
+  transform: none !important;
+}
+.theme-light .active\:scale-\[0\.98\]:active {
+  transform: none !important;
+}
+.theme-light .active\:scale-\[0\.96\]:active {
+  transform: none !important;
+}
+
+/* Kill ALL backdrop-blur in light mode */
+.theme-light [class*='backdrop-blur'] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Kill ambient glow animation in light mode */
+.theme-light .ambient-glow {
+  animation: none !important;
+  opacity: 0.15 !important;
+}
+
+/* -------------------------------------------------
+   FOCUS — refined, thin ring
+   ------------------------------------------------- */
+
+.theme-light *:focus-visible {
+  outline-width: 1.5px;
+  outline-offset: 1px;
+}
+
+/* -------------------------------------------------
+   TOOLTIPS — solid, bordered, no heavy shadow
+   ------------------------------------------------- */
+
+.theme-light [role='tooltip'] {
+  background: #ffffff !important;
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-elevated);
+  color: var(--color-fg-default);
+}
+
+/* -------------------------------------------------
+   TOASTS — clean semantic styling
+   ------------------------------------------------- */
+
+.theme-light .border-green-500\/30 {
+  border-color: var(--color-success) !important;
+  border-opacity: 0.2;
+}
+.theme-light .bg-green-500\/10 {
+  background-color: var(--color-success-subtle) !important;
+}
+.theme-light .border-red-500\/30 {
+  border-color: var(--color-danger) !important;
+  border-opacity: 0.2;
+}
+.theme-light .bg-red-500\/10 {
+  background-color: var(--color-danger-subtle) !important;
+}
+.theme-light .border-yellow-500\/30 {
+  border-color: var(--color-warning) !important;
+  border-opacity: 0.2;
+}
+.theme-light .bg-yellow-500\/10 {
+  background-color: var(--color-warning-subtle) !important;
+}
+.theme-light .border-blue-500\/30 {
+  border-color: var(--color-info) !important;
+  border-opacity: 0.2;
+}
+.theme-light .bg-blue-500\/10 {
+  background-color: var(--color-info-subtle) !important;
+}
+
+/* -------------------------------------------------
+   SIDEBAR — clean, quiet, no glow on brand elements
+   ------------------------------------------------- */
+
+.theme-light .glass-sidebar [style*='boxShadow'],
+.theme-light .glass-sidebar [style*='box-shadow'] {
+  /* CSS can't override inline styles, handled in JSX */
+}
+
+/* Sidebar nav hover — barely perceptible bg shift */
+.theme-light .glass-sidebar button:hover,
+.theme-light .glass-sidebar a:hover {
+  filter: none;
+}
+
+/* -------------------------------------------------
+   BOARD — issue cards get cleaner treatment
+   ------------------------------------------------- */
+
+/* Remove glow from AI-created cards in light mode */
+.theme-light [style*='0 0 12px'] {
+  box-shadow: none !important;
+}
+
+/* Staleness indicator — use semantic warning color */
+.theme-light .border-l-amber-400\/60 {
+  border-left-color: var(--color-warning) !important;
+  opacity: 0.7;
+}
+
+.theme-light .text-amber-400\/80 {
+  color: var(--color-warning) !important;
+  opacity: 0.85;
+}
+
+/* Gate pending badge in light mode */
+.theme-light .bg-amber-400\/15 {
+  background-color: var(--color-warning-subtle) !important;
+}
+.theme-light .text-amber-400 {
+  color: var(--color-warning) !important;
+}
+
+/* -------------------------------------------------
+   SCROLLBAR — lighter, more subtle
+   ------------------------------------------------- */
+
+.theme-light ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.theme-light ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.theme-light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 100px;
+}
+
+.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 /* =====================================================
@@ -378,4 +621,7 @@ body {
   background-color: var(--color-bg-base);
   color: var(--color-fg-default);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.01em;
 }

@@ -257,7 +257,7 @@ export default function ArchitectureFilterBar({ components = [], filters, onFilt
   const clearAll = () => onFilterChange({ types: [], connection: null })
 
   return (
-    <div className="relative z-40 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-3 py-2 backdrop-blur-sm">
+    <div className="relative z-40 flex flex-wrap items-center gap-2 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] px-3 py-2">
       {/* Filter icon */}
       <div className="flex items-center gap-1.5 text-[var(--color-fg-muted)]">
         <Filter size={14} />

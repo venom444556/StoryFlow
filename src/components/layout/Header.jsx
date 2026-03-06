@@ -37,7 +37,7 @@ function Toast({ message, type = 'success', onDone }) {
       className={[
         'absolute right-[var(--space-6)] top-full mt-[var(--space-2)]',
         'rounded-[var(--radius-lg)] border px-[var(--space-4)] py-[var(--space-2)]',
-        'text-[var(--text-xs)] font-[var(--font-medium)] shadow-lg backdrop-blur-md',
+        'text-[var(--text-xs)] font-[var(--font-medium)] shadow-[var(--shadow-toast)]',
         colorClasses,
       ].join(' ')}
       style={{ zIndex: 'var(--z-toast)' }}

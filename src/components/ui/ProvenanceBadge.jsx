@@ -62,7 +62,7 @@ export default function ProvenanceBadge({
           config.textClass,
           config.borderClass,
           sizeClasses[size] || sizeClasses.sm,
-          hasDetails ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
+          hasDetails ? 'cursor-pointer hover:opacity-80' : 'cursor-default',
           confidenceLevel === 'low' && 'ring-1 ring-[var(--color-confidence-low)]/30',
         ]
           .filter(Boolean)

@@ -188,7 +188,7 @@ export default function DashboardPage() {
                 key={project.id}
                 onClick={() => navigate(`/project/${project.id}`)}
                 className={[
-                  'glass-card-elevated group cursor-pointer p-5',
+                  'glass-card-elevated group cursor-pointer p-6',
                   `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
                 ].join(' ')}
               >
@@ -251,7 +251,7 @@ export default function DashboardPage() {
                         {progress}%
                       </span>
                     </div>
-                    <div className="h-1 w-full rounded-full bg-[var(--color-bg-muted)]">
+                    <div className="h-1.5 w-full rounded-full bg-[var(--color-bg-muted)]">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
