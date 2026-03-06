@@ -61,9 +61,23 @@
 .glass-card:hover {
   background: var(--color-bg-glass-hover);
   border-color: var(--color-border-emphasis);
-  box-shadow:
-    var(--shadow-card-hover),
-    0 0 0 1px rgba(var(--accent-default-rgb), 0.05);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Elevated variant for primary cards */
+.glass-card-elevated {
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition: all var(--duration-normal) var(--ease-default);
+  position: relative;
+}
+
+.glass-card-elevated:hover {
+  border-color: var(--color-border-emphasis);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .glass-sidebar {
@@ -146,10 +160,25 @@
    ===================================================== */
 
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent-default), #f97316, #ef4444);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-fg-default);
+  -webkit-text-fill-color: var(--color-fg-default);
+}
+
+/* Accent underline for branded headings */
+.heading-accent {
+  position: relative;
+  display: inline-block;
+}
+
+.heading-accent::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 32px;
+  height: 2px;
+  background: var(--accent-default);
+  border-radius: var(--radius-full);
 }
 
 /* Display headings use Outfit */

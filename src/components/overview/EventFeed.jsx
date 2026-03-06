@@ -199,9 +199,7 @@ export default function EventFeed() {
       {/* Header with filters */}
       <div className="flex items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-3">
         <Zap size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-          Activity Feed
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Activity Feed</h3>
         <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
           {events.length}
         </span>

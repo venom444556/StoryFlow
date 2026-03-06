@@ -93,9 +93,7 @@ export default function ComponentTree({ components, selectedId, onSelect, onAdd,
   return (
     <GlassCard className="flex flex-1 flex-col overflow-hidden">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-          Components
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Components</h3>
         <Button variant="ghost" size="sm" icon={Plus} onClick={onAdd}>
           Add
         </Button>

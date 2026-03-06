@@ -74,9 +74,9 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="gradient-text text-[var(--text-lg)] font-[var(--font-bold)] tracking-tight"
+            className="text-[var(--text-lg)] font-[var(--font-bold)] tracking-tight text-[var(--color-fg-default)]"
           >
-            StoryFlow
+            Story<span className="text-[var(--accent-default)]">Flow</span>
           </motion.span>
         )}
 
@@ -140,7 +140,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Projects section */}
         {(!collapsed || mobileMenuOpen) && (
           <div className="mb-[var(--space-2)] flex items-center justify-between px-[var(--space-3)]">
-            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] uppercase tracking-wider text-[var(--color-fg-muted)]">
+            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] text-[var(--color-fg-subtle)]">
               Projects
             </span>
             <span className="rounded-full bg-[var(--color-bg-glass-hover)] px-[var(--space-2)] py-0.5 text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]">

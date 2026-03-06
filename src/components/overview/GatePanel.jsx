@@ -178,9 +178,7 @@ export default function GatePanel({ projectId }) {
     <GlassCard className="border border-amber-400/10">
       <div className="mb-3 flex items-center gap-2">
         <ShieldAlert size={14} className="text-amber-400" />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-amber-400">
-          Action Required
-        </h3>
+        <h3 className="text-sm font-semibold text-amber-400">Action Required</h3>
         {pendingGates.length > 0 && (
           <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium text-amber-400">
             {pendingGates.length}

@@ -97,9 +97,7 @@ export default function MetricsSummary({ project }) {
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
         <Activity size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-          Metrics
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Metrics</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">

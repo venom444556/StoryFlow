@@ -154,9 +154,7 @@ export default function SessionHistory({ projectId }) {
       <GlassCard padding="none" className="overflow-hidden">
         <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
           <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-            Session History
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Session History</h3>
         </div>
         <div className="space-y-3 p-4">
           {[1, 2].map((i) => (
@@ -189,9 +187,7 @@ export default function SessionHistory({ projectId }) {
     <GlassCard padding="none" className="overflow-hidden">
       <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
         <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-          Session History
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Session History</h3>
         <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
           {sessions.length}
         </span>

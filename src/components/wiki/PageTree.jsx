@@ -217,9 +217,7 @@ export default function PageTree({
       {/* Header */}
       <div className="shrink-0 border-b border-[var(--color-border-default)] px-3 py-3">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-            Pages
-          </h3>
+          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Pages</h3>
           <Button variant="ghost" size="sm" icon={Plus} onClick={() => onAddPage(null)}>
             New
           </Button>

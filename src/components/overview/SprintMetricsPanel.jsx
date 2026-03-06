@@ -158,9 +158,7 @@ export default function SprintMetricsPanel({ project }) {
     <GlassCard>
       <div className="mb-3 flex items-center gap-2">
         <BarChart3 size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-          Sprint Metrics
-        </h3>
+        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Sprint Metrics</h3>
       </div>
 
       <div className="space-y-5">

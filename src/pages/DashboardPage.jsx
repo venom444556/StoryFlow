@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { FolderKanban, Plus, Trash2, RotateCcw, Trash } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useProjects } from '../hooks/useProjects'
-import GlassCard from '../components/ui/GlassCard'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
 import SearchBar from '../components/ui/SearchBar'
@@ -20,14 +19,7 @@ const STATUS_BADGE_VARIANT = {
   archived: 'gray',
 }
 
-const STATUS_ACCENT_COLOR = {
-  planning: 'bg-[var(--color-info)]',
-  'in-progress': 'bg-[var(--color-warning)]',
-  completed: 'bg-[var(--color-success)]',
-  archived: 'bg-[var(--color-fg-muted)]',
-}
-
-const TECH_BADGE_VARIANTS = ['purple', 'blue', 'cyan', 'green', 'pink']
+const TECH_BADGE_VARIANTS = ['default']
 
 export default function DashboardPage() {
   const {
@@ -73,41 +65,43 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="h-full overflow-auto p-6">
-      {/* Title section */}
-      <div className="mb-6 animate-entrance">
-        <h1 className="gradient-text text-3xl font-bold tracking-tight">Projects</h1>
-        <p className="mt-1 text-sm text-[var(--color-fg-muted)]">
-          {projects.length} project{projects.length !== 1 ? 's' : ''}
-          {trashedProjects.length > 0 && (
-            <span className="text-[var(--color-fg-subtle)]">
-              {' · '}
-              {trashedProjects.length} in trash
-            </span>
-          )}
-        </p>
-      </div>
-
-      {/* Action bar */}
-      <div className="mb-6 flex items-center gap-3 animate-entrance stagger-1">
-        <SearchBar
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search projects..."
-          className="max-w-xs"
-        />
-        <Button variant="primary" icon={Plus} onClick={() => setShowNewModal(true)}>
-          New Project
-        </Button>
-        {trashedProjects.length > 0 && (
-          <Button
-            variant={showTrash ? 'secondary' : 'ghost'}
-            icon={Trash}
-            onClick={() => setShowTrash((prev) => !prev)}
-          >
-            Trash ({trashedProjects.length})
+    <div className="h-full overflow-auto p-6 lg:p-8">
+      {/* Title row — title left, actions right */}
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-entrance">
+        <div>
+          <h1 className="heading-accent text-2xl font-bold tracking-tight text-[var(--color-fg-default)]">
+            Projects
+          </h1>
+          <p className="mt-3 text-sm text-[var(--color-fg-muted)]">
+            {projects.length} project{projects.length !== 1 ? 's' : ''}
+            {trashedProjects.length > 0 && (
+              <span className="text-[var(--color-fg-subtle)]">
+                {' · '}
+                {trashedProjects.length} in trash
+              </span>
+            )}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 animate-entrance stagger-1">
+          <SearchBar
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search projects..."
+            className="w-56"
+          />
+          <Button variant="primary" icon={Plus} onClick={() => setShowNewModal(true)}>
+            New Project
           </Button>
-        )}
+          {trashedProjects.length > 0 && (
+            <Button
+              variant={showTrash ? 'secondary' : 'ghost'}
+              icon={Trash}
+              onClick={() => setShowTrash((prev) => !prev)}
+            >
+              Trash ({trashedProjects.length})
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Trash section */}
@@ -181,83 +175,106 @@ export default function DashboardPage() {
 
       {/* Project grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((project, index) => {
             const statusVariant = STATUS_BADGE_VARIANT[project.status] || 'default'
-            const accentColor = STATUS_ACCENT_COLOR[project.status] || 'bg-gray-500'
             const issues = project.board?.issues || []
+            const doneCount = issues.filter((i) => i.status === 'Done').length
             const openCount = issues.filter((i) => i.status !== 'Done').length
+            const progress = issues.length > 0 ? Math.round((doneCount / issues.length) * 100) : 0
 
             return (
-              <GlassCard
+              <div
                 key={project.id}
-                hover
-                padding="none"
                 onClick={() => navigate(`/project/${project.id}`)}
-                className={`animate-entrance-scale stagger-${Math.min(index + 2, 8)}`}
+                className={[
+                  'glass-card-elevated group cursor-pointer p-5',
+                  `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
+                ].join(' ')}
               >
-                {/* Color accent bar */}
-                <div className={`h-1 w-full ${accentColor}`} />
-
-                <div className="p-5">
-                  {/* Project name + trash */}
-                  <div className="mb-2 flex items-start justify-between gap-2">
-                    <h3 className="truncate text-base font-semibold text-[var(--color-fg-default)]">
+                {/* Header: name + status + trash */}
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3
+                      className="truncate text-base font-semibold text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
+                      style={{ transitionDuration: 'var(--duration-fast)' }}
+                    >
                       {project.name}
                     </h3>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge variant={statusVariant} dot size="sm">
+                      {project.status}
+                    </Badge>
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
                         setTrashTarget(project)
                       }}
-                      className="shrink-0 rounded-md p-1 text-[var(--color-fg-subtle)] transition-colors hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger-fg)]"
+                      className="rounded-md p-1 text-[var(--color-fg-subtle)] opacity-0 group-hover:opacity-100 transition-all hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger-fg)]"
+                      style={{ transitionDuration: 'var(--duration-fast)' }}
                       title="Move to trash"
                     >
                       <Trash2 size={14} />
                     </button>
                   </div>
-
-                  {/* Status badge */}
-                  <div className="mb-3">
-                    <Badge variant={statusVariant} dot size="sm">
-                      {project.status}
-                    </Badge>
-                  </div>
-
-                  {/* Tech stack badges */}
-                  {project.techStack && project.techStack.length > 0 && (
-                    <div className="mb-3 flex flex-wrap gap-1">
-                      {project.techStack.slice(0, 3).map((tech, i) => (
-                        <Badge
-                          key={tech}
-                          variant={TECH_BADGE_VARIANTS[i % TECH_BADGE_VARIANTS.length]}
-                          size="sm"
-                        >
-                          {tech}
-                        </Badge>
-                      ))}
-                      {project.techStack.length > 3 && (
-                        <Badge variant="default" size="sm">
-                          +{project.techStack.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Issue summary */}
-                  <p className="mb-2 text-xs text-[var(--color-fg-muted)]">
-                    {issues.length} issue{issues.length !== 1 ? 's' : ''}
-                    {openCount > 0 && `, ${openCount} open`}
-                  </p>
-
-                  {/* Last updated */}
-                  {project.updatedAt && (
-                    <p className="text-xs text-[var(--color-fg-subtle)]">
-                      Updated {formatRelative(project.updatedAt)}
-                    </p>
-                  )}
                 </div>
-              </GlassCard>
+
+                {/* Tech stack */}
+                {project.techStack && project.techStack.length > 0 && (
+                  <div className="mb-4 flex flex-wrap gap-1">
+                    {project.techStack.slice(0, 3).map((tech, i) => (
+                      <Badge
+                        key={tech}
+                        variant={TECH_BADGE_VARIANTS[i % TECH_BADGE_VARIANTS.length]}
+                        size="sm"
+                      >
+                        {tech}
+                      </Badge>
+                    ))}
+                    {project.techStack.length > 3 && (
+                      <Badge variant="default" size="sm">
+                        +{project.techStack.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+
+                {/* Progress bar */}
+                {issues.length > 0 && (
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs text-[var(--color-fg-muted)]">
+                        {doneCount}/{issues.length} done
+                      </span>
+                      <span className="text-xs font-medium text-[var(--color-fg-muted)]">
+                        {progress}%
+                      </span>
+                    </div>
+                    <div className="h-1 w-full rounded-full bg-[var(--color-bg-muted)]">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${progress}%`,
+                          background:
+                            progress === 100 ? 'var(--color-success)' : 'var(--accent-default)',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Footer: stats + timestamp */}
+                <div className="flex items-center justify-between text-xs text-[var(--color-fg-subtle)]">
+                  <span>
+                    {issues.length} issue{issues.length !== 1 ? 's' : ''}
+                    {openCount > 0 && (
+                      <span className="text-[var(--color-fg-muted)]"> · {openCount} open</span>
+                    )}
+                  </span>
+                  {project.updatedAt && <span>{formatRelative(project.updatedAt)}</span>}
+                </div>
+              </div>
             )
           })}
         </div>
