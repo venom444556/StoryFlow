@@ -544,6 +544,110 @@ export function checkGates(projectId, { since } = {}) {
   return request(`/api/projects/${encodeURIComponent(projectId)}/gates${qs ? `?${qs}` : ''}`)
 }
 
+// --- Workflow nodes ---
+
+export function listWorkflowNodes(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/workflow/nodes`)
+}
+
+export function getWorkflowNode(projectId, nodeId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/workflow/nodes/${encodeURIComponent(nodeId)}`
+  )
+}
+
+export function addWorkflowNode(projectId, data, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/workflow/nodes`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: extraHeaders,
+  })
+}
+
+export function updateWorkflowNode(projectId, nodeId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/workflow/nodes/${encodeURIComponent(nodeId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function deleteWorkflowNode(projectId, nodeId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/workflow/nodes/${encodeURIComponent(nodeId)}`,
+    {
+      method: 'DELETE',
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function linkIssueToWorkflowNode(projectId, nodeId, issueKey, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/workflow/nodes/${encodeURIComponent(nodeId)}/link`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ issueKey }),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function unlinkIssueFromWorkflowNode(projectId, nodeId, issueKey, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/workflow/nodes/${encodeURIComponent(nodeId)}/unlink`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ issueKey }),
+      headers: extraHeaders,
+    }
+  )
+}
+
+// --- Architecture components ---
+
+export function listArchitectureComponents(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/architecture/components`)
+}
+
+export function getArchitectureComponent(projectId, componentId) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/architecture/components/${encodeURIComponent(componentId)}`
+  )
+}
+
+export function addArchitectureComponent(projectId, data, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/architecture/components`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: extraHeaders,
+  })
+}
+
+export function updateArchitectureComponent(projectId, componentId, data, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/architecture/components/${encodeURIComponent(componentId)}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: extraHeaders,
+    }
+  )
+}
+
+export function deleteArchitectureComponent(projectId, componentId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/architecture/components/${encodeURIComponent(componentId)}`,
+    {
+      method: 'DELETE',
+      headers: extraHeaders,
+    }
+  )
+}
+
 // --- Health check ---
 
 export async function checkConnection() {

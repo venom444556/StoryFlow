@@ -97,6 +97,28 @@ function validatePageBody(body, isUpdate = false) {
   return null
 }
 
+// --- Auto-sync: issue Done → linked workflow nodes (#39) ---
+function autoSyncLinkedWorkflowNodes(projectId, issueKey) {
+  try {
+    const project = db.getProject(projectId)
+    if (!project?.workflow?.nodes) return
+    for (const node of project.workflow.nodes) {
+      if (!node.linkedIssueKeys?.includes(issueKey)) continue
+      // Check if ALL linked issues are Done
+      const issues = project.board?.issues || []
+      const allLinkedDone = node.linkedIssueKeys.every((key) => {
+        const iss = issues.find((i) => i.key === key)
+        return iss && iss.status === 'Done'
+      })
+      if (allLinkedDone && node.status !== 'success') {
+        db.updateWorkflowNode(projectId, node.id, { status: 'success' })
+      }
+    }
+  } catch (err) {
+    console.error('[AutoSync] Failed to sync workflow nodes for issue', issueKey, err.message)
+  }
+}
+
 // --- Middleware ---
 app.use(express.json({ limit: '10mb' }))
 
@@ -374,6 +396,12 @@ app.put('/api/projects/:id/issues/:issueId', (req, res) => {
       data: { key: issue.key, type: issue.type, status: issue.status },
     })
     broadcastEvent(event)
+
+    // #39 — Auto-update linked workflow nodes when issue moves to Done
+    if (req.body.status === 'Done' && issue.key) {
+      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    }
+
     notifyClients()
     res.json(issue)
   })
@@ -495,6 +523,12 @@ app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
       data: { key: issue.key, type: issue.type, status: issue.status },
     })
     broadcastEvent(event)
+
+    // #39 — Auto-update linked workflow nodes when issue moves to Done
+    if (req.body.status === 'Done' && issue.key) {
+      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    }
+
     notifyClients()
     res.json(issue)
   })
@@ -1115,6 +1149,188 @@ app.post('/api/projects/:id/check-duplicate', (req, res) => {
   const issues = project.board?.issues || []
   const result = checkTitleDuplication(req.body.title, issues, req.body.threshold)
   res.json(result)
+})
+
+// --- Workflow nodes ---
+
+app.get('/api/projects/:id/workflow/nodes', (req, res) => {
+  const nodes = db.listWorkflowNodes(req.params.id)
+  if (nodes === null) return res.status(404).json({ error: 'Project not found' })
+  res.json(nodes)
+})
+
+app.get('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
+  const node = db.getWorkflowNode(req.params.id, req.params.nodeId)
+  if (!node) return res.status(404).json({ error: 'Node not found' })
+  res.json(node)
+})
+
+app.post('/api/projects/:id/workflow/nodes', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const node = db.addWorkflowNode(req.params.id, req.body)
+    if (!node) return res.status(404).json({ error: 'Project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'workflow',
+      action: 'create',
+      entityType: 'workflow_node',
+      entityId: node.id,
+      entityTitle: node.title || node.id,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.status(201).json(node)
+  })
+})
+
+app.put('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const result = db.updateWorkflowNode(req.params.id, req.params.nodeId, req.body)
+    if (!result) return res.status(404).json({ error: 'Node not found' })
+    if (result.error) return res.status(400).json({ error: result.error })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'workflow',
+      action: 'update',
+      entityType: 'workflow_node',
+      entityId: req.params.nodeId,
+      entityTitle: result.title || req.params.nodeId,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(result)
+  })
+})
+
+app.delete('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const ok = db.deleteWorkflowNode(req.params.id, req.params.nodeId)
+    if (!ok) return res.status(404).json({ error: 'Node not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'workflow',
+      action: 'delete',
+      entityType: 'workflow_node',
+      entityId: req.params.nodeId,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json({ ok: true })
+  })
+})
+
+app.post('/api/projects/:id/workflow/nodes/:nodeId/link', (req, res) => {
+  const { issueKey } = req.body
+  if (!issueKey) return res.status(400).json({ error: 'issueKey is required' })
+  withProjectLock(req.params.id, () => {
+    const node = db.linkIssueToWorkflowNode(req.params.id, req.params.nodeId, issueKey)
+    if (!node) return res.status(404).json({ error: 'Node not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'workflow',
+      action: 'link',
+      entityType: 'workflow_node',
+      entityId: req.params.nodeId,
+      entityTitle: `${node.title || req.params.nodeId} ← ${issueKey}`,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(node)
+  })
+})
+
+app.post('/api/projects/:id/workflow/nodes/:nodeId/unlink', (req, res) => {
+  const { issueKey } = req.body
+  if (!issueKey) return res.status(400).json({ error: 'issueKey is required' })
+  withProjectLock(req.params.id, () => {
+    const node = db.unlinkIssueFromWorkflowNode(req.params.id, req.params.nodeId, issueKey)
+    if (!node) return res.status(404).json({ error: 'Node not found' })
+    notifyClients()
+    res.json(node)
+  })
+})
+
+// --- Architecture components ---
+
+app.get('/api/projects/:id/architecture/components', (req, res) => {
+  const comps = db.listArchitectureComponents(req.params.id)
+  if (comps === null) return res.status(404).json({ error: 'Project not found' })
+  res.json(comps)
+})
+
+app.get('/api/projects/:id/architecture/components/:compId', (req, res) => {
+  const comp = db.getArchitectureComponent(req.params.id, req.params.compId)
+  if (!comp) return res.status(404).json({ error: 'Component not found' })
+  res.json(comp)
+})
+
+app.post('/api/projects/:id/architecture/components', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const comp = db.addArchitectureComponent(req.params.id, req.body)
+    if (!comp) return res.status(404).json({ error: 'Project not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'create',
+      entityType: 'architecture_component',
+      entityId: comp.id,
+      entityTitle: comp.name || comp.id,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.status(201).json(comp)
+  })
+})
+
+app.put('/api/projects/:id/architecture/components/:compId', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const comp = db.updateArchitectureComponent(req.params.id, req.params.compId, req.body)
+    if (!comp) return res.status(404).json({ error: 'Component not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'update',
+      entityType: 'architecture_component',
+      entityId: req.params.compId,
+      entityTitle: comp.name || req.params.compId,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json(comp)
+  })
+})
+
+app.delete('/api/projects/:id/architecture/components/:compId', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const ok = db.deleteArchitectureComponent(req.params.id, req.params.compId)
+    if (!ok) return res.status(404).json({ error: 'Component not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'delete',
+      entityType: 'architecture_component',
+      entityId: req.params.compId,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json({ ok: true })
+  })
 })
 
 // --- Catch-all for production SPA serving ---

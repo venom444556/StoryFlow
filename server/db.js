@@ -856,13 +856,283 @@ export function deleteMilestone(projectId, milestoneId) {
 }
 
 // ---------------------------------------------------------------------------
+// Workflow nodes
+// ---------------------------------------------------------------------------
+
+export function listWorkflowNodes(projectId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return project.workflow?.nodes || []
+}
+
+export function getWorkflowNode(projectId, nodeId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return (project.workflow?.nodes || []).find((n) => n.id === nodeId) || null
+}
+
+export function addWorkflowNode(projectId, node) {
+  const project = getProject(projectId)
+  if (!project) return null
+  if (!project.workflow) project.workflow = { nodes: [], connections: [] }
+  if (!project.workflow.nodes) project.workflow.nodes = []
+
+  const now = new Date().toISOString()
+  const newNode = {
+    ...node,
+    id: node.id || crypto.randomUUID(),
+    status: node.status || 'idle',
+    createdAt: now,
+    updatedAt: now,
+  }
+  project.workflow.nodes.push(newNode)
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newNode
+}
+
+export function updateWorkflowNode(projectId, nodeId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const node = (project.workflow?.nodes || []).find((n) => n.id === nodeId)
+  if (!node) return null
+
+  // #40 — Validate phase nodes: cannot set status to "success" if children are incomplete
+  if (updates.status === 'success' && node.children?.nodes?.length > 0) {
+    const children = node.children.nodes
+    const allComplete = children.every((c) => c.status === 'success')
+    if (!allComplete) {
+      return { error: 'Cannot set phase to success: not all children are complete' }
+    }
+  }
+
+  const now = new Date().toISOString()
+
+  // Support updating a specific child node within a phase
+  if (updates.child_id) {
+    const child = (node.children?.nodes || []).find((c) => c.id === updates.child_id)
+    if (!child) return null
+    const { child_id, ...childUpdates } = updates
+    Object.assign(child, childUpdates, { updatedAt: now })
+
+    // Auto-derive parent phase status from children
+    const children = node.children.nodes
+    const allSuccess = children.every((c) => c.status === 'success')
+    const anyRunning = children.some((c) => c.status === 'running')
+    const anyError = children.some((c) => c.status === 'error')
+    if (allSuccess) node.status = 'success'
+    else if (anyError) node.status = 'error'
+    else if (anyRunning) node.status = 'running'
+
+    node.updatedAt = now
+  } else {
+    Object.assign(node, updates, { updatedAt: now })
+  }
+
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return node
+}
+
+export function deleteWorkflowNode(projectId, nodeId) {
+  const project = getProject(projectId)
+  if (!project || !project.workflow?.nodes) return false
+  const idx = project.workflow.nodes.findIndex((n) => n.id === nodeId)
+  if (idx === -1) return false
+  project.workflow.nodes.splice(idx, 1)
+  // Also remove connections referencing this node
+  if (project.workflow.connections) {
+    project.workflow.connections = project.workflow.connections.filter(
+      (c) => c.from !== nodeId && c.to !== nodeId
+    )
+  }
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
+export function linkIssueToWorkflowNode(projectId, nodeId, issueKey) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const node = (project.workflow?.nodes || []).find((n) => n.id === nodeId)
+  if (!node) return null
+
+  if (!node.linkedIssueKeys) node.linkedIssueKeys = []
+  if (!node.linkedIssueKeys.includes(issueKey)) {
+    node.linkedIssueKeys.push(issueKey)
+  }
+  const now = new Date().toISOString()
+  node.updatedAt = now
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return node
+}
+
+export function unlinkIssueFromWorkflowNode(projectId, nodeId, issueKey) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const node = (project.workflow?.nodes || []).find((n) => n.id === nodeId)
+  if (!node || !node.linkedIssueKeys) return null
+
+  node.linkedIssueKeys = node.linkedIssueKeys.filter((k) => k !== issueKey)
+  const now = new Date().toISOString()
+  node.updatedAt = now
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return node
+}
+
+// ---------------------------------------------------------------------------
+// Architecture components
+// ---------------------------------------------------------------------------
+
+export function listArchitectureComponents(projectId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return project.architecture?.components || []
+}
+
+export function getArchitectureComponent(projectId, componentId) {
+  const project = getProject(projectId)
+  if (!project) return null
+  return (project.architecture?.components || []).find((c) => c.id === componentId) || null
+}
+
+export function addArchitectureComponent(projectId, component) {
+  const project = getProject(projectId)
+  if (!project) return null
+  if (!project.architecture) project.architecture = { components: [], connections: [] }
+  if (!project.architecture.components) project.architecture.components = []
+
+  const now = new Date().toISOString()
+  const newComp = {
+    ...component,
+    id: component.id || crypto.randomUUID(),
+    createdAt: now,
+    updatedAt: now,
+  }
+  project.architecture.components.push(newComp)
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return newComp
+}
+
+export function updateArchitectureComponent(projectId, componentId, updates) {
+  const project = getProject(projectId)
+  if (!project) return null
+  const comp = (project.architecture?.components || []).find((c) => c.id === componentId)
+  if (!comp) return null
+
+  const now = new Date().toISOString()
+  Object.assign(comp, updates, { updatedAt: now })
+  project.updatedAt = now
+  upsertProject(projectId, project)
+  return comp
+}
+
+export function deleteArchitectureComponent(projectId, componentId) {
+  const project = getProject(projectId)
+  if (!project || !project.architecture?.components) return false
+  const idx = project.architecture.components.findIndex((c) => c.id === componentId)
+  if (idx === -1) return false
+  project.architecture.components.splice(idx, 1)
+  // Also remove connections referencing this component
+  if (project.architecture.connections) {
+    project.architecture.connections = project.architecture.connections.filter(
+      (c) => c.from !== componentId && c.to !== componentId
+    )
+  }
+  project.updatedAt = new Date().toISOString()
+  upsertProject(projectId, project)
+  return true
+}
+
+// ---------------------------------------------------------------------------
 // Add project (convenience — creates from partial data)
 // ---------------------------------------------------------------------------
+
+const DEPENDENCIES_TEMPLATE = `# Dependencies & Tech Stack
+
+## Runtime Versions
+| Runtime | Version |
+|---------|---------|
+| | |
+
+## Production Dependencies
+| Package | Version | Purpose |
+|---------|---------|---------|
+| | | |
+
+## Dev Dependencies
+| Package | Version | Purpose |
+|---------|---------|---------|
+| | | |
+
+## External Services & APIs
+| Service | Purpose | Required? |
+|---------|---------|-----------|
+| | | |
+
+## Environment Variables
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| | | | |
+
+## DB Migrations
+| Migration | Description | Date |
+|-----------|-------------|------|
+| | | |
+`
+
+const WORKFLOW_RULES_TEMPLATE = `# Agent: Workflow Rules
+
+## Update Rules
+1. **Proactive, not reactive** — Update StoryFlow before or during implementation, not after being asked.
+2. **Create issues before writing code** — Every code change should have a corresponding issue in "In Progress" status.
+3. **Mark Done immediately** — When a story/task is complete, update its status to "Done" right away.
+4. **Update workflow nodes** — When completing work linked to workflow nodes, update the node status.
+
+## Dependency Transparency
+- When adding a new dependency (npm, pip, etc.), update the "Dependencies & Tech Stack" wiki page.
+- When adding a new environment variable, document it immediately.
+- When creating a DB migration, log it in the Dependencies page.
+
+## Workflow Node Maintenance
+- Keep workflow node statuses in sync with actual progress.
+- Phase nodes derive status from children — update children, not the parent directly.
+- Link issues to workflow nodes using linkedIssueKeys for automatic status tracking.
+
+## Correction Protocol
+- If the human corrects a StoryFlow update, acknowledge and fix immediately.
+- Log the correction as a learning in the session summary.
+`
 
 export function addProject(project) {
   const now = new Date().toISOString()
   const id = project.id || crypto.randomUUID()
   const newProject = { ...project, id, createdAt: now, updatedAt: now }
+
+  // Auto-scaffold wiki pages (#44, #45)
+  if (!newProject.pages) newProject.pages = []
+  newProject.pages.push({
+    id: crypto.randomUUID(),
+    title: 'Dependencies & Tech Stack',
+    content: DEPENDENCIES_TEMPLATE,
+    parentId: null,
+    createdAt: now,
+    updatedAt: now,
+    createdBy: 'system',
+  })
+  newProject.pages.push({
+    id: crypto.randomUUID(),
+    title: 'Agent: Workflow Rules',
+    content: WORKFLOW_RULES_TEMPLATE,
+    parentId: null,
+    createdAt: now,
+    updatedAt: now,
+    createdBy: 'system',
+  })
+
   upsertProject(id, newProject)
   return newProject
 }

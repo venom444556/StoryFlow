@@ -60,6 +60,9 @@ const STATUS_BYPASS_TOOLS = new Set([
   'storyflow_record_event', // bookkeeping — not real work
   'storyflow_save_session_summary', // bookkeeping
   'storyflow_acknowledge_directive', // bookkeeping
+  'storyflow_list_workflow_nodes', // read-only
+  'storyflow_get_workflow_node', // read-only
+  'storyflow_list_architecture_components', // read-only
 ])
 
 function scheduleAutoIdle(projectId) {
@@ -1250,6 +1253,315 @@ server.registerTool(
     await sf.deleteMilestone(project_id, milestone_id, headers)
     return {
       content: [{ type: 'text', text: `Milestone ${milestone_id} deleted successfully.` }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: List Workflow Nodes
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_workflow_nodes',
+  {
+    description: 'List all workflow nodes for a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    const nodes = await sf.listWorkflowNodes(project_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(nodes, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Workflow Node
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_workflow_node',
+  {
+    description: 'Get a single workflow node by ID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      node_id: z.string().describe('Workflow node ID'),
+    },
+  },
+  async ({ project_id, node_id }) => {
+    const node = await sf.getWorkflowNode(project_id, node_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(node, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Add Workflow Node
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_add_workflow_node',
+  {
+    description: 'Add a new workflow node to a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      title: z.string().describe('Node title'),
+      type: z
+        .enum(['start', 'end', 'phase', 'decision', 'milestone', 'task'])
+        .describe('Node type'),
+      description: z.string().optional().describe('Node description'),
+      x: z.number().optional().describe('X position on canvas'),
+      y: z.number().optional().describe('Y position on canvas'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, title, type, description, x, y, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const node = await sf.addWorkflowNode(project_id, { title, type, description, x, y }, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(node, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update Workflow Node (#42)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_workflow_node',
+  {
+    description:
+      'Update a workflow node status or fields. For phase nodes, can also update a specific child by passing child_id. Phase nodes cannot be set to "success" unless all children are complete.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      node_id: z.string().describe('Workflow node ID'),
+      status: z
+        .enum(['idle', 'running', 'success', 'error'])
+        .optional()
+        .describe('New node status'),
+      child_id: z.string().optional().describe('Child node ID within a phase node'),
+      error: z.string().optional().describe('Error message (when status is "error")'),
+      title: z.string().optional().describe('Updated title'),
+      description: z.string().optional().describe('Updated description'),
+      ...provenanceParams,
+    },
+  },
+  async ({
+    project_id,
+    node_id,
+    status,
+    child_id,
+    error,
+    title,
+    description,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const updates = {}
+    if (status !== undefined) updates.status = status
+    if (child_id !== undefined) updates.child_id = child_id
+    if (error !== undefined) updates.error = error
+    if (title !== undefined) updates.title = title
+    if (description !== undefined) updates.description = description
+    const node = await sf.updateWorkflowNode(project_id, node_id, updates, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(node, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Workflow Node
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_workflow_node',
+  {
+    description: 'Delete a workflow node and all its connections. Cannot be undone.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      node_id: z.string().describe('Workflow node ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, node_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deleteWorkflowNode(project_id, node_id, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ deleted: true, node_id }, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Link Issue to Workflow Node (#39)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_link_issue_to_node',
+  {
+    description:
+      'Link a board issue to a workflow node by issue key. When linked issues move to Done, the workflow node can be auto-updated.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      node_id: z.string().describe('Workflow node ID'),
+      issue_key: z.string().describe('Issue key (e.g. "SC-42")'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, node_id, issue_key, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const node = await sf.linkIssueToWorkflowNode(project_id, node_id, issue_key, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(node, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Unlink Issue from Workflow Node
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_unlink_issue_from_node',
+  {
+    description: 'Remove a link between a board issue and a workflow node.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      node_id: z.string().describe('Workflow node ID'),
+      issue_key: z.string().describe('Issue key to unlink'),
+    },
+  },
+  async ({ project_id, node_id, issue_key }) => {
+    const node = await sf.unlinkIssueFromWorkflowNode(project_id, node_id, issue_key)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(node, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: List Architecture Components
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_architecture_components',
+  {
+    description: 'List all architecture components for a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    const comps = await sf.listArchitectureComponents(project_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(comps, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Add Architecture Component
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_add_architecture_component',
+  {
+    description: 'Add a new architecture component to a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      name: z.string().describe('Component name'),
+      type: z
+        .string()
+        .optional()
+        .describe('Component type (e.g. "api", "service", "page", "model")'),
+      description: z.string().optional().describe('Component description'),
+      dependencies: z.array(z.string()).optional().describe('IDs of components this depends on'),
+      x: z.number().optional().describe('X position on canvas'),
+      y: z.number().optional().describe('Y position on canvas'),
+      ...provenanceParams,
+    },
+  },
+  async ({
+    project_id,
+    name,
+    type,
+    description,
+    dependencies,
+    x,
+    y,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const comp = await sf.addArchitectureComponent(
+      project_id,
+      { name, type, description, dependencies, x, y },
+      headers
+    )
+    return {
+      content: [{ type: 'text', text: JSON.stringify(comp, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Update Architecture Component
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_update_architecture_component',
+  {
+    description: 'Update an architecture component. Only provided fields are changed.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      component_id: z.string().describe('Component ID'),
+      name: z.string().optional().describe('Updated name'),
+      type: z.string().optional().describe('Updated type'),
+      description: z.string().optional().describe('Updated description'),
+      dependencies: z.array(z.string()).optional().describe('Updated dependency IDs'),
+      ...provenanceParams,
+    },
+  },
+  async ({
+    project_id,
+    component_id,
+    name,
+    type,
+    description,
+    dependencies,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    const updates = {}
+    if (name !== undefined) updates.name = name
+    if (type !== undefined) updates.type = type
+    if (description !== undefined) updates.description = description
+    if (dependencies !== undefined) updates.dependencies = dependencies
+    const comp = await sf.updateArchitectureComponent(project_id, component_id, updates, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(comp, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Delete Architecture Component
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_architecture_component',
+  {
+    description: 'Delete an architecture component and all its connections. Cannot be undone.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      component_id: z.string().describe('Component ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, component_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    await sf.deleteArchitectureComponent(project_id, component_id, headers)
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ deleted: true, component_id }, null, 2) }],
     }
   }
 )
