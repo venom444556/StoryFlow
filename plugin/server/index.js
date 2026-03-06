@@ -30,6 +30,73 @@ const server = new McpServer({
 })
 
 // ---------------------------------------------------------------------------
+// Auto AI-status tracker
+// Automatically sets status to 'working' when mutating tools are called,
+// and debounces back to 'idle' after 30 seconds of inactivity.
+// ---------------------------------------------------------------------------
+const AUTO_IDLE_DELAY_MS = 30_000
+const _idleTimers = {} // projectId → timeout handle
+
+// Tools that should NOT trigger auto-status (read-only or status-management tools)
+const STATUS_BYPASS_TOOLS = new Set([
+  'storyflow_list_projects',
+  'storyflow_get_project',
+  'storyflow_list_issues',
+  'storyflow_get_issue_by_key',
+  'storyflow_list_sprints',
+  'storyflow_sprint_metrics',
+  'storyflow_get_board_summary',
+  'storyflow_run_hygiene',
+  'storyflow_list_pages',
+  'storyflow_get_page',
+  'storyflow_list_sessions',
+  'storyflow_get_last_session',
+  'storyflow_query_events',
+  'storyflow_check_connection',
+  'storyflow_check_gates',
+  'storyflow_get_steering_inputs',
+  'storyflow_update_ai_status', // avoid recursion
+  'storyflow_sync_from_git',
+  'storyflow_record_event', // bookkeeping — not real work
+  'storyflow_save_session_summary', // bookkeeping
+  'storyflow_acknowledge_directive', // bookkeeping
+])
+
+function scheduleAutoIdle(projectId) {
+  if (_idleTimers[projectId]) clearTimeout(_idleTimers[projectId])
+  _idleTimers[projectId] = setTimeout(async () => {
+    try {
+      await sf.updateAiStatus(projectId, 'idle', '')
+    } catch {
+      // best-effort — don't break anything
+    }
+    delete _idleTimers[projectId]
+  }, AUTO_IDLE_DELAY_MS)
+}
+
+// Wrap registerTool to inject auto-status on mutating tool calls
+const _origRegisterTool = server.registerTool.bind(server)
+server.registerTool = function (name, schema, handler) {
+  if (STATUS_BYPASS_TOOLS.has(name)) {
+    return _origRegisterTool(name, schema, handler)
+  }
+  const wrappedHandler = async (params) => {
+    const projectId = params.project_id
+    if (projectId) {
+      try {
+        const toolLabel = name.replace('storyflow_', '').replace(/_/g, ' ')
+        await sf.updateAiStatus(projectId, 'working', toolLabel)
+      } catch {
+        // best-effort
+      }
+      scheduleAutoIdle(projectId)
+    }
+    return handler(params)
+  }
+  return _origRegisterTool(name, schema, wrappedHandler)
+}
+
+// ---------------------------------------------------------------------------
 // Tool: List Projects
 // ---------------------------------------------------------------------------
 server.registerTool(
