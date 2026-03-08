@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Clock,
   Target,
+  Tag,
 } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import ProgressBar from '../ui/ProgressBar'
@@ -18,9 +19,11 @@ import { formatDate } from '../../utils/dates'
 import { sanitizeColor } from '../../utils/sanitize'
 
 function getStatus(progress) {
-  if (progress === 0) return { label: 'Not Started', variant: 'gray', icon: Clock }
-  if (progress >= 100) return { label: 'Complete', variant: 'green', icon: CheckCircle2 }
-  return { label: 'In Progress', variant: 'blue', icon: Target }
+  if (progress === 0)
+    return { label: 'Not Started', variant: 'gray', icon: Clock, lineColor: '#6b7280' }
+  if (progress >= 100)
+    return { label: 'Complete', variant: 'green', icon: CheckCircle2, lineColor: '#10b981' }
+  return { label: 'In Progress', variant: 'blue', icon: Target, lineColor: '#8b5cf6' }
 }
 
 export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
@@ -32,36 +35,30 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
 
   return (
     <motion.div layout className="relative flex gap-4">
-      {/* Timeline spine */}
+      {/* Timeline spine — color based on status */}
       <div className="flex flex-col items-center pt-1">
         {/* Dot */}
         <div
           className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 shadow-lg"
           style={{
-            borderColor: sanitizeColor(phase.color, '#f59e0b'),
-            backgroundColor:
-              phase.progress >= 100 ? sanitizeColor(phase.color, '#f59e0b') : 'transparent',
-            boxShadow: `0 0 8px ${sanitizeColor(phase.color, '#f59e0b')}40`,
+            borderColor: status.lineColor,
+            backgroundColor: phase.progress >= 100 ? status.lineColor : 'transparent',
+            boxShadow: `0 0 8px ${status.lineColor}40`,
           }}
         />
         {/* Connecting line */}
         {!isLast && (
-          <div
-            className="mt-0 w-px flex-1"
-            style={{ backgroundColor: `${sanitizeColor(phase.color, '#f59e0b')}30` }}
-          />
+          <div className="mt-0 w-0.5 flex-1" style={{ backgroundColor: `${status.lineColor}30` }} />
         )}
       </div>
 
       {/* Card */}
       <div className="group mb-4 flex-1 pb-2">
-        <GlassCard padding="none" className="overflow-hidden">
-          {/* Color accent bar */}
-          <div
-            className="h-1 w-full"
-            style={{ backgroundColor: sanitizeColor(phase.color, '#f59e0b') }}
-          />
-
+        <GlassCard
+          padding="none"
+          className="overflow-hidden border-l-4"
+          style={{ borderLeftColor: sanitizeColor(phase.color, '#f59e0b') }}
+        >
           <div className="p-4">
             {/* Header row */}
             <div className="flex items-start justify-between gap-3">
@@ -148,7 +145,19 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
               </div>
             )}
 
-            {/* Progress */}
+            {/* Deliverable tags */}
+            {(phase.deliverables || []).length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {phase.deliverables.map((d, i) => (
+                  <Badge key={i} variant="purple" size="xs">
+                    <Tag size={9} className="mr-1" />
+                    {d}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Progress with glow */}
             <div className="mt-3">
               <div className="mb-1 flex items-center justify-between">
                 <span className="text-xs text-[var(--color-fg-muted)]">Progress</span>
@@ -156,7 +165,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                   {Math.round(phase.progress || 0)}%
                 </span>
               </div>
-              <ProgressBar value={phase.progress || 0} size="sm" />
+              <ProgressBar value={phase.progress || 0} size="sm" glow />
             </div>
           </div>
         </GlassCard>

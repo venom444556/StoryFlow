@@ -115,14 +115,14 @@ export default function VelocityChart({ sprints = [] }) {
               y1={gl.y}
               x2={VIEW_WIDTH - PADDING.right}
               y2={gl.y}
-              style={{ stroke: 'var(--th-border)' }}
+              style={{ stroke: 'var(--color-border-default)' }}
               strokeWidth={1}
             />
             <text
               x={PADDING.left - 8}
               y={gl.y + 3}
               textAnchor="end"
-              style={{ fill: 'var(--th-text-muted)' }}
+              style={{ fill: 'var(--color-fg-muted)' }}
               fontSize={9}
               fontFamily="Inter, system-ui, sans-serif"
             >
@@ -168,7 +168,7 @@ export default function VelocityChart({ sprints = [] }) {
               x={bar.x + bar.width / 2}
               y={bar.y - 6}
               textAnchor="middle"
-              style={{ fill: 'var(--th-text-secondary)' }}
+              style={{ fill: 'var(--color-fg-muted)' }}
               fontSize={10}
               fontWeight={600}
               fontFamily="Inter, system-ui, sans-serif"
@@ -181,7 +181,7 @@ export default function VelocityChart({ sprints = [] }) {
               x={bar.x + bar.width / 2}
               y={VIEW_HEIGHT - 8}
               textAnchor="middle"
-              style={{ fill: 'var(--th-text-muted)' }}
+              style={{ fill: 'var(--color-fg-muted)' }}
               fontSize={9}
               fontFamily="Inter, system-ui, sans-serif"
             >
@@ -218,7 +218,7 @@ export default function VelocityChart({ sprints = [] }) {
           y1={PADDING.top}
           x2={PADDING.left}
           y2={PADDING.top + CHART_H}
-          style={{ stroke: 'var(--th-border-hover)' }}
+          style={{ stroke: 'var(--color-border-emphasis)' }}
           strokeWidth={1}
         />
         <line
@@ -226,7 +226,7 @@ export default function VelocityChart({ sprints = [] }) {
           y1={PADDING.top + CHART_H}
           x2={VIEW_WIDTH - PADDING.right}
           y2={PADDING.top + CHART_H}
-          style={{ stroke: 'var(--th-border-hover)' }}
+          style={{ stroke: 'var(--color-border-emphasis)' }}
           strokeWidth={1}
         />
       </svg>

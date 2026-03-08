@@ -105,10 +105,16 @@ export default function AIStatusCard() {
               {aiStatus.detail}
             </p>
           ) : (
-            <p className="mt-1.5 text-sm text-[var(--color-fg-subtle)]">
-              {aiStatus.status === 'idle'
-                ? 'Waiting for tasks \u2014 use the steering bar below to direct the agent'
-                : 'Processing...'}
+            <p className="mt-1.5 flex items-center gap-2 text-sm text-[var(--color-fg-subtle)]">
+              {aiStatus.status === 'working' && (
+                <span className="flex items-center gap-1.5 text-[var(--color-success)]">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--color-success)]" />
+                  AI Active
+                </span>
+              )}
+              {aiStatus.status === 'idle' &&
+                'Waiting for tasks \u2014 use the steering bar below to direct the agent'}
+              {aiStatus.status === 'blocked' && 'Waiting for your input...'}
             </p>
           )}
         </div>

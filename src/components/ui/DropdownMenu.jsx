@@ -72,11 +72,11 @@ export default function DropdownMenu({ trigger, items = [], className = '', alig
             transition={{ duration: 0.15, ease: 'easeOut' }}
             role="menu"
           >
-            {items.map((item, i) => {
+            {items.map((item) => {
               const Icon = item.icon
               return (
                 <button
-                  key={i}
+                  key={item.label}
                   onClick={() => {
                     item.onClick?.()
                     setIsOpen(false)

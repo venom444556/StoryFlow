@@ -137,6 +137,13 @@ export function updateProject(id, data, extraHeaders = {}) {
   })
 }
 
+export function deleteProject(id, extraHeaders = {}) {
+  return request(`/api/projects/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: extraHeaders,
+  })
+}
+
 // --- Phase advancement ---
 
 const PHASE_ORDER = ['planning', 'in-progress', 'completed']
@@ -646,6 +653,24 @@ export function deleteArchitectureComponent(projectId, componentId, extraHeaders
       headers: extraHeaders,
     }
   )
+}
+
+// --- Steering ---
+
+export function steer(projectId, text, priority = 'normal') {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/steer`, {
+    method: 'POST',
+    body: JSON.stringify({ text, priority }),
+  })
+}
+
+// --- Duplicate check ---
+
+export function checkDuplicate(projectId, title) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/check-duplicate`, {
+    method: 'POST',
+    body: JSON.stringify({ title }),
+  })
 }
 
 // --- Health check ---

@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Compass, Loader2 } from 'lucide-react'
 
 const QUICK_ACTIONS = [
-  'Focus on bug fixes',
-  'Write documentation',
-  'Plan the next sprint',
-  'Review open issues',
+  { label: 'Optimize Code', icon: '⚡' },
+  { label: 'Find Bugs', icon: '🔍' },
+  { label: 'Gen Docs', icon: '📝' },
+  { label: 'Plan Sprint', icon: '📋' },
+  { label: 'Review Issues', icon: '✅' },
 ]
 
 export default function SteeringBar({ projectId }) {
@@ -54,16 +55,21 @@ export default function SteeringBar({ projectId }) {
 
   return (
     <div className="glass-card overflow-hidden p-0">
-      {/* Quick action chips */}
+      {/* Quick action pills */}
       <div className="flex items-center gap-2 overflow-x-auto border-b border-[var(--color-border-default)] px-4 py-2">
         <Compass size={12} className="shrink-0 text-[var(--color-fg-faint)]" />
         {QUICK_ACTIONS.map((action) => (
           <button
-            key={action}
-            onClick={() => handleQuickAction(action)}
-            className="shrink-0 rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[11px] text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)]"
+            key={action.label}
+            onClick={() => handleQuickAction(action.label)}
+            className="shrink-0 rounded-full px-3 py-1 text-[11px] font-medium text-[var(--color-fg-muted)] transition-all hover:text-[var(--color-fg-default)]"
+            style={{
+              backgroundColor: 'var(--color-bg-glass)',
+              border: '1px solid var(--color-border-default)',
+            }}
           >
-            {action}
+            <span className="mr-1">{action.icon}</span>
+            {action.label}
           </button>
         ))}
       </div>

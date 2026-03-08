@@ -19,7 +19,7 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
         />
       )}
       {title && (
-        <h3 className="mb-[var(--space-2)] text-[var(--text-lg)] font-[var(--font-medium)] text-[var(--color-fg-subtle)]">
+        <h3 className="mb-[var(--space-2)] text-[var(--text-lg)] font-medium text-[var(--color-fg-subtle)]">
           {title}
         </h3>
       )}

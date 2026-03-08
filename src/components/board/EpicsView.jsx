@@ -65,7 +65,10 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
                   <span className="shrink-0 text-xs font-medium text-[var(--color-fg-muted)]">
                     {epic.key}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]">
+                  <span
+                    className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]"
+                    title={epic.title}
+                  >
                     {epic.title}
                   </span>
                   <motion.div

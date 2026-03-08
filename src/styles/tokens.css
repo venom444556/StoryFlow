@@ -409,6 +409,25 @@
   --color-ai-idle: #64748b; /* muted — AI is idle */
   --color-ai-blocked: #f59e0b; /* yellow — AI needs input */
 
+  /* Node & canvas tokens */
+  --shadow-node-active:
+    0 0 16px rgba(var(--accent-default-rgb), 0.4), 0 0 4px rgba(var(--accent-default-rgb), 0.2);
+  --shadow-node-cycle: 0 0 16px rgba(239, 68, 68, 0.5), 0 0 4px rgba(239, 68, 68, 0.3);
+  --color-bg-statusbar: rgba(255, 248, 240, 0.04);
+  --sidebar-active-border: linear-gradient(
+    180deg,
+    var(--accent-default),
+    rgba(var(--accent-default-rgb), 0.3)
+  );
+
+  /* Obsidian gradient card */
+  --color-bg-obsidian: linear-gradient(
+    135deg,
+    rgba(255, 248, 240, 0.07) 0%,
+    rgba(255, 248, 240, 0.03) 100%
+  );
+  --color-bg-obsidian-border: rgba(255, 248, 240, 0.1);
+
   /* Confidence level tokens */
   --color-confidence-high: #22c55e;
   --color-confidence-high-bg: rgba(34, 197, 94, 0.12);
@@ -620,6 +639,25 @@
   --color-ai-working: #15803d;
   --color-ai-idle: #8a8279;
   --color-ai-blocked: #c2410c;
+
+  /* Node & canvas tokens (light) */
+  --shadow-node-active:
+    0 0 12px rgba(var(--accent-default-rgb), 0.2), 0 0 3px rgba(var(--accent-default-rgb), 0.1);
+  --shadow-node-cycle: 0 0 12px rgba(220, 38, 38, 0.3), 0 0 3px rgba(220, 38, 38, 0.15);
+  --color-bg-statusbar: rgba(44, 40, 37, 0.04);
+  --sidebar-active-border: linear-gradient(
+    180deg,
+    var(--accent-default),
+    rgba(var(--accent-default-rgb), 0.3)
+  );
+
+  /* Obsidian gradient card (light) */
+  --color-bg-obsidian: linear-gradient(
+    135deg,
+    rgba(44, 40, 37, 0.04) 0%,
+    rgba(44, 40, 37, 0.01) 100%
+  );
+  --color-bg-obsidian-border: rgba(44, 40, 37, 0.08);
 
   /* Confidence level tokens (light) */
   --color-confidence-high: #15803d;

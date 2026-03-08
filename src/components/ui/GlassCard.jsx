@@ -10,15 +10,19 @@ export default function GlassCard({
   className = '',
   hover = false,
   padding = 'md',
+  variant,
   onClick,
   as: Component = 'div',
   ...rest
 }) {
+  const isObsidian = variant === 'obsidian'
+
   return (
     <Component
       className={[
-        'glass-card',
+        isObsidian ? '' : 'glass-card',
         PADDING[padding] || PADDING.md,
+        isObsidian && 'rounded-[var(--radius-lg)]',
         hover && 'transition-colors cursor-pointer',
         onClick && !hover && 'cursor-pointer',
         className,
@@ -26,6 +30,10 @@ export default function GlassCard({
         .filter(Boolean)
         .join(' ')}
       style={{
+        ...(isObsidian && {
+          background: 'var(--color-bg-obsidian)',
+          border: '1px solid var(--color-bg-obsidian-border)',
+        }),
         transitionDuration: 'var(--duration-normal)',
         transitionTimingFunction: 'var(--ease-default)',
       }}

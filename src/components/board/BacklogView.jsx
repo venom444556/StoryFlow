@@ -97,7 +97,10 @@ export function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         <span className="shrink-0 text-xs font-medium text-[var(--color-fg-muted)]">
           {issue.key}
         </span>
-        <span className="min-w-0 flex-1 truncate text-sm text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]">
+        <span
+          className="min-w-0 flex-1 truncate text-sm text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)]"
+          title={issue.title}
+        >
           {issue.title}
         </span>
         {issue.assignee && <Avatar name={issue.assignee} size="sm" />}

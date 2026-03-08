@@ -42,7 +42,7 @@ export default function Tooltip({ children, content, position = 'top', showArrow
         className={[
           'pointer-events-none absolute whitespace-nowrap',
           'rounded-[var(--radius-lg)] bg-[var(--color-bg-overlay)] px-[var(--space-3)] py-[var(--space-2)]',
-          'text-[var(--text-xs)] font-[var(--font-medium)] text-[var(--color-fg-default)]',
+          'text-[var(--text-xs)] font-medium text-[var(--color-fg-default)]',
           'shadow-[var(--shadow-elevated)] transition-all',
           pos.tooltip,
           visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95',

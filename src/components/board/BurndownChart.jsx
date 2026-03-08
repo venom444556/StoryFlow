@@ -118,14 +118,14 @@ export default function BurndownChart({ data = [] }) {
               y1={gl.y}
               x2={VIEW_WIDTH - PADDING.right}
               y2={gl.y}
-              style={{ stroke: 'var(--th-border)' }}
+              style={{ stroke: 'var(--color-border-default)' }}
               strokeWidth={1}
             />
             <text
               x={PADDING.left - 8}
               y={gl.y + 3}
               textAnchor="end"
-              style={{ fill: 'var(--th-text-muted)' }}
+              style={{ fill: 'var(--color-fg-muted)' }}
               fontSize={9}
               fontFamily="Inter, system-ui, sans-serif"
             >
@@ -143,7 +143,7 @@ export default function BurndownChart({ data = [] }) {
                 x={xl.x}
                 y={VIEW_HEIGHT - 8}
                 textAnchor="middle"
-                style={{ fill: 'var(--th-text-muted)' }}
+                style={{ fill: 'var(--color-fg-muted)' }}
                 fontSize={9}
                 fontFamily="Inter, system-ui, sans-serif"
               >
@@ -156,7 +156,7 @@ export default function BurndownChart({ data = [] }) {
         <path
           d={chart.idealPath}
           fill="none"
-          style={{ stroke: 'var(--th-text-faint)' }}
+          style={{ stroke: 'var(--color-fg-faint)' }}
           strokeWidth={1.5}
           strokeDasharray="6 3"
         />
@@ -196,7 +196,7 @@ export default function BurndownChart({ data = [] }) {
             cx={dot.cx}
             cy={dot.cy}
             r={3}
-            style={{ fill: 'var(--th-bg)' }}
+            style={{ fill: 'var(--color-bg-base)' }}
             stroke="url(#burndown-line-grad)"
             strokeWidth={1.5}
           />
@@ -208,7 +208,7 @@ export default function BurndownChart({ data = [] }) {
           y1={PADDING.top}
           x2={PADDING.left}
           y2={PADDING.top + CHART_H}
-          style={{ stroke: 'var(--th-border-hover)' }}
+          style={{ stroke: 'var(--color-border-emphasis)' }}
           strokeWidth={1}
         />
         <line
@@ -216,7 +216,7 @@ export default function BurndownChart({ data = [] }) {
           y1={PADDING.top + CHART_H}
           x2={VIEW_WIDTH - PADDING.right}
           y2={PADDING.top + CHART_H}
-          style={{ stroke: 'var(--th-border-hover)' }}
+          style={{ stroke: 'var(--color-border-emphasis)' }}
           strokeWidth={1}
         />
       </svg>

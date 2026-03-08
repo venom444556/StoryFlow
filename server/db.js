@@ -131,6 +131,10 @@ export function withProjectLock(projectId, fn) {
   const prev = _projectLocks.get(projectId) || Promise.resolve()
   const next = prev.then(fn, fn) // run fn even if prior rejects
   _projectLocks.set(projectId, next)
+  // Prevent unhandled rejection crashes (Node 15+ terminates on these)
+  next.catch((err) => {
+    console.error(`[DB] Unhandled error in project lock for ${projectId}:`, err.message || err)
+  })
   // Clean up the map entry when the chain settles to avoid unbounded growth
   next.finally(() => {
     if (_projectLocks.get(projectId) === next) {
@@ -593,9 +597,12 @@ export function addPage(projectId, page) {
   if (!project.pages) project.pages = []
 
   const now = new Date().toISOString()
+  // Auto-publish "Agent:" pages — they're agent self-documentation, not user-facing drafts
+  const autoPublish = page.createdBy === 'ai' && page.title?.startsWith('Agent:') && !page.status
   const newPage = {
     ...page,
     id: page.id || crypto.randomUUID(),
+    status: autoPublish ? 'published' : page.status || 'draft',
     createdAt: now,
     updatedAt: now,
   }

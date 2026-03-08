@@ -235,7 +235,8 @@ export default function IssueDetail({
                 />
               ) : (
                 <h2
-                  className="cursor-pointer truncate text-base font-semibold text-[var(--color-fg-default)] transition-colors"
+                  className="cursor-pointer text-base font-semibold text-[var(--color-fg-default)] transition-colors"
+                  title={issue.title}
                   onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-default)')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = '')}
                   onClick={() => {

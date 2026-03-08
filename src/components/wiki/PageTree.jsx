@@ -1,6 +1,15 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, ChevronDown, FileText, Plus, Trash2, Pin } from 'lucide-react'
+import {
+  ChevronRight,
+  ChevronDown,
+  FileText,
+  FolderOpen,
+  Folder,
+  Plus,
+  Trash2,
+  Pin,
+} from 'lucide-react'
 import SearchBar from '../ui/SearchBar'
 import Button from '../ui/Button'
 
@@ -63,7 +72,8 @@ function TreeNode({
   const isSelected = node.id === selectedPageId
   const icon = node.icon || null
   const isAiAuthored = node.createdBy === 'ai'
-  const needsReview = isAiAuthored && node.status !== 'published'
+  const isAgentPage = node.title?.startsWith('Agent:')
+  const needsReview = isAiAuthored && node.status !== 'published' && !isAgentPage
 
   // If filtering, only show nodes that match (or have a matching descendant)
   if (filter && !matchesFilter(node, filter)) return null
@@ -76,15 +86,23 @@ function TreeNode({
         className={[
           'group flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm transition-colors cursor-pointer select-none',
           isSelected
-            ? 'text-[var(--color-fg-default)]'
+            ? 'text-[var(--color-fg-default)] border-l-2'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
-          isAiAuthored && 'border-l-2 border-l-[var(--color-ai-accent)]',
+          isAiAuthored &&
+            !isSelected &&
+            !isAgentPage &&
+            'border-l-2 border-l-[var(--color-ai-accent)]',
         ]
           .filter(Boolean)
           .join(' ')}
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          ...(isSelected ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.2)' } : {}),
+          ...(isSelected
+            ? {
+                backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
+                borderLeftColor: 'var(--accent-default)',
+              }
+            : {}),
         }}
         onClick={() => onSelectPage(node.id)}
       >
@@ -97,21 +115,29 @@ function TreeNode({
             }}
             className="shrink-0 rounded p-0.5 hover:bg-[var(--color-bg-glass-hover)]"
           >
-            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
           </button>
         ) : (
-          <span className="w-[18px] shrink-0" />
+          <span className="w-[16px] shrink-0" />
         )}
 
-        {/* Icon */}
+        {/* Icon: folder for parents, file for leaves */}
         {icon ? (
           <span className="shrink-0 text-base leading-none">{icon}</span>
+        ) : hasChildren ? (
+          isExpanded ? (
+            <FolderOpen size={14} className="shrink-0" style={{ color: 'var(--accent-default)' }} />
+          ) : (
+            <Folder size={14} className="shrink-0 text-[var(--color-fg-muted)]" />
+          )
         ) : (
           <FileText size={14} className="shrink-0 text-[var(--color-fg-muted)]" />
         )}
 
         {/* Title */}
-        <span className="flex-1 truncate">{node.title || 'Untitled'}</span>
+        <span className="flex-1 truncate" title={node.title || 'Untitled'}>
+          {node.title || 'Untitled'}
+        </span>
 
         {/* AI review indicator */}
         {needsReview && (

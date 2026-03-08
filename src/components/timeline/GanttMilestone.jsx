@@ -38,7 +38,7 @@ export default function GanttMilestone({ milestone, cx, cy, onMilestoneClick }) 
             width={Math.min(milestone.name.length * 6.5 + 16, 160)}
             height={22}
             rx={6}
-            style={{ fill: 'var(--th-panel, #1e293b)' }}
+            style={{ fill: 'var(--color-bg-glass)' }}
             stroke={color}
             strokeWidth={1}
             opacity={0.95}

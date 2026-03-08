@@ -192,7 +192,7 @@ function MiniDepGraph({ component, allComponents }) {
                 x={leftX + nodeW / 2}
                 y={y + nodeH / 2 + 4}
                 textAnchor="middle"
-                fill="var(--th-text-muted)"
+                fill="var(--color-fg-muted)"
                 fontSize="10"
               >
                 {dep.name.length > 14 ? dep.name.slice(0, 12) + '\u2026' : dep.name}
@@ -242,7 +242,7 @@ function MiniDepGraph({ component, allComponents }) {
                 x={rightX + nodeW / 2}
                 y={y + nodeH / 2 + 4}
                 textAnchor="middle"
-                fill="var(--th-text-muted)"
+                fill="var(--color-fg-muted)"
                 fontSize="10"
               >
                 {ub.name.length > 14 ? ub.name.slice(0, 12) + '\u2026' : ub.name}
@@ -300,7 +300,10 @@ export default function ComponentDetail({
             <Badge variant={TYPE_COLORS[component.type] || 'default'} size="xs" dot>
               {component.type}
             </Badge>
-            <h3 className="truncate text-sm font-semibold text-[var(--color-fg-default)]">
+            <h3
+              className="truncate text-sm font-semibold text-[var(--color-fg-default)]"
+              title={component.name}
+            >
               {component.name}
             </h3>
           </div>

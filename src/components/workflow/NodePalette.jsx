@@ -42,7 +42,13 @@ const ICON_MAP = {
  * - isOpen    {boolean}   whether the palette is visible
  * - onClose   {function}  callback to close the palette
  */
-export default function NodePalette({ onSelect, isOpen, onClose }) {
+export default function NodePalette({
+  onSelect,
+  isOpen,
+  onClose,
+  inline = false,
+  disabled = false,
+}) {
   const panelRef = useRef(null)
 
   // Close on click outside
@@ -65,6 +71,36 @@ export default function NodePalette({ onSelect, isOpen, onClose }) {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isOpen, onClose])
+
+  // Inline mode renders as a grid directly in a sidebar
+  if (inline) {
+    return (
+      <div className="grid grid-cols-2 gap-1.5">
+        {NODE_TYPES.map((typeDef) => {
+          const Icon = ICON_MAP[typeDef.icon]
+          return (
+            <button
+              key={typeDef.type}
+              onClick={() => !disabled && onSelect?.(typeDef)}
+              disabled={disabled}
+              className="group flex flex-col items-center gap-1 rounded-lg border border-transparent bg-[var(--color-bg-glass)] px-1.5 py-2 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)] disabled:opacity-50 disabled:pointer-events-none"
+            >
+              {Icon && (
+                <Icon
+                  size={16}
+                  style={{ color: sanitizeColor(typeDef.color) }}
+                  className="transition-transform duration-150 group-hover:scale-110"
+                />
+              )}
+              <span className="text-[10px] font-medium text-[var(--color-fg-default)]">
+                {typeDef.label}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
 
   return (
     <AnimatePresence>

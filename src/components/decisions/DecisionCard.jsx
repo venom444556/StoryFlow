@@ -9,9 +9,10 @@ const STATUS_CONFIG = {
   proposed: { label: 'Proposed', variant: 'yellow' },
   accepted: { label: 'Accepted', variant: 'green' },
   superseded: { label: 'Superseded', variant: 'gray' },
+  deprecated: { label: 'Deprecated', variant: 'red' },
 }
 
-export default function DecisionCard({ decision, onEdit, onClick }) {
+export default function DecisionCard({ decision, onEdit, onClick, isActive = false, index = 0 }) {
   const statusCfg = STATUS_CONFIG[decision.status] || STATUS_CONFIG.proposed
   const tags = decision.tags || []
 
@@ -26,30 +27,28 @@ export default function DecisionCard({ decision, onEdit, onClick }) {
       <GlassCard
         hover
         padding="none"
-        className="group overflow-hidden"
+        className={[
+          'group overflow-hidden border-l-2 transition-all',
+          isActive ? 'border-l-[var(--accent-default)]' : 'border-l-transparent',
+        ].join(' ')}
+        style={isActive ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.08)' } : undefined}
         onClick={() => onClick?.(decision)}
       >
-        {/* Status accent stripe */}
-        <div
-          className={[
-            'h-0.5 w-full',
-            decision.status === 'accepted' && 'bg-green-500',
-            decision.status === 'proposed' && 'bg-yellow-500',
-            decision.status === 'superseded' && 'bg-[var(--color-fg-subtle)]',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-        />
-
         <div className="p-4">
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5">
-                <h4 className="truncate text-sm font-semibold text-[var(--color-fg-default)]">
+                <span className="shrink-0 text-[10px] font-bold text-[var(--color-fg-subtle)]">
+                  ADR-{String(index + 1).padStart(3, '0')}
+                </span>
+                <h4
+                  className="truncate text-sm font-semibold text-[var(--color-fg-default)]"
+                  title={decision.title}
+                >
                   {decision.title}
                 </h4>
-                <Badge variant={statusCfg.variant} size="sm" dot>
+                <Badge variant={statusCfg.variant} size="sm" outline>
                   {statusCfg.label}
                 </Badge>
                 {decision.createdBy && (

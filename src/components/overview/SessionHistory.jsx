@@ -24,8 +24,19 @@ function SessionCard({ session }) {
       onClick={() => setExpanded((v) => !v)}
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--color-ai-bg)]">
-          <History size={14} className="text-[var(--color-ai-accent)]" />
+        {/* Dot indicator with color coding */}
+        <div className="mt-2 flex flex-col items-center gap-1">
+          <span
+            className="h-2.5 w-2.5 shrink-0 rounded-full"
+            style={{
+              backgroundColor:
+                session.issues_created > 0
+                  ? 'var(--color-success)'
+                  : session.issues_updated > 0
+                    ? 'var(--color-info)'
+                    : 'var(--color-fg-faint)',
+            }}
+          />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">

@@ -32,7 +32,7 @@ const TextArea = forwardRef(function TextArea(
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
       {label && (
-        <label className="mb-[var(--space-2)] flex items-center gap-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)] text-[var(--color-fg-muted)]">
+        <label className="mb-[var(--space-2)] flex items-center gap-[var(--space-2)] text-[var(--text-sm)] font-medium text-[var(--color-fg-muted)]">
           {label}
           {hasError && <AlertCircle size={14} className="text-[var(--color-danger)]" />}
           {hasSuccess && <CheckCircle size={14} className="text-[var(--color-success)]" />}

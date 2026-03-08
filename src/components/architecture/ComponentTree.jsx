@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
-import { ChevronRight, ChevronDown, Plus, Network } from 'lucide-react'
+import { ChevronRight, ChevronDown, Plus, Network, Folder, FolderOpen } from 'lucide-react'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 import GlassCard from '../ui/GlassCard'
 import EmptyState from '../ui/EmptyState'
-import { TYPE_COLORS } from './constants'
+import { TYPE_COLORS, TYPE_HEX_COLORS, TYPE_ICONS } from './constants'
+import { sanitizeColor } from '../../utils/sanitize'
 
 // Build a tree structure from the flat components array
 function buildTree(components) {
@@ -31,6 +32,8 @@ function TreeNode({ node, selectedId, onSelect, depth = 0, highlightIds }) {
   const hasChildren = node.children && node.children.length > 0
   const isSelected = selectedId === node.id
   const isDimmed = highlightIds && !highlightIds.has(node.id)
+  const TypeIcon = TYPE_ICONS[node.type] || null
+  const hexColor = sanitizeColor(TYPE_HEX_COLORS[node.type], '#6b7280')
 
   return (
     <div>
@@ -57,16 +60,29 @@ function TreeNode({ node, selectedId, onSelect, depth = 0, highlightIds }) {
             }}
             className="flex h-4 w-4 shrink-0 items-center justify-center text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]"
           >
-            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            {expanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
           </span>
         ) : (
           <span className="h-4 w-4 shrink-0" />
         )}
 
+        {/* Color-coded type icon */}
+        {hasChildren ? (
+          expanded ? (
+            <FolderOpen size={14} style={{ color: hexColor }} className="shrink-0" />
+          ) : (
+            <Folder size={14} style={{ color: hexColor }} className="shrink-0" />
+          )
+        ) : TypeIcon ? (
+          <TypeIcon size={14} style={{ color: hexColor }} className="shrink-0" />
+        ) : null}
+
+        <span className="truncate" title={node.name}>
+          {node.name}
+        </span>
         <Badge variant={TYPE_COLORS[node.type] || 'default'} size="xs">
           {node.type || 'component'}
         </Badge>
-        <span className="truncate">{node.name}</span>
       </button>
 
       {hasChildren && expanded && (

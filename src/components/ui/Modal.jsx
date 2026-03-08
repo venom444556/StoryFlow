@@ -141,10 +141,10 @@ export default function Modal({
           >
             {/* Header */}
             {title && (
-              <div className="flex items-center justify-between border-b border-[var(--border-default)] px-[var(--space-6)] py-[var(--space-4)]">
+              <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-[var(--space-6)] py-[var(--space-4)]">
                 <h2
                   id={titleId.current}
-                  className="text-[var(--text-lg)] font-[var(--font-semibold)] text-[var(--color-fg-default)]"
+                  className="text-[var(--text-lg)] font-semibold text-[var(--color-fg-default)]"
                 >
                   {title}
                 </h2>

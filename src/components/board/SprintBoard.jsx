@@ -125,7 +125,7 @@ function SprintHeader({
                     onDelete?.()
                     setMenuOpen(false)
                   }}
-                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-[var(--color-fg-danger)] hover:bg-[var(--color-bg-glass-hover)]"
+                  className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-xs text-[var(--color-danger)] hover:bg-[var(--color-bg-glass-hover)]"
                 >
                   <Trash2 size={12} /> Delete Sprint
                 </button>

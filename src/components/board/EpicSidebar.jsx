@@ -1,9 +1,19 @@
 import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Layers } from 'lucide-react'
-import IssueTypeIcon from './IssueTypeIcon'
 import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
+
+const EPIC_COLORS = [
+  'bg-purple-400',
+  'bg-blue-400',
+  'bg-cyan-400',
+  'bg-green-400',
+  'bg-yellow-400',
+  'bg-orange-400',
+  'bg-pink-400',
+  'bg-red-400',
+]
 
 export default function EpicSidebar({
   issues = [],
@@ -15,12 +25,18 @@ export default function EpicSidebar({
   // Compute epic data
   const epicData = useMemo(() => {
     const epics = issues.filter((i) => i.type === 'epic')
-    return epics.map((epic) => {
+    return epics.map((epic, idx) => {
       const children = issues.filter((i) => i.epicId === epic.id && i.id !== epic.id)
       const total = children.length
       const done = children.filter((c) => c.status === 'Done').length
       const progress = total > 0 ? Math.round((done / total) * 100) : 0
-      return { ...epic, childCount: total, doneCount: done, progress }
+      return {
+        ...epic,
+        childCount: total,
+        doneCount: done,
+        progress,
+        colorDot: EPIC_COLORS[idx % EPIC_COLORS.length],
+      }
     })
   }, [issues])
 
@@ -113,7 +129,9 @@ export default function EpicSidebar({
                 >
                   {/* Epic title row */}
                   <div className="mb-1.5 flex items-center gap-2">
-                    <IssueTypeIcon type="epic" size={14} />
+                    <span
+                      className={['h-2.5 w-2.5 shrink-0 rounded-full', epic.colorDot].join(' ')}
+                    />
                     <span
                       className={[
                         'min-w-0 flex-1 truncate text-sm font-medium',
@@ -124,6 +142,7 @@ export default function EpicSidebar({
                       style={
                         activeEpicId === epic.id ? { color: 'var(--accent-default)' } : undefined
                       }
+                      title={epic.title}
                     >
                       {epic.title}
                     </span>
@@ -134,17 +153,9 @@ export default function EpicSidebar({
 
                   {/* Stats row */}
                   <div className="mt-1.5 flex items-center justify-between text-[10px]">
+                    <span className="text-[var(--color-fg-muted)]">{epic.childCount} issues</span>
                     <span className="text-[var(--color-fg-muted)]">
                       {epic.doneCount}/{epic.childCount} done
-                    </span>
-                    <span
-                      className={
-                        epic.progress === 100
-                          ? 'text-[var(--color-success)]'
-                          : 'text-[var(--color-fg-muted)]'
-                      }
-                    >
-                      {epic.progress}%
                     </span>
                   </div>
                 </button>

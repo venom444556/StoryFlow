@@ -65,7 +65,7 @@ export default function GanttTimeAxis({
             y1={headerHeight}
             x2={tick.x}
             y2={chartHeight}
-            style={{ stroke: 'var(--th-border, rgba(255,255,255,0.06))' }}
+            style={{ stroke: 'var(--color-border-default)' }}
             strokeWidth={1}
           />
           <text
@@ -75,7 +75,7 @@ export default function GanttTimeAxis({
             dominantBaseline="central"
             fontSize={10}
             fontFamily="Inter, system-ui, sans-serif"
-            style={{ fill: 'var(--th-text-muted, #64748b)' }}
+            style={{ fill: 'var(--color-fg-muted)' }}
           >
             {tick.label}
           </text>

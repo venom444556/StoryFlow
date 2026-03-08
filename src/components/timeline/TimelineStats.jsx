@@ -1,88 +1,71 @@
 import { useMemo } from 'react'
-import { TrendingUp, Layers, Flag, Calendar } from 'lucide-react'
+import { Clock, Flag, Bot } from 'lucide-react'
 import { differenceInDays, parseISO } from 'date-fns'
 import GlassCard from '../ui/GlassCard'
 
-function StatCard({ icon: Icon, value, label, color }) {
-  return (
-    <GlassCard padding="sm">
-      <div className="flex items-center gap-3">
-        <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-          style={{ backgroundColor: `${color}18` }}
-        >
-          <Icon size={18} style={{ color }} />
-        </div>
-        <div className="min-w-0">
-          <div className="text-lg font-bold text-[var(--color-fg-default)] leading-tight">
-            {value}
-          </div>
-          <div className="text-[11px] text-[var(--color-fg-muted)] truncate">{label}</div>
-        </div>
-      </div>
-    </GlassCard>
-  )
-}
-
 export default function TimelineStats({ phases = [], milestones = [] }) {
   const stats = useMemo(() => {
-    // Overall progress
-    const progress =
-      phases.length > 0
-        ? Math.round(phases.reduce((sum, p) => sum + (p.progress || 0), 0) / phases.length)
-        : 0
+    // Days elapsed since earliest startDate
+    let daysElapsed = 0
+    const today = new Date()
+    let earliest = null
+    for (const phase of phases) {
+      if (phase.startDate) {
+        const start = parseISO(phase.startDate)
+        if (!earliest || start < earliest) earliest = start
+      }
+    }
+    if (earliest) {
+      daysElapsed = Math.max(0, differenceInDays(today, earliest))
+    }
 
     // Milestone counts
     const completedMilestones = milestones.filter((m) => m.completed).length
 
-    // Days remaining until latest endDate
-    let daysRemaining = null
-    const today = new Date()
-    for (const phase of phases) {
-      if (phase.endDate) {
-        const end = parseISO(phase.endDate)
-        const diff = differenceInDays(end, today)
-        if (daysRemaining === null || diff > daysRemaining) {
-          daysRemaining = diff
-        }
-      }
-    }
+    // Active phases (in progress)
+    const activePhases = phases.filter(
+      (p) => (p.progress || 0) > 0 && (p.progress || 0) < 100
+    ).length
 
-    return { progress, completedMilestones, daysRemaining }
+    return { daysElapsed, completedMilestones, activePhases }
   }, [phases, milestones])
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <StatCard
-        icon={TrendingUp}
-        value={`${stats.progress}%`}
-        label="Overall Progress"
-        color="#6366f1"
-      />
-      <StatCard
-        icon={Layers}
-        value={phases.length}
-        label={phases.length === 1 ? 'Phase' : 'Phases'}
-        color="#3b82f6"
-      />
-      <StatCard
-        icon={Flag}
-        value={`${stats.completedMilestones}/${milestones.length}`}
-        label="Milestones Done"
-        color="#10b981"
-      />
-      <StatCard
-        icon={Calendar}
-        value={stats.daysRemaining !== null ? stats.daysRemaining : '—'}
-        label={
-          stats.daysRemaining !== null && stats.daysRemaining >= 0
-            ? 'Days Remaining'
-            : stats.daysRemaining !== null
-              ? 'Days Overdue'
-              : 'No End Date'
-        }
-        color={stats.daysRemaining !== null && stats.daysRemaining < 0 ? '#ef4444' : '#f59e0b'}
-      />
-    </div>
+    <GlassCard padding="sm">
+      <div className="flex items-center justify-around divide-x divide-[var(--color-border-default)]">
+        {/* Days elapsed */}
+        <div className="flex items-center gap-2 px-4">
+          <Clock size={14} className="text-[var(--color-fg-muted)]" />
+          <div>
+            <span className="text-sm font-bold text-[var(--color-fg-default)]">
+              {stats.daysElapsed}
+            </span>
+            <span className="ml-1 text-xs text-[var(--color-fg-muted)]">days elapsed</span>
+          </div>
+        </div>
+
+        {/* Milestones */}
+        <div className="flex items-center gap-2 px-4">
+          <Flag size={14} className="text-[var(--color-success)]" />
+          <div>
+            <span className="text-sm font-bold text-[var(--color-fg-default)]">
+              {stats.completedMilestones}/{milestones.length}
+            </span>
+            <span className="ml-1 text-xs text-[var(--color-fg-muted)]">milestones</span>
+          </div>
+        </div>
+
+        {/* Active phases */}
+        <div className="flex items-center gap-2 px-4">
+          <Bot size={14} className="text-[var(--color-info)]" />
+          <div>
+            <span className="text-sm font-bold text-[var(--color-fg-default)]">
+              {stats.activePhases}
+            </span>
+            <span className="ml-1 text-xs text-[var(--color-fg-muted)]">active phases</span>
+          </div>
+        </div>
+      </div>
+    </GlassCard>
   )
 }

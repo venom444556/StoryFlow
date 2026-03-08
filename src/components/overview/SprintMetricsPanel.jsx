@@ -15,7 +15,10 @@ function HorizontalBar({ label, value, max, color }) {
   const pct = max > 0 ? (value / max) * 100 : 0
   return (
     <div className="flex items-center gap-3">
-      <span className="w-20 shrink-0 truncate text-[11px] text-[var(--color-fg-muted)]">
+      <span
+        className="w-20 shrink-0 truncate text-[11px] text-[var(--color-fg-muted)]"
+        title={label}
+      >
         {label}
       </span>
       <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-[var(--color-bg-glass)]">

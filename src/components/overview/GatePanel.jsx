@@ -53,13 +53,15 @@ function GateCard({ gate }) {
           <div className="mt-3 flex items-center gap-2">
             <button
               onClick={handleApprove}
-              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-success)]/15 px-3 py-1.5 text-xs font-medium text-[var(--color-success)] transition-colors hover:bg-[var(--color-success)]/25"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--color-fg-on-accent)] transition-colors hover:opacity-90"
+              style={{ backgroundColor: 'var(--color-success)' }}
             >
               <Check size={12} /> Approve
             </button>
             <button
               onClick={handleReject}
-              className="flex items-center gap-1.5 rounded-lg bg-[var(--color-danger)]/15 px-3 py-1.5 text-xs font-medium text-[var(--color-danger)] transition-colors hover:bg-[var(--color-danger)]/25"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--color-fg-on-accent)] transition-colors hover:opacity-90"
+              style={{ backgroundColor: 'var(--color-danger)' }}
             >
               <XCircle size={12} /> Reject
             </button>
@@ -175,7 +177,7 @@ export default function GatePanel({ projectId }) {
   if (pendingGates.length === 0 && !isBlocked) return null
 
   return (
-    <GlassCard className="border border-amber-400/10">
+    <GlassCard variant="obsidian" className="border border-amber-400/10">
       <div className="mb-3 flex items-center gap-2">
         <ShieldAlert size={14} className="text-amber-400" />
         <h3 className="text-sm font-semibold text-amber-400">Action Required</h3>

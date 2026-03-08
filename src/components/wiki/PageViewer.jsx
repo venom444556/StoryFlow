@@ -20,7 +20,8 @@ export default function PageViewer({
 }) {
   if (!page) return null
 
-  const isAiDraft = page.createdBy === 'ai' && page.status !== 'published'
+  const isAgentPage = page.title?.startsWith('Agent:')
+  const isAiDraft = page.createdBy === 'ai' && page.status !== 'published' && !isAgentPage
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -38,11 +39,13 @@ export default function PageViewer({
 
             {/* Meta row */}
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Badge variant={STATUS_VARIANT[page.status] || 'default'} size="sm">
-                {page.status || 'draft'}
-              </Badge>
+              {!isAgentPage && (
+                <Badge variant={STATUS_VARIANT[page.status] || 'default'} size="sm">
+                  {page.status || 'draft'}
+                </Badge>
+              )}
 
-              {page.createdBy && (
+              {page.createdBy && !isAgentPage && (
                 <ProvenanceBadge
                   actor={page.createdBy}
                   reasoning={page.createdByReasoning}
@@ -58,9 +61,12 @@ export default function PageViewer({
               ))}
 
               {page.updatedAt && (
-                <span className="flex items-center gap-1 text-xs text-[var(--color-fg-subtle)]">
+                <span className="flex items-center gap-1.5 text-xs text-[var(--color-fg-subtle)]">
                   <Clock size={12} />
-                  Updated {formatRelative(page.updatedAt)}
+                  {isAgentPage
+                    ? 'Auto-synced'
+                    : `Last edited by ${page.createdBy === 'ai' ? 'AI Agent' : 'Human'}`}{' '}
+                  {formatRelative(page.updatedAt)}
                 </span>
               )}
             </div>

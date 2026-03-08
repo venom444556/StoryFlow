@@ -93,7 +93,7 @@ export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete,
             cx={midX}
             cy={midY}
             r="10"
-            style={{ fill: 'var(--th-bg)' }}
+            style={{ fill: 'var(--color-bg-base)' }}
             stroke="#ef4444"
             strokeWidth="2"
           />

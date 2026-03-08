@@ -258,6 +258,40 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: Delete Project
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_delete_project',
+  {
+    description:
+      'Soft-delete a StoryFlow project. The project is marked as deleted but can be recovered. Use with caution -- this removes the project from all listings.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID to delete'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, reasoning, confidence, session_id }) => {
+    const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
+    try {
+      const result = await sf.deleteProject(project_id, headers)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error deleting project: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Advance Phase
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -865,13 +899,18 @@ server.registerTool(
       title: z.string().describe('Page title'),
       content: z.string().optional().describe('Page content (markdown)'),
       parent_id: z.string().optional().describe('Parent page ID for nesting'),
+      status: z
+        .enum(['draft', 'published'])
+        .optional()
+        .describe('Page status (default: draft, "Agent:" pages auto-publish)'),
       ...provenanceParams,
     },
   },
-  async ({ project_id, title, content, parent_id, reasoning, confidence, session_id }) => {
+  async ({ project_id, title, content, parent_id, status, reasoning, confidence, session_id }) => {
     const data = { title }
     if (content) data.content = content
     if (parent_id) data.parentId = parent_id
+    if (status) data.status = status
     const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
     const page = await sf.createPage(project_id, data, headers)
     return {
@@ -898,14 +937,35 @@ server.registerTool(
       title: z.string().optional().describe('New title'),
       content: z.string().optional().describe('New content (markdown)'),
       parent_id: z.string().optional().describe('New parent page ID'),
+      status: z.enum(['draft', 'published']).optional().describe('Page status'),
+      labels: z.array(z.string()).optional().describe('Page labels/tags'),
+      pinned: z.boolean().optional().describe('Pin/unpin the page'),
+      icon: z.string().optional().describe('Page icon emoji'),
       ...provenanceParams,
     },
   },
-  async ({ project_id, page_id, title, content, parent_id, reasoning, confidence, session_id }) => {
+  async ({
+    project_id,
+    page_id,
+    title,
+    content,
+    parent_id,
+    status,
+    labels,
+    pinned,
+    icon,
+    reasoning,
+    confidence,
+    session_id,
+  }) => {
     const data = {}
     if (title !== undefined) data.title = title
     if (content !== undefined) data.content = content
     if (parent_id !== undefined) data.parentId = parent_id
+    if (status !== undefined) data.status = status
+    if (labels !== undefined) data.labels = labels
+    if (pinned !== undefined) data.pinned = pinned
+    if (icon !== undefined) data.icon = icon
     const headers = buildProvenanceHeaders({ reasoning, confidence, session_id })
     const page = await sf.updatePage(project_id, page_id, data, headers)
     return {
@@ -1024,6 +1084,51 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: List Decisions
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_decisions',
+  {
+    description: 'List all architecture decisions (ADRs) for a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    const decisions = await sf.listDecisions(project_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(decisions, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Decision
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_decision',
+  {
+    description: 'Get a single decision (ADR) by ID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      decision_id: z.string().describe('Decision ID'),
+    },
+  },
+  async ({ project_id, decision_id }) => {
+    const decisions = await sf.listDecisions(project_id)
+    const decision = decisions.find((d) => d.id === decision_id)
+    if (!decision)
+      return {
+        content: [{ type: 'text', text: `Decision ${decision_id} not found` }],
+        isError: true,
+      }
+    return {
+      content: [{ type: 'text', text: JSON.stringify(decision, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Create Decision
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -1108,6 +1213,48 @@ server.registerTool(
 )
 
 // ---------------------------------------------------------------------------
+// Tool: List Phases
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_phases',
+  {
+    description: 'List all timeline phases for a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    const phases = await sf.listPhases(project_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(phases, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Phase
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_phase',
+  {
+    description: 'Get a single timeline phase by ID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      phase_id: z.string().describe('Phase ID'),
+    },
+  },
+  async ({ project_id, phase_id }) => {
+    const phases = await sf.listPhases(project_id)
+    const phase = phases.find((p) => p.id === phase_id)
+    if (!phase)
+      return { content: [{ type: 'text', text: `Phase ${phase_id} not found` }], isError: true }
+    return {
+      content: [{ type: 'text', text: JSON.stringify(phase, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
 // Tool: Create Phase
 // ---------------------------------------------------------------------------
 server.registerTool(
@@ -1181,6 +1328,51 @@ server.registerTool(
     await sf.deletePhase(project_id, phase_id, headers)
     return {
       content: [{ type: 'text', text: `Phase ${phase_id} deleted successfully.` }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: List Milestones
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_milestones',
+  {
+    description: 'List all timeline milestones for a project.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    const milestones = await sf.listMilestones(project_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(milestones, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Milestone
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_milestone',
+  {
+    description: 'Get a single timeline milestone by ID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      milestone_id: z.string().describe('Milestone ID'),
+    },
+  },
+  async ({ project_id, milestone_id }) => {
+    const milestones = await sf.listMilestones(project_id)
+    const milestone = milestones.find((m) => m.id === milestone_id)
+    if (!milestone)
+      return {
+        content: [{ type: 'text', text: `Milestone ${milestone_id} not found` }],
+        isError: true,
+      }
+    return {
+      content: [{ type: 'text', text: JSON.stringify(milestone, null, 2) }],
     }
   }
 )
@@ -1454,6 +1646,26 @@ server.registerTool(
     const comps = await sf.listArchitectureComponents(project_id)
     return {
       content: [{ type: 'text', text: JSON.stringify(comps, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Get Architecture Component
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_get_architecture_component',
+  {
+    description: 'Get a single architecture component by ID.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      component_id: z.string().describe('Component ID'),
+    },
+  },
+  async ({ project_id, component_id }) => {
+    const comp = await sf.getArchitectureComponent(project_id, component_id)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(comp, null, 2) }],
     }
   }
 )
@@ -2338,6 +2550,52 @@ server.registerTool(
         content: [{ type: 'text', text: `Error: ${err.message}` }],
         isError: true,
       }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Steer (submit directive to human)
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_steer',
+  {
+    description:
+      'Submit a steering directive to the human. Use this when you need human input, approval, or want to flag something for attention.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      text: z.string().describe('The steering message or question for the human'),
+      priority: z
+        .enum(['low', 'normal', 'high', 'critical'])
+        .optional()
+        .describe('Priority of the directive (default: normal)'),
+    },
+  },
+  async ({ project_id, text, priority }) => {
+    const directive = await sf.steer(project_id, text, priority || 'normal')
+    return {
+      content: [{ type: 'text', text: JSON.stringify(directive, null, 2) }],
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Check Duplicate
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_check_duplicate',
+  {
+    description:
+      'Check if an issue title already exists in the project before creating a new one. Returns potential duplicates.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      title: z.string().describe('The issue title to check for duplicates'),
+    },
+  },
+  async ({ project_id, title }) => {
+    const result = await sf.checkDuplicate(project_id, title)
+    return {
+      content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
     }
   }
 )

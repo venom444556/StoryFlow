@@ -1,19 +1,40 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { X, Plus, Trash2, ChevronDown, ChevronRight, Calendar, Scale } from 'lucide-react'
+import {
+  X,
+  Plus,
+  Trash2,
+  ChevronDown,
+  ChevronRight,
+  Calendar,
+  Bot,
+  User,
+  MessageSquare,
+  Send,
+} from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import Button from '../ui/Button'
+import Badge from '../ui/Badge'
 import Select from '../ui/Select'
 import TagInput from '../ui/TagInput'
+import ProvenanceBadge from '../ui/ProvenanceBadge'
 import ConfirmDialog from '../ui/ConfirmDialog'
-import { formatDate } from '../../utils/dates'
+import { formatDate, formatRelative } from '../../utils/dates'
 import { generateId } from '../../utils/ids'
 
 const STATUS_OPTIONS = [
   { value: 'proposed', label: 'Proposed' },
   { value: 'accepted', label: 'Accepted' },
   { value: 'superseded', label: 'Superseded' },
+  { value: 'deprecated', label: 'Deprecated' },
 ]
+
+const STATUS_VARIANT = {
+  proposed: 'yellow',
+  accepted: 'green',
+  superseded: 'gray',
+  deprecated: 'red',
+}
 
 function InlineTextArea({ value, onChange, placeholder, rows = 3, className = '' }) {
   return (
@@ -108,8 +129,40 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
   )
 }
 
-export default function DecisionDetail({ decision, onUpdate, onClose }) {
+function CommentItem({ comment }) {
+  const isAi = comment.author === 'ai'
+  return (
+    <div className="flex gap-3">
+      <div
+        className={[
+          'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs',
+          isAi
+            ? 'bg-[var(--color-ai-bg)] text-[var(--color-ai-accent)]'
+            : 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-muted)]',
+        ].join(' ')}
+      >
+        {isAi ? <Bot size={14} /> : <User size={14} />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-[var(--color-fg-default)]">
+            {isAi ? 'AI Agent' : 'Human'}
+          </span>
+          {comment.createdAt && (
+            <span className="text-[10px] text-[var(--color-fg-subtle)]">
+              {formatRelative(comment.createdAt)}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-sm leading-relaxed text-[var(--color-fg-muted)]">{comment.text}</p>
+      </div>
+    </div>
+  )
+}
+
+export default function DecisionDetail({ decision, index = 0, onUpdate, onClose }) {
   const [removeAltId, setRemoveAltId] = useState(null)
+  const [commentText, setCommentText] = useState('')
 
   const handleFieldChange = useCallback(
     (field) => (e) => {
@@ -158,6 +211,21 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
     setRemoveAltId(null)
   }, [removeAltId, decision.id, decision.alternatives, onUpdate])
 
+  const handleAddComment = useCallback(() => {
+    if (!commentText.trim()) return
+    const comments = [...(decision.comments || [])]
+    comments.push({
+      id: generateId(),
+      author: 'human',
+      text: commentText.trim(),
+      createdAt: new Date().toISOString(),
+    })
+    onUpdate(decision.id, { comments })
+    setCommentText('')
+  }, [commentText, decision.id, decision.comments, onUpdate])
+
+  const statusVariant = STATUS_VARIANT[decision.status] || 'default'
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 24 }}
@@ -167,51 +235,84 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
       className="flex h-full flex-col"
     >
       <GlassCard padding="none" className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <Scale size={18} className="text-purple-400" />
-            <span className="text-sm font-semibold text-[var(--color-fg-default)]">
-              Decision Detail
-            </span>
+        {/* Header — ADR number + title + status */}
+        <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-fg-subtle)]">
+                  ADR-{String(index + 1).padStart(3, '0')}
+                </span>
+                <Badge variant={statusVariant} size="sm" outline>
+                  {decision.status || 'proposed'}
+                </Badge>
+                {decision.createdBy && (
+                  <ProvenanceBadge
+                    actor={decision.createdBy}
+                    reasoning={decision.createdByReasoning}
+                    timestamp={decision.createdAt}
+                    size="xs"
+                  />
+                )}
+              </div>
+              <input
+                value={decision.title || ''}
+                onChange={handleFieldChange('title')}
+                placeholder="Decision title"
+                className="w-full bg-transparent text-lg font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Select
+                value={decision.status}
+                options={STATUS_OPTIONS}
+                onChange={handleStatusChange}
+                className="w-32"
+              />
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
-          >
-            <X size={18} />
-          </button>
         </div>
 
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-5 py-5">
           <div className="space-y-6">
-            {/* Title & Status */}
-            <div>
-              <SectionHeader>Title & Status</SectionHeader>
-              <div className="space-y-3">
-                <input
-                  value={decision.title || ''}
-                  onChange={handleFieldChange('title')}
-                  placeholder="Decision title"
-                  className="glass-input w-full px-3 py-2 text-base font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
-                />
-                <Select
-                  label="Status"
-                  value={decision.status}
-                  options={STATUS_OPTIONS}
-                  onChange={handleStatusChange}
-                />
+            {/* AI proposer card */}
+            {decision.createdBy === 'ai' && (
+              <div className="flex items-center gap-3 rounded-lg border border-[var(--color-ai-border)] bg-[var(--color-ai-bg)] px-4 py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-ai-accent)]/20 text-[var(--color-ai-accent)]">
+                  <Bot size={16} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-xs font-medium text-[var(--color-ai-accent)]">
+                    Proposed by AI Agent
+                  </span>
+                  {decision.createdByReasoning && (
+                    <p className="mt-0.5 text-xs text-[var(--color-fg-muted)]">
+                      {decision.createdByReasoning}
+                    </p>
+                  )}
+                </div>
+                {decision.confidence !== undefined && decision.confidence !== null && (
+                  <div className="shrink-0 text-right">
+                    <span className="text-lg font-semibold text-[var(--color-ai-accent)]">
+                      {Math.round(decision.confidence * 100)}%
+                    </span>
+                    <p className="text-[10px] text-[var(--color-fg-subtle)]">confidence</p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
             {/* Context */}
             <div>
               <SectionHeader>Context</SectionHeader>
-              <p className="mb-2 text-xs text-[var(--color-fg-muted)]">
-                What prompted this decision?
-              </p>
               <InlineTextArea
                 value={decision.context}
                 onChange={handleFieldChange('context')}
@@ -220,19 +321,21 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
               />
             </div>
 
-            {/* Decision */}
+            {/* Decision — styled as quote block */}
             <div>
               <SectionHeader>Decision</SectionHeader>
-              <p className="mb-2 text-xs text-[var(--color-fg-muted)]">What was decided?</p>
-              <InlineTextArea
-                value={decision.decision}
-                onChange={handleFieldChange('decision')}
-                placeholder="Describe the decision that was made..."
-                rows={3}
-              />
+              <div className="rounded-lg border-l-4 border-l-[var(--accent-default)] bg-[var(--color-bg-glass)] pl-4 pr-3 py-3">
+                <InlineTextArea
+                  value={decision.decision}
+                  onChange={handleFieldChange('decision')}
+                  placeholder="Describe the decision that was made..."
+                  rows={3}
+                  className="bg-transparent"
+                />
+              </div>
             </div>
 
-            {/* Alternatives */}
+            {/* Alternatives Analysis */}
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <SectionHeader className="mb-0">Alternatives Considered</SectionHeader>
@@ -259,18 +362,39 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
               )}
             </div>
 
-            {/* Consequences */}
+            {/* Consequences — positive / negative grid */}
             <div>
               <SectionHeader>Consequences</SectionHeader>
-              <p className="mb-2 text-xs text-[var(--color-fg-muted)]">
-                What are the implications?
-              </p>
-              <InlineTextArea
-                value={decision.consequences}
-                onChange={handleFieldChange('consequences')}
-                placeholder="Describe the expected consequences..."
-                rows={3}
-              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 flex items-center gap-1.5 text-xs text-[var(--color-success)]">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
+                    Positive
+                  </label>
+                  <InlineTextArea
+                    value={decision.consequencesPositive || decision.consequences || ''}
+                    onChange={(e) =>
+                      onUpdate(decision.id, { consequencesPositive: e.target.value })
+                    }
+                    placeholder="Benefits and positive outcomes..."
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 flex items-center gap-1.5 text-xs text-[var(--color-danger)]">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-danger)]" />
+                    Negative
+                  </label>
+                  <InlineTextArea
+                    value={decision.consequencesNegative || ''}
+                    onChange={(e) =>
+                      onUpdate(decision.id, { consequencesNegative: e.target.value })
+                    }
+                    placeholder="Trade-offs and risks..."
+                    rows={3}
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Tags */}
@@ -311,6 +435,44 @@ export default function DecisionDetail({ decision, onUpdate, onClose }) {
                     <span>Updated: {formatDate(decision.updatedAt)}</span>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Comment Thread */}
+            <div>
+              <SectionHeader>
+                <span className="flex items-center gap-1.5">
+                  <MessageSquare size={12} />
+                  Discussion ({(decision.comments || []).length})
+                </span>
+              </SectionHeader>
+              {(decision.comments || []).length > 0 && (
+                <div className="mb-4 space-y-4">
+                  {decision.comments.map((comment) => (
+                    <CommentItem key={comment.id} comment={comment} />
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <input
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      handleAddComment()
+                    }
+                  }}
+                  placeholder="Add a comment..."
+                  className="glass-input flex-1 px-3 py-2 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
+                />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={Send}
+                  onClick={handleAddComment}
+                  disabled={!commentText.trim()}
+                />
               </div>
             </div>
           </div>

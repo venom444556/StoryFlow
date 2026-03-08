@@ -20,6 +20,7 @@ export default function ProgressBar({
   className = '',
   color,
   animated = true,
+  glow = false,
 }) {
   const clampedValue = Math.max(0, Math.min(100, value))
   const barColor = color || getBarColor(clampedValue)
@@ -47,6 +48,7 @@ export default function ProgressBar({
               duration: 0.6,
               ease: [0.4, 0, 0.2, 1],
             }}
+            style={glow ? { boxShadow: '0 0 8px currentColor, 0 0 2px currentColor' } : undefined}
           />
         ) : (
           <div
@@ -54,12 +56,13 @@ export default function ProgressBar({
             style={{
               width: `${clampedValue}%`,
               transitionDuration: 'var(--duration-slow)',
+              ...(glow ? { boxShadow: '0 0 8px currentColor, 0 0 2px currentColor' } : {}),
             }}
           />
         )}
       </div>
       {showLabel && (
-        <span className="shrink-0 text-[var(--text-xs)] font-[var(--font-medium)] text-[var(--color-fg-subtle)] tabular-nums">
+        <span className="shrink-0 text-[var(--text-xs)] font-medium text-[var(--color-fg-subtle)] tabular-nums">
           {Math.round(clampedValue)}%
         </span>
       )}

@@ -78,7 +78,7 @@ export default function Button({
     <Tag
       {...(isButton ? { type } : {})}
       className={[
-        `inline-flex items-center justify-center whitespace-nowrap ${radiusClass} font-[var(--font-medium)]`,
+        `inline-flex items-center justify-center whitespace-nowrap ${radiusClass} font-medium`,
         'transition-all outline-none',
         VARIANTS[variant] || VARIANTS.primary,
         SIZES[size] || SIZES.md,

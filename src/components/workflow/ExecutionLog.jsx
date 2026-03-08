@@ -42,7 +42,7 @@ export default function ExecutionLog({ logs = [], onClear }) {
   return (
     <div
       className="flex h-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
-      style={{ backgroundColor: 'var(--th-panel)' }}
+      style={{ backgroundColor: 'var(--color-bg-glass)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">

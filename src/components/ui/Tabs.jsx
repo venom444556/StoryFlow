@@ -69,7 +69,7 @@ export default function Tabs({
             tabIndex={isActive ? 0 : -1}
             className={[
               'relative flex items-center gap-[var(--space-2)] rounded-[var(--radius-pill)]',
-              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
+              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-medium',
               'transition-colors outline-none',
               'focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-inset',
               isActive

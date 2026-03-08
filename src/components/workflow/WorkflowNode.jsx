@@ -222,7 +222,7 @@ export default function WorkflowNode({
         zIndex: isSelected ? 20 : 2,
         cursor: 'grab',
         transition: 'border-color 0.2s, box-shadow 0.2s, ring 0.2s',
-        backgroundColor: 'var(--th-panel)',
+        backgroundColor: 'var(--color-bg-glass)',
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={(e) => {
@@ -274,7 +274,10 @@ export default function WorkflowNode({
         {/* Config preview */}
         {configPreview && (
           <div className="mt-2 rounded-md bg-[var(--color-bg-glass)] px-2 py-1.5">
-            <code className="block truncate text-[10px] leading-tight text-[var(--color-fg-muted)]">
+            <code
+              className="block truncate text-[10px] leading-tight text-[var(--color-fg-muted)]"
+              title={configPreview}
+            >
               {configPreview}
             </code>
           </div>
@@ -283,7 +286,10 @@ export default function WorkflowNode({
         {/* Description preview (only if no config preview) */}
         {node.description && !configPreview && (
           <div className="mt-2">
-            <p className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]">
+            <p
+              className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]"
+              title={node.description}
+            >
               {node.description}
             </p>
           </div>
@@ -293,7 +299,9 @@ export default function WorkflowNode({
         {node.error && (
           <div className="mt-2 flex items-start gap-1 text-[11px] text-red-400">
             <AlertCircle size={12} className="mt-0.5 flex-shrink-0" />
-            <span className="line-clamp-2">{node.error}</span>
+            <span className="line-clamp-2" title={node.error}>
+              {node.error}
+            </span>
           </div>
         )}
 

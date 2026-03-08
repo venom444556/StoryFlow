@@ -111,7 +111,7 @@ export default function GanttChart({
             y={0}
             width={chartWidth}
             height={HEADER_HEIGHT}
-            style={{ fill: 'var(--th-panel, rgba(15,23,42,0.6))' }}
+            style={{ fill: 'var(--color-bg-glass)' }}
           />
 
           {/* Header bottom border */}
@@ -120,7 +120,7 @@ export default function GanttChart({
             y1={HEADER_HEIGHT}
             x2={chartWidth}
             y2={HEADER_HEIGHT}
-            style={{ stroke: 'var(--th-border-hover, rgba(255,255,255,0.12))' }}
+            style={{ stroke: 'var(--color-border-emphasis)' }}
             strokeWidth={1}
           />
 
@@ -133,7 +133,7 @@ export default function GanttChart({
                 y1={HEADER_HEIGHT + i * ROW_HEIGHT}
                 x2={chartWidth}
                 y2={HEADER_HEIGHT + i * ROW_HEIGHT}
-                style={{ stroke: 'var(--th-border, rgba(255,255,255,0.06))' }}
+                style={{ stroke: 'var(--color-border-default)' }}
                 strokeWidth={1}
               />
             ) : null
@@ -144,7 +144,7 @@ export default function GanttChart({
             y1={HEADER_HEIGHT + sortedPhases.length * ROW_HEIGHT}
             x2={chartWidth}
             y2={HEADER_HEIGHT + sortedPhases.length * ROW_HEIGHT}
-            style={{ stroke: 'var(--th-border, rgba(255,255,255,0.06))' }}
+            style={{ stroke: 'var(--color-border-default)' }}
             strokeWidth={1}
           />
 
@@ -154,7 +154,7 @@ export default function GanttChart({
             y1={0}
             x2={LABEL_WIDTH}
             y2={chartHeight}
-            style={{ stroke: 'var(--th-border, rgba(255,255,255,0.06))' }}
+            style={{ stroke: 'var(--color-border-default)' }}
             strokeWidth={1}
           />
 

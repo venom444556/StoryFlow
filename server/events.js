@@ -223,10 +223,14 @@ export function queryEvents(projectId, filters = {}) {
     columns.forEach((col, i) => {
       obj[col] = row[i]
     })
-    // Parse JSON fields
-    if (obj.changes) obj.changes = JSON.parse(obj.changes)
-    if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
-    if (obj.data) obj.data = JSON.parse(obj.data)
+    // Parse JSON fields (guard against corrupted data)
+    try {
+      if (obj.changes) obj.changes = JSON.parse(obj.changes)
+      if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
+      if (obj.data) obj.data = JSON.parse(obj.data)
+    } catch {
+      // Leave as raw string if JSON is corrupted
+    }
     return obj
   })
 }
@@ -244,9 +248,13 @@ export function getEvent(eventId) {
   columns.forEach((col, i) => {
     obj[col] = row[i]
   })
-  if (obj.changes) obj.changes = JSON.parse(obj.changes)
-  if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
-  if (obj.data) obj.data = JSON.parse(obj.data)
+  try {
+    if (obj.changes) obj.changes = JSON.parse(obj.changes)
+    if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
+    if (obj.data) obj.data = JSON.parse(obj.data)
+  } catch {
+    // Leave as raw string if JSON is corrupted
+  }
   return obj
 }
 

@@ -304,6 +304,27 @@ app.put('/api/projects/:id', (req, res) => {
   })
 })
 
+app.delete('/api/projects/:id', (req, res) => {
+  withProjectLock(req.params.id, () => {
+    const project = db.getProject(req.params.id)
+    if (!project) return res.status(404).json({ error: 'Project not found' })
+    db.softDeleteProject(req.params.id)
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'delete',
+      entityType: 'project',
+      entityId: req.params.id,
+      entityTitle: project.name,
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json({ success: true, message: `Project "${project.name}" deleted` })
+  })
+})
+
 // --- Board summary ---
 app.get('/api/projects/:id/board-summary', (req, res) => {
   const summary = db.getBoardSummary(req.params.id)

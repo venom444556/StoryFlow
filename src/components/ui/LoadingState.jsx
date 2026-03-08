@@ -45,7 +45,7 @@ export default function LoadingState({
     return (
       <div
         className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-base)]/80"
-        style={{ zIndex: 'var(--z-overlay)' }}
+        style={{ zIndex: 'var(--z-drawer)' }}
       >
         {content}
       </div>

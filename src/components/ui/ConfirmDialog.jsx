@@ -20,7 +20,7 @@ export default function ConfirmDialog({
           <Icon size={24} className="text-[var(--color-danger)]" aria-hidden="true" />
         </div>
 
-        <h3 className="mb-[var(--space-2)] text-[var(--text-lg)] font-[var(--font-semibold)] text-[var(--color-fg-default)]">
+        <h3 className="mb-[var(--space-2)] text-[var(--text-lg)] font-semibold text-[var(--color-fg-default)]">
           {title}
         </h3>
         <p className="mb-[var(--space-6)] text-[var(--text-sm)] text-[var(--color-fg-subtle)]">

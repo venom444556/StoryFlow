@@ -107,7 +107,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
       className="flex h-full w-72 flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
-      style={{ backgroundColor: 'var(--th-panel)' }}
+      style={{ backgroundColor: 'var(--color-bg-glass)' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--color-border-default)] px-4 py-3">
@@ -160,7 +160,7 @@ export default function NodeProperties({ node, onUpdate, onDelete, onClose }) {
           <div>
             <label className="mb-1.5 block text-sm text-[var(--color-fg-muted)]">Status</label>
             <Badge variant={STATUS_BADGE_VARIANT[node.status] || 'gray'} dot>
-              {node.status.charAt(0).toUpperCase() + node.status.slice(1)}
+              {(node.status || 'idle').charAt(0).toUpperCase() + (node.status || 'idle').slice(1)}
             </Badge>
           </div>
 

@@ -7,6 +7,8 @@ import ChartsPanel from '../board/ChartsPanel'
 import FilterBar from '../board/FilterBar'
 import EpicSidebar from '../board/EpicSidebar'
 import IssueDetail from '../board/IssueDetail'
+import SprintHealthWidget from '../board/SprintHealthWidget'
+import Badge from '../ui/Badge'
 import ConfirmDialog from '../ui/ConfirmDialog'
 import { canonicalizeLabel } from '../../utils/labelDefinitions'
 
@@ -207,6 +209,36 @@ export default function BoardTab({
 
   return (
     <div className="flex h-full flex-col">
+      {/* Sprint header with health widget */}
+      {board?.sprints?.length > 0 && (
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Badge variant="purple" size="md">
+              {board.sprints[board.sprints.length - 1]?.name || 'Sprint'}
+            </Badge>
+            {board.sprints[board.sprints.length - 1]?.startDate && (
+              <span className="text-xs text-[var(--color-fg-subtle)]">
+                {new Date(board.sprints[board.sprints.length - 1].startDate).toLocaleDateString(
+                  undefined,
+                  { month: 'short', day: 'numeric' }
+                )}
+                {board.sprints[board.sprints.length - 1].endDate && (
+                  <>
+                    {' '}
+                    —{' '}
+                    {new Date(board.sprints[board.sprints.length - 1].endDate).toLocaleDateString(
+                      undefined,
+                      { month: 'short', day: 'numeric' }
+                    )}
+                  </>
+                )}
+              </span>
+            )}
+          </div>
+          <SprintHealthWidget sprint={board.sprints[board.sprints.length - 1]} issues={allIssues} />
+        </div>
+      )}
+
       {/* Toolbar: view-mode switcher + epic toggle + charts toggle */}
       <div className="mb-4 flex items-center gap-3">
         {/* Segmented view-mode control */}

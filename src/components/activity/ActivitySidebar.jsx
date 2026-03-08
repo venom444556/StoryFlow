@@ -121,7 +121,10 @@ function EventItem({ event }) {
 
           {/* Reasoning preview */}
           {event.reasoning && (
-            <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[var(--color-fg-subtle)]">
+            <p
+              className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[var(--color-fg-subtle)]"
+              title={event.reasoning}
+            >
               {event.reasoning}
             </p>
           )}

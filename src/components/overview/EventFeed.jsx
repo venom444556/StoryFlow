@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
-import ProvenanceBadge from '../ui/ProvenanceBadge'
+import AIBadge from '../ui/AIBadge'
 
 const ACTION_ICONS = {
   create: Plus,
@@ -103,10 +103,12 @@ function FeedItem({ event }) {
       transition={{ duration: 0.15 }}
       className={[
         'group flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--color-bg-glass)]',
-        isPendingGate && 'border-l-2 border-l-amber-400/60 bg-amber-400/5',
+        'border-l-[3px]',
+        isPendingGate ? 'border-l-amber-400/60 bg-amber-400/5' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      style={!isPendingGate ? { borderLeftColor: categoryColor } : undefined}
     >
       {/* Category-colored icon */}
       <div
@@ -121,7 +123,10 @@ function FeedItem({ event }) {
         <p className="text-[13px] leading-snug text-[var(--color-fg-default)]">{description}</p>
 
         {event.reasoning && (
-          <p className="mt-0.5 line-clamp-1 text-[11px] text-[var(--color-fg-subtle)]">
+          <p
+            className="mt-0.5 line-clamp-1 text-[11px] text-[var(--color-fg-subtle)]"
+            title={event.reasoning}
+          >
             {event.reasoning}
           </p>
         )}
@@ -136,12 +141,7 @@ function FeedItem({ event }) {
 
         {/* Meta row */}
         <div className="mt-1 flex items-center gap-2">
-          <ProvenanceBadge
-            actor={event.actor}
-            confidence={event.confidence}
-            reasoning={event.reasoning}
-            size="xs"
-          />
+          <AIBadge source={event.actor === 'ai' ? 'ai' : 'human'} />
           <span
             className="rounded-full px-1.5 py-px text-[9px] font-medium"
             style={{

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Plus, Flag, BarChart3, List, Clock } from 'lucide-react'
+import { Plus, Flag, BarChart3, List, Clock, Download } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Button from '../ui/Button'
 import Tabs from '../ui/Tabs'
@@ -12,8 +12,8 @@ import PhaseForm from '../timeline/PhaseForm'
 import MilestoneForm from '../timeline/MilestoneForm'
 
 const VIEW_TABS = [
-  { key: 'chart', label: 'Chart', icon: BarChart3 },
-  { key: 'list', label: 'List', icon: List },
+  { key: 'list', label: 'Phase Overview', icon: List },
+  { key: 'chart', label: 'Gantt Chart', icon: BarChart3 },
 ]
 
 const TIME_SCALES = [
@@ -30,7 +30,7 @@ export default function TimelineTab({
   updateMilestone,
   deleteMilestone,
 }) {
-  const [view, setView] = useState('chart')
+  const [view, setView] = useState('list')
   const [timeScale, setTimeScale] = useState('weeks')
 
   // Phase CRUD state
@@ -119,6 +119,9 @@ export default function TimelineTab({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" icon={Download} onClick={() => window.print()}>
+            Export
+          </Button>
           <Button variant="ghost" icon={Flag} onClick={() => setShowMilestoneForm(true)}>
             Add Milestone
           </Button>
@@ -126,11 +129,6 @@ export default function TimelineTab({
             Add Phase
           </Button>
         </div>
-      </div>
-
-      {/* Stats row */}
-      <div className="mb-5">
-        <TimelineStats phases={phases} milestones={milestones} />
       </div>
 
       {/* Sub-tabs + time scale toggle */}
@@ -239,6 +237,13 @@ export default function TimelineTab({
         milestone={editingMilestone}
         phases={phases}
       />
+
+      {/* Stats footer */}
+      {(phases.length > 0 || milestones.length > 0) && (
+        <div className="mt-5">
+          <TimelineStats phases={phases} milestones={milestones} />
+        </div>
+      )}
 
       {/* Delete confirm dialogs */}
       <ConfirmDialog

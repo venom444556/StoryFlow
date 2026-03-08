@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
-import { Clock, Tag } from 'lucide-react'
-import IssueTypeIcon from './IssueTypeIcon'
+import { Clock, Tag, MessageSquare, Sparkles } from 'lucide-react'
 import Avatar from '../ui/Avatar'
 import Badge from '../ui/Badge'
+import TypeBadge from '../ui/TypeBadge'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
+import BlockedBanner from './BlockedBanner'
 import { getConfidenceLevel } from '../../utils/confidence'
 import { getStaleInfo } from '../../utils/staleness'
 import { useSettings } from '../../contexts/SettingsContext'
@@ -75,10 +76,18 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
             : undefined
       }
     >
-      {/* Top row: type icon + key + provenance */}
+      {/* Top row: type badge + key + AI sparkle + provenance */}
       <div className="mb-2 flex items-center gap-2">
-        <IssueTypeIcon type={issue.type} size={14} />
+        <TypeBadge type={issue.type} />
         <span className="text-xs font-medium text-[var(--color-fg-muted)]">{issue.key}</span>
+        {isAiCreated && (
+          <span
+            className="flex items-center gap-0.5 text-[10px] text-[var(--color-ai-accent)]"
+            title="AI Generated"
+          >
+            <Sparkles size={10} />
+          </span>
+        )}
         <div className="flex-1" />
         {issue.createdBy && (
           <ProvenanceBadge
@@ -91,8 +100,16 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         )}
       </div>
 
+      {/* Blocked banner */}
+      {issue.status === 'Blocked' && (
+        <BlockedBanner blockedAt={issue.blockedAt || issue.updatedAt} />
+      )}
+
       {/* Title */}
-      <p className="mb-2.5 line-clamp-2 text-sm font-medium leading-snug text-[var(--color-fg-default)] group-hover:text-[var(--color-fg-default)]">
+      <p
+        className="mb-2.5 line-clamp-2 text-sm font-medium leading-snug text-[var(--color-fg-default)] group-hover:text-[var(--color-fg-default)]"
+        title={issue.title}
+      >
         {issue.title}
       </p>
 
@@ -104,7 +121,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         </div>
       )}
 
-      {/* Bottom row: priority, points, assignee, labels */}
+      {/* Bottom row: priority, points, comments, labels, assignee */}
       <div className="flex items-center gap-2">
         {/* Priority badge */}
         {issue.priority && (
@@ -125,6 +142,17 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
 
         {/* Spacer */}
         <div className="flex-1" />
+
+        {/* Comment count */}
+        {issue.comments && issue.comments.length > 0 && (
+          <span
+            className="flex items-center gap-0.5 text-[10px] text-[var(--color-fg-muted)]"
+            title={`${issue.comments.length} comments`}
+          >
+            <MessageSquare size={10} />
+            {issue.comments.length}
+          </span>
+        )}
 
         {/* Labels count */}
         {issue.labels && issue.labels.length > 0 && (

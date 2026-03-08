@@ -10,40 +10,49 @@ export default function OverviewTab({ project }) {
   if (!project) return null
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
+    <div className="mx-auto max-w-6xl space-y-5">
       {/* AI Status — hero card at the top */}
       <div className="animate-entrance stagger-1">
         <AIStatusCard />
       </div>
 
-      {/* Gate approvals + escalations — only renders when gates exist or AI is blocked */}
-      <div className="animate-entrance stagger-2">
-        <GatePanel projectId={project.id} />
-      </div>
+      {/* Two-column grid: gates+events left, metrics+sessions right */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+        {/* Left column — primary content */}
+        <div className="space-y-5">
+          {/* Gate approvals + escalations */}
+          <div className="animate-entrance stagger-2">
+            <GatePanel projectId={project.id} />
+          </div>
 
-      {/* Metrics row */}
-      <div className="animate-entrance stagger-3">
-        <MetricsSummary project={project} />
-      </div>
+          {/* Event Feed */}
+          <div className="animate-entrance stagger-3">
+            <EventFeed />
+          </div>
 
-      {/* Sprint metrics — velocity, cycle time, status distribution */}
-      <div className="animate-entrance stagger-4">
-        <SprintMetricsPanel project={project} />
-      </div>
+          {/* Steering Bar — input at the bottom of left column */}
+          <div className="animate-entrance stagger-6">
+            <SteeringBar projectId={project.id} />
+          </div>
+        </div>
 
-      {/* Event Feed — primary content */}
-      <div className="animate-entrance stagger-5">
-        <EventFeed />
-      </div>
+        {/* Right column — metrics + sessions */}
+        <div className="space-y-5">
+          {/* Metrics row */}
+          <div className="animate-entrance stagger-3">
+            <MetricsSummary project={project} />
+          </div>
 
-      {/* Session History — past agent work sessions */}
-      <div className="animate-entrance stagger-6">
-        <SessionHistory projectId={project.id} />
-      </div>
+          {/* Sprint metrics */}
+          <div className="animate-entrance stagger-4">
+            <SprintMetricsPanel project={project} />
+          </div>
 
-      {/* Steering Bar — fixed-feeling input at the bottom */}
-      <div className="animate-entrance stagger-7">
-        <SteeringBar projectId={project.id} />
+          {/* Session History */}
+          <div className="animate-entrance stagger-5">
+            <SessionHistory projectId={project.id} />
+          </div>
+        </div>
       </div>
     </div>
   )

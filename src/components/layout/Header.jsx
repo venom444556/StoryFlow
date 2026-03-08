@@ -37,7 +37,7 @@ function Toast({ message, type = 'success', onDone }) {
       className={[
         'absolute right-[var(--space-6)] top-full mt-[var(--space-2)]',
         'rounded-[var(--radius-lg)] border px-[var(--space-4)] py-[var(--space-2)]',
-        'text-[var(--text-xs)] font-[var(--font-medium)] shadow-[var(--shadow-toast)]',
+        'text-[var(--text-xs)] font-medium shadow-[var(--shadow-toast)]',
         colorClasses,
       ].join(' ')}
       style={{ zIndex: 'var(--z-toast)' }}
@@ -192,7 +192,7 @@ export default function Header({
                 <span
                   className={
                     isLast
-                      ? 'font-[var(--font-medium)] text-[var(--color-fg-default)]'
+                      ? 'font-medium text-[var(--color-fg-default)]'
                       : 'text-[var(--color-fg-muted)]'
                   }
                 >
@@ -202,9 +202,7 @@ export default function Header({
             )
           })}
           {breadcrumbs.length === 0 && (
-            <span className="font-[var(--font-medium)] text-[var(--color-fg-default)]">
-              Dashboard
-            </span>
+            <span className="font-medium text-[var(--color-fg-default)]">Dashboard</span>
           )}
         </nav>
       </div>
@@ -231,7 +229,7 @@ export default function Header({
             className={[
               'hidden rounded-[var(--radius-sm)] border border-[var(--color-border-default)]',
               'bg-[var(--color-bg-glass)] px-[var(--space-1)] py-0.5',
-              'text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]',
+              'text-[10px] font-medium text-[var(--color-fg-muted)]',
               'sm:inline-block',
             ].join(' ')}
           >

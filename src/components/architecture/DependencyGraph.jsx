@@ -377,7 +377,7 @@ export default function DependencyGraph({
   return (
     <div
       ref={canvasRef}
-      className="relative flex-1 overflow-hidden bg-surface-primary rounded-xl"
+      className="relative flex-1 overflow-hidden bg-[var(--color-surface-primary)] rounded-xl"
       style={{
         cursor: canvasCursor,
         minHeight: 400,
@@ -442,7 +442,7 @@ export default function DependencyGraph({
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
                 opacity: highlightIds && !highlightIds.has(comp.id) ? 0.15 : 1,
                 transition: 'border-color 0.2s, box-shadow 0.2s, opacity 0.2s',
-                backgroundColor: 'var(--th-panel)',
+                backgroundColor: 'var(--color-bg-glass)',
               }}
               onMouseDown={(e) => handleNodeMouseDown(comp.id, e)}
             >
@@ -460,7 +460,10 @@ export default function DependencyGraph({
                       <TypeIcon size={13} style={{ color: hexColor }} />
                     </div>
                   )}
-                  <span className="flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]">
+                  <span
+                    className="flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]"
+                    title={comp.name}
+                  >
                     {comp.name}
                   </span>
                 </div>
@@ -483,7 +486,10 @@ export default function DependencyGraph({
                 {/* Description preview */}
                 {comp.description && (
                   <div className="mt-2">
-                    <p className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]">
+                    <p
+                      className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]"
+                      title={comp.description}
+                    >
                       {comp.description}
                     </p>
                   </div>

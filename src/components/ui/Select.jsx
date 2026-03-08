@@ -28,7 +28,7 @@ const Select = forwardRef(function Select(
   return (
     <div className={['w-full', className].filter(Boolean).join(' ')}>
       {label && (
-        <label className="mb-[var(--space-2)] block text-[var(--text-sm)] font-[var(--font-medium)] text-[var(--color-fg-muted)]">
+        <label className="mb-[var(--space-2)] block text-[var(--text-sm)] font-medium text-[var(--color-fg-muted)]">
           {label}
         </label>
       )}

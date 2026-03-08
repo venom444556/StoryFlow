@@ -1,13 +1,16 @@
 import { useState, useCallback, useMemo } from 'react'
-import { PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { PanelRightClose, PanelRightOpen, Rocket } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import { executeWorkflow } from '../../utils/workflow'
 
 import WorkflowToolbar from '../workflow/WorkflowToolbar'
+import WorkflowSidebar from '../workflow/WorkflowSidebar'
 import WorkflowCanvas from '../workflow/WorkflowCanvas'
+import NodeProperties from '../workflow/NodeProperties'
 import NodeDetailModal from '../workflow/NodeDetailModal'
 import ExecutionLog from '../workflow/ExecutionLog'
 import SubWorkflowOverlay from '../workflow/SubWorkflowOverlay'
+import StatusBar from '../ui/StatusBar'
 
 // ---------------------------------------------------------------------------
 // WorkflowTab
@@ -248,6 +251,8 @@ export default function WorkflowTab({ project, onUpdate }) {
     setExecutionLog([])
   }, [isExecuting, nodes, saveNodes])
 
+  const selectedNode = nodes.find((n) => n.id === selectedNodeId) || null
+
   return (
     <div className="flex h-full flex-col">
       {/* Toolbar */}
@@ -260,42 +265,70 @@ export default function WorkflowTab({ project, onUpdate }) {
         connectionCount={connections.length}
       />
 
-      {/* Main area */}
+      {/* 3-panel layout: sidebar | canvas | properties */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Canvas */}
-        <WorkflowCanvas
-          nodes={nodes}
-          connections={connections}
-          selectedNodeId={selectedNodeId}
-          onSaveNodes={saveNodes}
-          onSaveConnections={saveConnections}
-          onSaveBoth={saveBoth}
-          onSelectNode={setSelectedNodeId}
-          onDrillDown={handleDrillDown}
-          onNodeDoubleClick={setDetailNodeId}
-          onAddChildren={handleAddChildren}
-          isExecuting={isExecuting}
-          canvasId="main"
-        />
+        {/* Left sidebar: palette + layers + templates */}
+        <WorkflowSidebar onAddNode={handleAddNode} nodes={nodes} isExecuting={isExecuting} />
 
-        {/* Execution log (right) */}
-        <div className="relative flex items-stretch">
-          <button
-            onClick={() => setLogPanelOpen((prev) => !prev)}
-            className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-[var(--color-border-default)] p-1.5 text-[var(--color-fg-muted)] backdrop-blur-lg transition-colors hover:text-[var(--color-fg-default)]"
-            style={{ backgroundColor: 'var(--th-panel)' }}
-            title={logPanelOpen ? 'Hide log' : 'Show log'}
-          >
-            {logPanelOpen ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
-          </button>
-
-          {logPanelOpen && (
-            <div className="w-72">
-              <ExecutionLog logs={executionLog} onClear={() => setExecutionLog([])} />
-            </div>
-          )}
+        {/* Center canvas */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <WorkflowCanvas
+            nodes={nodes}
+            connections={connections}
+            selectedNodeId={selectedNodeId}
+            onSaveNodes={saveNodes}
+            onSaveConnections={saveConnections}
+            onSaveBoth={saveBoth}
+            onSelectNode={setSelectedNodeId}
+            onDrillDown={handleDrillDown}
+            onNodeDoubleClick={setDetailNodeId}
+            onAddChildren={handleAddChildren}
+            isExecuting={isExecuting}
+            canvasId="main"
+          />
         </div>
+
+        {/* Right panel: node properties (persistent) or execution log */}
+        {selectedNode ? (
+          <NodeProperties
+            node={selectedNode}
+            onUpdate={handleUpdateNode}
+            onDelete={handleDeleteNode}
+            onClose={() => setSelectedNodeId(null)}
+          />
+        ) : (
+          <div className="relative flex items-stretch">
+            <button
+              onClick={() => setLogPanelOpen((prev) => !prev)}
+              className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-[var(--color-border-default)] p-1.5 text-[var(--color-fg-muted)] backdrop-blur-lg transition-colors hover:text-[var(--color-fg-default)]"
+              style={{ backgroundColor: 'var(--color-bg-glass)' }}
+              title={logPanelOpen ? 'Hide log' : 'Show log'}
+            >
+              {logPanelOpen ? <PanelRightClose size={14} /> : <PanelRightOpen size={14} />}
+            </button>
+
+            {logPanelOpen && (
+              <div className="w-72">
+                <ExecutionLog logs={executionLog} onClear={() => setExecutionLog([])} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Footer StatusBar */}
+      <StatusBar>
+        <Rocket size={12} className="text-[var(--color-success)]" />
+        <span>{nodes.length} nodes</span>
+        <span className="text-[var(--color-fg-faint)]">|</span>
+        <span>{connections.length} connections</span>
+        {isExecuting && (
+          <>
+            <span className="text-[var(--color-fg-faint)]">|</span>
+            <span className="text-[var(--color-warning)]">Executing...</span>
+          </>
+        )}
+      </StatusBar>
 
       {/* Node Detail Modal */}
       <NodeDetailModal

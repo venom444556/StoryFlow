@@ -49,7 +49,7 @@ export default function GanttBar({
         fontSize={12}
         fontWeight={600}
         fontFamily="Inter, system-ui, sans-serif"
-        style={{ fill: 'var(--th-text-secondary, #94a3b8)' }}
+        style={{ fill: 'var(--color-fg-muted)' }}
         className="select-none"
       >
         {phase.name.length > 18 ? phase.name.slice(0, 16) + '\u2026' : phase.name}
@@ -89,7 +89,7 @@ export default function GanttBar({
         fontSize={11}
         fontWeight={500}
         fontFamily="Inter, system-ui, sans-serif"
-        style={{ fill: 'var(--th-text-muted, #64748b)' }}
+        style={{ fill: 'var(--color-fg-muted)' }}
       >
         {progress}%
       </text>

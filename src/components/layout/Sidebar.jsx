@@ -54,7 +54,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         // Desktop: always visible, relative position
         'md:relative md:flex md:h-full',
       ].join(' ')}
-      style={{ zIndex: mobileMenuOpen ? 'var(--z-overlay)' : 'var(--z-sticky)' }}
+      style={{ zIndex: mobileMenuOpen ? 'var(--z-drawer)' : 'var(--z-sticky)' }}
       animate={{ width: mobileMenuOpen ? 260 : collapsed ? 64 : 260 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
     >
@@ -74,7 +74,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-[var(--text-lg)] font-[var(--font-bold)] tracking-tight text-[var(--color-fg-default)]"
+            className="text-[var(--text-lg)] font-bold tracking-tight text-[var(--color-fg-default)]"
           >
             Story<span className="text-[var(--accent-default)]">Flow</span>
           </motion.span>
@@ -112,7 +112,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
           className={({ isActive }) =>
             [
               'group flex items-center gap-[var(--space-3)] rounded-[var(--radius-lg)]',
-              'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
+              'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)] font-medium',
               'transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)]',
               isActive
@@ -140,10 +140,10 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         {/* Projects section */}
         {(!collapsed || mobileMenuOpen) && (
           <div className="mb-[var(--space-2)] flex items-center justify-between px-[var(--space-3)]">
-            <span className="text-[var(--text-xs)] font-[var(--font-semibold)] uppercase tracking-wider text-[var(--color-fg-subtle)]">
+            <span className="text-[var(--text-xs)] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]">
               Projects
             </span>
-            <span className="rounded-full bg-[var(--color-bg-glass-hover)] px-[var(--space-2)] py-0.5 text-[10px] font-[var(--font-medium)] text-[var(--color-fg-muted)]">
+            <span className="rounded-full bg-[var(--color-bg-glass-hover)] px-[var(--space-2)] py-0.5 text-[10px] font-medium text-[var(--color-fg-muted)]">
               {projects.length}
             </span>
           </div>
@@ -194,7 +194,9 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                   aria-label={`Status: ${project.status || 'planning'}`}
                   role="img"
                 />
-                <span className="truncate">{project.name}</span>
+                <span className="truncate" title={project.name}>
+                  {project.name}
+                </span>
               </button>
             )
           })}
@@ -258,7 +260,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
             onClick={handleNewProject}
             className={[
               'flex w-full items-center justify-center gap-[var(--space-2)] rounded-[var(--radius-pill)]',
-              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-[var(--font-medium)]',
+              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-medium',
               'text-white transition-all',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-offset-2',
               'active:scale-[0.98]',
