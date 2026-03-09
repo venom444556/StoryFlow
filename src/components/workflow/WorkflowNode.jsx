@@ -208,7 +208,6 @@ export default function WorkflowNode({
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
       className={[
         'absolute select-none rounded-xl border-2',
-        'backdrop-blur-xl',
         'hover:shadow-[0_0_24px_rgba(99,102,241,0.12)]',
         getStatusClasses(node.status),
         isSelected && 'ring-2 ring-blue-500/60 ring-offset-1 ring-offset-transparent',
@@ -222,7 +221,7 @@ export default function WorkflowNode({
         zIndex: isSelected ? 20 : 2,
         cursor: 'grab',
         transition: 'border-color 0.2s, box-shadow 0.2s, ring 0.2s',
-        backgroundColor: 'var(--color-bg-glass)',
+        backgroundColor: 'var(--color-bg-node)',
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={(e) => {

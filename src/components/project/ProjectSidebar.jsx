@@ -188,7 +188,7 @@ export default function ProjectSidebar({ activeTab, projectId, onTabChange }) {
                   className={[
                     'absolute bottom-full right-0 mb-2 z-50',
                     'w-48 rounded-lg border border-[var(--color-border-default)]',
-                    'bg-[var(--color-bg-glass)] backdrop-blur-xl shadow-lg',
+                    'bg-[var(--color-bg-glass)] shadow-lg',
                     'overflow-hidden',
                   ].join(' ')}
                 >

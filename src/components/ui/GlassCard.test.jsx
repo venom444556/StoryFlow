@@ -19,8 +19,14 @@ describe('GlassCard', () => {
       expect(screen.getByText('Content').tagName).toBe('DIV')
     })
 
-    it('applies glass-card class', () => {
+    it('applies obsidian variant by default', () => {
       render(<GlassCard>Content</GlassCard>)
+      const card = screen.getByText('Content')
+      expect(card).toHaveStyle({ background: 'var(--color-bg-obsidian)' })
+    })
+
+    it('applies glass-card class when variant is glass', () => {
+      render(<GlassCard variant="glass">Content</GlassCard>)
       expect(screen.getByText('Content')).toHaveClass('glass-card')
     })
   })
@@ -141,8 +147,18 @@ describe('GlassCard', () => {
       expect(screen.getByText('Content')).toHaveClass('custom-class')
     })
 
-    it('preserves glass-card class with custom className', () => {
+    it('preserves custom className', () => {
       render(<GlassCard className="custom-class">Content</GlassCard>)
+      const card = screen.getByText('Content')
+      expect(card).toHaveClass('custom-class')
+    })
+
+    it('preserves glass-card class with custom className when variant is glass', () => {
+      render(
+        <GlassCard variant="glass" className="custom-class">
+          Content
+        </GlassCard>
+      )
       const card = screen.getByText('Content')
       expect(card).toHaveClass('glass-card', 'custom-class')
     })
@@ -206,17 +222,17 @@ describe('GlassCard', () => {
   describe('Edge Cases', () => {
     it('handles empty children', () => {
       const { container } = render(<GlassCard></GlassCard>)
-      expect(container.querySelector('.glass-card')).toBeInTheDocument()
+      expect(container.firstChild).toBeInTheDocument()
     })
 
     it('handles null children', () => {
       const { container } = render(<GlassCard>{null}</GlassCard>)
-      expect(container.querySelector('.glass-card')).toBeInTheDocument()
+      expect(container.firstChild).toBeInTheDocument()
     })
 
     it('handles undefined children', () => {
       const { container } = render(<GlassCard>{undefined}</GlassCard>)
-      expect(container.querySelector('.glass-card')).toBeInTheDocument()
+      expect(container.firstChild).toBeInTheDocument()
     })
 
     it('handles multiple className values', () => {

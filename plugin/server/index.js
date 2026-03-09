@@ -22,6 +22,10 @@ const provenanceParams = {
     .describe('WHY this action is being taken (shown to the human in the transparency dashboard)'),
   confidence: z.number().min(0).max(1).optional().describe('Confidence level (0-1) in this action'),
   session_id: z.string().optional().describe('Current session ID for event correlation'),
+  parent_event_id: z
+    .string()
+    .optional()
+    .describe('ID of the parent event (e.g. an approved gate) that authorizes this action'),
 }
 
 const server = new McpServer({
@@ -77,7 +81,15 @@ function scheduleAutoIdle(projectId) {
   }, AUTO_IDLE_DELAY_MS)
 }
 
-// Wrap registerTool to inject auto-status on mutating tool calls
+// Phase 4: Tools that bypass the escalation pause (read-only + communication tools)
+const ESCALATION_BYPASS_TOOLS = new Set([
+  ...STATUS_BYPASS_TOOLS,
+  'storyflow_escalate',
+  'storyflow_respond_to_human',
+  'storyflow_list_snapshots',
+])
+
+// Wrap registerTool to inject auto-status and escalation pause on mutating tool calls
 const _origRegisterTool = server.registerTool.bind(server)
 server.registerTool = function (name, schema, handler) {
   if (STATUS_BYPASS_TOOLS.has(name)) {
@@ -85,6 +97,36 @@ server.registerTool = function (name, schema, handler) {
   }
   const wrappedHandler = async (params) => {
     const projectId = params.project_id
+
+    // Phase 4: Block mutating tools when agent is paused (escalation active)
+    if (projectId && !ESCALATION_BYPASS_TOOLS.has(name)) {
+      try {
+        const base = sf.getBaseUrl()
+        if (base) {
+          const statusResp = await fetch(
+            `${base}/api/projects/${encodeURIComponent(projectId)}/ai-status`,
+            { headers: { 'Content-Type': 'application/json' } }
+          ).catch(() => null)
+          if (statusResp?.ok) {
+            const aiStatus = await statusResp.json()
+            if (aiStatus.status === 'blocked') {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Agent is paused — waiting for human input. Call storyflow_get_steering_inputs after human responds.',
+                  },
+                ],
+                isError: true,
+              }
+            }
+          }
+        }
+      } catch {
+        // best-effort — don't block on status check failure
+      }
+    }
+
     if (projectId) {
       try {
         const toolLabel = name.replace('storyflow_', '').replace(/_/g, ' ')
@@ -2671,6 +2713,82 @@ server.registerTool(
             type: 'text',
             text: JSON.stringify(
               results.length > 0 ? results : { acknowledged: true, comment },
+              null,
+              2
+            ),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: List Snapshots
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_list_snapshots',
+  {
+    description:
+      'List available snapshots for a project. Snapshots are auto-created before high-risk mutations (deletes, batch updates). Use to find a restore point after an accidental destructive action.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+    },
+  },
+  async ({ project_id }) => {
+    try {
+      const snapshots = await sf.listSnapshots(project_id)
+      return {
+        content: [
+          {
+            type: 'text',
+            text:
+              snapshots.length === 0
+                ? 'No snapshots available for this project.'
+                : JSON.stringify(snapshots, null, 2),
+          },
+        ],
+      }
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `Error: ${err.message}` }],
+        isError: true,
+      }
+    }
+  }
+)
+
+// ---------------------------------------------------------------------------
+// Tool: Restore Snapshot
+// ---------------------------------------------------------------------------
+server.registerTool(
+  'storyflow_restore_snapshot',
+  {
+    description:
+      'Restore a project to a previous snapshot. Use this to undo an accidental destructive action (e.g. deleted issues, wrong batch update). Requires a snapshot_id from storyflow_list_snapshots.',
+    inputSchema: {
+      project_id: z.string().describe('Project ID'),
+      snapshot_id: z
+        .string()
+        .describe('Snapshot ID to restore from (get from storyflow_list_snapshots)'),
+      ...provenanceParams,
+    },
+  },
+  async ({ project_id, snapshot_id, reasoning, confidence, session_id, parent_event_id }) => {
+    try {
+      const headers = buildProvenanceHeaders({ reasoning, confidence, session_id, parent_event_id })
+      const result = await sf.restoreSnapshot(project_id, snapshot_id, headers)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(
+              { restored: true, snapshot_id, project_name: result.project?.name },
               null,
               2
             ),

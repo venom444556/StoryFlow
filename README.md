@@ -36,6 +36,11 @@ Full Kanban board with epics, stories, tasks, and bugs. Includes sprint manageme
 Real-time visibility into everything the AI agent does:
 
 - **Gate Approvals** -- pending gates surface as prominent action cards; approve or reject with optional comments before the agent proceeds
+- **Gate Enforcement** -- AI mutations on gated entities are mechanically blocked (403) until the human approves; humans bypass gates entirely
+- **Confidence Auto-Gating** -- AI mutations with confidence < 0.5 automatically create pending gates, blocking further changes until reviewed
+- **Mechanical Agent Pause** -- when the AI escalates, all mutating MCP tool calls are blocked until the human responds with a steering directive
+- **Snapshots & Undo** -- auto-snapshots before every destructive mutation (deletes, batch updates); restore any snapshot to roll back mistakes
+- **Causal Event Chains** -- every event can link to its parent via `parent_event_id`, enabling full audit trails from gate approval through subsequent mutations
 - **Escalation Response** -- when the AI is blocked, respond directly with steering directives
 - **Sprint Metrics** -- CSS-only velocity bars, status distribution charts, cycle time and blocked time analytics computed from board data
 - **Session History** -- collapsible timeline of past agent sessions showing work done, decisions, learnings, and next steps
@@ -136,7 +141,7 @@ The client stores data in IndexedDB for fast access. The Express server persists
 
 ![AI Transparency Loop](docs/diagrams/ai-loop.png)
 
-Every AI action is recorded as an event with provenance (actor, reasoning, confidence). Gate events require human approval before the agent proceeds. Steering directives flow back to the agent via a queue. The result: **full auditability with zero overhead** — the agent's normal workflow produces the audit trail automatically.
+Every AI action is recorded as an event with provenance (actor, reasoning, confidence). Gate events mechanically block the agent from further mutations on that entity until the human approves. Low-confidence actions auto-create gates. Escalations pause all mutating tool calls. Steering directives flow back to the agent via a queue and auto-unblock paused agents. The result: **mechanical safety rails that are invisible on the happy path** — the agent only gets blocked when it genuinely needs human oversight.
 
 ## Project Structure
 
@@ -209,9 +214,9 @@ Configuration is saved to `~/.config/storyflow/config.json` and persists across 
 | `/storyflow:open` | Open StoryFlow UI in browser |
 | `/storyflow:board [project]` | Show board summary for a project |
 
-### MCP Tools (46)
+### MCP Tools (48)
 
-The plugin exposes 46 MCP tools across 11 categories that Claude can use automatically during development:
+The plugin exposes 48 MCP tools across 12 categories that Claude can use automatically during development:
 
 | Category | Tools | Examples |
 |----------|-------|---------|
@@ -224,6 +229,7 @@ The plugin exposes 46 MCP tools across 11 categories that Claude can use automat
 | **Timeline** | 6 | `create_phase`, `update_phase`, `delete_phase`, `create_milestone`, `update_milestone`, `delete_milestone` |
 | **Sessions** | 3 | `save_session_summary`, `get_last_session`, `list_sessions` |
 | **Transparency** | 8 | `record_event`, `query_events`, `update_ai_status`, `check_gates`, `escalate` |
+| **Snapshots** | 2 | `list_snapshots`, `restore_snapshot` |
 | **Git** | 1 | `sync_from_git` |
 
 All tools are prefixed with `storyflow_`. `list_issues` supports pagination (`page`, `limit`), text search, and a compact `fields=summary` mode for large projects. `update_project` accepts `techStack`, `overview`, `architecture`, and `timeline` fields in addition to name/description/status. See [`plugin/skills/storyflow/SKILL.md`](plugin/skills/storyflow/SKILL.md) for the full tool reference.
@@ -242,6 +248,11 @@ The primary threat StoryFlow guards against is **unauthorized tool access** — 
 - The token is validated using constant-time comparison to prevent timing attacks.
 - The `/api/sync` endpoint requires an explicit `X-Confirm: overwrite-all` header and rejects empty payloads to prevent accidental data wipes.
 - A write lock on sync prevents concurrent sync + mutation races.
+- **Gate enforcement middleware** blocks AI mutations on entities with pending approval gates (403). Humans bypass entirely.
+- **Confidence auto-gating** creates pending gates when AI confidence is below 0.5, preventing the agent from proceeding on uncertain decisions.
+- **Mechanical agent pause** blocks all mutating MCP tool calls when the agent has escalated, until the human responds with a steering directive.
+- **Auto-snapshots** capture project state before every destructive mutation (deletes, batch updates). Restore any snapshot to undo mistakes. Capped at 20 per project with LRU eviction.
+- **Causal event chains** link every action to its authorization via `parent_event_id`, enabling full audit trails from gate approval through subsequent mutations.
 
 **What's NOT in scope:**
 

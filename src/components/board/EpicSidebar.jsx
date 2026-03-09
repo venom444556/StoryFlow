@@ -70,7 +70,7 @@ export default function EpicSidebar({
           animate={{ width: 256, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex w-64 shrink-0 flex-col border-r border-[var(--color-border-default)] backdrop-blur-xl"
+          className="flex w-64 shrink-0 flex-col border-r border-[var(--color-border-default)]"
           style={{ backgroundColor: 'var(--th-panel-light)' }}
         >
           {/* Header */}

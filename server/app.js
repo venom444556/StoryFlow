@@ -17,6 +17,8 @@ import {
   cleanupOldEvents,
   checkApprovalGates,
   getRejectedEvents,
+  hasEntityGate,
+  getEventChain,
 } from './events.js'
 import {
   addSteeringDirective,
@@ -212,6 +214,54 @@ app.post('/api/*', requireToken)
 app.put('/api/*', requireToken)
 app.delete('/api/*', requireToken)
 
+// ---------------------------------------------------------------------------
+// Gate enforcement middleware — Phase 1
+// Blocks AI mutations on entities with pending gates. Humans bypass.
+// ---------------------------------------------------------------------------
+const ENTITY_PARAM_MAP = {
+  issueId: 'issue',
+  key: 'issue',
+  pageId: 'page',
+  sprintId: 'sprint',
+  decisionId: 'decision',
+  phaseId: 'phase',
+  milestoneId: 'milestone',
+  nodeId: 'workflow_node',
+  compId: 'architecture_component',
+}
+
+function enforceGates(req, res, next) {
+  // Humans bypass gates
+  if (req.headers['x-storyflow-actor'] !== 'ai') return next()
+
+  const projectId = req.params.id
+  if (!projectId) return next()
+
+  // Find entity type/id from route params
+  for (const [param, entityType] of Object.entries(ENTITY_PARAM_MAP)) {
+    const entityId = req.params[param]
+    if (entityId) {
+      try {
+        if (hasEntityGate(projectId, entityType, entityId)) {
+          return res.status(403).json({
+            error: 'Blocked by pending gate',
+            gated_entity: { type: entityType, id: entityId },
+          })
+        }
+      } catch {
+        // If gate check fails, don't block — fail open
+      }
+      break
+    }
+  }
+  next()
+}
+
+// Apply gate enforcement to all mutating project routes
+app.post('/api/projects/:id/*', enforceGates)
+app.put('/api/projects/:id/*', enforceGates)
+app.delete('/api/projects/:id/*', enforceGates)
+
 // Project ID format validation (slug-based: lowercase alphanumeric + hyphens)
 const PROJECT_ID_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/
 function validateProjectId(req, res, next) {
@@ -222,6 +272,17 @@ function validateProjectId(req, res, next) {
   next()
 }
 app.param('id', validateProjectId)
+
+// ---------------------------------------------------------------------------
+// Snapshot helper — Phase 3
+// Auto-snapshots before high-risk mutations (deletes, batch ops)
+// ---------------------------------------------------------------------------
+function maybeSnapshot(req, action, entityType, entityId) {
+  const projectId = req.params.id
+  const actor = req.headers['x-storyflow-actor'] || 'human'
+  const entity = entityId ? `${entityType}:${entityId}` : entityType
+  return db.createSnapshot(projectId, { action, entity, actor })
+}
 
 // --- Sync endpoint (destructive: replaces all projects) ---
 // Global sync lock prevents concurrent sync + mutation races
@@ -308,6 +369,7 @@ app.delete('/api/projects/:id', (req, res) => {
   withProjectLock(req.params.id, () => {
     const project = db.getProject(req.params.id)
     if (!project) return res.status(404).json({ error: 'Project not found' })
+    maybeSnapshot(req, 'delete_project', 'project', req.params.id)
     db.softDeleteProject(req.params.id)
     const provenance = extractProvenance(req)
     const event = emitMutationEvent({
@@ -430,6 +492,7 @@ app.put('/api/projects/:id/issues/:issueId', (req, res) => {
 
 app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_issue', 'issue', req.params.issueId)
     const ok = db.deleteIssue(req.params.id, req.params.issueId)
     if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
     const provenance = extractProvenance(req)
@@ -457,6 +520,7 @@ app.post('/api/projects/:id/issues/batch-update', (req, res) => {
     return res.status(400).json({ error: 'Maximum 50 updates per batch' })
   }
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'batch_update_issues', 'batch', null)
     const provenance = extractProvenance(req)
     const results = { updated: [], errors: [] }
 
@@ -557,6 +621,7 @@ app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
 
 app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_issue_by_key', 'issue', req.params.key)
     const ok = db.deleteIssueByKey(req.params.id, req.params.key)
     if (!ok) return res.status(404).json({ error: 'Issue not found' })
     const provenance = extractProvenance(req)
@@ -744,6 +809,7 @@ app.put('/api/projects/:id/pages/:pageId', (req, res) => {
 
 app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_page', 'page', req.params.pageId)
     const ok = db.deletePage(req.params.id, req.params.pageId)
     if (!ok) return res.status(404).json({ error: 'Page or project not found' })
     const provenance = extractProvenance(req)
@@ -797,6 +863,7 @@ app.put('/api/projects/:id/sprints/:sprintId', (req, res) => {
 // --- Sprint deletion ---
 app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_sprint', 'sprint', req.params.sprintId)
     const ok = db.deleteSprint(req.params.id, req.params.sprintId)
     if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
     const provenance = extractProvenance(req)
@@ -866,6 +933,7 @@ app.put('/api/projects/:id/decisions/:decisionId', (req, res) => {
 
 app.delete('/api/projects/:id/decisions/:decisionId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_decision', 'decision', req.params.decisionId)
     const ok = db.deleteDecision(req.params.id, req.params.decisionId)
     if (!ok) return res.status(404).json({ error: 'Decision or project not found' })
     const provenance = extractProvenance(req)
@@ -935,6 +1003,7 @@ app.put('/api/projects/:id/phases/:phaseId', (req, res) => {
 
 app.delete('/api/projects/:id/phases/:phaseId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_phase', 'phase', req.params.phaseId)
     const ok = db.deletePhase(req.params.id, req.params.phaseId)
     if (!ok) return res.status(404).json({ error: 'Phase or project not found' })
     const provenance = extractProvenance(req)
@@ -1004,6 +1073,7 @@ app.put('/api/projects/:id/milestones/:milestoneId', (req, res) => {
 
 app.delete('/api/projects/:id/milestones/:milestoneId', (req, res) => {
   withProjectLock(req.params.id, () => {
+    maybeSnapshot(req, 'delete_milestone', 'milestone', req.params.milestoneId)
     const ok = db.deleteMilestone(req.params.id, req.params.milestoneId)
     if (!ok) return res.status(404).json({ error: 'Milestone or project not found' })
     const provenance = extractProvenance(req)
@@ -1079,7 +1149,22 @@ app.post('/api/projects/:id/events/:eventId/respond', (req, res) => {
   }
   const event = respondToEvent(req.params.eventId, req.body)
   if (!event) return res.status(404).json({ error: 'Event not found' })
+
+  // Phase 5: Record the response as a causal child of the original event
+  const responseEvent = recordEvent({
+    project_id: req.params.id,
+    actor: 'human',
+    category: event.category || 'system',
+    action: req.body.action,
+    entity_type: event.entity_type,
+    entity_id: event.entity_id,
+    entity_title: `${req.body.action}: ${(event.entity_title || '').slice(0, 100)}`,
+    data: { comment: req.body.comment || null, original_event_id: req.params.eventId },
+    parent_event_id: req.params.eventId,
+  })
+
   broadcastEvent(event)
+  broadcastEvent(responseEvent)
   // Broadcast gate status change for real-time UI updates
   if (event.status) {
     broadcastGateUpdate({
@@ -1096,6 +1181,36 @@ app.get('/api/projects/:id/gates', (req, res) => {
   const pending = checkApprovalGates(req.params.id)
   const rejected = getRejectedEvents(req.params.id, req.query.since)
   res.json({ pending, rejected })
+})
+
+// --- Snapshots — Phase 3 ---
+app.get('/api/projects/:id/snapshots', (req, res) => {
+  const snapshots = db.listSnapshots(req.params.id)
+  res.json(snapshots)
+})
+
+app.post('/api/projects/:id/snapshots/:snapshotId/restore', (req, res) => {
+  if (req.headers['x-confirm'] !== 'restore') {
+    return res.status(400).json({ error: 'Restore requires X-Confirm: restore header' })
+  }
+  withProjectLock(req.params.id, () => {
+    const project = db.restoreSnapshot(req.params.id, req.params.snapshotId)
+    if (!project) return res.status(404).json({ error: 'Snapshot not found' })
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'system',
+      action: 'update',
+      entityType: 'snapshot',
+      entityId: req.params.snapshotId,
+      entityTitle: 'Project restored from snapshot',
+      data: { snapshot_id: req.params.snapshotId },
+    })
+    broadcastEvent(event)
+    notifyClients()
+    res.json({ restored: true, snapshot_id: req.params.snapshotId, project })
+  })
 })
 
 // --- Event Cleanup ---
@@ -1139,6 +1254,17 @@ app.post('/api/projects/:id/steer', (req, res) => {
     priority: req.body.priority,
     context: req.body.context,
   })
+
+  // Phase 4: Auto-unblock agent when human sends a steering directive while blocked
+  if (aiStatus[req.params.id]?.status === 'blocked') {
+    aiStatus[req.params.id] = {
+      status: 'idle',
+      detail: 'Unblocked by steering directive',
+      updatedAt: new Date().toISOString(),
+    }
+    broadcastAiStatus({ projectId: req.params.id, ...aiStatus[req.params.id] })
+  }
+
   res.status(201).json(directive)
 })
 

@@ -43,93 +43,44 @@
 /* ----- Glass surface ----- */
 .glass {
   background: var(--color-bg-glass);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
   border: 1px solid var(--color-border-default);
 }
 
 /* ----- Glass card — the core visual element ----- */
 .glass-card {
   background: var(--color-bg-card, var(--color-bg-glass));
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-card);
-  transition:
-    box-shadow var(--duration-normal) var(--ease-default),
-    border-color var(--duration-normal) var(--ease-default),
-    transform var(--duration-normal) var(--ease-default);
+  border-radius: var(--radius-md);
+  transition: border-color var(--duration-normal) var(--ease-default);
   position: relative;
   overflow: hidden;
 }
 
-/* Gradient accent border at top of every card */
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(var(--accent-default-rgb), 0.5),
-    transparent
-  );
-  z-index: 1;
-}
-
 .glass-card:hover {
   border-color: var(--color-border-emphasis);
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
 }
 
 /* ----- Elevated card — project cards, primary content ----- */
 .glass-card-elevated {
   background: var(--color-bg-card, var(--color-bg-glass));
-  backdrop-filter: blur(24px) saturate(1.3);
-  -webkit-backdrop-filter: blur(24px) saturate(1.3);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
   transition:
     box-shadow var(--duration-normal) var(--ease-default),
-    border-color var(--duration-normal) var(--ease-default),
-    transform var(--duration-normal) var(--ease-default);
+    border-color var(--duration-normal) var(--ease-default);
   position: relative;
   overflow: hidden;
-}
-
-.glass-card-elevated::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(var(--accent-default-rgb), 0.6),
-    transparent
-  );
-  z-index: 1;
 }
 
 .glass-card-elevated:hover {
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
-  transform: translateY(-3px);
 }
 
 /* ----- Sidebar ----- */
 .glass-sidebar {
   background: var(--color-bg-overlay);
-  backdrop-filter: blur(32px) saturate(1.4);
-  -webkit-backdrop-filter: blur(32px) saturate(1.4);
   border-right: 1px solid var(--color-border-muted);
 }
 
@@ -175,49 +126,26 @@
 
 .theme-light .glass-card {
   background: #ffffff;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-color: var(--color-border-default);
   box-shadow: var(--shadow-card);
-}
-
-/* Hide the gradient accent border in light mode */
-.theme-light .glass-card::before {
-  display: none;
 }
 
 .theme-light .glass-card:hover {
   background: #fafaf9;
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
-  transform: none;
 }
 
 .theme-light .glass-card-elevated {
   background: #ffffff;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-color: var(--color-border-default);
-  box-shadow: var(--shadow-card);
-}
-
-/* Hide the gradient accent border in light mode */
-.theme-light .glass-card-elevated::before {
-  display: none;
 }
 
 .theme-light .glass-card-elevated:hover {
   border-color: var(--color-border-emphasis);
-  box-shadow: var(--shadow-card-hover);
-  transform: none;
 }
 
 .theme-light .glass-sidebar {
   background: #ffffff;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   border-color: var(--color-border-default);
-  box-shadow: none;
 }
 
 /* -------------------------------------------------

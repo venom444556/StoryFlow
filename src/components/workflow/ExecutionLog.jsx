@@ -41,7 +41,7 @@ export default function ExecutionLog({ logs = [], onClear }) {
 
   return (
     <div
-      className="flex h-full flex-col border-l border-[var(--color-border-default)] backdrop-blur-2xl"
+      className="flex h-full flex-col border-l border-[var(--color-border-default)]"
       style={{ backgroundColor: 'var(--color-bg-glass)' }}
     >
       {/* Header */}

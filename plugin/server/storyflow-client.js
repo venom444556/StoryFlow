@@ -52,13 +52,20 @@ export function isConfigured() {
 const REQUEST_TIMEOUT_MS = parseInt(process.env.STORYFLOW_TIMEOUT_MS, 10) || 15_000
 
 /** Build provenance headers from optional params */
-export function buildProvenanceHeaders({ reasoning, confidence, session_id, agent_id } = {}) {
+export function buildProvenanceHeaders({
+  reasoning,
+  confidence,
+  session_id,
+  agent_id,
+  parent_event_id,
+} = {}) {
   const headers = { 'X-StoryFlow-Actor': 'ai' }
   if (reasoning) headers['X-StoryFlow-Reasoning'] = reasoning
   if (confidence !== undefined && confidence !== null)
     headers['X-StoryFlow-Confidence'] = String(confidence)
   if (session_id) headers['X-StoryFlow-Session-Id'] = session_id
   if (agent_id) headers['X-StoryFlow-Agent-Id'] = agent_id
+  if (parent_event_id) headers['X-StoryFlow-Parent-Event-Id'] = parent_event_id
   return headers
 }
 
@@ -671,6 +678,22 @@ export function checkDuplicate(projectId, title) {
     method: 'POST',
     body: JSON.stringify({ title }),
   })
+}
+
+// --- Snapshots ---
+
+export function listSnapshots(projectId) {
+  return request(`/api/projects/${encodeURIComponent(projectId)}/snapshots`)
+}
+
+export function restoreSnapshot(projectId, snapshotId, extraHeaders = {}) {
+  return request(
+    `/api/projects/${encodeURIComponent(projectId)}/snapshots/${encodeURIComponent(snapshotId)}/restore`,
+    {
+      method: 'POST',
+      headers: { 'X-Confirm': 'restore', ...extraHeaders },
+    }
+  )
 }
 
 // --- Health check ---

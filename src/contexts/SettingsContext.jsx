@@ -4,7 +4,7 @@ const STORAGE_KEY = 'storyflow-settings'
 
 const DEFAULT_SETTINGS = {
   theme: 'dark', // 'dark' | 'light'
-  accentColor: 'amber', // 'amber' | 'purple' | 'blue' | 'cyan' | 'green' | 'pink'
+  accentColor: 'cyan', // 'amber' | 'purple' | 'blue' | 'cyan' | 'green' | 'pink'
   sidebarCollapsed: false,
   animationsEnabled: true,
   autoSave: true,

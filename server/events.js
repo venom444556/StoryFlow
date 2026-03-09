@@ -79,6 +79,14 @@ export function initEvents(database) {
 
   db.run('CREATE INDEX IF NOT EXISTS idx_events_status ON events(project_id, status)')
 
+  // Migration: add parent_event_id column for causal chains (idempotent)
+  try {
+    db.run('ALTER TABLE events ADD COLUMN parent_event_id TEXT DEFAULT NULL')
+  } catch {
+    // Column already exists — ignore
+  }
+  db.run('CREATE INDEX IF NOT EXISTS idx_events_parent ON events(parent_event_id)')
+
   console.log('[Events] Events table ready')
 }
 
@@ -134,14 +142,15 @@ export function recordEvent(event) {
     human_response: event.human_response ? JSON.stringify(event.human_response) : null,
     status: event.status || null,
     data: JSON.stringify(event.data || {}),
+    parent_event_id: event.parent_event_id || null,
   }
 
   db.run(
     `INSERT INTO events
       (id, project_id, timestamp, actor, agent_id, session_id, category, action,
        entity_type, entity_id, entity_title, changes, reasoning, confidence,
-       triggered_by, human_response, status, data)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       triggered_by, human_response, status, data, parent_event_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       record.id,
       record.project_id,
@@ -161,6 +170,7 @@ export function recordEvent(event) {
       record.human_response,
       record.status,
       record.data,
+      record.parent_event_id,
     ]
   )
 
@@ -297,8 +307,12 @@ export function extractProvenance(req) {
       : null,
     agent_id: req.headers['x-storyflow-agent-id'] || null,
     session_id: req.headers['x-storyflow-session-id'] || null,
+    parent_event_id: req.headers['x-storyflow-parent-event-id'] || null,
   }
 }
+
+// Confidence threshold below which AI mutations auto-create a pending gate
+const DEFAULT_CONFIDENCE_THRESHOLD = 0.5
 
 /** Build and record an event from a mutation context */
 export function emitMutationEvent({
@@ -313,7 +327,21 @@ export function emitMutationEvent({
   data,
   triggeredBy,
   requiresApproval,
+  parentEventId,
 }) {
+  // Phase 2: Auto-gate low-confidence AI mutations
+  let eventData = data || {}
+  if (
+    provenance.actor === 'ai' &&
+    provenance.confidence !== null &&
+    provenance.confidence !== undefined &&
+    provenance.confidence < DEFAULT_CONFIDENCE_THRESHOLD &&
+    !requiresApproval
+  ) {
+    requiresApproval = true
+    eventData = { ...eventData, auto_gated: true, auto_gate_reason: 'low_confidence' }
+  }
+
   const event = recordEvent({
     project_id: projectId,
     actor: provenance.actor,
@@ -329,7 +357,8 @@ export function emitMutationEvent({
     confidence: provenance.confidence,
     triggered_by: triggeredBy,
     status: requiresApproval ? 'pending' : null,
-    data,
+    data: eventData,
+    parent_event_id: parentEventId || null,
   })
 
   return event
@@ -441,6 +470,65 @@ export function cleanupAllEvents(retentionDays = 90) {
   }
 
   return { deleted: toDelete, cutoff }
+}
+
+// ---------------------------------------------------------------------------
+// Gate Enforcement — Phase 1
+// ---------------------------------------------------------------------------
+
+/** Check if a pending gate exists for a specific entity */
+export function hasEntityGate(projectId, entityType, entityId) {
+  if (!db) throw new Error('Events not initialized')
+  const results = db.exec(
+    `SELECT 1 FROM events
+     WHERE project_id = ? AND entity_type = ? AND entity_id = ? AND status = 'pending'
+     LIMIT 1`,
+    [projectId, entityType, entityId]
+  )
+  return results.length > 0 && results[0].values.length > 0
+}
+
+// ---------------------------------------------------------------------------
+// Causal Event Chains — Phase 5
+// ---------------------------------------------------------------------------
+
+/** Get an event and all its descendants (causal chain) */
+export function getEventChain(eventId) {
+  if (!db) throw new Error('Events not initialized')
+
+  const root = getEvent(eventId)
+  if (!root) return null
+
+  const results = db.exec(
+    `WITH RECURSIVE chain AS (
+       SELECT * FROM events WHERE id = ?
+       UNION ALL
+       SELECT e.* FROM events e
+       JOIN chain c ON e.parent_event_id = c.id
+     )
+     SELECT * FROM chain ORDER BY timestamp ASC`,
+    [eventId]
+  )
+
+  if (results.length === 0) return { root, chain: [] }
+
+  const columns = results[0].columns
+  const chain = results[0].values.map((row) => {
+    const obj = {}
+    columns.forEach((col, i) => {
+      obj[col] = row[i]
+    })
+    try {
+      if (obj.changes) obj.changes = JSON.parse(obj.changes)
+      if (obj.human_response) obj.human_response = JSON.parse(obj.human_response)
+      if (obj.data) obj.data = JSON.parse(obj.data)
+    } catch {
+      // Leave as raw string if JSON is corrupted
+    }
+    return obj
+  })
+
+  return { root, chain }
 }
 
 /** Count events for a project (for metrics) */

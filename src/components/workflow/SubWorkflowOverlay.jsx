@@ -24,7 +24,7 @@ function OverlayBreadcrumb({ parentTitle, viewStack, onNavigate }) {
 
   return (
     <div
-      className="flex items-center gap-1 border-b border-[var(--color-bg-glass)] px-4 py-1.5 text-xs backdrop-blur-md"
+      className="flex items-center gap-1 border-b border-[var(--color-bg-glass)] px-4 py-1.5 text-xs"
       style={{ backgroundColor: 'var(--th-panel-medium)' }}
     >
       <button

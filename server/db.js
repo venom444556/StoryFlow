@@ -83,6 +83,22 @@ export async function initDb() {
     'CREATE INDEX IF NOT EXISTS idx_agent_sessions_project ON agent_sessions(project_id, created_at DESC)'
   )
 
+  // Snapshots table for undo/restore
+  db.run(`
+    CREATE TABLE IF NOT EXISTS snapshots (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL,
+      trigger_action TEXT NOT NULL,
+      trigger_entity TEXT,
+      trigger_actor TEXT,
+      data TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+  `)
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_snapshots_project ON snapshots(project_id, created_at DESC)'
+  )
+
   // Initialize event stream table
   initEvents(db)
 
@@ -1052,6 +1068,75 @@ export function deleteArchitectureComponent(projectId, componentId) {
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
   return true
+}
+
+// ---------------------------------------------------------------------------
+// Snapshot operations — Phase 3
+// ---------------------------------------------------------------------------
+
+const MAX_SNAPSHOTS_PER_PROJECT = 20
+
+export function createSnapshot(projectId, { action, entity, actor }) {
+  const project = getProject(projectId)
+  if (!project) return null
+
+  const id = crypto.randomUUID()
+  const now = new Date().toISOString()
+
+  db.run(
+    `INSERT INTO snapshots (id, project_id, trigger_action, trigger_entity, trigger_actor, data, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [id, projectId, action, entity || null, actor || null, JSON.stringify(project), now]
+  )
+
+  const countResult = db.exec('SELECT COUNT(*) FROM snapshots WHERE project_id = ?', [projectId])
+  const count = countResult.length > 0 ? countResult[0].values[0][0] : 0
+  if (count > MAX_SNAPSHOTS_PER_PROJECT) {
+    db.run(
+      `DELETE FROM snapshots WHERE id IN (
+         SELECT id FROM snapshots WHERE project_id = ?
+         ORDER BY created_at ASC LIMIT ?
+       )`,
+      [projectId, count - MAX_SNAPSHOTS_PER_PROJECT]
+    )
+  }
+
+  scheduleSave()
+  return {
+    id,
+    project_id: projectId,
+    trigger_action: action,
+    trigger_entity: entity,
+    created_at: now,
+  }
+}
+
+export function listSnapshots(projectId) {
+  const results = db.exec(
+    `SELECT id, project_id, trigger_action, trigger_entity, trigger_actor, created_at
+     FROM snapshots WHERE project_id = ? ORDER BY created_at DESC`,
+    [projectId]
+  )
+  if (results.length === 0) return []
+  return results[0].values.map((row) => ({
+    id: row[0],
+    project_id: row[1],
+    trigger_action: row[2],
+    trigger_entity: row[3],
+    trigger_actor: row[4],
+    created_at: row[5],
+  }))
+}
+
+export function restoreSnapshot(projectId, snapshotId) {
+  const results = db.exec('SELECT data FROM snapshots WHERE id = ? AND project_id = ?', [
+    snapshotId,
+    projectId,
+  ])
+  if (results.length === 0 || results[0].values.length === 0) return null
+  const project = JSON.parse(results[0].values[0][0])
+  upsertProject(projectId, project)
+  return project
 }
 
 // ---------------------------------------------------------------------------

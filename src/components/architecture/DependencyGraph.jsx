@@ -426,7 +426,7 @@ export default function DependencyGraph({
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 350, damping: 25 }}
               className={[
-                'absolute select-none rounded-xl border-2 backdrop-blur-xl',
+                'absolute select-none rounded-xl border-2',
                 'hover:shadow-[0_0_24px_rgba(99,102,241,0.12)]',
                 isSelected
                   ? 'border-blue-500/60 ring-2 ring-blue-500/40 ring-offset-1 ring-offset-transparent'
@@ -442,7 +442,7 @@ export default function DependencyGraph({
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
                 opacity: highlightIds && !highlightIds.has(comp.id) ? 0.15 : 1,
                 transition: 'border-color 0.2s, box-shadow 0.2s, opacity 0.2s',
-                backgroundColor: 'var(--color-bg-glass)',
+                backgroundColor: 'var(--color-bg-node)',
               }}
               onMouseDown={(e) => handleNodeMouseDown(comp.id, e)}
             >

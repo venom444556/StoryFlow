@@ -300,7 +300,7 @@ export default function WorkflowTab({ project, onUpdate }) {
           <div className="relative flex items-stretch">
             <button
               onClick={() => setLogPanelOpen((prev) => !prev)}
-              className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-[var(--color-border-default)] p-1.5 text-[var(--color-fg-muted)] backdrop-blur-lg transition-colors hover:text-[var(--color-fg-default)]"
+              className="absolute -left-8 top-3 z-10 rounded-l-md border border-r-0 border-[var(--color-border-default)] p-1.5 text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg-default)]"
               style={{ backgroundColor: 'var(--color-bg-glass)' }}
               title={logPanelOpen ? 'Hide log' : 'Show log'}
             >

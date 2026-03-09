@@ -194,7 +194,7 @@ export default function NodeContextMenu({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.12, ease: 'easeOut' }}
-        className="absolute z-50 min-w-[192px] rounded-xl border border-[var(--color-border-emphasis)] p-1.5 shadow-2xl backdrop-blur-2xl"
+        className="absolute z-50 min-w-[192px] rounded-xl border border-[var(--color-border-emphasis)] p-1.5 shadow-2xl"
         style={{
           left: position.left,
           top: position.top,

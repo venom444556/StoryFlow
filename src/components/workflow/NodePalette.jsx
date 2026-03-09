@@ -111,7 +111,7 @@ export default function NodePalette({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="absolute left-0 top-full z-50 mt-2 w-[360px] rounded-xl border border-[var(--color-border-default)] p-3 shadow-2xl backdrop-blur-2xl"
+          className="absolute left-0 top-full z-50 mt-2 w-[360px] rounded-xl border border-[var(--color-border-default)] p-3 shadow-2xl"
           style={{ backgroundColor: 'var(--th-panel-heavy)' }}
         >
           <h4 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
