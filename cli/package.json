@@ -1,0 +1,36 @@
+{
+  "name": "storyflow-cli",
+  "version": "0.1.3",
+  "description": "StoryFlow Agent CLI — lightweight project management from the terminal",
+  "author": "Sheldon Spence",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "storyflow-cli": "bin/storyflow.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/venom444556/StoryFlow",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/venom444556/StoryFlow/tree/main/cli#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0"
+  },
+  "keywords": [
+    "storyflow",
+    "project-management",
+    "cli",
+    "agent",
+    "ai"
+  ]
+}

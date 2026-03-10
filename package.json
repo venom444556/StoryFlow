@@ -68,7 +68,7 @@
   ],
   "lint-staged": {
     "*.{js,jsx}": [
-      "eslint --fix",
+      "eslint --fix --ignore-pattern cli/",
       "prettier --write"
     ],
     "*.{json,css,md}": [
