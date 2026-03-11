@@ -7,6 +7,7 @@ import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
 import EmptyState from '../ui/EmptyState'
 import GlassCard from '../ui/GlassCard'
+import { shortEpicTitle } from '../../utils/constants'
 
 export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) {
   const [expandedEpicId, setExpandedEpicId] = useState(null)
@@ -69,7 +70,7 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
                     className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]"
                     title={epic.title}
                   >
-                    {epic.title}
+                    {shortEpicTitle(epic.title)}
                   </span>
                   <motion.div
                     animate={{ rotate: isExpanded ? 90 : 0 }}
@@ -139,7 +140,7 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden border-t border-[var(--color-border-default)]"
                   >
-                    <div className="max-h-[400px] overflow-y-auto p-2">
+                    <div className="max-h-[400px] divide-y divide-[var(--color-border-default)] overflow-y-auto">
                       {epic.children.length === 0 ? (
                         <p className="py-4 text-center text-xs text-[var(--color-fg-muted)]">
                           No child issues yet
@@ -205,7 +206,7 @@ function OrphanSection({ issues, onIssueClick, onDeleteIssue }) {
             transition={{ duration: 0.2 }}
             className="overflow-hidden border-t border-[var(--color-border-default)]"
           >
-            <div className="max-h-[400px] overflow-y-auto p-2">
+            <div className="max-h-[400px] divide-y divide-[var(--color-border-default)] overflow-y-auto">
               {issues.map((issue) => (
                 <BacklogRow
                   key={issue.id}

@@ -71,10 +71,6 @@ function TreeNode({
   const isExpanded = expandedIds.has(node.id)
   const isSelected = node.id === selectedPageId
   const icon = node.icon || null
-  const isAiAuthored = node.createdBy === 'ai'
-  const isAgentPage = node.title?.startsWith('Agent:')
-  const needsReview = isAiAuthored && node.status !== 'published' && !isAgentPage
-
   // If filtering, only show nodes that match (or have a matching descendant)
   if (filter && !matchesFilter(node, filter)) return null
 
@@ -88,10 +84,6 @@ function TreeNode({
           isSelected
             ? 'text-[var(--color-fg-default)] border-l-2'
             : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]',
-          isAiAuthored &&
-            !isSelected &&
-            !isAgentPage &&
-            'border-l-2 border-l-[var(--color-ai-accent)]',
         ]
           .filter(Boolean)
           .join(' ')}
@@ -138,13 +130,6 @@ function TreeNode({
         <span className="flex-1 truncate" title={node.title || 'Untitled'}>
           {node.title || 'Untitled'}
         </span>
-
-        {/* AI review indicator */}
-        {needsReview && (
-          <span className="shrink-0 rounded-full bg-[var(--color-ai-bg)] px-1.5 py-px text-[9px] font-medium text-[var(--color-ai-accent)]">
-            Review
-          </span>
-        )}
 
         {/* Pin indicator */}
         {node.pinned && <Pin size={12} className="shrink-0 text-yellow-500/70" />}

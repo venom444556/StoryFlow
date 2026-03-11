@@ -210,6 +210,7 @@ For detailed playbooks on each capability, read the references:
 - **Statuses**: "To Do", "In Progress", "Done", "Blocked" — exact strings, title-case
 - **Story points**: Fibonacci only — 1, 2, 3, 5, 8, 13
 - **Issue types**: "epic", "story", "task", "bug" — lowercase
+- **Epic naming**: use shorthand "P0:", "P1:", "P2:" etc. — never "Phase 0:", "Phase 1:". Example: "P1: Foundation", "P2: Core Product"
 - **Priorities**: "critical", "high", "medium", "low"
 - **Dedup**: always check existing issues before creating. Match by title, case-insensitive
 - **Never delete**: issues are never removed by this agent. Only humans delete.

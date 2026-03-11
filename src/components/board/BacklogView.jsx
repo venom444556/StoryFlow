@@ -18,6 +18,7 @@ import Avatar from '../ui/Avatar'
 import DropdownMenu from '../ui/DropdownMenu'
 import { getLabel } from '../../utils/labelDefinitions'
 import { sanitizeColor } from '../../utils/sanitize'
+import { shortEpicTitle } from '../../utils/constants'
 
 const VIRTUALIZE_THRESHOLD = 50
 
@@ -523,7 +524,7 @@ function EpicGroupedList({ epicGroups, onIssueClick, onDeleteIssue }) {
                 className="flex-1 text-sm font-medium"
                 style={{ color: 'var(--accent-default)' }}
               >
-                {epic.title}
+                {shortEpicTitle(epic.title)}
               </span>
               <Badge variant="purple" size="sm">
                 {children.length} issues

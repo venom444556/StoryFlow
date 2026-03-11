@@ -95,6 +95,19 @@ export const POINT_SCALES = {
 }
 
 // ---------------------------------------------------------------------------
+// Display helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Shorten epic/phase titles for compact display.
+ * "Phase 1: Foundation" → "P1: Foundation"
+ */
+export function shortEpicTitle(title) {
+  if (!title) return 'Untitled'
+  return title.replace(/^Phase\s+(\d+)/i, 'P$1')
+}
+
+// ---------------------------------------------------------------------------
 // Navigation tab keys
 // ---------------------------------------------------------------------------
 export const TAB_KEYS = {

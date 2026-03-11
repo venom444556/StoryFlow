@@ -115,14 +115,6 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
     [pages, updatePage]
   )
 
-  // ----- Status toggle (not currently used, but kept for future) -----
-  // eslint-disable-next-line no-unused-vars
-  const _handlePublishToggle = useCallback(() => {
-    if (!selectedPage) return
-    const nextStatus = selectedPage.status === 'published' ? 'draft' : 'published'
-    updatePage(selectedPageId, { status: nextStatus })
-  }, [selectedPage, selectedPageId, updatePage])
-
   // ----- Version restore -----
 
   const handleRestore = useCallback(
