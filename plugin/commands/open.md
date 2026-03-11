@@ -10,7 +10,7 @@ Open the StoryFlow UI in the user's browser.
 
 ## Instructions
 
-1. Read the StoryFlow URL from `~/.config/storyflow/config.json` or `$STORYFLOW_URL`
+1. Get the StoryFlow URL by running `storyflow config show` or reading `~/.config/storyflow/config.json`
 2. If not configured, tell the user to run `/storyflow:setup` first
 3. Open the URL in the default browser:
    - On macOS: `open <url>`

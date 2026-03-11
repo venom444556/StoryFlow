@@ -10,9 +10,8 @@ Show a board summary for a StoryFlow project.
 ## Instructions
 
 1. If not configured, tell the user to run `/storyflow:setup` first
-2. If no project argument given, list all projects and ask which one
-3. Call the `storyflow_get_board_summary` MCP tool with the project ID
-4. Format the output as a readable summary:
+2. Run `storyflow board --json` (or `storyflow board <project> --json` if a project argument is given) via Bash
+3. Format the output as a readable summary:
 
 ```
 Board Summary — <Project Name>
@@ -31,7 +30,7 @@ Stale Issues: <staleCount>
 
 ## Arguments
 
-- `[project]` — Optional project ID or name. If omitted, lists projects to choose from.
+- `[project]` — Optional project name or ID. If omitted, uses default project.
 
 ## Examples
 

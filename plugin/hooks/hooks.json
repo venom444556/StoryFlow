@@ -1,5 +1,5 @@
 {
-  "description": "StoryFlow closed-loop board sync — dispatches the storyflow-agent to keep the board in sync with actual work",
+  "description": "StoryFlow closed-loop board sync — dispatches the storyflow-agent to keep the board in sync with actual work (CLI-based, zero MCP)",
   "hooks": {
     "PostToolUse": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -q '\"completed\"'; then echo 'Task completed. Invoke the storyflow-agent to move the corresponding issue to Done on the StoryFlow board. Pass it the task subject and completion details.'; elif echo \"$input\" | grep -q '\"in_progress\"'; then echo 'Task started. Invoke the storyflow-agent to ensure this task has a corresponding issue on the StoryFlow board and set it to In Progress.'; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -q '\"completed\"'; then echo 'Task completed. Invoke the storyflow-agent to move the corresponding issue to Done on the StoryFlow board using the CLI (storyflow issues done <key>). Pass it the task subject and completion details.'; elif echo \"$input\" | grep -q '\"in_progress\"'; then echo 'Task started. Invoke the storyflow-agent to ensure this task has a corresponding issue on the StoryFlow board and set it to In Progress using the CLI.'; fi",
             "timeout": 5
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Plan approved. Invoke the storyflow-agent to create issues from the plan on the StoryFlow board and set them to In Progress. Pass it the plan details.'",
+            "command": "echo 'Plan approved. Invoke the storyflow-agent to create issues from the plan on the StoryFlow board using the CLI (storyflow issues create ...) and set them to In Progress. Pass it the plan details.'",
             "timeout": 5
           }
         ]
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -qE '\\.md\"?$'; then echo 'Markdown file written. Invoke the storyflow-agent to check if this should be synced to the StoryFlow wiki.'; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE '\\.md\"?$'; then echo 'Markdown file written. Invoke the storyflow-agent to check if this should be synced to the StoryFlow wiki using the CLI (storyflow pages create/update).'; fi",
             "timeout": 5
           }
         ]
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board — pass it the commit message so it can mark completed issues as Done.'; elif echo \"$input\" | grep -qE '(npm test|vitest|jest|pytest|cargo test)'; then if echo \"$input\" | grep -qiE '(passed|Tests:.*passed|OK)'; then echo 'Tests passed. Invoke the storyflow-agent to record a milestone nudge for in-progress issues.'; elif echo \"$input\" | grep -qiE '(FAIL|failed|error)'; then echo 'Tests failed. Invoke the storyflow-agent to file bugs for failing tests.'; fi; elif echo \"$input\" | grep -qE 'gh pr create'; then echo 'PR created. Invoke the storyflow-agent to link related issues and update their status.'; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board via CLI — pass it the commit message so it can mark completed issues as Done (storyflow issues done <key>).'; elif echo \"$input\" | grep -qE '(npm test|vitest|jest|pytest|cargo test)'; then if echo \"$input\" | grep -qiE '(passed|Tests:.*passed|OK)'; then echo 'Tests passed. Invoke the storyflow-agent to record a milestone nudge for in-progress issues via CLI.'; elif echo \"$input\" | grep -qiE '(FAIL|failed|error)'; then echo 'Tests failed. Invoke the storyflow-agent to file bugs for failing tests via CLI (storyflow issues create --type bug ...).'; fi; elif echo \"$input\" | grep -qE 'gh pr create'; then echo 'PR created. Invoke the storyflow-agent to link related issues and update their status via CLI.'; fi",
             "timeout": 5
           }
         ]
@@ -49,7 +49,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. If StoryFlow is not configured or unreachable, skip silently.'",
+            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. Use the storyflow CLI (not MCP tools). If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session ending. Invoke the storyflow-agent to reconcile the StoryFlow board before stopping. If StoryFlow is not configured or unreachable, skip silently.'",
+            "command": "echo 'Session ending. Invoke the storyflow-agent to reconcile the StoryFlow board before stopping. Use the storyflow CLI (not MCP tools). If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]

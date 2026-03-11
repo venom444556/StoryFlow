@@ -1,7 +1,7 @@
 {
   "name": "storyflow",
-  "version": "2.0.0",
-  "description": "Integrate Claude Code with StoryFlow project management — 37 MCP tools for issues, sprints, wiki, AI transparency, agent autonomy, and git reconciliation.",
+  "version": "3.0.0",
+  "description": "Integrate Claude Code with StoryFlow project management via CLI — issues, sprints, wiki, AI transparency, agent autonomy, and git reconciliation. Zero MCP overhead.",
   "author": {
     "name": "StoryFlow",
     "url": "https://github.com/venom444556/StoryFlow"
@@ -15,7 +15,7 @@
     "issues",
     "sprints",
     "wiki",
-    "mcp",
+    "cli",
     "ai-transparency",
     "agent-autonomy"
   ]

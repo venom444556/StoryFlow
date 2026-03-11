@@ -9,7 +9,7 @@ Check StoryFlow connectivity and sync status.
 
 ## Instructions
 
-1. Call the `storyflow_check_connection` MCP tool
+1. Run `storyflow status` via Bash
 2. Display the result:
 
 ### If connected:
@@ -23,7 +23,7 @@ StoryFlow is reachable at <url>
 Cannot reach StoryFlow at <url>
   Error: <error message>
 
-  Make sure StoryFlow is running: cd <storyflow-dir> && npm run dev:full
+  Make sure StoryFlow is running: cd <storyflow-dir> && node server/index.js
   Or reconfigure: /storyflow:setup
 ```
 
