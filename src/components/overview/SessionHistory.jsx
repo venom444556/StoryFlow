@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { History, ChevronDown, ChevronUp, Plus, Pencil, BookOpen, Lightbulb } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import GlassCard from '../ui/GlassCard'
 import SectionHeader from '../ui/SectionHeader'
 import EmptyState from '../ui/EmptyState'
 
@@ -170,8 +169,8 @@ export default function SessionHistory({ projectId }) {
 
   if (loading) {
     return (
-      <GlassCard padding="none" className="overflow-hidden">
-        <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+      <div className="glass-card flex flex-col overflow-hidden">
+        <div className="border-b border-[var(--color-border-default)] px-5 py-4">
           <SectionHeader icon={History} color="var(--color-ai-accent)" className="mb-0">
             Session History
           </SectionHeader>
@@ -187,25 +186,25 @@ export default function SessionHistory({ projectId }) {
             </div>
           ))}
         </div>
-      </GlassCard>
+      </div>
     )
   }
 
   if (sessions.length === 0) {
     return (
-      <GlassCard padding="none">
+      <div className="glass-card overflow-hidden">
         <EmptyState
           icon={History}
           title="No agent sessions yet"
           description="Session history will appear here after the AI agent completes work on your project"
         />
-      </GlassCard>
+      </div>
     )
   }
 
   return (
-    <GlassCard padding="none" className="overflow-hidden">
-      <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+    <div className="glass-card flex flex-col overflow-hidden">
+      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
         <SectionHeader
           icon={History}
           color="var(--color-ai-accent)"
@@ -215,11 +214,11 @@ export default function SessionHistory({ projectId }) {
           Session History
         </SectionHeader>
       </div>
-      <div className="max-h-[400px] overflow-y-auto py-1">
+      <div className="max-h-[400px] overflow-y-auto py-2">
         {sessions.map((session) => (
           <SessionCard key={session.id} session={session} />
         ))}
       </div>
-    </GlassCard>
+    </div>
   )
 }

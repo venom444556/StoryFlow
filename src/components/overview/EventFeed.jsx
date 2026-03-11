@@ -61,11 +61,9 @@ const FILTERS = [
 ]
 
 function FeedItem({ event }) {
-  const respondToEvent = useEventStore((s) => s.respondToEvent)
   const Icon = ACTION_ICONS[event.action] || FileText
   const categoryColor = CATEGORY_COLORS[event.category] || 'var(--color-fg-muted)'
   const isPendingGate = event.status === 'pending'
-  const isPendingAi = event.actor === 'ai' && !event.human_response
 
   const timeAgo = useMemo(() => {
     try {
@@ -117,12 +115,10 @@ function FeedItem({ event }) {
       transition={{ duration: 0.15 }}
       className={[
         'group flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--color-bg-glass)]',
-        'border-l-[3px]',
-        isPendingGate ? 'border-l-amber-400/60 bg-amber-400/5' : '',
+        isPendingGate ? 'bg-amber-400/5' : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      style={!isPendingGate ? { borderLeftColor: categoryColor } : undefined}
     >
       {/* Category-colored icon */}
       <div
@@ -169,31 +165,6 @@ function FeedItem({ event }) {
             {absoluteTime}
           </span>
         </div>
-
-        {/* Approve/Reject for pending AI actions */}
-        {isPendingAi && (
-          <div className="mt-2 flex gap-2">
-            <button
-              onClick={() => respondToEvent(event.id, 'approve')}
-              className="flex items-center gap-1 rounded-md bg-[var(--color-success-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-success)] transition-colors hover:opacity-80"
-            >
-              <Check size={10} /> Approve
-            </button>
-            <button
-              onClick={() => respondToEvent(event.id, 'reject')}
-              className="flex items-center gap-1 rounded-md bg-[var(--color-danger-subtle)] px-2 py-1 text-[11px] font-medium text-[var(--color-danger)] transition-colors hover:opacity-80"
-            >
-              <XCircle size={10} /> Reject
-            </button>
-          </div>
-        )}
-
-        {event.human_response && (
-          <div className="mt-1 text-[10px] text-[var(--color-fg-subtle)]">
-            {event.human_response.action === 'approve' ? 'Approved' : 'Rejected'}
-            {event.human_response.comment && ` — ${event.human_response.comment}`}
-          </div>
-        )}
       </div>
     </motion.div>
   )
@@ -213,7 +184,7 @@ export default function EventFeed() {
   return (
     <div className="glass-card flex flex-col overflow-hidden">
       {/* Header with filters */}
-      <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
         <SectionHeader
           icon={Zap}
           color="var(--accent-default)"
@@ -245,7 +216,7 @@ export default function EventFeed() {
       </div>
 
       {/* Event list */}
-      <div className="max-h-[520px] flex-1 overflow-y-auto py-1">
+      <div className="max-h-[520px] flex-1 overflow-y-auto py-2">
         {filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
             <Zap size={28} className="mb-2 text-[var(--color-fg-faint)]" />

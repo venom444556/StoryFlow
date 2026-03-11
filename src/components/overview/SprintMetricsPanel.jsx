@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, Clock, Layers } from 'lucide-react'
-import GlassCard from '../ui/GlassCard'
 import SectionHeader from '../ui/SectionHeader'
 import { MetricTile } from './MetricsSummary'
 
@@ -156,12 +155,14 @@ export default function SprintMetricsPanel({ project }) {
   if (issues.length === 0) return null
 
   return (
-    <GlassCard>
-      <SectionHeader icon={BarChart3} color="var(--color-info, #3b82f6)">
-        Sprint Metrics
-      </SectionHeader>
+    <div className="glass-card flex flex-col overflow-hidden">
+      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+        <SectionHeader icon={BarChart3} color="var(--color-info, #3b82f6)" className="mb-0">
+          Sprint Metrics
+        </SectionHeader>
+      </div>
 
-      <div className="space-y-5">
+      <div className="space-y-6 px-5 py-4">
         {/* Cycle time + blocked time tiles */}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {cycleTimeSamples > 0 && (
@@ -215,6 +216,6 @@ export default function SprintMetricsPanel({ project }) {
           </div>
         )}
       </div>
-    </GlassCard>
+    </div>
   )
 }

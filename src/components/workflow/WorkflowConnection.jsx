@@ -15,9 +15,9 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
  * - connection {object}    { id, from, to }
  * - onDelete   {function}  callback to remove this connection
  */
-// Handle Y offset from node top — matches the fixed `top-[34px]` in WorkflowNode
-// Handle center = 34px (top offset) + 7px (half of 14px handle height) = 41px
-const HANDLE_CENTER_Y = 41
+// Handle Y offset from node top — matches the fixed `top-[38px]` in WorkflowNode
+// Handle center = 38px (top offset) + 7px (half of 14px handle height) = 45px
+const HANDLE_CENTER_Y = 45
 
 function getOutputPoint(node) {
   return {
@@ -43,7 +43,7 @@ export default function WorkflowConnection({ fromNode, toNode, connection, onDel
   const pathD = buildBezierPath(start.x, start.y, end.x, end.y)
 
   const baseColor = getConnectionColor(fromNode, toNode)
-  const strokeColor = hovered ? '#3b82f6' : baseColor
+  const strokeColor = hovered ? '#22d3ee' : baseColor
 
   // Midpoint for delete button
   const midX = (start.x + end.x) / 2

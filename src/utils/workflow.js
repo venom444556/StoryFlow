@@ -150,21 +150,21 @@ export function buildBezierPath(startX, startY, endX, endY) {
  * @returns {string} hex colour
  */
 export function getConnectionColor(fromNode, toNode) {
-  if (!fromNode || !toNode) return '#4b5563' // gray-600
+  if (!fromNode || !toNode) return '#475569' // slate-600
 
   if (fromNode.status === 'error' || toNode.status === 'error') {
-    return '#ef4444' // red-500
+    return '#f87171' // red-400
   }
   if (fromNode.status === 'success' && toNode.status === 'running') {
-    return '#eab308' // yellow-500
+    return '#fbbf24' // amber-400
   }
   if (fromNode.status === 'success' && toNode.status === 'success') {
-    return '#22c55e' // green-500
+    return '#34d399' // emerald-400
   }
   if (fromNode.status === 'running' || toNode.status === 'running') {
-    return '#eab308' // yellow-500
+    return '#fbbf24' // amber-400
   }
-  return '#4b5563' // gray-600  (idle / default)
+  return '#475569' // slate-600 (idle / default — visible on Neptune charcoal)
 }
 
 // ---------------------------------------------------------------------------

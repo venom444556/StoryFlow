@@ -29,9 +29,9 @@
   --color-glass-hover: var(--color-bg-glass-hover);
   --color-glass-active: var(--color-bg-glass-active);
 
-  /* Typography — Outfit (display) + DM Sans (body) */
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', 'DM Sans', system-ui, sans-serif;
+  /* Typography — General Sans (Neptune-inspired) */
+  --font-sans: 'General Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'General Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
@@ -43,6 +43,8 @@
 /* ----- Glass surface ----- */
 .glass {
   background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border-default);
 }
 
@@ -50,7 +52,7 @@
 .glass-card {
   background: var(--color-bg-card, var(--color-bg-glass));
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   transition: border-color var(--duration-normal) var(--ease-default);
   position: relative;
   overflow: hidden;
@@ -64,7 +66,7 @@
 .glass-card-elevated {
   background: var(--color-bg-card, var(--color-bg-glass));
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   transition:
     box-shadow var(--duration-normal) var(--ease-default),
@@ -76,6 +78,27 @@
 .glass-card-elevated:hover {
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
+}
+
+/* ----- Neptune gradient top border accent ----- */
+.glass-card-neptune {
+  background: var(--color-bg-card, var(--color-bg-glass));
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card-neptune::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+  opacity: 0.6;
 }
 
 /* ----- Sidebar ----- */
@@ -130,7 +153,7 @@
 }
 
 .theme-light .glass-card:hover {
-  background: #fafaf9;
+  background: #f8f9fb;
   border-color: var(--color-border-emphasis);
   box-shadow: var(--shadow-card-hover);
 }
@@ -352,13 +375,13 @@
   border-radius: var(--radius-full);
 }
 
-/* Display headings use Outfit */
+/* Display headings — General Sans with Neptune tracking */
 h1,
 h2,
 h3,
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 /* =====================================================
@@ -551,5 +574,5 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  letter-spacing: 0.01em;
+  letter-spacing: 0em;
 }

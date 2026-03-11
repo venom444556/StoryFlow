@@ -23,15 +23,16 @@ export const TYPE_COLORS = {
 }
 
 // Hex colors for graph rendering (node color bars, edges)
+// Tuned for Neptune charcoal palette — Tailwind 400-level for visibility without harshness
 export const TYPE_HEX_COLORS = {
-  page: '#3b82f6',
-  component: '#8b5cf6',
-  hook: '#06b6d4',
-  util: '#eab308',
-  context: '#22c55e',
-  api: '#ef4444',
-  service: '#ec4899',
-  model: '#6b7280',
+  page: '#60a5fa',
+  component: '#a78bfa',
+  hook: '#22d3ee',
+  util: '#fbbf24',
+  context: '#34d399',
+  api: '#fb923c',
+  service: '#f472b6',
+  model: '#94a3b8',
 }
 
 export const TYPE_ICONS = {

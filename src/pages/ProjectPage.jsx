@@ -157,7 +157,7 @@ export default function ProjectPage() {
       />
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="shrink-0 px-4 pt-3 pb-2 md:px-6 md:pt-4">
+        <div className="shrink-0 px-4 pt-4 pb-3 md:px-8 md:pt-5">
           <ProjectHeader project={project} onUpdate={updateProject} />
         </div>
 
@@ -178,7 +178,7 @@ export default function ProjectPage() {
           </div>
         )}
 
-        <div className="flex-1 overflow-auto px-4 pb-20 md:px-6 md:pb-6">
+        <div className="flex-1 overflow-auto px-4 pb-20 md:px-8 md:pb-8">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0 }}

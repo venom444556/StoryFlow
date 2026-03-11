@@ -65,14 +65,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="h-full overflow-auto p-6 lg:p-8">
+    <div className="h-full overflow-auto p-8 lg:p-12">
       {/* Title row — title left, actions right */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-entrance">
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-entrance">
         <div>
-          <h1 className="heading-accent text-2xl font-bold tracking-tight text-[var(--color-fg-default)]">
+          <h1 className="heading-accent text-4xl font-medium tracking-tight text-[var(--color-fg-default)]">
             Projects
           </h1>
-          <p className="mt-3 text-sm text-[var(--color-fg-muted)]">
+          <p className="mt-3 text-base text-[var(--color-fg-muted)]">
             {projects.length} project{projects.length !== 1 ? 's' : ''}
             {trashedProjects.length > 0 && (
               <span className="text-[var(--color-fg-subtle)]">
@@ -175,7 +175,7 @@ export default function DashboardPage() {
 
       {/* Project grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((project, index) => {
             const statusVariant = STATUS_BADGE_VARIANT[project.status] || 'default'
             const issues = project.board?.issues || []
@@ -188,7 +188,7 @@ export default function DashboardPage() {
                 key={project.id}
                 onClick={() => navigate(`/project/${project.id}`)}
                 className={[
-                  'glass-card-elevated group cursor-pointer p-6',
+                  'glass-card-elevated group cursor-pointer p-7',
                   `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
                 ].join(' ')}
               >
@@ -196,7 +196,7 @@ export default function DashboardPage() {
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <h3
-                      className="truncate text-base font-semibold text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
+                      className="truncate text-lg font-bold tracking-tight text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
                       style={{ transitionDuration: 'var(--duration-fast)' }}
                     >
                       {project.name}

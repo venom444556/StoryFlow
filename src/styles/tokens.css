@@ -224,12 +224,12 @@
   --accent-pink-rgb: 236, 72, 153;
   --accent-indigo-rgb: 99, 102, 241;
 
-  /* Interactive colors */
-  --interactive-default: var(--accent-indigo);
-  --interactive-hover: #4f46e5;
-  --interactive-active: #4338ca;
-  --interactive-disabled: #94a3b8;
-  --interactive-rgb: var(--accent-indigo-rgb);
+  /* Interactive colors — teal/cyan (Neptune signature) */
+  --interactive-default: var(--accent-cyan);
+  --interactive-hover: #0891b2;
+  --interactive-active: #0e7490;
+  --interactive-disabled: #64748b;
+  --interactive-rgb: var(--accent-cyan-rgb);
 
   /* Accent alias — resolves to user-chosen accent (set by SettingsContext) */
   --accent-default: var(--accent-active, #06b6d4);
@@ -248,57 +248,57 @@
 }
 
 /* =====================================================
-   DARK THEME (Default)
+   DARK THEME (Default) — Neptune Charcoal
    ===================================================== */
 
 .theme-dark {
   color-scheme: dark;
 
   /* -------------------------------------------------
-     BACKGROUND COLORS — Warm Obsidian
+     BACKGROUND COLORS — Cool Charcoal
      ------------------------------------------------- */
-  --color-bg-base: #0c0a09;
-  --color-bg-subtle: #1c1917;
-  --color-bg-muted: #292524;
-  --color-bg-emphasis: #44403c;
-  --color-bg-inverse: #fafaf9;
-  --color-dropdown-bg: #1c1917;
+  --color-bg-base: #0f1117;
+  --color-bg-subtle: #161922;
+  --color-bg-muted: #1e2130;
+  --color-bg-emphasis: #2a2e3d;
+  --color-bg-inverse: #f0f2f5;
+  --color-dropdown-bg: #161922;
 
-  /* Glass/translucent backgrounds — visible elevation against #0c0a09 */
-  --color-bg-glass: rgba(255, 248, 240, 0.055);
-  --color-bg-glass-hover: rgba(255, 248, 240, 0.085);
-  --color-bg-glass-active: rgba(255, 248, 240, 0.12);
-  --color-bg-glass-emphasis: rgba(255, 248, 240, 0.16);
+  /* Glass/translucent backgrounds — cool blue-white tint */
+  --color-bg-glass: rgba(148, 163, 194, 0.06);
+  --color-bg-glass-hover: rgba(148, 163, 194, 0.1);
+  --color-bg-glass-active: rgba(148, 163, 194, 0.14);
+  --color-bg-glass-emphasis: rgba(148, 163, 194, 0.18);
 
   /* Node backgrounds — solid for canvas elements */
-  --color-bg-node: #1c1917;
-  --color-bg-node-hover: #292524;
+  --color-bg-node: #161922;
+  --color-bg-node-hover: #1e2130;
 
-  /* Card background — elevated above #0c0a09, clearly visible step */
-  --color-bg-card: #1c1917;
+  /* Card background — elevated above base */
+  --color-bg-card: #161922;
 
   /* Overlay backgrounds */
-  --color-bg-overlay: rgba(12, 10, 9, 0.88);
-  --color-bg-overlay-heavy: rgba(12, 10, 9, 0.94);
+  --color-bg-overlay: rgba(15, 17, 23, 0.88);
+  --color-bg-overlay-heavy: rgba(15, 17, 23, 0.94);
   --color-bg-backdrop: rgba(0, 0, 0, 0.65);
 
   /* -------------------------------------------------
-     FOREGROUND/TEXT COLORS
+     FOREGROUND/TEXT COLORS — cool slate
      ------------------------------------------------- */
-  --color-fg-default: #fafaf9;
-  --color-fg-muted: #a8a29e;
-  --color-fg-subtle: #78716c;
-  --color-fg-faint: #57534e;
-  --color-fg-inverse: #0c0a09;
+  --color-fg-default: #f0f2f5;
+  --color-fg-muted: #8b92a5;
+  --color-fg-subtle: #5c6478;
+  --color-fg-faint: #3d4455;
+  --color-fg-inverse: #0f1117;
   --color-fg-on-accent: #ffffff;
 
   /* -------------------------------------------------
-     BORDER COLORS — warm-tinted
+     BORDER COLORS — cool slate
      ------------------------------------------------- */
-  --color-border-default: rgba(168, 162, 158, 0.15);
-  --color-border-muted: rgba(168, 162, 158, 0.09);
-  --color-border-emphasis: rgba(168, 162, 158, 0.24);
-  --color-border-strong: rgba(168, 162, 158, 0.35);
+  --color-border-default: rgba(139, 146, 165, 0.15);
+  --color-border-muted: rgba(139, 146, 165, 0.09);
+  --color-border-emphasis: rgba(139, 146, 165, 0.24);
+  --color-border-strong: rgba(139, 146, 165, 0.35);
 
   /* -------------------------------------------------
      STATUS COLORS
@@ -323,18 +323,18 @@
   /* -------------------------------------------------
      INPUT COLORS
      ------------------------------------------------- */
-  --color-input-bg: rgba(250, 245, 235, 0.04);
-  --color-input-bg-hover: rgba(250, 245, 235, 0.06);
-  --color-input-bg-focus: rgba(250, 245, 235, 0.07);
-  --color-input-border: rgba(168, 162, 158, 0.15);
-  --color-input-placeholder: #78716c;
+  --color-input-bg: rgba(148, 163, 194, 0.05);
+  --color-input-bg-hover: rgba(148, 163, 194, 0.08);
+  --color-input-bg-focus: rgba(148, 163, 194, 0.1);
+  --color-input-border: rgba(139, 146, 165, 0.15);
+  --color-input-placeholder: #5c6478;
 
   /* -------------------------------------------------
      SCROLLBAR
      ------------------------------------------------- */
   --color-scrollbar-track: transparent;
-  --color-scrollbar-thumb: rgba(168, 162, 158, 0.2);
-  --color-scrollbar-thumb-hover: rgba(168, 162, 158, 0.35);
+  --color-scrollbar-thumb: rgba(139, 146, 165, 0.2);
+  --color-scrollbar-thumb-hover: rgba(139, 146, 165, 0.35);
 
   /* -------------------------------------------------
      SELECTION
@@ -343,18 +343,18 @@
   --color-selection-fg: #ffffff;
 
   /* -------------------------------------------------
-     SHADOWS — warm-tinted
+     SHADOWS — cool-tinted
      ------------------------------------------------- */
   --shadow-color: rgba(0, 0, 0, 0.4);
   --glow-color: rgba(6, 182, 212, 0.2);
 
-  /* Card shadow — dramatic multi-layer with inner highlight */
+  /* Card shadow — dramatic multi-layer with cool inner highlight */
   --shadow-card:
     0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px -2px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 248, 240, 0.08);
+    inset 0 1px 0 rgba(148, 163, 194, 0.08);
   --shadow-card-hover:
     0 2px 4px rgba(0, 0, 0, 0.3), 0 12px 40px -8px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(var(--accent-default-rgb), 0.15), inset 0 1px 0 rgba(255, 248, 240, 0.1);
+    0 0 0 1px rgba(var(--accent-default-rgb), 0.15), inset 0 1px 0 rgba(148, 163, 194, 0.1);
 
   /* Button glow — accent-colored atmospheric shadow */
   --shadow-button-primary:
@@ -363,20 +363,20 @@
 
   /* Elevated — modals, dropdowns, command palette */
   --shadow-elevated:
-    0 0 0 1px rgba(255, 248, 240, 0.06), 0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(148, 163, 194, 0.06), 0 4px 8px rgba(0, 0, 0, 0.3),
     0 16px 48px -8px rgba(0, 0, 0, 0.6);
 
   /* Toast — floating notification */
   --shadow-toast:
     0 2px 8px rgba(0, 0, 0, 0.3), 0 8px 24px -4px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 248, 240, 0.06);
+    inset 0 1px 0 rgba(148, 163, 194, 0.06);
 
   /* -------------------------------------------------
-     AMBIENT BACKGROUND
+     AMBIENT BACKGROUND — cool teal/slate orbs
      ------------------------------------------------- */
-  --color-orb-purple: rgba(6, 182, 212, 0.18);
-  --color-orb-blue: rgba(8, 145, 178, 0.1);
-  --color-orb-cyan: rgba(14, 116, 144, 0.07);
+  --color-orb-purple: rgba(6, 182, 212, 0.14);
+  --color-orb-blue: rgba(56, 89, 160, 0.08);
+  --color-orb-cyan: rgba(14, 116, 144, 0.06);
 
   /* -------------------------------------------------
      FOCUS RING
@@ -388,17 +388,17 @@
      Used by charts, graphs, canvas, and panels.
      Maps to semantic tokens for theme-awareness.
      ------------------------------------------------- */
-  --th-bg: #0c0a09;
-  --th-panel: rgba(250, 245, 235, 0.05);
-  --th-panel-light: rgba(250, 245, 235, 0.03);
-  --th-panel-medium: rgba(12, 10, 9, 0.6);
-  --th-panel-heavy: rgba(12, 10, 9, 0.88);
-  --th-panel-solid: #1c1917;
-  --th-border: rgba(168, 162, 158, 0.12);
-  --th-border-hover: rgba(168, 162, 158, 0.2);
-  --th-text-muted: #a8a29e;
-  --th-text-faint: #57534e;
-  --th-text-secondary: #a8a29e;
+  --th-bg: #0f1117;
+  --th-panel: rgba(148, 163, 194, 0.05);
+  --th-panel-light: rgba(148, 163, 194, 0.03);
+  --th-panel-medium: rgba(15, 17, 23, 0.6);
+  --th-panel-heavy: rgba(15, 17, 23, 0.88);
+  --th-panel-solid: #161922;
+  --th-border: rgba(139, 146, 165, 0.12);
+  --th-border-hover: rgba(139, 146, 165, 0.2);
+  --th-text-muted: #8b92a5;
+  --th-text-faint: #3d4455;
+  --th-text-secondary: #8b92a5;
 
   /* -------------------------------------------------
      AI TRANSPARENCY (themed)
@@ -417,20 +417,20 @@
   --shadow-node-active:
     0 0 16px rgba(var(--accent-default-rgb), 0.4), 0 0 4px rgba(var(--accent-default-rgb), 0.2);
   --shadow-node-cycle: 0 0 16px rgba(239, 68, 68, 0.5), 0 0 4px rgba(239, 68, 68, 0.3);
-  --color-bg-statusbar: rgba(255, 248, 240, 0.04);
+  --color-bg-statusbar: rgba(148, 163, 194, 0.04);
   --sidebar-active-border: linear-gradient(
     180deg,
     var(--accent-default),
     rgba(var(--accent-default-rgb), 0.3)
   );
 
-  /* Obsidian gradient card */
+  /* Neptune gradient card */
   --color-bg-obsidian: linear-gradient(
     135deg,
-    rgba(255, 248, 240, 0.07) 0%,
-    rgba(255, 248, 240, 0.03) 100%
+    rgba(148, 163, 194, 0.07) 0%,
+    rgba(148, 163, 194, 0.03) 100%
   );
-  --color-bg-obsidian-border: rgba(255, 248, 240, 0.1);
+  --color-bg-obsidian-border: rgba(148, 163, 194, 0.1);
 
   /* Confidence level tokens */
   --color-confidence-high: #22c55e;
@@ -477,9 +477,8 @@
 }
 
 /* =====================================================
-   LIGHT THEME — "Warm Linen"
-   Warm bone/eggshell base with amber undertones.
-   No cold Slate grays — all neutrals are warm Stone.
+   LIGHT THEME — "Arctic Slate"
+   Cool gray-white base with blue undertones.
    ===================================================== */
 
 .theme-light {
@@ -487,25 +486,25 @@
 
   /* -------------------------------------------------
      BACKGROUND COLORS
-     Warm bone → eggshell → linen → warm stone
+     Cool white → ice → frost → slate
      ------------------------------------------------- */
-  --color-bg-base: #f9f7f4; /* Bone */
-  --color-bg-subtle: #f3f0eb; /* Eggshell */
-  --color-bg-muted: #ebe7e0; /* Linen */
-  --color-bg-emphasis: #ddd8cf; /* Warm stone */
-  --color-bg-inverse: #2c2825; /* Warm charcoal */
+  --color-bg-base: #f5f6f8; /* Ice white */
+  --color-bg-subtle: #eef0f4; /* Frost */
+  --color-bg-muted: #e4e7ed; /* Cool gray */
+  --color-bg-emphasis: #d5d9e2; /* Slate */
+  --color-bg-inverse: #1a1d28; /* Cool charcoal */
   --color-dropdown-bg: #ffffff;
 
   /* Glass/card backgrounds — solid white (no translucency in light mode) */
   --color-bg-card: #ffffff;
   --color-bg-glass: #ffffff;
-  --color-bg-glass-hover: #fafaf9;
-  --color-bg-glass-active: #f5f3f0;
-  --color-bg-glass-emphasis: #f3f0eb;
+  --color-bg-glass-hover: #f8f9fb;
+  --color-bg-glass-active: #f0f2f5;
+  --color-bg-glass-emphasis: #eef0f4;
 
   /* Node backgrounds — solid for canvas elements */
   --color-bg-node: #ffffff;
-  --color-bg-node-hover: #fafaf9;
+  --color-bg-node-hover: #f8f9fb;
 
   /* Overlay backgrounds — solid for light mode */
   --color-bg-overlay: #ffffff;
@@ -514,23 +513,23 @@
 
   /* -------------------------------------------------
      FOREGROUND/TEXT COLORS
-     Warm charcoal scale — no blue tint
+     Cool charcoal scale with blue tint
      ------------------------------------------------- */
-  --color-fg-default: #2c2825;
-  --color-fg-muted: #6b6560;
-  --color-fg-subtle: #8a8279;
-  --color-fg-faint: #b0a89e;
-  --color-fg-inverse: #f9f7f4;
+  --color-fg-default: #1a1d28;
+  --color-fg-muted: #5a6072;
+  --color-fg-subtle: #7c8294;
+  --color-fg-faint: #a4a9b8;
+  --color-fg-inverse: #f5f6f8;
   --color-fg-on-accent: #ffffff;
 
   /* -------------------------------------------------
      BORDER COLORS
-     Warm, defined — structured like a well-made book
+     Cool, crisp — defined with blue tint
      ------------------------------------------------- */
-  --color-border-default: #e0dbd3;
-  --color-border-muted: #e8e4dc;
-  --color-border-emphasis: #c7bfb5;
-  --color-border-strong: #9e958b;
+  --color-border-default: #dde0e8;
+  --color-border-muted: #e6e9ef;
+  --color-border-emphasis: #c2c7d3;
+  --color-border-strong: #9ba1b2;
 
   /* -------------------------------------------------
      STATUS COLORS
@@ -557,31 +556,30 @@
      INPUT COLORS
      Slightly lighter than base for inset feel
      ------------------------------------------------- */
-  --color-input-bg: #fdfcfa;
-  --color-input-bg-hover: #f7f4f0;
-  --color-input-bg-focus: #fdfcfa;
-  --color-input-border: #cbc4ba;
-  --color-input-placeholder: #a39b91;
+  --color-input-bg: #fafbfc;
+  --color-input-bg-hover: #f2f4f7;
+  --color-input-bg-focus: #fafbfc;
+  --color-input-border: #c2c7d3;
+  --color-input-placeholder: #9ba1b2;
 
   /* -------------------------------------------------
      SCROLLBAR
      ------------------------------------------------- */
-  --color-scrollbar-track: #ebe7e0;
-  --color-scrollbar-thumb: #c7bfb5;
-  --color-scrollbar-thumb-hover: #9e958b;
+  --color-scrollbar-track: #e4e7ed;
+  --color-scrollbar-thumb: #c2c7d3;
+  --color-scrollbar-thumb-hover: #9ba1b2;
 
   /* -------------------------------------------------
      SELECTION
      ------------------------------------------------- */
-  --color-selection-bg: rgba(99, 102, 241, 0.12);
-  --color-selection-fg: #2c2825;
+  --color-selection-bg: rgba(6, 182, 212, 0.12);
+  --color-selection-fg: #1a1d28;
 
   /* -------------------------------------------------
-     SHADOWS
-     Warm-tinted, soft depth
+     SHADOWS — cool-tinted, soft depth
      ------------------------------------------------- */
   --shadow-color: rgba(0, 0, 0, 0.04);
-  --glow-color: rgba(99, 102, 241, 0.06);
+  --glow-color: rgba(6, 182, 212, 0.06);
 
   /* Card-specific shadow — Apple-tight */
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.06);
@@ -600,12 +598,11 @@
   --shadow-toast: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
 
   /* -------------------------------------------------
-     GRADIENT ORB BACKGROUNDS
-     Warm amber/rose/gold instead of purple/blue/cyan
+     GRADIENT ORB BACKGROUNDS — cool, barely visible
      ------------------------------------------------- */
-  --color-orb-purple: rgba(180, 130, 80, 0.015);
-  --color-orb-blue: rgba(160, 100, 120, 0.01);
-  --color-orb-cyan: rgba(140, 120, 90, 0.008);
+  --color-orb-purple: rgba(6, 182, 212, 0.015);
+  --color-orb-blue: rgba(56, 89, 160, 0.01);
+  --color-orb-cyan: rgba(100, 116, 139, 0.008);
 
   /* -------------------------------------------------
      FOCUS RING
@@ -613,27 +610,27 @@
   --focus-ring-color: var(--interactive-default);
 
   /* -------------------------------------------------
-     INTERACTIVE COLORS (indigo — the brand)
+     INTERACTIVE COLORS (teal — Neptune brand)
      ------------------------------------------------- */
-  --interactive-default: #4f46e5;
-  --interactive-hover: #4338ca;
-  --interactive-active: #3730a3;
+  --interactive-default: #0891b2;
+  --interactive-hover: #0e7490;
+  --interactive-active: #155e75;
 
   /* -------------------------------------------------
      THEME BRIDGE (--th-* aliases)
      Solid white panels for clean light mode
      ------------------------------------------------- */
-  --th-bg: #f9f7f4;
-  --th-panel: rgba(44, 40, 37, 0.03);
-  --th-panel-light: rgba(44, 40, 37, 0.02);
+  --th-bg: #f5f6f8;
+  --th-panel: rgba(26, 29, 40, 0.03);
+  --th-panel-light: rgba(26, 29, 40, 0.02);
   --th-panel-medium: #ffffff;
   --th-panel-heavy: #ffffff;
   --th-panel-solid: #ffffff;
-  --th-border: #e0dbd3;
-  --th-border-hover: #c7bfb5;
-  --th-text-muted: #6b6560;
-  --th-text-faint: #b0a89e;
-  --th-text-secondary: #8a8279;
+  --th-border: #dde0e8;
+  --th-border-hover: #c2c7d3;
+  --th-text-muted: #5a6072;
+  --th-text-faint: #a4a9b8;
+  --th-text-secondary: #7c8294;
 
   /* -------------------------------------------------
      AI TRANSPARENCY (themed)
@@ -645,27 +642,27 @@
   --color-human-border: rgba(124, 58, 237, 0.3);
   --color-human-bg: rgba(124, 58, 237, 0.06);
   --color-ai-working: #15803d;
-  --color-ai-idle: #8a8279;
+  --color-ai-idle: #7c8294;
   --color-ai-blocked: #c2410c;
 
   /* Node & canvas tokens (light) */
   --shadow-node-active:
     0 0 12px rgba(var(--accent-default-rgb), 0.2), 0 0 3px rgba(var(--accent-default-rgb), 0.1);
   --shadow-node-cycle: 0 0 12px rgba(220, 38, 38, 0.3), 0 0 3px rgba(220, 38, 38, 0.15);
-  --color-bg-statusbar: rgba(44, 40, 37, 0.04);
+  --color-bg-statusbar: rgba(26, 29, 40, 0.04);
   --sidebar-active-border: linear-gradient(
     180deg,
     var(--accent-default),
     rgba(var(--accent-default-rgb), 0.3)
   );
 
-  /* Obsidian gradient card (light) */
+  /* Neptune gradient card (light) */
   --color-bg-obsidian: linear-gradient(
     135deg,
-    rgba(44, 40, 37, 0.04) 0%,
-    rgba(44, 40, 37, 0.01) 100%
+    rgba(26, 29, 40, 0.04) 0%,
+    rgba(26, 29, 40, 0.01) 100%
   );
-  --color-bg-obsidian-border: rgba(44, 40, 37, 0.08);
+  --color-bg-obsidian-border: rgba(26, 29, 40, 0.08);
 
   /* Confidence level tokens (light) */
   --color-confidence-high: #15803d;

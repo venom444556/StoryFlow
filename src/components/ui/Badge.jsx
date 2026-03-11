@@ -70,7 +70,7 @@ export default function Badge({
         'inline-flex items-center gap-1 rounded-full font-medium',
         outline
           ? `bg-transparent border ${OUTLINE_VARIANTS[variant] || OUTLINE_VARIANTS.default}`
-          : VARIANTS[variant] || VARIANTS.default,
+          : `border border-[var(--color-border-muted)] ${VARIANTS[variant] || VARIANTS.default}`,
         SIZES[size] || SIZES.sm,
       ].join(' ')}
     >

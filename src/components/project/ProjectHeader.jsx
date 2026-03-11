@@ -126,12 +126,12 @@ export default function ProjectHeader({ project, onUpdate }) {
             onChange={(e) => setNameValue(e.target.value)}
             onBlur={commitName}
             onKeyDown={handleKeyDown}
-            className="w-full border-none bg-transparent text-lg font-semibold text-[var(--color-fg-default)] outline-none"
+            className="w-full border-none bg-transparent text-xl font-bold text-[var(--color-fg-default)] outline-none tracking-tight"
           />
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="truncate text-lg font-semibold text-[var(--color-fg-default)] transition-colors"
+            className="truncate text-xl font-bold tracking-tight text-[var(--color-fg-default)] transition-colors"
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-default)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = '')}
           >

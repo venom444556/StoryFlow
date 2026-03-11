@@ -12,7 +12,7 @@ export default function WorkflowZoomControls({
   const pct = Math.round(scale * 100)
 
   return (
-    <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1 rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-emphasis)] px-1.5 py-1 shadow-lg">
+    <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-emphasis)] px-2 py-1.5 shadow-xl shadow-black/20">
       <Tooltip content="Zoom out">
         <button
           onClick={onZoomOut}

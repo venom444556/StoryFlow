@@ -207,6 +207,9 @@ export default function Header({
         </nav>
       </div>
 
+      {/* Separator */}
+      <div className="mx-[var(--space-4)] h-5 w-px bg-[var(--color-border-default)]" />
+
       {/* Actions */}
       <div className="flex items-center gap-[var(--space-1)]">
         {/* Search */}

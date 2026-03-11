@@ -83,7 +83,7 @@ export default function NodePalette({
               key={typeDef.type}
               onClick={() => !disabled && onSelect?.(typeDef)}
               disabled={disabled}
-              className="group flex flex-col items-center gap-1 rounded-lg border border-transparent bg-[var(--color-bg-glass)] px-1.5 py-2 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)] disabled:opacity-50 disabled:pointer-events-none"
+              className="group flex flex-col items-center gap-1 rounded-xl border border-transparent bg-[var(--color-bg-glass)] px-1.5 py-2.5 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)] disabled:opacity-50 disabled:pointer-events-none"
             >
               {Icon && (
                 <Icon
@@ -111,11 +111,11 @@ export default function NodePalette({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.96 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="absolute left-0 top-full z-50 mt-2 w-[360px] rounded-xl border border-[var(--color-border-default)] p-3 shadow-2xl"
+          className="absolute left-0 top-full z-50 mt-2 w-[380px] rounded-2xl border border-[var(--color-border-default)] p-4 shadow-2xl shadow-black/30"
           style={{ backgroundColor: 'var(--th-panel-heavy)' }}
         >
           <h4 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
-            Choose a Node Type
+            Choose a node type
           </h4>
 
           <div className="grid grid-cols-3 gap-2">
@@ -125,7 +125,7 @@ export default function NodePalette({
                 <button
                   key={typeDef.type}
                   onClick={() => onSelect?.(typeDef)}
-                  className="group flex flex-col items-center gap-1.5 rounded-lg border border-transparent bg-[var(--color-bg-glass)] px-2 py-3 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)]"
+                  className="group flex flex-col items-center gap-1.5 rounded-xl border border-transparent bg-[var(--color-bg-glass)] px-2 py-3 text-center transition-all duration-150 hover:border-[var(--color-border-emphasis)] hover:bg-[var(--color-bg-glass-hover)]"
                 >
                   {Icon && (
                     <Icon

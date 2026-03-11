@@ -18,7 +18,7 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
 // drag, connection-drawing, zoom/pan, and context menu support.
 // Uses extracted hooks for viewport, drag, pan, and connection management.
 // ---------------------------------------------------------------------------
-const HANDLE_CENTER_Y = 41
+const HANDLE_CENTER_Y = 45
 
 export default function WorkflowCanvas({
   nodes,
@@ -255,7 +255,7 @@ export default function WorkflowCanvas({
         y1={startY}
         x2={tempConnectionEnd.x}
         y2={tempConnectionEnd.y}
-        stroke="#3b82f6"
+        stroke="#22d3ee"
         strokeWidth="2"
         strokeDasharray="6 4"
         strokeLinecap="round"
@@ -287,10 +287,10 @@ export default function WorkflowCanvas({
   return (
     <div
       ref={canvasRef}
-      className="relative flex-1 overflow-hidden bg-[var(--color-surface-primary)] rounded-xl"
+      className="relative flex-1 overflow-hidden bg-[var(--color-surface-primary)] rounded-2xl"
       style={{
         cursor: canvasCursor,
-        backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.8px, transparent 0.8px)`,
+        backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.6px, transparent 0.6px)`,
         backgroundSize: `${gridSize}px ${gridSize}px`,
         backgroundPosition: `${gridOffX}px ${gridOffY}px`,
       }}

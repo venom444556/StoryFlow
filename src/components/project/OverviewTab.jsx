@@ -10,45 +10,41 @@ export default function OverviewTab({ project }) {
   if (!project) return null
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
-      {/* AI Status — hero card at the top */}
+    <div className="space-y-8 pb-8">
+      {/* AI Status — hero banner, full width */}
       <div className="animate-entrance stagger-1">
         <AIStatusCard />
       </div>
 
-      {/* Two-column grid: gates+events left, metrics+sessions right */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_380px]">
-        {/* Left column — primary content */}
-        <div className="space-y-5">
-          {/* Gate approvals + escalations */}
-          <div className="animate-entrance stagger-2">
-            <GatePanel projectId={project.id} />
-          </div>
+      {/* Hero metrics — full-width row */}
+      <div className="animate-entrance stagger-2">
+        <MetricsSummary project={project} />
+      </div>
 
-          {/* Event Feed */}
-          <div className="animate-entrance stagger-3">
+      {/* Gate approvals + escalations */}
+      <div className="animate-entrance stagger-3">
+        <GatePanel projectId={project.id} />
+      </div>
+
+      {/* Two-column: feed + steering left, sprint + sessions right */}
+      <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1fr_420px]">
+        {/* Left column — activity & steering */}
+        <div className="space-y-8">
+          <div className="animate-entrance stagger-4">
             <EventFeed />
           </div>
 
-          {/* Steering Bar — input at the bottom of left column */}
-          <div className="animate-entrance stagger-6">
+          <div className="animate-entrance stagger-5">
             <SteeringBar projectId={project.id} />
           </div>
         </div>
 
-        {/* Right column — metrics + sessions */}
-        <div className="space-y-5">
-          {/* Metrics row */}
-          <div className="animate-entrance stagger-3">
-            <MetricsSummary project={project} />
-          </div>
-
-          {/* Sprint metrics */}
+        {/* Right column — sprint metrics + sessions */}
+        <div className="space-y-8">
           <div className="animate-entrance stagger-4">
             <SprintMetricsPanel project={project} />
           </div>
 
-          {/* Session History */}
           <div className="animate-entrance stagger-5">
             <SessionHistory projectId={project.id} />
           </div>

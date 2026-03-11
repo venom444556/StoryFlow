@@ -34,7 +34,7 @@ export default function WorkflowToolbar({
   }
 
   return (
-    <div className="glass relative z-10 flex items-center justify-between gap-4 px-4 py-2.5">
+    <div className="glass relative z-10 flex items-center justify-between gap-4 rounded-2xl px-5 py-3">
       {/* Left – add node */}
       <div className="relative flex items-center gap-2">
         <button

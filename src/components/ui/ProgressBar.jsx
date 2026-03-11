@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 
 function getBarColor(value) {
-  if (value < 25) return 'from-[var(--color-danger)] to-red-400'
-  if (value < 50) return 'from-[var(--color-warning)] to-yellow-400'
-  if (value < 75) return 'from-[var(--color-info)] to-blue-400'
-  return 'from-[var(--color-success)] to-green-400'
+  if (value < 25) return 'from-[var(--color-danger)] to-[var(--color-danger)]'
+  if (value < 50) return 'from-[var(--color-warning)] to-[var(--color-warning)]'
+  if (value < 75) return 'from-[var(--accent-cyan)] to-[var(--accent-blue)]'
+  return 'from-[var(--color-success)] to-[var(--accent-cyan)]'
 }
 
 const SIZES = {

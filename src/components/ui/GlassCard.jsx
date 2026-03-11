@@ -1,8 +1,8 @@
 const PADDING = {
   none: '',
   sm: 'p-[var(--space-3)]',
-  md: 'p-[var(--space-3-5)]',
-  lg: 'p-[var(--space-7)]',
+  md: 'p-[var(--space-5)]',
+  lg: 'p-[var(--space-8)]',
 }
 
 export default function GlassCard({
@@ -22,7 +22,7 @@ export default function GlassCard({
       className={[
         isObsidian ? '' : 'glass-card',
         PADDING[padding] || PADDING.md,
-        isObsidian && 'rounded-[var(--radius-md)]',
+        isObsidian && 'rounded-[var(--radius-lg)]',
         hover && 'transition-colors cursor-pointer',
         onClick && !hover && 'cursor-pointer',
         className,

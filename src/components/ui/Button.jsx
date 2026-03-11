@@ -92,7 +92,8 @@ export default function Button({
         transitionTimingFunction: 'var(--ease-default)',
         ...(isPrimary
           ? {
-              background: 'var(--accent-default)',
+              background:
+                'linear-gradient(135deg, var(--accent-default), var(--interactive-hover))',
               boxShadow: 'var(--shadow-button-primary)',
             }
           : {}),

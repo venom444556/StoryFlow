@@ -1,44 +1,75 @@
 import { useMemo } from 'react'
-import {
-  Bot,
-  User,
-  CheckCircle2,
-  AlertTriangle,
-  TrendingUp,
-  Activity,
-  Gauge,
-  ShieldAlert,
-} from 'lucide-react'
-import GlassCard from '../ui/GlassCard'
-import SectionHeader from '../ui/SectionHeader'
+import { Bot, User, CheckCircle2, AlertTriangle, Gauge, ShieldAlert } from 'lucide-react'
 import Sparkline from '../ui/Sparkline'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
 
 export function MetricTile({ icon: Icon, label, value, subtext, color, trend }) {
   return (
     <div
-      className="group flex flex-col gap-1 rounded-xl bg-[var(--color-bg-glass)] p-3 transition-colors hover:bg-[var(--color-bg-glass-hover)]"
-      style={{ transitionDuration: 'var(--duration-normal)' }}
+      className="group relative flex flex-col gap-2 overflow-hidden rounded-2xl p-5 transition-all hover:scale-[1.02]"
+      style={{
+        background: 'var(--color-bg-glass)',
+        border: '1px solid var(--color-border-default)',
+        transitionDuration: 'var(--duration-normal)',
+      }}
       title={`${label}: ${value}${subtext ? ` — ${subtext}` : ''}`}
     >
+      {/* Top accent line */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background: `linear-gradient(to right, transparent, ${color}, transparent)`,
+          opacity: 0.4,
+        }}
+      />
+
       <div className="flex items-center justify-between">
         <div
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
           style={{
             backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
           }}
         >
-          <Icon size={12} style={{ color }} />
+          <Icon size={16} style={{ color }} />
         </div>
         {trend && trend.length >= 2 && (
-          <Sparkline data={trend} width={48} height={18} color={color} strokeWidth={1.5} />
+          <Sparkline data={trend} width={56} height={22} color={color} strokeWidth={1.5} />
         )}
       </div>
-      <p className="text-xl font-bold leading-none tracking-tight text-[var(--color-fg-default)]">
+      <p className="text-3xl font-bold leading-none tracking-tight text-[var(--color-fg-default)]">
         {value}
       </p>
-      <p className="text-[11px] font-medium text-[var(--color-fg-muted)]">{label}</p>
-      {subtext && <p className="text-[10px] text-[var(--color-fg-subtle)]">{subtext}</p>}
+      <div>
+        <p className="text-xs font-medium text-[var(--color-fg-muted)]">{label}</p>
+        {subtext && <p className="mt-0.5 text-[11px] text-[var(--color-fg-subtle)]">{subtext}</p>}
+      </div>
+    </div>
+  )
+}
+
+function HeroStat({ value, label, color }) {
+  return (
+    <div
+      className="relative flex flex-col items-center justify-center overflow-hidden rounded-2xl px-6 py-8"
+      style={{
+        background: 'var(--color-bg-glass)',
+        border: '1px solid var(--color-border-default)',
+      }}
+    >
+      {/* Glow behind the number */}
+      <div
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          background: `radial-gradient(circle at 50% 60%, ${color || 'var(--accent-default)'}, transparent 70%)`,
+        }}
+      />
+      <p
+        className="relative text-5xl font-bold leading-none tracking-tight"
+        style={{ color: color || 'var(--color-fg-default)' }}
+      >
+        {value}
+      </p>
+      <p className="relative mt-3 text-sm font-medium text-[var(--color-fg-muted)]">{label}</p>
     </div>
   )
 }
@@ -50,21 +81,17 @@ export default function MetricsSummary({ project }) {
     const aiEvents = events.filter((e) => e.actor === 'ai')
     const humanEvents = events.filter((e) => e.actor === 'human')
 
-    // Human override rate: AI events that were rejected / total AI events with response
     const respondedAi = aiEvents.filter((e) => e.human_response)
     const rejected = respondedAi.filter((e) => e.human_response?.action === 'reject')
     const overrideRate =
       respondedAi.length > 0 ? Math.round((rejected.length / respondedAi.length) * 100) : 0
 
-    // Issues stats from project data
     const issues = project?.board?.issues || []
     const doneIssues = issues.filter((i) => i.status === 'Done')
     const inProgressIssues = issues.filter((i) => i.status === 'In Progress')
     const blockedIssues = issues.filter((i) => i.status === 'Blocked')
-    const totalPoints = issues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
     const donePoints = doneIssues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
 
-    // Average AI confidence from events with confidence scores
     const aiWithConfidence = aiEvents.filter(
       (e) => e.confidence !== null && e.confidence !== undefined
     )
@@ -75,7 +102,6 @@ export default function MetricsSummary({ project }) {
           )
         : null
 
-    // Determine confidence color
     let confidenceColor = 'var(--color-fg-muted)'
     if (avgConfidence !== null) {
       if (avgConfidence >= 80) confidenceColor = 'var(--color-confidence-high)'
@@ -83,7 +109,6 @@ export default function MetricsSummary({ project }) {
       else confidenceColor = 'var(--color-confidence-low)'
     }
 
-    // Completion percentage
     const completionPct =
       issues.length > 0 ? Math.round((doneIssues.length / issues.length) * 100) : 0
 
@@ -96,7 +121,6 @@ export default function MetricsSummary({ project }) {
       issuesBlocked: blockedIssues.length,
       totalIssues: issues.length,
       velocity: donePoints,
-      totalPoints,
       avgConfidence,
       confidenceColor,
       completionPct,
@@ -104,35 +128,21 @@ export default function MetricsSummary({ project }) {
   }, [events, project])
 
   return (
-    <GlassCard>
-      <SectionHeader icon={Activity} color="var(--accent-default)">
-        Metrics
-      </SectionHeader>
-
-      {/* Hero stats row */}
-      <div className="mb-3 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
-          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-fg-default)]">
-            {metrics.totalIssues}
-          </p>
-          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Total Issues</p>
-        </div>
-        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
-          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-success)]">
-            {metrics.completionPct}%
-          </p>
-          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Complete</p>
-        </div>
-        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
-          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-info)]">
-            {metrics.velocity}
-          </p>
-          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Points Done</p>
-        </div>
+    <div className="space-y-6">
+      {/* Hero stats — big, full-width, Neptune-style */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <HeroStat value={metrics.totalIssues} label="Total Issues" />
+        <HeroStat
+          value={`${metrics.completionPct}%`}
+          label="Complete"
+          color="var(--color-success)"
+        />
+        <HeroStat value={metrics.velocity} label="Points Done" color="var(--accent-cyan)" />
+        <HeroStat value={metrics.issuesInProgress} label="In Progress" color="var(--color-info)" />
       </div>
 
-      {/* Detail tiles */}
-      <div className="grid grid-cols-2 gap-2">
+      {/* Detail tiles — secondary metrics */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <MetricTile
           icon={Bot}
           label="AI Actions"
@@ -156,10 +166,10 @@ export default function MetricsSummary({ project }) {
         />
         <MetricTile
           icon={CheckCircle2}
-          label="In Progress"
-          value={metrics.issuesInProgress}
+          label="Done"
+          value={metrics.issuesDone}
           subtext={`${metrics.issuesBlocked} blocked`}
-          color="var(--color-info, #3b82f6)"
+          color="var(--color-success)"
         />
         {metrics.avgConfidence !== null && (
           <MetricTile
@@ -180,6 +190,6 @@ export default function MetricsSummary({ project }) {
           />
         )}
       </div>
-    </GlassCard>
+    </div>
   )
 }

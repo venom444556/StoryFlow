@@ -10,7 +10,7 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
 // Adapted from WorkflowConnection but simplified — no execution status.
 // Arrow goes FROM depender TO dependency (A→B means "A depends on B").
 // ---------------------------------------------------------------------------
-const NODE_HEIGHT_CENTER = 40 // approximate center of a node
+const NODE_HEIGHT_CENTER = 48 // approximate center of a node
 
 function getOutputPoint(node) {
   return {
@@ -37,7 +37,7 @@ export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete,
   const pathD = buildBezierPath(start.x, start.y, end.x, end.y)
 
   const baseColor = TYPE_HEX_COLORS[sourceType] || '#6b7280'
-  const strokeColor = hovered ? '#3b82f6' : baseColor
+  const strokeColor = hovered ? '#22d3ee' : baseColor
 
   // Midpoint for delete button
   const midX = (start.x + end.x) / 2

@@ -377,11 +377,11 @@ export default function DependencyGraph({
   return (
     <div
       ref={canvasRef}
-      className="relative flex-1 overflow-hidden bg-[var(--color-surface-primary)] rounded-xl"
+      className="relative flex-1 overflow-hidden bg-[var(--color-surface-primary)] rounded-2xl"
       style={{
         cursor: canvasCursor,
         minHeight: 400,
-        backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.8px, transparent 0.8px)`,
+        backgroundImage: `radial-gradient(circle, var(--color-border-emphasis) 0.6px, transparent 0.6px)`,
         backgroundSize: `${gridSize}px ${gridSize}px`,
         backgroundPosition: `${gridOffX}px ${gridOffY}px`,
       }}
@@ -422,15 +422,13 @@ export default function DependencyGraph({
           return (
             <motion.div
               key={comp.id}
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
               className={[
-                'absolute select-none rounded-xl border-2',
-                'hover:shadow-[0_0_24px_rgba(99,102,241,0.12)]',
-                isSelected
-                  ? 'border-blue-500/60 ring-2 ring-blue-500/40 ring-offset-1 ring-offset-transparent'
-                  : 'border-[var(--color-border-default)]',
+                'absolute select-none rounded-2xl',
+                isSelected &&
+                  'ring-2 ring-[var(--accent-cyan)]/50 ring-offset-2 ring-offset-transparent',
               ]
                 .filter(Boolean)
                 .join(' ')}
@@ -441,27 +439,37 @@ export default function DependencyGraph({
                 zIndex: isSelected ? 20 : 2,
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
                 opacity: highlightIds && !highlightIds.has(comp.id) ? 0.15 : 1,
-                transition: 'border-color 0.2s, box-shadow 0.2s, opacity 0.2s',
-                backgroundColor: 'var(--color-bg-node)',
+                background: 'var(--color-bg-node, var(--color-bg-obsidian))',
+                border: isSelected
+                  ? `1.5px solid var(--accent-cyan, #06b6d4)`
+                  : '1.5px solid var(--color-border-default)',
+                boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
+                transition: 'border-color 0.25s, box-shadow 0.25s, opacity 0.2s',
               }}
               onMouseDown={(e) => handleNodeMouseDown(comp.id, e)}
             >
-              {/* Color bar */}
-              <div className="h-1 rounded-t-[10px]" style={{ backgroundColor: hexColor }} />
+              {/* Top accent gradient — Neptune signature */}
+              <div
+                className="absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${hexColor}, transparent)`,
+                  opacity: 0.7,
+                }}
+              />
 
-              <div className="px-3 py-2.5">
+              <div className="px-4 py-3">
                 {/* Header */}
-                <div className="mb-1.5 flex items-center gap-2">
+                <div className="mb-2 flex items-center gap-2.5">
                   {TypeIcon && (
                     <div
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
-                      style={{ backgroundColor: `${hexColor}22` }}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${hexColor}18` }}
                     >
-                      <TypeIcon size={13} style={{ color: hexColor }} />
+                      <TypeIcon size={15} style={{ color: hexColor }} />
                     </div>
                   )}
                   <span
-                    className="flex-1 truncate text-sm font-semibold text-[var(--color-fg-default)]"
+                    className="flex-1 truncate text-[13px] font-bold tracking-tight text-[var(--color-fg-default)]"
                     title={comp.name}
                   >
                     {comp.name}
@@ -469,15 +477,19 @@ export default function DependencyGraph({
                 </div>
 
                 {/* Type badge + dep count */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <span
-                    className="inline-block rounded-full px-2 py-0.5 text-[10px] font-medium"
-                    style={{ backgroundColor: `${hexColor}22`, color: hexColor }}
+                    className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-semibold tracking-wide"
+                    style={{
+                      backgroundColor: `${hexColor}15`,
+                      color: hexColor,
+                      border: `1px solid ${hexColor}25`,
+                    }}
                   >
                     {comp.type}
                   </span>
                   {depCount > 0 && (
-                    <span className="text-[10px] text-[var(--color-fg-muted)]">
+                    <span className="text-[10px] text-[var(--color-fg-subtle)]">
                       {depCount} dep{depCount !== 1 ? 's' : ''}
                     </span>
                   )}
@@ -485,9 +497,9 @@ export default function DependencyGraph({
 
                 {/* Description preview */}
                 {comp.description && (
-                  <div className="mt-2">
+                  <div className="mt-2.5">
                     <p
-                      className="line-clamp-1 text-[10px] leading-tight text-[var(--color-fg-muted)]"
+                      className="line-clamp-1 text-[10px] leading-relaxed text-[var(--color-fg-subtle)]"
                       title={comp.description}
                     >
                       {comp.description}

@@ -54,7 +54,11 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
         // Desktop: always visible, relative position
         'md:relative md:flex md:h-full',
       ].join(' ')}
-      style={{ zIndex: mobileMenuOpen ? 'var(--z-drawer)' : 'var(--z-sticky)' }}
+      style={{
+        zIndex: mobileMenuOpen ? 'var(--z-drawer)' : 'var(--z-sticky)',
+        background:
+          'linear-gradient(180deg, var(--color-bg-overlay) 0%, var(--color-bg-subtle) 100%)',
+      }}
       animate={{ width: mobileMenuOpen ? 260 : collapsed ? 64 : 260 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
     >

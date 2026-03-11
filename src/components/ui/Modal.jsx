@@ -124,7 +124,7 @@ export default function Modal({
           <motion.div
             ref={modalRef}
             className={[
-              'glass-card relative z-10 w-full overflow-hidden',
+              'glass-card-neptune relative z-10 w-full overflow-hidden',
               SIZE_MAP[size] || SIZE_MAP.md,
               // Full-screen on mobile for md+ modals
               size !== 'sm' ? 'max-md:max-w-none max-md:h-full max-md:rounded-none' : '',
@@ -133,6 +133,7 @@ export default function Modal({
               .join(' ')}
             style={{
               boxShadow: 'var(--shadow-elevated)',
+              borderRadius: 'var(--radius-xl)',
             }}
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
