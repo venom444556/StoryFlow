@@ -17,7 +17,7 @@ export default function OverviewTab({ project }) {
       </div>
 
       {/* Two-column grid: gates+events left, metrics+sessions right */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_380px]">
         {/* Left column — primary content */}
         <div className="space-y-5">
           {/* Gate approvals + escalations */}

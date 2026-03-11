@@ -16,6 +16,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
 import AIBadge from '../ui/AIBadge'
+import SectionHeader from '../ui/SectionHeader'
 
 const ACTION_ICONS = {
   create: Plus,
@@ -74,6 +75,19 @@ function FeedItem({ event }) {
     }
   }, [event.timestamp])
 
+  const absoluteTime = useMemo(() => {
+    try {
+      return new Date(event.timestamp).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+    } catch {
+      return ''
+    }
+  }, [event.timestamp])
+
   const description = useMemo(() => {
     const entity = event.entity_title || event.entity_type || ''
     switch (event.action) {
@@ -124,7 +138,7 @@ function FeedItem({ event }) {
 
         {event.reasoning && (
           <p
-            className="mt-0.5 line-clamp-1 text-[11px] text-[var(--color-fg-subtle)]"
+            className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-[var(--color-fg-subtle)]"
             title={event.reasoning}
           >
             {event.reasoning}
@@ -151,7 +165,9 @@ function FeedItem({ event }) {
           >
             {CATEGORY_LABELS[event.category] || event.category}
           </span>
-          <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
+          <span className="font-mono text-[10px] text-[var(--color-fg-faint)]" title={timeAgo}>
+            {absoluteTime}
+          </span>
         </div>
 
         {/* Approve/Reject for pending AI actions */}
@@ -197,33 +213,35 @@ export default function EventFeed() {
   return (
     <div className="glass-card flex flex-col overflow-hidden">
       {/* Header with filters */}
-      <div className="flex items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-3">
-        <Zap size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Activity Feed</h3>
-        <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
-          {events.length}
-        </span>
-
-        <div className="flex-1" />
-
-        {/* Filter chips */}
-        <div className="flex items-center gap-1">
-          <Filter size={11} className="mr-1 text-[var(--color-fg-faint)]" />
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setActiveFilter(f.key)}
-              className={[
-                'rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
-                activeFilter === f.key
-                  ? 'bg-[var(--color-accent-emphasis)] text-white'
-                  : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)]',
-              ].join(' ')}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+      <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+        <SectionHeader
+          icon={Zap}
+          color="var(--accent-default)"
+          count={events.length}
+          live={events.length > 0}
+          className="mb-0"
+          action={
+            <div className="flex items-center gap-1">
+              <Filter size={11} className="mr-1 text-[var(--color-fg-faint)]" />
+              {FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setActiveFilter(f.key)}
+                  className={[
+                    'rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
+                    activeFilter === f.key
+                      ? 'bg-[var(--color-accent-emphasis)] text-white'
+                      : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass-hover)]',
+                  ].join(' ')}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          }
+        >
+          Activity Feed
+        </SectionHeader>
       </div>
 
       {/* Event list */}

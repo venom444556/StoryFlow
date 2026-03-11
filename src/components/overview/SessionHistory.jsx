@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { History, ChevronDown, ChevronUp, Plus, Pencil, BookOpen, Lightbulb } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import GlassCard from '../ui/GlassCard'
+import SectionHeader from '../ui/SectionHeader'
 import EmptyState from '../ui/EmptyState'
 
 function SessionCard({ session }) {
@@ -39,14 +40,21 @@ function SessionCard({ session }) {
           />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p className="text-[13px] font-medium text-[var(--color-fg-default)]">
+          <div className="flex items-start gap-2">
+            <p
+              className={[
+                'text-[13px] font-medium leading-snug text-[var(--color-fg-default)]',
+                !expanded && 'line-clamp-2',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
               {session.summary || session.work_done || 'Agent session'}
             </p>
             {expanded ? (
-              <ChevronUp size={12} className="shrink-0 text-[var(--color-fg-muted)]" />
+              <ChevronUp size={12} className="mt-0.5 shrink-0 text-[var(--color-fg-muted)]" />
             ) : (
-              <ChevronDown size={12} className="shrink-0 text-[var(--color-fg-muted)]" />
+              <ChevronDown size={12} className="mt-0.5 shrink-0 text-[var(--color-fg-muted)]" />
             )}
           </div>
 
@@ -163,9 +171,10 @@ export default function SessionHistory({ projectId }) {
   if (loading) {
     return (
       <GlassCard padding="none" className="overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
-          <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
-          <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Session History</h3>
+        <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+          <SectionHeader icon={History} color="var(--color-ai-accent)" className="mb-0">
+            Session History
+          </SectionHeader>
         </div>
         <div className="space-y-3 p-4">
           {[1, 2].map((i) => (
@@ -196,12 +205,15 @@ export default function SessionHistory({ projectId }) {
 
   return (
     <GlassCard padding="none" className="overflow-hidden">
-      <div className="flex items-center gap-2 border-b border-[var(--color-border-default)] px-4 py-3">
-        <History size={14} style={{ color: 'var(--color-ai-accent)' }} />
-        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Session History</h3>
-        <span className="rounded-full bg-[var(--color-bg-glass)] px-2 py-0.5 text-[10px] text-[var(--color-fg-muted)]">
-          {sessions.length}
-        </span>
+      <div className="border-b border-[var(--color-border-default)] px-4 py-3">
+        <SectionHeader
+          icon={History}
+          color="var(--color-ai-accent)"
+          count={sessions.length}
+          className="mb-0"
+        >
+          Session History
+        </SectionHeader>
       </div>
       <div className="max-h-[400px] overflow-y-auto py-1">
         {sessions.map((session) => (

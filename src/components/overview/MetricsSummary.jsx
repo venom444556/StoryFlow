@@ -10,33 +10,35 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
+import SectionHeader from '../ui/SectionHeader'
+import Sparkline from '../ui/Sparkline'
 import { useEventStore, selectEvents } from '../../stores/eventStore'
 
-export function MetricTile({ icon: Icon, label, value, subtext, color }) {
+export function MetricTile({ icon: Icon, label, value, subtext, color, trend }) {
   return (
     <div
-      className="group flex items-start gap-2.5 rounded-xl bg-[var(--color-bg-glass)] p-3 transition-colors hover:bg-[var(--color-bg-glass-hover)]"
+      className="group flex flex-col gap-1 rounded-xl bg-[var(--color-bg-glass)] p-3 transition-colors hover:bg-[var(--color-bg-glass-hover)]"
       style={{ transitionDuration: 'var(--duration-normal)' }}
       title={`${label}: ${value}${subtext ? ` — ${subtext}` : ''}`}
     >
-      <div
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-        style={{
-          backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
-          transitionDuration: 'var(--duration-normal)',
-        }}
-      >
-        <Icon size={14} style={{ color }} />
+      <div className="flex items-center justify-between">
+        <div
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg"
+          style={{
+            backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+          }}
+        >
+          <Icon size={12} style={{ color }} />
+        </div>
+        {trend && trend.length >= 2 && (
+          <Sparkline data={trend} width={48} height={18} color={color} strokeWidth={1.5} />
+        )}
       </div>
-      <div className="min-w-0">
-        <p className="text-lg font-bold leading-none tracking-tight text-[var(--color-fg-default)]">
-          {value}
-        </p>
-        <p className="mt-1 truncate text-[11px] font-medium text-[var(--color-fg-muted)]">
-          {label}
-        </p>
-        {subtext && <p className="truncate text-[10px] text-[var(--color-fg-subtle)]">{subtext}</p>}
-      </div>
+      <p className="text-xl font-bold leading-none tracking-tight text-[var(--color-fg-default)]">
+        {value}
+      </p>
+      <p className="text-[11px] font-medium text-[var(--color-fg-muted)]">{label}</p>
+      {subtext && <p className="text-[10px] text-[var(--color-fg-subtle)]">{subtext}</p>}
     </div>
   )
 }
@@ -81,6 +83,10 @@ export default function MetricsSummary({ project }) {
       else confidenceColor = 'var(--color-confidence-low)'
     }
 
+    // Completion percentage
+    const completionPct =
+      issues.length > 0 ? Math.round((doneIssues.length / issues.length) * 100) : 0
+
     return {
       aiActions: aiEvents.length,
       humanActions: humanEvents.length,
@@ -93,16 +99,39 @@ export default function MetricsSummary({ project }) {
       totalPoints,
       avgConfidence,
       confidenceColor,
+      completionPct,
     }
   }, [events, project])
 
   return (
     <GlassCard>
-      <div className="mb-3 flex items-center gap-2">
-        <Activity size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Metrics</h3>
+      <SectionHeader icon={Activity} color="var(--accent-default)">
+        Metrics
+      </SectionHeader>
+
+      {/* Hero stats row */}
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
+          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-fg-default)]">
+            {metrics.totalIssues}
+          </p>
+          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Total Issues</p>
+        </div>
+        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
+          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-success)]">
+            {metrics.completionPct}%
+          </p>
+          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Complete</p>
+        </div>
+        <div className="rounded-xl bg-[var(--color-bg-glass)] p-3 text-center">
+          <p className="text-2xl font-black leading-none tracking-tight text-[var(--color-info)]">
+            {metrics.velocity}
+          </p>
+          <p className="mt-1 text-[10px] font-medium text-[var(--color-fg-muted)]">Points Done</p>
+        </div>
       </div>
 
+      {/* Detail tiles */}
       <div className="grid grid-cols-2 gap-2">
         <MetricTile
           icon={Bot}
@@ -127,32 +156,27 @@ export default function MetricsSummary({ project }) {
         />
         <MetricTile
           icon={CheckCircle2}
-          label="Issues Done"
-          value={metrics.issuesDone}
-          subtext={`of ${metrics.totalIssues} total`}
-          color="var(--color-success, #22c55e)"
-        />
-        <MetricTile
-          icon={ShieldAlert}
-          label="Blocked"
-          value={metrics.issuesBlocked}
-          subtext={metrics.issuesBlocked > 0 ? 'need attention' : 'none'}
-          color="var(--color-warning, #eab308)"
-        />
-        <MetricTile
-          icon={TrendingUp}
-          label="Velocity"
-          value={`${metrics.velocity} pts`}
-          subtext={`of ${metrics.totalPoints} total`}
+          label="In Progress"
+          value={metrics.issuesInProgress}
+          subtext={`${metrics.issuesBlocked} blocked`}
           color="var(--color-info, #3b82f6)"
         />
         {metrics.avgConfidence !== null && (
           <MetricTile
             icon={Gauge}
-            label="Avg AI Confidence"
+            label="AI Confidence"
             value={`${metrics.avgConfidence}%`}
             subtext={`across ${metrics.aiActions} actions`}
             color={metrics.confidenceColor}
+          />
+        )}
+        {metrics.issuesBlocked > 0 && (
+          <MetricTile
+            icon={ShieldAlert}
+            label="Blocked"
+            value={metrics.issuesBlocked}
+            subtext="need attention"
+            color="var(--color-warning, #eab308)"
           />
         )}
       </div>

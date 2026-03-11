@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, Clock, Layers } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
+import SectionHeader from '../ui/SectionHeader'
 import { MetricTile } from './MetricsSummary'
 
 const STATUS_COLORS = {
@@ -14,14 +15,14 @@ const STATUS_COLORS = {
 function HorizontalBar({ label, value, max, color }) {
   const pct = max > 0 ? (value / max) * 100 : 0
   return (
-    <div className="flex items-center gap-3">
-      <span
-        className="w-20 shrink-0 truncate text-[11px] text-[var(--color-fg-muted)]"
-        title={label}
-      >
-        {label}
-      </span>
-      <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-[var(--color-bg-glass)]">
+    <div className="space-y-1">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-[var(--color-fg-muted)]" title={label}>
+          {label}
+        </span>
+        <span className="text-[11px] font-medium text-[var(--color-fg-default)]">{value} pts</span>
+      </div>
+      <div className="relative h-4 overflow-hidden rounded-md bg-[var(--color-bg-glass)]">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-md"
           style={{ backgroundColor: color }}
@@ -30,9 +31,6 @@ function HorizontalBar({ label, value, max, color }) {
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
       </div>
-      <span className="w-12 shrink-0 text-right text-[11px] font-medium text-[var(--color-fg-default)]">
-        {value} pts
-      </span>
     </div>
   )
 }
@@ -159,10 +157,9 @@ export default function SprintMetricsPanel({ project }) {
 
   return (
     <GlassCard>
-      <div className="mb-3 flex items-center gap-2">
-        <BarChart3 size={14} style={{ color: 'var(--accent-default)' }} />
-        <h3 className="text-sm font-semibold text-[var(--color-fg-default)]">Sprint Metrics</h3>
-      </div>
+      <SectionHeader icon={BarChart3} color="var(--color-info, #3b82f6)">
+        Sprint Metrics
+      </SectionHeader>
 
       <div className="space-y-5">
         {/* Cycle time + blocked time tiles */}
