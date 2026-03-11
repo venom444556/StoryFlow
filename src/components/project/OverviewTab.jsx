@@ -4,7 +4,6 @@ import EventFeed from '../overview/EventFeed'
 import MetricsSummary from '../overview/MetricsSummary'
 import SprintMetricsPanel from '../overview/SprintMetricsPanel'
 import SessionHistory from '../overview/SessionHistory'
-import SteeringBar from '../overview/SteeringBar'
 
 export default function OverviewTab({ project }) {
   if (!project) return null
@@ -28,14 +27,10 @@ export default function OverviewTab({ project }) {
 
       {/* Two-column: feed + steering left, sprint + sessions right */}
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1fr_420px]">
-        {/* Left column — activity & steering */}
+        {/* Left column — activity */}
         <div className="space-y-8">
           <div className="animate-entrance stagger-4">
             <EventFeed />
-          </div>
-
-          <div className="animate-entrance stagger-5">
-            <SteeringBar projectId={project.id} />
           </div>
         </div>
 

@@ -111,7 +111,7 @@ export const useEventStore = create((set, get) => ({
     get().disconnectWebSocket()
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${wsProtocol}//localhost:3001`
+    const wsUrl = `${wsProtocol}//${window.location.host}/ws`
 
     try {
       const ws = new WebSocket(wsUrl)

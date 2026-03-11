@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
-import { Bot, User, CheckCircle2, AlertTriangle, Gauge, ShieldAlert } from 'lucide-react'
 import Sparkline from '../ui/Sparkline'
-import { useEventStore, selectEvents } from '../../stores/eventStore'
 
 export function MetricTile({ icon: Icon, label, value, subtext, color, trend }) {
   return (
@@ -75,121 +73,28 @@ function HeroStat({ value, label, color }) {
 }
 
 export default function MetricsSummary({ project }) {
-  const events = useEventStore(selectEvents)
-
   const metrics = useMemo(() => {
-    const aiEvents = events.filter((e) => e.actor === 'ai')
-    const humanEvents = events.filter((e) => e.actor === 'human')
-
-    const respondedAi = aiEvents.filter((e) => e.human_response)
-    const rejected = respondedAi.filter((e) => e.human_response?.action === 'reject')
-    const overrideRate =
-      respondedAi.length > 0 ? Math.round((rejected.length / respondedAi.length) * 100) : 0
-
     const issues = project?.board?.issues || []
     const doneIssues = issues.filter((i) => i.status === 'Done')
     const inProgressIssues = issues.filter((i) => i.status === 'In Progress')
-    const blockedIssues = issues.filter((i) => i.status === 'Blocked')
     const donePoints = doneIssues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
-
-    const aiWithConfidence = aiEvents.filter(
-      (e) => e.confidence !== null && e.confidence !== undefined
-    )
-    const avgConfidence =
-      aiWithConfidence.length > 0
-        ? Math.round(
-            (aiWithConfidence.reduce((s, e) => s + e.confidence, 0) / aiWithConfidence.length) * 100
-          )
-        : null
-
-    let confidenceColor = 'var(--color-fg-muted)'
-    if (avgConfidence !== null) {
-      if (avgConfidence >= 80) confidenceColor = 'var(--color-confidence-high)'
-      else if (avgConfidence >= 50) confidenceColor = 'var(--color-confidence-medium)'
-      else confidenceColor = 'var(--color-confidence-low)'
-    }
-
     const completionPct =
       issues.length > 0 ? Math.round((doneIssues.length / issues.length) * 100) : 0
 
     return {
-      aiActions: aiEvents.length,
-      humanActions: humanEvents.length,
-      overrideRate,
-      issuesDone: doneIssues.length,
-      issuesInProgress: inProgressIssues.length,
-      issuesBlocked: blockedIssues.length,
       totalIssues: issues.length,
+      issuesInProgress: inProgressIssues.length,
       velocity: donePoints,
-      avgConfidence,
-      confidenceColor,
       completionPct,
     }
-  }, [events, project])
+  }, [project])
 
   return (
-    <div className="space-y-6">
-      {/* Hero stats — big, full-width, Neptune-style */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <HeroStat value={metrics.totalIssues} label="Total Issues" />
-        <HeroStat
-          value={`${metrics.completionPct}%`}
-          label="Complete"
-          color="var(--color-success)"
-        />
-        <HeroStat value={metrics.velocity} label="Points Done" color="var(--accent-cyan)" />
-        <HeroStat value={metrics.issuesInProgress} label="In Progress" color="var(--color-info)" />
-      </div>
-
-      {/* Detail tiles — secondary metrics */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-        <MetricTile
-          icon={Bot}
-          label="AI Actions"
-          value={metrics.aiActions}
-          subtext="this session"
-          color="var(--color-ai-accent)"
-        />
-        <MetricTile
-          icon={User}
-          label="Human Actions"
-          value={metrics.humanActions}
-          subtext="this session"
-          color="var(--color-human-accent)"
-        />
-        <MetricTile
-          icon={AlertTriangle}
-          label="Override Rate"
-          value={`${metrics.overrideRate}%`}
-          subtext={`of ${metrics.aiActions} AI actions`}
-          color="var(--color-warning, #eab308)"
-        />
-        <MetricTile
-          icon={CheckCircle2}
-          label="Done"
-          value={metrics.issuesDone}
-          subtext={`${metrics.issuesBlocked} blocked`}
-          color="var(--color-success)"
-        />
-        {metrics.avgConfidence !== null && (
-          <MetricTile
-            icon={Gauge}
-            label="AI Confidence"
-            value={`${metrics.avgConfidence}%`}
-            subtext={`across ${metrics.aiActions} actions`}
-            color={metrics.confidenceColor}
-          />
-        )}
-        {metrics.issuesBlocked > 0 && (
-          <MetricTile
-            icon={ShieldAlert}
-            label="Blocked"
-            value={metrics.issuesBlocked}
-            subtext="need attention"
-            color="var(--color-warning, #eab308)"
-          />
-        )}
-      </div>
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <HeroStat value={metrics.totalIssues} label="Total Issues" />
+      <HeroStat value={`${metrics.completionPct}%`} label="Complete" color="var(--color-success)" />
+      <HeroStat value={metrics.velocity} label="Points Done" color="var(--accent-cyan)" />
+      <HeroStat value={metrics.issuesInProgress} label="In Progress" color="var(--color-info)" />
     </div>
   )
 }

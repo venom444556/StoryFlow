@@ -87,7 +87,7 @@ export default function AIStatusCard() {
         {/* Status info — more spacious */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold tracking-tight text-[var(--color-fg-default)]">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--color-fg-default)]">
               AI Agent
             </h3>
             <span
@@ -120,7 +120,7 @@ export default function AIStatusCard() {
                 </span>
               )}
               {aiStatus.status === 'idle' &&
-                'Waiting for tasks \u2014 use the steering bar below to direct the agent'}
+                'Waiting for tasks \u2014 use the chat button to direct the agent'}
               {aiStatus.status === 'blocked' && 'Waiting for your input...'}
             </p>
           )}

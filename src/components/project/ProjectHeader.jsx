@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { Download, Check } from 'lucide-react'
+import { Download, Check, Pencil } from 'lucide-react'
 import Badge from '../ui/Badge'
 import Button from '../ui/Button'
 
@@ -131,11 +131,13 @@ export default function ProjectHeader({ project, onUpdate }) {
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="truncate text-xl font-bold tracking-tight text-[var(--color-fg-default)] transition-colors"
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-default)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '')}
+            className="group flex items-center gap-2 truncate text-xl font-bold tracking-tight text-[var(--color-fg-default)] transition-colors hover:text-[var(--accent-default)]"
           >
             {project.name}
+            <Pencil
+              size={14}
+              className="shrink-0 opacity-0 transition-opacity group-hover:opacity-50"
+            />
           </button>
         )}
       </div>

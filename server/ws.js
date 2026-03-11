@@ -18,22 +18,30 @@ const MAX_CONNECTIONS = 20 // max concurrent clients
 // Auth: reuse the same token as REST API
 const AUTH_TOKEN = process.env.STORYFLOW_MCP_TOKEN || null
 
-// Allowed origins for WebSocket connections (same as REST CORS)
-const ALLOWED_ORIGINS = new Set(
-  (
-    process.env.STORYFLOW_CORS_ORIGINS ||
-    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001'
-  )
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean)
-)
+// Origin verification: trust any localhost origin (private app), or use env override
+const CUSTOM_ORIGINS = process.env.STORYFLOW_CORS_ORIGINS
+  ? new Set(
+      process.env.STORYFLOW_CORS_ORIGINS.split(',')
+        .map((o) => o.trim())
+        .filter(Boolean)
+    )
+  : null
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true // non-browser clients (CLI, curl) don't send Origin
+  if (CUSTOM_ORIGINS) return CUSTOM_ORIGINS.has(origin)
+  try {
+    const url = new URL(origin)
+    return url.hostname === 'localhost' || url.hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
+}
 
 /** Verify WebSocket upgrade request (origin + token) */
 function verifyClient(info) {
   const origin = info.origin || info.req.headers.origin
-  // Reject connections from unknown origins (browser clients send Origin header)
-  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+  if (!isAllowedOrigin(origin)) {
     console.warn(`[WS] Rejected connection from disallowed origin: ${origin}`)
     return false
   }

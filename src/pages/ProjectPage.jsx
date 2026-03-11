@@ -18,6 +18,7 @@ import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import ProjectSidebar from '../components/project/ProjectSidebar'
 import ProjectHeader from '../components/project/ProjectHeader'
+import SteeringBar from '../components/overview/SteeringBar'
 
 // Sub-navigation for tabs with multiple views
 const SUB_NAV = {
@@ -293,6 +294,9 @@ export default function ProjectPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Floating steering chat — available on all tabs */}
+      <SteeringBar projectId={id} />
     </div>
   )
 }

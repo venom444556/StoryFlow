@@ -73,19 +73,6 @@ function FeedItem({ event }) {
     }
   }, [event.timestamp])
 
-  const absoluteTime = useMemo(() => {
-    try {
-      return new Date(event.timestamp).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      })
-    } catch {
-      return ''
-    }
-  }, [event.timestamp])
-
   const description = useMemo(() => {
     const entity = event.entity_title || event.entity_type || ''
     switch (event.action) {
@@ -114,56 +101,48 @@ function FeedItem({ event }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15 }}
       className={[
-        'group flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[var(--color-bg-glass)]',
+        'rounded-xl px-3 py-3 transition-colors hover:bg-[var(--color-bg-glass)]',
         isPendingGate ? 'bg-amber-400/5' : '',
       ]
         .filter(Boolean)
         .join(' ')}
     >
-      {/* Category-colored icon */}
-      <div
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-        style={{ backgroundColor: `color-mix(in srgb, ${categoryColor} 12%, transparent)` }}
-      >
-        <Icon size={14} style={{ color: categoryColor }} />
-      </div>
-
-      {/* Content */}
-      <div className="min-w-0 flex-1">
-        <p className="text-[13px] leading-snug text-[var(--color-fg-default)]">{description}</p>
-
-        {event.reasoning && (
-          <p
-            className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-[var(--color-fg-subtle)]"
-            title={event.reasoning}
-          >
-            {event.reasoning}
-          </p>
-        )}
-
-        {/* Pending gate label */}
-        {isPendingGate && (
-          <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-amber-400">
-            <Clock size={11} />
-            <span>Awaiting Approval</span>
-          </div>
-        )}
-
-        {/* Meta row */}
-        <div className="mt-1 flex items-center gap-2">
-          <AIBadge source={event.actor === 'ai' ? 'ai' : 'human'} />
+      <div className="flex items-start gap-3">
+        {/* Dot indicator with color coding — matches SessionHistory */}
+        <div className="mt-2 flex flex-col items-center gap-1">
           <span
-            className="rounded-full px-1.5 py-px text-[9px] font-medium"
-            style={{
-              backgroundColor: `color-mix(in srgb, ${categoryColor} 10%, transparent)`,
-              color: categoryColor,
-            }}
-          >
-            {CATEGORY_LABELS[event.category] || event.category}
-          </span>
-          <span className="font-mono text-[10px] text-[var(--color-fg-faint)]" title={timeAgo}>
-            {absoluteTime}
-          </span>
+            className="h-2.5 w-2.5 shrink-0 rounded-full"
+            style={{ backgroundColor: categoryColor }}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] font-medium leading-snug text-[var(--color-fg-default)]">
+            {description}
+          </p>
+
+          {/* Reasoning — always visible, gives each item substance */}
+          {event.reasoning && (
+            <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--color-fg-muted)]">
+              {event.reasoning}
+            </p>
+          )}
+
+          {/* Pending gate label */}
+          {isPendingGate && (
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-amber-400">
+              <Clock size={11} />
+              <span>Awaiting Approval</span>
+            </div>
+          )}
+
+          {/* Stat chips — matches SessionHistory */}
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <AIBadge source={event.actor === 'ai' ? 'ai' : 'human'} />
+            <span className="flex items-center gap-1 rounded-full bg-[var(--color-info)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--color-info)]">
+              <Icon size={9} /> {CATEGORY_LABELS[event.category] || event.category}
+            </span>
+            <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
+          </div>
         </div>
       </div>
     </motion.div>

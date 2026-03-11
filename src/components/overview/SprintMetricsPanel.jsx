@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, Clock, Layers } from 'lucide-react'
 import SectionHeader from '../ui/SectionHeader'
-import { MetricTile } from './MetricsSummary'
 
 const STATUS_COLORS = {
   'To Do': 'var(--color-fg-muted, #6b7280)',
@@ -16,10 +15,10 @@ function HorizontalBar({ label, value, max, color }) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-[var(--color-fg-muted)]" title={label}>
+        <span className="text-xs text-[var(--color-fg-default)]" title={label}>
           {label}
         </span>
-        <span className="text-[11px] font-medium text-[var(--color-fg-default)]">{value} pts</span>
+        <span className="text-xs font-semibold text-[var(--color-fg-default)]">{value} pts</span>
       </div>
       <div className="relative h-4 overflow-hidden rounded-md bg-[var(--color-bg-glass)]">
         <motion.div
@@ -45,9 +44,7 @@ function StatusDistribution({ issues }) {
 
   return (
     <div>
-      <p className="mb-2 text-[11px] font-medium text-[var(--color-fg-muted)]">
-        Status Distribution
-      </p>
+      <p className="mb-2 text-xs font-bold text-[var(--color-fg-default)]">Status Distribution</p>
       <div className="flex h-6 overflow-hidden rounded-lg">
         {Object.entries(counts).map(([status, count]) => {
           if (count === 0) return null
@@ -56,7 +53,7 @@ function StatusDistribution({ issues }) {
           return (
             <motion.div
               key={status}
-              className="flex items-center justify-center text-[9px] font-medium text-white/90"
+              className="flex items-center justify-center text-[13px] font-semibold text-white"
               style={{ backgroundColor: STATUS_COLORS[status] }}
               initial={{ width: 0 }}
               animate={{ width: `${displayPct}%` }}
@@ -74,7 +71,7 @@ function StatusDistribution({ issues }) {
             count > 0 && (
               <div
                 key={status}
-                className="flex items-center gap-1 text-[10px] text-[var(--color-fg-subtle)]"
+                className="flex items-center gap-1 text-[11px] text-[var(--color-fg-muted)]"
               >
                 <span
                   className="h-2 w-2 rounded-full"
@@ -162,36 +159,42 @@ export default function SprintMetricsPanel({ project }) {
         </SectionHeader>
       </div>
 
-      <div className="space-y-6 px-5 py-4">
-        {/* Cycle time + blocked time tiles */}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {cycleTimeSamples > 0 && (
-            <MetricTile
-              icon={Clock}
-              label="Avg Cycle Time"
-              value={
-                avgCycleTimeDays < 1
-                  ? `${Math.round(avgCycleTimeDays * 24)}h`
-                  : `${avgCycleTimeDays.toFixed(1)}d`
-              }
-              subtext={`across ${cycleTimeSamples} issues`}
-              color="var(--color-info, #3b82f6)"
-            />
-          )}
-          {blockedSamples > 0 && (
-            <MetricTile
-              icon={Layers}
-              label="Avg Blocked Time"
-              value={
-                avgBlockedTimeHours < 24
-                  ? `${Math.round(avgBlockedTimeHours)}h`
-                  : `${(avgBlockedTimeHours / 24).toFixed(1)}d`
-              }
-              subtext={`across ${blockedSamples} issues`}
-              color="var(--color-warning, #eab308)"
-            />
-          )}
-        </div>
+      <div className="space-y-4 px-5 py-4">
+        {/* Inline stats — compact, no cards */}
+        {(cycleTimeSamples > 0 || blockedSamples > 0) && (
+          <div className="flex items-center gap-4">
+            {cycleTimeSamples > 0 && (
+              <div className="flex items-center gap-2">
+                <Clock size={13} className="text-[var(--color-info)]" />
+                <div>
+                  <span className="text-sm font-bold text-[var(--color-fg-default)]">
+                    {avgCycleTimeDays < 1
+                      ? `${Math.round(avgCycleTimeDays * 24)} hour${Math.round(avgCycleTimeDays * 24) === 1 ? '' : 's'}`
+                      : `${avgCycleTimeDays.toFixed(1)} day${avgCycleTimeDays.toFixed(1) === '1.0' ? '' : 's'}`}
+                  </span>
+                  <span className="ml-1.5 text-[11px] text-[var(--color-fg-muted)]">
+                    cycle time
+                  </span>
+                </div>
+              </div>
+            )}
+            {blockedSamples > 0 && (
+              <div className="flex items-center gap-2">
+                <Layers size={13} className="text-[var(--color-warning)]" />
+                <div>
+                  <span className="text-sm font-bold text-[var(--color-fg-default)]">
+                    {avgBlockedTimeHours < 24
+                      ? `${Math.round(avgBlockedTimeHours)} hour${Math.round(avgBlockedTimeHours) === 1 ? '' : 's'}`
+                      : `${(avgBlockedTimeHours / 24).toFixed(1)} day${(avgBlockedTimeHours / 24).toFixed(1) === '1.0' ? '' : 's'}`}
+                  </span>
+                  <span className="ml-1.5 text-[11px] text-[var(--color-fg-muted)]">
+                    blocked avg
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Status distribution */}
         <StatusDistribution issues={issues} />
@@ -199,9 +202,7 @@ export default function SprintMetricsPanel({ project }) {
         {/* Sprint velocity bars */}
         {sprintVelocity.length > 0 && (
           <div>
-            <p className="mb-2 text-[11px] font-medium text-[var(--color-fg-muted)]">
-              Sprint Velocity
-            </p>
+            <p className="mb-2 text-xs font-bold text-[var(--color-fg-default)]">Sprint Velocity</p>
             <div className="space-y-1.5">
               {sprintVelocity.map((sprint) => (
                 <HorizontalBar
