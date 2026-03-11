@@ -152,6 +152,7 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
                             issue={child}
                             onIssueClick={onIssueClick}
                             onDeleteIssue={onDeleteIssue}
+                            compact
                           />
                         ))
                       )}
@@ -213,6 +214,7 @@ function OrphanSection({ issues, onIssueClick, onDeleteIssue }) {
                   issue={issue}
                   onIssueClick={onIssueClick}
                   onDeleteIssue={onDeleteIssue}
+                  compact
                 />
               ))}
             </div>

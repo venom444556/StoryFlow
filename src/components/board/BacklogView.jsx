@@ -78,7 +78,7 @@ function sortIssues(issues, sortKey, sortDir) {
   return sorted
 }
 
-export function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
+export function BacklogRow({ issue, onIssueClick, onDeleteIssue, compact = false }) {
   const labels = issue.labels || []
   const visibleLabels = labels.slice(0, 3)
   const overflowCount = labels.length - 3
@@ -90,9 +90,12 @@ export function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -4 }}
       onClick={() => onIssueClick?.(issue)}
-      className="group cursor-pointer rounded-lg border border-transparent px-4 py-2.5 transition-all hover:border-[var(--color-border-default)] hover:bg-[var(--color-bg-glass-hover)]"
+      className={[
+        'group cursor-pointer border border-transparent transition-all hover:border-[var(--color-border-default)] hover:bg-[var(--color-bg-glass-hover)]',
+        compact ? 'px-4 py-2' : 'rounded-lg px-4 py-2.5',
+      ].join(' ')}
     >
-      {/* Row 1: Type icon + Key + Title + Assignee */}
+      {/* Row 1: Type icon + Key + Title + compact metadata + Assignee */}
       <div className="flex items-center gap-2">
         <IssueTypeIcon type={issue.type} size={14} />
         <span className="shrink-0 text-xs font-medium text-[var(--color-fg-muted)]">
@@ -104,92 +107,125 @@ export function BacklogRow({ issue, onIssueClick, onDeleteIssue }) {
         >
           {issue.title}
         </span>
+
+        {/* Compact mode: inline metadata on the right */}
+        {compact && (
+          <div className="flex shrink-0 items-center gap-1.5">
+            {/* Priority dot only */}
+            <span
+              className={[
+                'h-2 w-2 rounded-full',
+                issue.priority === 'critical'
+                  ? 'bg-[var(--color-danger)]'
+                  : issue.priority === 'high'
+                    ? 'bg-[var(--color-warning)]'
+                    : issue.priority === 'medium'
+                      ? 'bg-[var(--color-info)]'
+                      : 'bg-[var(--color-fg-faint)]',
+              ].join(' ')}
+              title={issue.priority}
+            />
+            {/* Story points */}
+            {issue.storyPoints !== null && issue.storyPoints !== undefined && (
+              <span className="text-[10px] font-medium text-[var(--color-fg-subtle)]">
+                {issue.storyPoints}
+              </span>
+            )}
+            {/* Status badge */}
+            <Badge variant={STATUS_BADGE[issue.status] || 'default'} size="xs">
+              {issue.status}
+            </Badge>
+          </div>
+        )}
+
         {issue.assignee && <Avatar name={issue.assignee} size="sm" />}
       </div>
 
-      {/* Row 2: Priority + Points + Status + Labels + Actions */}
-      <div className="mt-1.5 flex items-center gap-2 pl-6">
-        {/* Priority */}
-        <Badge variant={PRIORITY_BADGE[issue.priority] || 'default'} size="xs" dot>
-          {issue.priority}
-        </Badge>
+      {/* Row 2: Priority + Points + Status + Labels + Actions (full mode only) */}
+      {!compact && (
+        <div className="mt-1.5 flex items-center gap-2 pl-6">
+          {/* Priority */}
+          <Badge variant={PRIORITY_BADGE[issue.priority] || 'default'} size="xs" dot>
+            {issue.priority}
+          </Badge>
 
-        {/* Story points */}
-        {issue.storyPoints !== null && issue.storyPoints !== undefined && (
-          <span
-            className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[10px] font-bold text-[var(--color-fg-muted)]"
-            title={`${issue.storyPoints} story points`}
+          {/* Story points */}
+          {issue.storyPoints !== null && issue.storyPoints !== undefined && (
+            <span
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[10px] font-bold text-[var(--color-fg-muted)]"
+              title={`${issue.storyPoints} story points`}
+            >
+              {issue.storyPoints}
+            </span>
+          )}
+
+          {/* Status */}
+          <Badge variant={STATUS_BADGE[issue.status] || 'default'} size="xs">
+            {issue.status}
+          </Badge>
+
+          {/* Labels */}
+          {labels.length > 0 && (
+            <>
+              <div className="h-3 w-px bg-[var(--color-border-default)]" />
+              <div className="flex items-center gap-1">
+                {visibleLabels.map((label) => {
+                  const def = getLabel(label)
+                  return (
+                    <Badge key={label} variant="purple" size="xs">
+                      {def && (
+                        <span
+                          className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
+                          style={{ backgroundColor: sanitizeColor(def.color) }}
+                        />
+                      )}
+                      {label}
+                    </Badge>
+                  )
+                })}
+                {overflowCount > 0 && (
+                  <span
+                    className="flex items-center gap-0.5 text-[10px] text-[var(--color-fg-subtle)]"
+                    title={labels.slice(3).join(', ')}
+                  >
+                    <Tag size={9} />+{overflowCount}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Actions menu */}
+          <div
+            className="opacity-0 transition-opacity group-hover:opacity-100"
+            onClick={(e) => e.stopPropagation()}
           >
-            {issue.storyPoints}
-          </span>
-        )}
-
-        {/* Status */}
-        <Badge variant={STATUS_BADGE[issue.status] || 'default'} size="xs">
-          {issue.status}
-        </Badge>
-
-        {/* Labels */}
-        {labels.length > 0 && (
-          <>
-            <div className="h-3 w-px bg-[var(--color-border-default)]" />
-            <div className="flex items-center gap-1">
-              {visibleLabels.map((label) => {
-                const def = getLabel(label)
-                return (
-                  <Badge key={label} variant="purple" size="xs">
-                    {def && (
-                      <span
-                        className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ backgroundColor: sanitizeColor(def.color) }}
-                      />
-                    )}
-                    {label}
-                  </Badge>
-                )
-              })}
-              {overflowCount > 0 && (
-                <span
-                  className="flex items-center gap-0.5 text-[10px] text-[var(--color-fg-subtle)]"
-                  title={labels.slice(3).join(', ')}
-                >
-                  <Tag size={9} />+{overflowCount}
-                </span>
-              )}
-            </div>
-          </>
-        )}
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Actions menu */}
-        <div
-          className="opacity-0 transition-opacity group-hover:opacity-100"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <DropdownMenu
-            trigger={
-              <button className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]">
-                <MoreHorizontal size={14} />
-              </button>
-            }
-            items={[
-              {
-                icon: Pencil,
-                label: 'Edit',
-                onClick: () => onIssueClick?.(issue),
-              },
-              {
-                icon: Trash2,
-                label: 'Delete',
-                danger: true,
-                onClick: () => onDeleteIssue?.(issue.id),
-              },
-            ]}
-          />
+            <DropdownMenu
+              trigger={
+                <button className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]">
+                  <MoreHorizontal size={14} />
+                </button>
+              }
+              items={[
+                {
+                  icon: Pencil,
+                  label: 'Edit',
+                  onClick: () => onIssueClick?.(issue),
+                },
+                {
+                  icon: Trash2,
+                  label: 'Delete',
+                  danger: true,
+                  onClick: () => onDeleteIssue?.(issue.id),
+                },
+              ]}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   )
 }
