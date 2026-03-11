@@ -1,0 +1,31 @@
+{
+  "name": "design-forge-cli",
+  "version": "0.1.0",
+  "description": "Design Forge CLI — drive Framer via Chrome DevTools Protocol",
+  "author": "Sheldon Spence",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "forge": "./bin/forge.js"
+  },
+  "files": [
+    "bin/",
+    "src/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "ws": "^8.18.0"
+  },
+  "keywords": [
+    "design-forge",
+    "framer",
+    "cdp",
+    "design",
+    "cli",
+    "agent"
+  ]
+}

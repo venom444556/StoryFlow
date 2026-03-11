@@ -1,0 +1,203 @@
+{
+  "skill_name": "design-forge",
+  "evals": [
+    {
+      "id": 0,
+      "name": "dark-portfolio",
+      "prompt": "Build me a minimal dark portfolio site for a product designer. I want it to feel premium and refined, like Linear or Vercel's site. Focus on clean typography and generous white space. The designer's name is Mika Chen, they specialize in SaaS product design.",
+      "expected_output": "A Design Decision Document with specific hex codes, font names, pixel values, followed by ordered forge CLI command sequences for each section (nav, hero, projects grid, about, contact, footer).",
+      "files": [],
+      "assertions": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD specifies at most 2 typefaces (display + body) \u2014 a monospace font for code/terminal is allowed as exception",
+          "type": "content_check"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+          "type": "content_check"
+        },
+        {
+          "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+          "type": "content_check"
+        },
+        {
+          "text": "Build plan includes forge screenshot commands after major sections",
+          "type": "content_check"
+        },
+        {
+          "text": "Colors and fonts in forge commands match the DDD values",
+          "type": "consistency_check"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "saas-landing",
+      "prompt": "Create a landing page for 'DevForge', a developer CLI tool that automates code reviews. Inspired by Linear and Raycast. Dark mode, technical audience. Needs hero with product screenshot area, features grid (3 columns), social proof logos section, pricing table (3 tiers), and footer. The tagline is 'Code reviews on autopilot.'",
+      "expected_output": "A DDD with dark palette, developer-oriented typography, followed by section-by-section forge CLI build plan with specific style values matching the DDD.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD names specific font families, not generic 'sans-serif'",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "type": "content_check"
+        },
+        {
+          "text": "DDD specifies at most 2 typefaces (display + body) \u2014 a monospace font for code/terminal is allowed as exception",
+          "type": "content_check"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8",
+          "type": "content_check"
+        },
+        {
+          "text": "Build plan contains forge CLI commands",
+          "type": "content_check"
+        },
+        {
+          "text": "Build plan includes forge screenshot after sections",
+          "type": "content_check"
+        },
+        {
+          "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+          "type": "completeness_check"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "vague-brief",
+      "prompt": "Make me a website",
+      "expected_output": "The skill should ask 2-3 clarifying questions about site type, aesthetic direction, audience, and content before proceeding. It should NOT generate a DDD or start building.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Response contains clarifying questions (question marks present)",
+          "type": "content_check"
+        },
+        {
+          "text": "Does NOT produce a full DDD without direction",
+          "type": "content_check"
+        },
+        {
+          "text": "Asks about site type or purpose",
+          "type": "content_check"
+        },
+        {
+          "text": "Asks about aesthetic direction, style, or references",
+          "type": "content_check"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "grade-screenshot",
+      "prompt": "Review this design for me. It's a dark-mode SaaS landing page with: a hero section using 64px Space Grotesk headline on #0A0A0A background with #E8E8E8 text, 18px DM Sans subhead in #888888, a #4F46E5 CTA button with 12px border-radius. Below is a features grid with 3 cards at 32px padding, #141414 background, 16px border-radius, 1px border at rgba(255,255,255,0.06). Section spacing is 96px. All spacing is on 8px grid. Contrast ratios all pass AA.",
+      "expected_output": "A Visual QA Report grading this as A or high B across all dimensions, with the anti-slop checklist passing, and only minor polish suggestions if any.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+          "type": "structure_check"
+        },
+        {
+          "text": "Overall grade is A or B (the described design follows best practices)",
+          "type": "accuracy_check"
+        },
+        {
+          "text": "Report includes anti-slop checklist",
+          "type": "structure_check"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "diagnose-issues",
+      "prompt": "Evaluate this design: a landing page with 3 different fonts (Inter, Playfair Display, and Fira Code used for body text), cards with mixed border-radius (8px on some, 16px on others, 24px on the CTA), #FFFFFF text on #1A1A1A background, section spacing of 45px, button padding of 11px, and a purple-to-pink gradient hero background. The body text is 13px.",
+      "expected_output": "A Visual QA Report grading this as D or F, identifying: 3 fonts (max 2), mixed border-radius, spacing not on 8px grid (45px, 11px), text below 14px (13px), pure white text in dark mode, and the purple-to-pink gradient anti-pattern.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags 13px body text as below 14px minimum",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags purple-to-pink gradient as anti-pattern",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags 45px or 11px spacing as not on 8px grid",
+          "type": "detection_check"
+        },
+        {
+          "text": "Overall grade is D or F",
+          "type": "accuracy_check"
+        },
+        {
+          "text": "Provides specific fix recommendations",
+          "type": "content_check"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "anti-slop-detection",
+      "prompt": "I built a hero section with a purple-to-pink gradient background (#8B5CF6 to #EC4899), Inter font at 400 weight on a muted gray palette, centered text spanning the full 1440px container width, and a stock photo of people in an office. The heading is 42px and the body text is 12px. What do you think?",
+      "expected_output": "Should flag multiple anti-slop violations: purple-to-pink gradient (#1), Inter on timid palette (#2), centered text on wide container (#5), stock photo (#6), and text below 14px (#4). Should recommend specific alternatives.",
+      "files": [],
+      "assertions": [
+        {
+          "text": "Identifies purple-to-pink gradient as anti-pattern",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags stock photo of people in office",
+          "type": "detection_check"
+        },
+        {
+          "text": "Flags 12px body text as below 14px minimum",
+          "type": "detection_check"
+        },
+        {
+          "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+          "type": "content_check"
+        }
+      ]
+    }
+  ]
+}

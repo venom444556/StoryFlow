@@ -1,0 +1,12 @@
+{
+  "hooks": [
+    {
+      "type": "PostToolUse",
+      "matcher": {
+        "tool": "Bash",
+        "command_pattern": "forge (insert|style|set-text|set-layout|move)"
+      },
+      "message": "Canvas mutated. Consider running `forge screenshot` to verify visual result."
+    }
+  ]
+}
