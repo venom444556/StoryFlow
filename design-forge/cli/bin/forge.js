@@ -27,9 +27,10 @@ process.on('unhandledRejection', (err) => {
 
 program
   .name('forge')
-  .description('Design Forge — drive Framer via Chrome DevTools Protocol')
+  .description('Design Forge — drive Framer and Figma for AI-driven web design')
   .version(pkg.version)
   .option('-p, --port <port>', 'CDP debug port', '9222')
+  .option('--figma-token <token>', 'Figma Personal Access Token (or set FIGMA_TOKEN env)')
 
 // Register command groups
 const commands = await Promise.all([
@@ -39,6 +40,7 @@ const commands = await Promise.all([
   import('../src/commands/observe.js'),
   import('../src/commands/interact.js'),
   import('../src/commands/publish.js'),
+  import('../src/commands/figma.js'),
 ])
 
 for (const mod of commands) {

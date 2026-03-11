@@ -6,6 +6,7 @@ description: "Build, design, or create websites and web pages — landing pages,
 # Design Forge — Orchestrator Skill
 
 Build production-grade websites in Framer via AI-driven design pipeline.
+Optionally source designs and tokens from Figma.
 
 ## Pipeline
 
@@ -19,6 +20,16 @@ Extract from user input:
 - **References**: any URLs, screenshots, or brand assets provided
 
 If the brief is vague, ask 2-3 focused questions. Don't proceed without direction.
+
+### 1b. Figma Source (Optional)
+
+If user provides a Figma URL or file key, extract design data before proceeding:
+1. `forge figma file <key>` — understand structure (pages, frames)
+2. `forge figma tokens <key> --format css` — extract design tokens (colors, spacing, fonts)
+3. `forge figma ddd <key> -o ddd-scaffold.md` — auto-generate DDD scaffold from tokens
+4. `forge figma export <key> <nodeId> --scale 2` — capture reference screenshots
+
+This replaces manual brief intake when a Figma design exists. See `figma-api.md` and `figma-framer-workflow.md` for details.
 
 ### 2. Design Direction
 
@@ -78,7 +89,7 @@ Delegate to `forge` CLI via Bash. Follow this sequence:
 3. Build section by section, following workflow-recipes.md patterns
 4. Use DDD values for every style property
 
-Reference `framer-canvas-map.md` for selectors and `framer-shortcuts.md` for fast manipulation.
+Reference `framer-canvas-map.md` for selectors, `framer-shortcuts.md` for fast manipulation, and `framer-guide.md` for deep Framer operational knowledge.
 
 ### 5. Visual QA Loop
 
@@ -113,3 +124,16 @@ Full-page evaluation:
 - **Specific values only.** If you can't name the hex code, you haven't decided.
 - **Consult design-principles.md** for every typography, color, and spacing decision.
 - **When in doubt, more white space.** Premium design = generous breathing room.
+
+## Reference Files
+
+| File | When to read |
+|------|-------------|
+| `design-principles.md` | Every design decision (typography, color, spacing rules) |
+| `framer-guide.md` | Building in Framer (panels, layout system, components, publishing) |
+| `framer-canvas-map.md` | CDP automation (selectors, coordinates, discovery commands) |
+| `framer-shortcuts.md` | Keyboard shortcuts for fast manipulation |
+| `framer-components.md` | Built-in + marketplace component reference |
+| `workflow-recipes.md` | Step-by-step forge CLI sequences for common sections |
+| `figma-api.md` | Reading Figma files (REST API endpoints, token extraction) |
+| `figma-framer-workflow.md` | Figma → Framer pipeline (token sync, import patterns, decision matrix) |
