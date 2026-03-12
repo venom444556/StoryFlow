@@ -12,6 +12,40 @@ It's also a full project management tool: Kanban board with sprints, wiki with m
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue)
 ![npm](https://img.shields.io/npm/v/storyflow-cli?label=storyflow-cli&color=CB3837&logo=npm)
 
+---
+
+## What's New in v2
+
+### Neptune Design System
+Complete visual identity overhaul. Cool charcoal palette with frosted glass surfaces, General Sans typography, and semantic design tokens powering two themes — **Obsidian** (dark glassmorphic) and **Warm Linen** (light, warm bone/eggshell). Every pixel earns its space.
+
+### Agent CLI
+The `storyflow-cli` npm package replaces MCP with direct shell commands. No JSON-RPC overhead, no deferred tool loading — just `storyflow board` in your terminal. Smart project resolution (type a name prefix, not a UUID), `--json` for piping, and full API coverage in 800 lines vs. 3,000+ lines of MCP boilerplate.
+
+```bash
+npm i -g storyflow-cli
+storyflow board                      # Visual board summary
+storyflow issues done PRJ-42         # Mark issue as Done
+storyflow steer "Focus on auth"      # Send steering directive
+```
+
+### 5 Mechanical Safety Rails
+Invisible on the happy path, block only when needed:
+
+- **Gate enforcement** — AI mutations on gated entities return 403 until you approve
+- **Confidence auto-gating** — uncertain AI actions (confidence < 0.5) auto-create pending gates
+- **Snapshots & undo** — auto-snapshot before every destructive mutation; 20-cap LRU per project
+- **Agent pause** — escalations block all AI writes until you respond
+- **Causal event chains** — full audit trail with `parent_event_id` linking gate approvals to downstream mutations
+
+### Live AI Dashboard
+Real-time overview with WebSocket-powered status card, event feed with provenance badges (who did what, why, and how confident), sprint metrics with velocity/burndown, and session history. Steering bar for mid-task course correction without restarting the agent.
+
+### Expanded API Surface
+46 tools covering the full project lifecycle: board CRUD, wiki pages, workflow canvas nodes, architecture components, timeline phases, decision records, sprint management, batch operations, hygiene checks, and git sync.
+
+---
+
 ## The Problem
 
 Autonomous coding agents hit three walls:
@@ -113,7 +147,7 @@ Issue lifecycle timestamps (`todoAt`, `inProgressAt`, `blockedAt`, `doneAt`) ena
 
 Two themes via semantic CSS variables:
 
-- **Obsidian** — dark glassmorphic with frosted glass panels
+- **Obsidian** — dark glassmorphic with frosted glass panels, cool charcoal palette
 - **Warm Linen** — light theme with warm bone/eggshell palette
 
 ## Tech Stack
