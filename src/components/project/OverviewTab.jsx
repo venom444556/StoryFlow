@@ -25,13 +25,11 @@ export default function OverviewTab({ project }) {
         <GatePanel projectId={project.id} />
       </div>
 
-      {/* Two-column: feed + steering left, sprint + sessions right */}
+      {/* Two-column: feed left, sprint + sessions right */}
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1fr_420px]">
-        {/* Left column — activity */}
-        <div className="space-y-8">
-          <div className="animate-entrance stagger-4">
-            <EventFeed />
-          </div>
+        {/* Left column — activity (stretches to match right column height) */}
+        <div className="animate-entrance stagger-4 flex flex-col">
+          <EventFeed className="flex-1" />
         </div>
 
         {/* Right column — sprint metrics + sessions */}

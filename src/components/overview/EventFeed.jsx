@@ -149,7 +149,7 @@ function FeedItem({ event }) {
   )
 }
 
-export default function EventFeed() {
+export default function EventFeed({ className = '' }) {
   const [activeFilter, setActiveFilter] = useState('all')
   const events = useEventStore(selectEvents)
 
@@ -161,7 +161,7 @@ export default function EventFeed() {
   }, [events, activeFilter])
 
   return (
-    <div className="glass-card flex flex-col overflow-hidden">
+    <div className={`glass-card flex flex-col overflow-hidden ${className}`}>
       {/* Header with filters */}
       <div className="border-b border-[var(--color-border-default)] px-5 py-4">
         <SectionHeader
@@ -195,7 +195,7 @@ export default function EventFeed() {
       </div>
 
       {/* Event list */}
-      <div className="max-h-[520px] flex-1 overflow-y-auto py-2">
+      <div className="flex-1 overflow-y-auto py-2">
         {filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
             <Zap size={28} className="mb-2 text-[var(--color-fg-faint)]" />
