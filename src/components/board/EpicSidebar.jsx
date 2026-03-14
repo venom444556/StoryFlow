@@ -175,8 +175,8 @@ export default function EpicSidebar({
                 className={[
                   'mb-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                   activeEpicId === null
-                    ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
-                    : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
+                    ? 'text-[var(--color-fg-default)] font-medium'
+                    : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
                 ].join(' ')}
               >
                 <span className="flex h-5 w-5 items-center justify-center rounded-md bg-[var(--color-bg-muted)]">
@@ -193,16 +193,8 @@ export default function EpicSidebar({
                     onClick={() => onFilterByEpic?.(epic.id)}
                     className={[
                       'group w-full rounded-lg px-3 py-2.5 text-left transition-colors',
-                      activeEpicId === epic.id ? 'ring-1' : 'hover:bg-[var(--color-bg-glass)]',
+                      activeEpicId !== epic.id && 'hover:text-[var(--color-fg-default)]',
                     ].join(' ')}
-                    style={
-                      activeEpicId === epic.id
-                        ? {
-                            backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
-                            '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
-                          }
-                        : undefined
-                    }
                   >
                     {/* Epic title row */}
                     <div className="mb-1.5 flex items-center gap-2">

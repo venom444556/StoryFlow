@@ -5,7 +5,6 @@ import Badge from '../ui/Badge'
 import TypeBadge from '../ui/TypeBadge'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
 import BlockedBanner from './BlockedBanner'
-import { getConfidenceLevel } from '../../utils/confidence'
 import { getStaleInfo } from '../../utils/staleness'
 import { useSettings } from '../../contexts/SettingsContext'
 
@@ -21,14 +20,6 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
   const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
   const { isStale, agoText } = getStaleInfo(issue, settings.staleThresholdMinutes * 60 * 1000)
   const isAiCreated = issue.createdBy === 'ai'
-  const confidenceLevel = isAiCreated ? getConfidenceLevel(issue.createdByConfidence) : null
-
-  const AI_GLOW_MAP = {
-    high: 'var(--color-ai-glow-high)',
-    medium: 'var(--color-ai-glow-medium)',
-    low: 'var(--color-ai-glow-low)',
-  }
-  const aiGlow = isAiCreated ? AI_GLOW_MAP[confidenceLevel] || 'var(--color-ai-glow)' : undefined
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', issue.id)
@@ -56,12 +47,10 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
       onClick={() => onClick?.(issue)}
       className={[
         'group cursor-grab rounded-xl border p-3 transition-all duration-200 active:cursor-grabbing',
-        'bg-[var(--color-bg-glass)] hover:bg-[var(--color-bg-glass-hover)]',
+        'bg-transparent hover:bg-[var(--color-bg-glass)]',
         isDragging
           ? 'ring-2'
           : 'border-[var(--color-border-default)] hover:border-[var(--color-border-emphasis)]',
-        isAiCreated && 'border-l-2 border-l-[var(--color-ai-accent)]',
-        isStale && !isAiCreated && 'border-l-2 border-l-amber-400/60',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -71,9 +60,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
               borderColor: 'rgba(var(--accent-default-rgb), 0.4)',
               '--tw-ring-color': 'rgba(var(--accent-default-rgb), 0.2)',
             }
-          : aiGlow
-            ? { boxShadow: `0 0 12px ${aiGlow}` }
-            : undefined
+          : undefined
       }
     >
       {/* Top row: type badge + key + AI sparkle + provenance */}
@@ -82,7 +69,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
         <span className="text-xs font-medium text-[var(--color-fg-muted)]">{issue.key}</span>
         {isAiCreated && (
           <span
-            className="flex items-center gap-0.5 text-[10px] text-[var(--color-ai-accent)]"
+            className="flex items-center gap-0.5 text-[10px] text-[var(--color-fg-subtle)]"
             title="AI Generated"
           >
             <Sparkles size={10} />

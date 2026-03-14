@@ -8,10 +8,10 @@ const ACTOR_CONFIG = {
   ai: {
     label: 'AI',
     icon: Bot,
-    bgClass: 'bg-[var(--color-ai-bg)]',
-    textClass: 'text-[var(--color-ai-accent)]',
-    borderClass: 'border-[var(--color-ai-border)]',
-    dotClass: 'bg-[var(--color-ai-accent)]',
+    bgClass: 'bg-[var(--badge-gray-bg)]',
+    textClass: 'text-[var(--badge-gray-fg)]',
+    borderClass: 'border-[var(--badge-gray-border)]',
+    dotClass: 'bg-[var(--badge-gray-fg)]',
   },
   human: {
     label: 'Human',

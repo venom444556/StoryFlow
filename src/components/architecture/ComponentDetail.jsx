@@ -284,10 +284,11 @@ export default function ComponentDetail({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -12 }}
       transition={{ duration: 0.15 }}
+      className="flex-1"
     >
-      <GlassCard className="!p-3">
+      <GlassCard className="!p-3 h-full flex flex-col">
         {/* Header: type badge + name + delete */}
-        <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="mb-2 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
             {TypeIcon && (
               <div
@@ -313,9 +314,11 @@ export default function ComponentDetail({
         </div>
 
         {/* Mini dependency visualization */}
-        <MiniDepGraph component={component} allComponents={allComponents} />
+        <div className="shrink-0">
+          <MiniDepGraph component={component} allComponents={allComponents} />
+        </div>
 
-        <div className="space-y-3">
+        <div className="flex flex-1 flex-col gap-3 min-h-0">
           <Input
             label="Name"
             value={component.name}
@@ -338,14 +341,16 @@ export default function ComponentDetail({
             />
           </div>
 
-          <div className="w-full">
-            <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">Description</label>
+          <div className="flex flex-1 flex-col min-h-0">
+            <label className="mb-1 block text-xs text-[var(--color-fg-muted)] shrink-0">
+              Description
+            </label>
             <textarea
               value={component.description || ''}
               onChange={(e) => onUpdate('description', e.target.value)}
               placeholder="Describe what this component does..."
-              rows={2}
-              className="glass-input w-full resize-none px-2.5 py-1.5 text-xs text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
+              className="glass-input w-full flex-1 resize-none px-2.5 py-1.5 text-xs text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
+              style={{ minHeight: '3rem' }}
             />
           </div>
 

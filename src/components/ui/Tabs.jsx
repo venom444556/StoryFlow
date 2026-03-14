@@ -45,12 +45,7 @@ export default function Tabs({
 
   return (
     <div
-      className={[
-        'glass inline-flex gap-[var(--space-1)] rounded-[var(--radius-pill)] p-[var(--space-1)]',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={['inline-flex gap-[var(--space-1)]', className].filter(Boolean).join(' ')}
       role="tablist"
     >
       {tabs.map((tab, index) => {
@@ -68,8 +63,8 @@ export default function Tabs({
             aria-controls={`${tab.key}-panel`}
             tabIndex={isActive ? 0 : -1}
             className={[
-              'relative flex items-center gap-[var(--space-2)] rounded-[var(--radius-pill)]',
-              'px-[var(--space-4)] py-[var(--space-2)] text-[var(--text-sm)] font-medium',
+              'relative flex items-center gap-[var(--space-2)]',
+              'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)] font-medium',
               'transition-colors outline-none',
               'focus-visible:ring-2 focus-visible:ring-[var(--interactive-default)] focus-visible:ring-inset',
               isActive
@@ -80,13 +75,6 @@ export default function Tabs({
               transitionDuration: 'var(--duration-normal)',
             }}
           >
-            {isActive && (
-              <motion.div
-                layoutId={`${layoutId}-indicator`}
-                className="absolute inset-0 rounded-[var(--radius-pill)] bg-[var(--color-bg-glass-active)]"
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              />
-            )}
             <span className="relative z-10 flex items-center gap-[var(--space-2)]">
               {Icon && <Icon size={16} />}
               {tab.label}

@@ -1,11 +1,10 @@
 import { useState, useMemo, useCallback } from 'react'
-import { Plus, Network, List, Boxes, Radio } from 'lucide-react'
+import { Plus, Network, List, Boxes } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { generateId } from '../../utils/ids'
 import Button from '../ui/Button'
 import Tabs from '../ui/Tabs'
 import EmptyState from '../ui/EmptyState'
-import StatusBar from '../ui/StatusBar'
 import ArchitectureFilterBar from '../architecture/ArchitectureFilterBar'
 import ComponentTree from '../architecture/ComponentTree'
 import ComponentDetail from '../architecture/ComponentDetail'
@@ -209,7 +208,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
               highlightIds={highlightIds}
             />
             {selected && (
-              <div className="w-80 shrink-0 overflow-y-auto">
+              <div className="w-80 shrink-0 overflow-y-auto flex flex-col">
                 <AnimatePresence mode="wait">
                   <ComponentDetail
                     key={selected.id}
@@ -273,14 +272,6 @@ export default function ArchitectureTab({ project, onUpdate }) {
           </div>
         </div>
       )}
-
-      {/* Footer StatusBar */}
-      <StatusBar>
-        <Radio size={12} className="text-[var(--color-success)]" />
-        <span>Live Arch Sync Active</span>
-        <span className="text-[var(--color-fg-faint)]">|</span>
-        <span>{components.length} components</span>
-      </StatusBar>
 
       {/* Add Component Modal */}
       <ComponentForm

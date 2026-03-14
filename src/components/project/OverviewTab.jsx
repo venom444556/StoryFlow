@@ -26,13 +26,13 @@ export default function OverviewTab({ project }) {
       </div>
 
       {/* Two-column: feed left, sprint + sessions right */}
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-[1fr_420px]">
-        {/* Left column — activity (stretches to match right column height) */}
-        <div className="animate-entrance stagger-4 flex flex-col">
-          <EventFeed className="flex-1" />
+      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[1fr_420px]">
+        {/* Left column — activity feed */}
+        <div className="animate-entrance stagger-4">
+          <EventFeed />
         </div>
 
-        {/* Right column — sprint metrics + sessions */}
+        {/* Right column — sprint metrics + sessions (determines row height) */}
         <div className="space-y-8">
           <div className="animate-entrance stagger-4">
             <SprintMetricsPanel project={project} />

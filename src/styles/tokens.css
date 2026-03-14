@@ -270,9 +270,9 @@
   --color-bg-glass-active: rgba(148, 163, 194, 0.14);
   --color-bg-glass-emphasis: rgba(148, 163, 194, 0.18);
 
-  /* Node backgrounds — solid for canvas elements */
-  --color-bg-node: #161922;
-  --color-bg-node-hover: #1e2130;
+  /* Node backgrounds — solid for canvas elements, lifted above base */
+  --color-bg-node: #1e2130;
+  --color-bg-node-hover: #262a3a;
 
   /* Card background — elevated above base */
   --color-bg-card: #161922;

@@ -13,10 +13,10 @@ const TYPE_OPTIONS = [
 ]
 
 const STATUS_DOT = {
-  [ISSUE_STATUSES.TODO]: 'bg-[var(--color-fg-faint)]',
-  [ISSUE_STATUSES.IN_PROGRESS]: 'bg-[var(--color-info)]',
+  [ISSUE_STATUSES.TODO]: 'bg-[var(--color-danger)]',
+  [ISSUE_STATUSES.IN_PROGRESS]: 'bg-[var(--color-warning)]',
   [ISSUE_STATUSES.DONE]: 'bg-[var(--color-success)]',
-  [ISSUE_STATUSES.BLOCKED]: 'bg-[var(--color-warning)]',
+  [ISSUE_STATUSES.BLOCKED]: 'bg-[var(--color-danger)]',
 }
 
 export default function QuickCreateBar({ onCreateIssue, defaultStatus = 'To Do', statusColumns }) {

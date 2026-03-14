@@ -195,7 +195,7 @@ export default function EventFeed({ className = '' }) {
       </div>
 
       {/* Event list */}
-      <div className="flex-1 overflow-y-auto py-2">
+      <div className="max-h-[400px] overflow-y-auto py-2">
         {filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
             <Zap size={28} className="mb-2 text-[var(--color-fg-faint)]" />

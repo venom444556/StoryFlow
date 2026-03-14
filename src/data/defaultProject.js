@@ -1,4 +1,4 @@
-export function createDefaultProject(name, id) {
+export function createDefaultProject(name, id, { techStack = [] } = {}) {
   if (!id || typeof id !== 'string') {
     throw new Error('createDefaultProject requires a valid string id')
   }
@@ -9,7 +9,7 @@ export function createDefaultProject(name, id) {
     name,
     description: '',
     status: 'planning',
-    techStack: [],
+    techStack,
     createdAt: now,
     updatedAt: now,
     overview: {

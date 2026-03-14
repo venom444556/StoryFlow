@@ -131,7 +131,7 @@ export const useProjectsStore = create(
         setProjects: (projects) => set({ projects }),
         setAutoRefreshInterval: (ms) => set({ autoRefreshInterval: ms }),
 
-        addProject: (name) => {
+        addProject: (name, { techStack = [] } = {}) => {
           const trimmed = (name || '').trim()
           if (!trimmed) {
             throw new Error('Project name is required')
@@ -142,7 +142,7 @@ export const useProjectsStore = create(
           }
           const existingIds = get().projects.map((p) => p.id)
           const id = generateProjectId(trimmed, existingIds)
-          const project = createDefaultProject(trimmed, id)
+          const project = createDefaultProject(trimmed, id, { techStack })
           set((state) => {
             state.projects.push(project)
           })

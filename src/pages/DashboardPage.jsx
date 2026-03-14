@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [search, setSearch] = useState('')
   const [showNewModal, setShowNewModal] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
+  const [newProjectTechStack, setNewProjectTechStack] = useState('')
   const [nameError, setNameError] = useState('')
   const [trashTarget, setTrashTarget] = useState(null)
   const [permanentDeleteTarget, setPermanentDeleteTarget] = useState(null)
@@ -54,9 +55,14 @@ export default function DashboardPage() {
       return
     }
     setNameError('')
-    const project = addProject(name)
+    const techStack = newProjectTechStack
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+    const project = addProject(name, { techStack })
     setShowNewModal(false)
     setNewProjectName('')
+    setNewProjectTechStack('')
     navigate(`/project/${project.id}`)
   }
 
@@ -69,11 +75,11 @@ export default function DashboardPage() {
       {/* Title row — title left, actions right */}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-entrance">
         <div>
-          <h1 className="heading-accent text-4xl font-medium tracking-tight text-[var(--color-fg-default)]">
-            Projects
+          <h1 className="heading-accent text-4xl font-bold tracking-tight text-[var(--color-fg-default)]">
+            PROJECTS
           </h1>
           <p className="mt-3 text-base text-[var(--color-fg-muted)]">
-            {projects.length} project{projects.length !== 1 ? 's' : ''}
+            {projects.length} Project{projects.length !== 1 ? 's' : ''}
             {trashedProjects.length > 0 && (
               <span className="text-[var(--color-fg-subtle)]">
                 {' · '}
@@ -302,6 +308,7 @@ export default function DashboardPage() {
         onClose={() => {
           setShowNewModal(false)
           setNewProjectName('')
+          setNewProjectTechStack('')
           setNameError('')
         }}
         title="New Project"
@@ -320,12 +327,25 @@ export default function DashboardPage() {
           required
           error={nameError}
         />
+        <div className="mt-3">
+          <Input
+            label="Tech stack"
+            value={newProjectTechStack}
+            onChange={(e) => setNewProjectTechStack(e.target.value)}
+            placeholder="React, Node.js, PostgreSQL"
+            onKeyDown={handleKeyDown}
+          />
+          <p className="mt-1 text-xs text-[var(--color-fg-subtle)]">
+            Comma-separated list of technologies
+          </p>
+        </div>
         <div className="mt-4 flex justify-end gap-2">
           <Button
             variant="ghost"
             onClick={() => {
               setShowNewModal(false)
               setNewProjectName('')
+              setNewProjectTechStack('')
               setNameError('')
             }}
           >

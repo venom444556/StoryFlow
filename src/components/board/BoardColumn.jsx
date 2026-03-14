@@ -7,24 +7,20 @@ import { ISSUE_STATUSES } from '../../utils/constants'
 
 const STATUS_ACCENT = {
   [ISSUE_STATUSES.TODO]: {
-    dot: 'bg-[var(--color-fg-faint)]',
-    dropGlow: 'ring-[var(--color-fg-faint)]/30 border-[var(--color-fg-faint)]/40',
-    headerBorder: 'border-t-[var(--color-fg-faint)]',
+    dot: 'bg-[var(--color-danger)]',
+    dropGlow: 'ring-[var(--color-danger)]/30 border-[var(--color-danger)]/40',
   },
   [ISSUE_STATUSES.IN_PROGRESS]: {
-    dot: 'bg-[var(--color-info)]',
-    dropGlow: 'ring-[var(--color-info)]/30 border-[var(--color-info)]/40',
-    headerBorder: 'border-t-[var(--color-info)]',
+    dot: 'bg-[var(--color-warning)]',
+    dropGlow: 'ring-[var(--color-warning)]/30 border-[var(--color-warning)]/40',
   },
   [ISSUE_STATUSES.DONE]: {
     dot: 'bg-[var(--color-success)]',
     dropGlow: 'ring-[var(--color-success)]/30 border-[var(--color-success)]/40',
-    headerBorder: 'border-t-[var(--color-success)]',
   },
   [ISSUE_STATUSES.BLOCKED]: {
     dot: 'bg-[var(--color-danger)]',
     dropGlow: 'ring-[var(--color-danger)]/30 border-[var(--color-danger)]/40',
-    headerBorder: 'border-t-[var(--color-danger)]',
   },
 }
 
@@ -74,8 +70,7 @@ export default function BoardColumn({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={[
-        'flex min-w-[280px] flex-1 flex-col self-stretch rounded-xl border border-t-2 transition-all duration-200',
-        accent.headerBorder,
+        'flex min-w-[280px] flex-1 flex-col self-stretch rounded-xl border transition-all duration-200',
         'bg-[var(--color-bg-glass)]',
         status === 'Done' && 'opacity-80',
         isDragOver

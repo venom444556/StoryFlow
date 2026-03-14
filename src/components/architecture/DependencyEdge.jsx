@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { buildBezierPath } from '../../utils/workflow'
 import { TYPE_HEX_COLORS } from './constants'
 import { NODE_WIDTH } from '../../utils/canvasConstants'
 
@@ -7,23 +6,54 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
 // DependencyEdge
 // ---------------------------------------------------------------------------
 // SVG bezier arrow between two architecture components.
-// Adapted from WorkflowConnection but simplified — no execution status.
 // Arrow goes FROM depender TO dependency (A→B means "A depends on B").
+// Connects from the nearest facing sides of each node pair.
 // ---------------------------------------------------------------------------
 const NODE_HEIGHT_CENTER = 48 // approximate center of a node
 
-function getOutputPoint(node) {
-  return {
-    x: node.x + NODE_WIDTH + 4,
-    y: node.y + NODE_HEIGHT_CENTER,
+// Pick connection ports based on relative node positions so lines connect
+// from the sides that face each other instead of always right→left.
+function getConnectionPoints(fromNode, toNode) {
+  const fromCx = fromNode.x + NODE_WIDTH / 2
+  const fromCy = fromNode.y + NODE_HEIGHT_CENTER
+  const toCx = toNode.x + NODE_WIDTH / 2
+  const toCy = toNode.y + NODE_HEIGHT_CENTER
+
+  const dx = toCx - fromCx
+  const dy = toCy - fromCy
+
+  let start, end
+
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    // Nodes are more horizontal — connect right→left or left→right
+    if (dx >= 0) {
+      start = { x: fromNode.x + NODE_WIDTH + 4, y: fromCy }
+      end = { x: toNode.x - 4, y: toCy }
+    } else {
+      start = { x: fromNode.x - 4, y: fromCy }
+      end = { x: toNode.x + NODE_WIDTH + 4, y: toCy }
+    }
+  } else {
+    // Nodes are more vertical — connect bottom→top or top→bottom
+    if (dy >= 0) {
+      start = { x: fromCx, y: fromNode.y + NODE_HEIGHT_CENTER * 2 + 4 }
+      end = { x: toCx, y: toNode.y - 4 }
+    } else {
+      start = { x: fromCx, y: fromNode.y - 4 }
+      end = { x: toCx, y: toNode.y + NODE_HEIGHT_CENTER * 2 + 4 }
+    }
   }
+
+  return { start, end, isVertical: Math.abs(dy) > Math.abs(dx) }
 }
 
-function getInputPoint(node) {
-  return {
-    x: node.x - 4,
-    y: node.y + NODE_HEIGHT_CENTER,
+function buildSmartPath(sx, sy, ex, ey, isVertical) {
+  if (isVertical) {
+    const midY = (sy + ey) / 2
+    return `M ${sx} ${sy} C ${sx} ${midY}, ${ex} ${midY}, ${ex} ${ey}`
   }
+  const midX = (sx + ex) / 2
+  return `M ${sx} ${sy} C ${midX} ${sy}, ${midX} ${ey}, ${ex} ${ey}`
 }
 
 export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete, edgeOpacity }) {
@@ -31,10 +61,8 @@ export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete,
 
   if (!fromNode || !toNode) return null
 
-  // Arrow goes from the depender (fromNode) output to the dependency (toNode) input
-  const start = getOutputPoint(fromNode)
-  const end = getInputPoint(toNode)
-  const pathD = buildBezierPath(start.x, start.y, end.x, end.y)
+  const { start, end, isVertical } = getConnectionPoints(fromNode, toNode)
+  const pathD = buildSmartPath(start.x, start.y, end.x, end.y, isVertical)
 
   const baseColor = TYPE_HEX_COLORS[sourceType] || '#6b7280'
   const strokeColor = hovered ? '#22d3ee' : baseColor
