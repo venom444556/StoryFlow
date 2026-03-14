@@ -324,7 +324,7 @@ export default function DecisionDetail({ decision, index = 0, onUpdate, onClose 
             {/* Decision — styled as quote block */}
             <div>
               <SectionHeader>Decision</SectionHeader>
-              <div className="rounded-lg border-l-4 border-l-[var(--accent-default)] bg-[var(--color-bg-glass)] pl-4 pr-3 py-3">
+              <div className="rounded-lg border-l-4 border-l-[var(--color-border-emphasis)] bg-[var(--color-bg-glass)] pl-4 pr-3 py-3">
                 <InlineTextArea
                   value={decision.decision}
                   onChange={handleFieldChange('decision')}

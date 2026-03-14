@@ -1,6 +1,11 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Plus, Scale, ArrowLeft } from 'lucide-react'
+
+const MIN_WIDTH = 280
+const MAX_WIDTH = 600
+const DEFAULT_WIDTH = 380
+const STORAGE_KEY = 'storyflow-decisions-sidebar-width'
 import Button from '../ui/Button'
 import EmptyState from '../ui/EmptyState'
 import DecisionCard from '../decisions/DecisionCard'
@@ -19,6 +24,56 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
   const [selectedDecision, setSelectedDecision] = useState(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, Number(saved))) : DEFAULT_WIDTH
+    } catch {
+      return DEFAULT_WIDTH
+    }
+  })
+  const [isDragging, setIsDragging] = useState(false)
+  const startXRef = useRef(0)
+  const startWidthRef = useRef(0)
+
+  const handleResizeStart = useCallback(
+    (e) => {
+      e.preventDefault()
+      startXRef.current = e.clientX
+      startWidthRef.current = sidebarWidth
+      setIsDragging(true)
+    },
+    [sidebarWidth]
+  )
+
+  useEffect(() => {
+    if (!isDragging) return
+    const handleMouseMove = (e) => {
+      const next = Math.max(
+        MIN_WIDTH,
+        Math.min(MAX_WIDTH, startWidthRef.current + (e.clientX - startXRef.current))
+      )
+      setSidebarWidth(next)
+    }
+    const handleMouseUp = () => {
+      setIsDragging(false)
+      try {
+        localStorage.setItem(STORAGE_KEY, String(sidebarWidth))
+      } catch {
+        /* ignore */
+      }
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.userSelect = 'none'
+    document.body.style.cursor = 'col-resize'
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+  }, [isDragging, sidebarWidth])
 
   const decisions = useMemo(() => project?.decisions || [], [project?.decisions])
 
@@ -77,12 +132,16 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
 
   return (
     <div className="flex h-full flex-col gap-4 md:flex-row">
-      {/* Sidebar list — fixed width */}
+      {/* Sidebar list — resizable */}
       <div
         className={[
-          'flex shrink-0 flex-col border-r border-[var(--color-border-default)]',
-          activeDecision ? 'hidden md:flex md:w-80' : 'w-full max-w-3xl mx-auto md:w-80',
+          'relative flex shrink-0 flex-col border-r border-[var(--color-border-default)]',
+          activeDecision ? 'hidden md:flex' : 'w-full max-w-3xl mx-auto md:flex',
         ].join(' ')}
+        style={{
+          width: activeDecision ? sidebarWidth : undefined,
+          transition: isDragging ? 'none' : 'width 0.2s ease',
+        }}
       >
         {/* Header */}
         <div className="mb-4 flex items-center justify-between pr-4">
@@ -93,29 +152,20 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
         </div>
 
         {/* Filter tabs */}
-        <div className="mb-3 flex flex-wrap items-center gap-1 rounded-lg bg-[var(--color-bg-glass)] p-1 mr-4">
+        <div className="mb-3 flex flex-wrap items-center gap-1 pr-4">
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.value}
               onClick={() => setStatusFilter(tab.value)}
               className={[
-                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-medium transition-all duration-150',
+                'flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium transition-colors',
                 statusFilter === tab.value
-                  ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)] shadow-sm'
+                  ? 'text-[var(--color-fg-default)]'
                   : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
               ].join(' ')}
             >
               {tab.label}
-              <span
-                className={[
-                  'rounded-full px-1.5 py-0.5 text-[10px]',
-                  statusFilter === tab.value
-                    ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
-                    : 'bg-[var(--color-bg-glass)] text-[var(--color-fg-muted)]',
-                ].join(' ')}
-              >
-                {counts[tab.value]}
-              </span>
+              <span className="text-[10px] text-[var(--color-fg-subtle)]">{counts[tab.value]}</span>
             </button>
           ))}
         </div>
@@ -153,6 +203,28 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
               }
             />
           )}
+        </div>
+
+        {/* Resize handle */}
+        <div
+          onMouseDown={handleResizeStart}
+          className={[
+            'absolute inset-y-0 -right-1 z-10 flex w-2 cursor-col-resize items-center justify-center',
+            'opacity-0 transition-opacity hover:opacity-100',
+            isDragging && 'opacity-100',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          title="Drag to resize"
+        >
+          <div
+            className={[
+              'h-8 w-1 rounded-full transition-colors',
+              isDragging
+                ? 'bg-[var(--accent-default)]'
+                : 'bg-[var(--color-fg-faint)] hover:bg-[var(--color-fg-muted)]',
+            ].join(' ')}
+          />
         </div>
       </div>
 

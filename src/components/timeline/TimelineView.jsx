@@ -74,15 +74,9 @@ export default function TimelineView({
       animate="show"
       className="relative pl-1"
     >
-      {/* Gradient spine behind individual segments */}
+      {/* Spine behind individual segments */}
       {items.length > 1 && (
-        <div
-          className="absolute left-[7.5px] top-0 bottom-0 w-0.5 rounded-full"
-          style={{
-            background: 'linear-gradient(to bottom, #10b981, #8b5cf6, #6b7280)',
-            opacity: 0.15,
-          }}
-        />
+        <div className="absolute left-[7px] top-0 bottom-0 w-px bg-[var(--color-border-default)]" />
       )}
       <AnimatePresence mode="popLayout">
         {items.map((item, index) => (

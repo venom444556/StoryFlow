@@ -16,14 +16,11 @@ import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
 import Tooltip from '../ui/Tooltip'
 import { formatDate } from '../../utils/dates'
-import { sanitizeColor } from '../../utils/sanitize'
 
 function getStatus(progress) {
-  if (progress === 0)
-    return { label: 'Not Started', variant: 'gray', icon: Clock, lineColor: '#6b7280' }
-  if (progress >= 100)
-    return { label: 'Complete', variant: 'green', icon: CheckCircle2, lineColor: '#10b981' }
-  return { label: 'In Progress', variant: 'blue', icon: Target, lineColor: '#8b5cf6' }
+  if (progress === 0) return { label: 'Not Started', variant: 'gray', icon: Clock }
+  if (progress >= 100) return { label: 'Complete', variant: 'green', icon: CheckCircle2 }
+  return { label: 'In Progress', variant: 'blue', icon: Target }
 }
 
 export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
@@ -35,35 +32,29 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
 
   return (
     <motion.div layout className="relative flex gap-4">
-      {/* Timeline spine — color based on status */}
+      {/* Timeline spine */}
       <div className="flex flex-col items-center pt-1">
         {/* Dot */}
         <div
-          className="relative z-10 h-3.5 w-3.5 shrink-0 rounded-full border-2 shadow-lg"
-          style={{
-            borderColor: status.lineColor,
-            backgroundColor: phase.progress >= 100 ? status.lineColor : 'transparent',
-            boxShadow: `0 0 8px ${status.lineColor}40`,
-          }}
+          className={[
+            'relative z-10 h-3 w-3 shrink-0 rounded-full border-2',
+            phase.progress >= 100
+              ? 'border-[var(--color-fg-muted)] bg-[var(--color-fg-muted)]'
+              : 'border-[var(--color-fg-subtle)] bg-transparent',
+          ].join(' ')}
         />
         {/* Connecting line */}
-        {!isLast && (
-          <div className="mt-0 w-0.5 flex-1" style={{ backgroundColor: `${status.lineColor}30` }} />
-        )}
+        {!isLast && <div className="mt-0 w-px flex-1 bg-[var(--color-border-default)]" />}
       </div>
 
       {/* Card */}
       <div className="group mb-4 flex-1 pb-2">
-        <GlassCard
-          padding="none"
-          className="overflow-hidden border-l-4"
-          style={{ borderLeftColor: sanitizeColor(phase.color, '#f59e0b') }}
-        >
+        <GlassCard padding="none" className="overflow-hidden">
           <div className="p-4">
             {/* Header row */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <h4 className="text-sm font-semibold text-[var(--color-fg-default)] truncate">
+                <h4 className="text-sm font-semibold text-[var(--color-fg-default)]">
                   {phase.name}
                 </h4>
                 <Badge variant={status.variant} size="sm" dot>
@@ -128,8 +119,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                 {phase.description.length > 120 && (
                   <button
                     onClick={() => setExpanded((prev) => !prev)}
-                    className="mt-1 inline-flex items-center gap-1 text-xs transition-colors"
-                    style={{ color: 'var(--accent-default)' }}
+                    className="mt-1 inline-flex items-center gap-1 text-xs text-[var(--color-fg-muted)] transition-colors hover:text-[var(--color-fg-default)]"
                   >
                     {expanded ? (
                       <>
@@ -165,7 +155,7 @@ export default function PhaseCard({ phase, onEdit, onDelete, isLast }) {
                   {Math.round(phase.progress || 0)}%
                 </span>
               </div>
-              <ProgressBar value={phase.progress || 0} size="sm" glow />
+              <ProgressBar value={phase.progress || 0} size="sm" />
             </div>
           </div>
         </GlassCard>

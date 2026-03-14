@@ -17,7 +17,7 @@
  */
 export function extractHeadings(markdown) {
   if (!markdown) return []
-  const lines = markdown.split('\n')
+  const lines = markdown.replace(/\\n/g, '\n').split('\n')
   const headings = []
   for (const line of lines) {
     const match = line.match(/^(#{1,6})\s+(.+)$/)
@@ -213,7 +213,10 @@ function parseTable(lines) {
 export function renderMarkdown(markdown) {
   if (!markdown) return ''
 
-  const lines = markdown.split('\n')
+  // Normalize literal \n sequences (double-escaped newlines from JSON/API)
+  const normalized = markdown.replace(/\\n/g, '\n')
+
+  const lines = normalized.split('\n')
   const htmlParts = []
   let i = 0
 

@@ -27,11 +27,7 @@ export default function DecisionCard({ decision, onEdit, onClick, isActive = fal
       <GlassCard
         hover
         padding="none"
-        className={[
-          'group overflow-hidden border-l-2 transition-all',
-          isActive ? 'border-l-[var(--accent-default)]' : 'border-l-transparent',
-        ].join(' ')}
-        style={isActive ? { backgroundColor: 'rgba(var(--accent-default-rgb), 0.08)' } : undefined}
+        className="group overflow-hidden transition-all"
         onClick={() => onClick?.(decision)}
       >
         <div className="p-4">
@@ -42,10 +38,7 @@ export default function DecisionCard({ decision, onEdit, onClick, isActive = fal
                 <span className="shrink-0 text-[10px] font-bold text-[var(--color-fg-subtle)]">
                   ADR-{String(index + 1).padStart(3, '0')}
                 </span>
-                <h4
-                  className="truncate text-sm font-semibold text-[var(--color-fg-default)]"
-                  title={decision.title}
-                >
+                <h4 className="text-sm font-semibold text-[var(--color-fg-default)]">
                   {decision.title}
                 </h4>
                 <Badge variant={statusCfg.variant} size="sm" outline>
