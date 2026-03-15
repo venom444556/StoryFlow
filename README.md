@@ -59,10 +59,10 @@ Autonomous coding agents hit three walls:
 git clone https://github.com/venom444556/StoryFlow.git
 cd StoryFlow
 npm install
-npm run dev:full     # Express server + Vite dev server
+npm run dev          # Express + Vite on a single port
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
 ## Agent CLI
 
@@ -184,9 +184,8 @@ Two themes via semantic CSS variables:
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev:full` | Start server + client together |
-| `npm run dev` | Vite dev server only |
-| `npm run server` | Express API server only |
+| `npm run dev` | Express + Vite dev server (single process, port 3001) |
+| `npm run dev:vite` | Standalone Vite dev server (port 3000, no API) |
 | `npm run build` | Production build |
 | `npm run test` | Run tests (vitest) |
 | `npm run lint` | Lint with ESLint |
@@ -215,8 +214,8 @@ See [SECURITY.md](SECURITY.md) for full security policy and vulnerability report
 ## Deployment
 
 ```bash
-npm run build        # Produces dist/
-npm run server       # Express serves dist/ + API on port 3001
+npm run build                          # Produces dist/
+NODE_ENV=production node server/index.js  # Express serves dist/ + API on port 3001
 ```
 
 Set `STORYFLOW_PORT` to change the port. Set `STORYFLOW_HOST` to change the bind address (default: `127.0.0.1`).
