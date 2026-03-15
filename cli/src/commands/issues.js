@@ -6,6 +6,20 @@ import { issues, resolveProject } from '../client.js'
 import * as out from '../output.js'
 import chalk from 'chalk'
 
+// Resolve an epic key (e.g. "SC-179") to its UUID. Accepts UUIDs as pass-through.
+async function resolveEpicId(projectId, epicRef) {
+  if (!epicRef) return undefined
+  // Already a UUID
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-/.test(epicRef)) return epicRef
+  // Looks like an issue key — resolve via API
+  const epic = await issues.getByKey(projectId, epicRef)
+  if (!epic || !epic.id) throw new Error(`Epic "${epicRef}" not found`)
+  if (epic.type !== 'epic') {
+    throw new Error(`${epicRef} is a ${epic.type}, not an epic`)
+  }
+  return epic.id
+}
+
 export function register(program) {
   const cmd = program.command('issues').alias('issue').description('Manage issues')
 
@@ -18,7 +32,8 @@ export function register(program) {
     .option('--sprint <sprintId>', 'Filter by sprint')
     .option('--epic <epicId>', 'Filter by epic')
     .option('-q, --search <query>', 'Search by title')
-    .option('--limit <n>', 'Limit results', '50')
+    .option('--limit <n>', 'Max results per page (default: all)')
+    .option('--page <n>', 'Page number (use with --limit)')
     .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
@@ -28,10 +43,28 @@ export function register(program) {
       if (opts.sprint) filters.sprintId = opts.sprint
       if (opts.epic) filters.epicId = opts.epic
       if (opts.search) filters.search = opts.search
-      if (opts.limit) filters.limit = opts.limit
 
-      const result = await issues.list(project, filters)
-      const list = result.issues || result
+      let list
+      if (opts.limit) {
+        // Explicit limit: single-page fetch
+        filters.limit = opts.limit
+        if (opts.page) filters.page = opts.page
+        const result = await issues.list(project, filters)
+        list = result.issues || result
+      } else {
+        // No limit: auto-paginate to get ALL issues
+        list = []
+        let page = 1
+        const batchSize = 100
+        while (true) {
+          const result = await issues.list(project, { ...filters, limit: batchSize, page })
+          const batch = result.issues || result
+          list.push(...batch)
+          if (!result.hasMore || batch.length < batchSize) break
+          page++
+        }
+      }
+
       if (opts.json) return out.json(list)
 
       out.heading(`Issues — ${project}`)
@@ -93,7 +126,7 @@ export function register(program) {
     .option('-s, --status <status>', 'Status', 'To Do')
     .option('-p, --priority <priority>', 'Priority (critical, high, medium, low)', 'medium')
     .option('--points <n>', 'Story points (1, 2, 3, 5, 8, 13)')
-    .option('--epic <epicId>', 'Parent epic ID')
+    .option('--epic <epic>', 'Parent epic (key like SC-179 or UUID)')
     .option('--sprint <sprintId>', 'Sprint ID')
     .option('-d, --description <desc>', 'Description')
     .option('--assignee <name>', 'Assignee')
@@ -107,7 +140,7 @@ export function register(program) {
         priority: opts.priority,
       }
       if (opts.points) data.storyPoints = parseInt(opts.points, 10)
-      if (opts.epic) data.epicId = opts.epic
+      if (opts.epic) data.epicId = await resolveEpicId(project, opts.epic)
       if (opts.sprint) data.sprintId = opts.sprint
       if (opts.description) data.description = opts.description
       if (opts.assignee) data.assignee = opts.assignee
@@ -127,7 +160,7 @@ export function register(program) {
     .option('--points <n>', 'Story points')
     .option('--assignee <name>', 'Assignee')
     .option('--sprint <sprintId>', 'Sprint ID')
-    .option('--epic <epicId>', 'Epic ID')
+    .option('--epic <epic>', 'Epic (key like SC-179 or UUID)')
     .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
@@ -138,7 +171,7 @@ export function register(program) {
       if (opts.points) data.storyPoints = parseInt(opts.points, 10)
       if (opts.assignee) data.assignee = opts.assignee
       if (opts.sprint) data.sprintId = opts.sprint
-      if (opts.epic) data.epicId = opts.epic
+      if (opts.epic) data.epicId = await resolveEpicId(project, opts.epic)
 
       const result = await issues.updateByKey(project, key, data)
       if (opts.json) return out.json(result)

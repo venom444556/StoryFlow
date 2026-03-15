@@ -344,7 +344,7 @@ export function listIssues(projectId, filters = {}) {
 
   // Pagination
   const page = Math.max(1, parseInt(filters.page, 10) || 1)
-  const limit = Math.min(100, Math.max(1, parseInt(filters.limit, 10) || 50))
+  const limit = Math.min(500, Math.max(1, parseInt(filters.limit, 10) || 50))
   const offset = (page - 1) * limit
 
   // Fields selection — return summary format when requested
