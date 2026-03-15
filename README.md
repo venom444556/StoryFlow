@@ -20,13 +20,13 @@ It's also a full project management tool: Kanban board with sprints, wiki with m
 Complete visual identity overhaul. Cool charcoal palette with frosted glass surfaces, General Sans typography, and semantic design tokens powering two themes — **Obsidian** (dark glassmorphic) and **Warm Linen** (light, warm bone/eggshell). Every pixel earns its space.
 
 ### Agent CLI
-The `storyflow-cli` npm package replaces MCP with direct shell commands. No JSON-RPC overhead, no deferred tool loading — just `storyflow board` in your terminal. Smart project resolution (type a name prefix, not a UUID), `--json` for piping, and full API coverage in 800 lines vs. 3,000+ lines of MCP boilerplate.
+The `storyflow-cli` npm package provides direct shell commands for every StoryFlow operation. 49 commands covering the full project lifecycle. Smart project resolution (type a name prefix, not a UUID), `--json` for piping, and full API coverage.
 
 ```bash
 npm i -g storyflow-cli
-storyflow board                      # Visual board summary
-storyflow issues done PRJ-42         # Mark issue as Done
-storyflow steer "Focus on auth"      # Send steering directive
+storyflow-cli board                      # Visual board summary
+storyflow-cli issues done PRJ-42         # Mark issue as Done
+storyflow-cli steer "Focus on auth"      # Send steering directive
 ```
 
 ### 5 Mechanical Safety Rails
@@ -41,8 +41,7 @@ Invisible on the happy path, block only when needed:
 ### Live AI Dashboard
 Real-time overview with WebSocket-powered status card, event feed with provenance badges (who did what, why, and how confident), sprint metrics with velocity/burndown, and session history. Steering bar for mid-task course correction without restarting the agent.
 
-### Expanded API Surface
-46 tools covering the full project lifecycle: board CRUD, wiki pages, workflow canvas nodes, architecture components, timeline phases, decision records, sprint management, batch operations, hygiene checks, and git sync.
+![Overview Dashboard](docs/screenshots/overview-dashboard.png)
 
 ---
 
@@ -67,7 +66,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Agent CLI
 
-The `storyflow-cli` package gives agents (and humans) direct terminal access to StoryFlow — no MCP overhead, no JSON-RPC, just shell commands.
+The `storyflow-cli` package gives agents (and humans) direct terminal access to StoryFlow — 49 commands covering the full project lifecycle.
 
 ```bash
 npm i -g storyflow-cli
@@ -81,6 +80,9 @@ storyflow-cli issues list -s "Blocked"   # Filter issues
 storyflow-cli issues done PRJ-42         # Mark issue as Done
 storyflow-cli steer "Focus on auth"      # Send steering directive
 storyflow-cli hygiene                    # Board health check
+storyflow-cli workflow list              # Workflow canvas nodes
+storyflow-cli architecture list          # Architecture components
+storyflow-cli decisions list             # Architecture decision records
 ```
 
 Smart project resolution — type a name prefix instead of UUIDs. Every command supports `--json` for piping.
@@ -91,6 +93,8 @@ See the full command reference at [npmjs.com/package/storyflow-cli](https://www.
 
 ### Board
 Kanban board with epics, stories, tasks, and bugs. Sprint management, backlog grooming, story point estimation, burndown charts, velocity tracking. Supports Blocked status with lifecycle timestamps.
+
+![Board](docs/screenshots/board-view.png)
 
 ### AI Transparency & Safety
 Five mechanical safety rails — invisible on the happy path, block only when needed:
@@ -106,20 +110,35 @@ Plus: event feed with provenance badges, session history, sprint metrics, and a 
 ### Wiki
 Nested documentation pages with markdown editor, live preview, page templates, and version history. The agent uses wiki pages as persistent memory across sessions.
 
+![Wiki](docs/screenshots/wiki-view.png)
+
 ### Workflow Canvas
 Visual node graph for project phases, dependencies, and execution flow. Supports sub-workflows, pan/zoom, and auto-sync with issue status.
+
+![Workflow Canvas](docs/screenshots/workflow-canvas.png)
 
 ### Architecture View
 Component tree with dependency mapping, cycle detection, and type-based filtering.
 
+![Architecture](docs/screenshots/architecture-view.png)
+
 ### Timeline & Decisions
-Phase-based progress tracking with milestones. Architectural decision records with alternatives analysis and consequences tracking.
+Gantt chart with phase bars, milestone diamonds, and responsive rendering. Architectural decision records with alternatives analysis and consequences tracking.
+
+![Timeline](docs/screenshots/timeline-view.png)
 
 ## Architecture
 
 ```
 cli/                 Agent CLI (npm: storyflow-cli)
-server/              Express backend (app.js, db.js, events.js, intelligence.js, ws.js)
+  src/commands/      49 commands: issues, board, sprints, pages, workflow,
+                     architecture, decisions, phases, milestones, events, etc.
+server/              Express backend
+  app.js             API routes + middleware
+  db.js              SQLite data layer (sql.js, JSON blob per project)
+  events.js          Transparency event stream, causal chains
+  intelligence.js    AI steering, confidence scoring, gate enforcement
+  ws.js              WebSocket server for real-time updates
 src/
   components/
     ui/              Shared components (Button, Modal, Badge, GlassCard, etc.)
@@ -130,11 +149,12 @@ src/
     wiki/            Documentation (PageTree, PageEditor, MarkdownRenderer)
     workflow/        Visual canvas (WorkflowCanvas, WorkflowNode)
     architecture/    Component tree (ComponentDetail, DependencyGraph)
-    timeline/        Phase tracking (PhaseCard, MilestoneMarker)
+    timeline/        Gantt chart (GanttChart, GanttBar, GanttMilestone, GanttTimeAxis)
     decisions/       Decision records (DecisionCard, DecisionForm)
   stores/            Zustand stores (projects, events, UI)
   styles/            Design tokens (tokens.css)
-plugin/              Claude Code plugin (MCP server, hooks, agent prompt)
+  utils/             Markdown parser, sanitizer, export/import
+plugin/              Claude Code plugin (hooks, agent prompt, skills)
 ```
 
 ### Data Model
@@ -157,7 +177,8 @@ Two themes via semantic CSS variables:
 | Frontend | React 18, Vite 6, Tailwind CSS 4.0, Zustand, Framer Motion |
 | Backend | Express 4, sql.js (SQLite), WebSocket |
 | CLI | Commander.js, chalk |
-| Persistence | SQLite (server), IndexedDB (client) |
+| Virtualization | @tanstack/react-virtual |
+| Persistence | SQLite (server), Dexie/IndexedDB (client) |
 
 ## Commands
 
@@ -167,15 +188,18 @@ Two themes via semantic CSS variables:
 | `npm run dev` | Vite dev server only |
 | `npm run server` | Express API server only |
 | `npm run build` | Production build |
-| `npm run test` | Run tests |
+| `npm run test` | Run tests (vitest) |
 | `npm run lint` | Lint with ESLint |
+| `npm run ci` | Full CI pipeline (format + lint + typecheck + test + build) |
 
 ## Security
 
 StoryFlow is for **local single-user use**. The primary threat model is unauthorized tool access.
 
 **Protected:**
-- API token auth (`STORYFLOW_MCP_TOKEN`) with constant-time comparison
+- API token auth (`STORYFLOW_TOKEN`) with constant-time comparison
+- Loopback binding (`127.0.0.1` by default)
+- CORS restricted to known UI origins
 - Gate enforcement blocks AI mutations on gated entities
 - Confidence auto-gating on uncertain decisions
 - Agent pause on escalation
@@ -186,6 +210,8 @@ StoryFlow is for **local single-user use**. The primary threat model is unauthor
 
 **Recommendations:** Set a strong token (`openssl rand -hex 32`), don't expose the port to untrusted networks, never commit tokens to version control.
 
+See [SECURITY.md](SECURITY.md) for full security policy and vulnerability reporting.
+
 ## Deployment
 
 ```bash
@@ -193,7 +219,7 @@ npm run build        # Produces dist/
 npm run server       # Express serves dist/ + API on port 3001
 ```
 
-Set `STORYFLOW_PORT` to change the port.
+Set `STORYFLOW_PORT` to change the port. Set `STORYFLOW_HOST` to change the bind address (default: `127.0.0.1`).
 
 ## License
 

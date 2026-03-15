@@ -152,10 +152,10 @@
   <line x1="769" y1="120" x2="769" y2="123" stroke="#fbbf24" stroke-width="1.3"/>
   <text x="786" y="136" style="font-size:14px;font-weight:700;fill:#fbbf24;">Claude Code</text>
 
-  <!-- MCP Server -->
+  <!-- Agent CLI -->
   <rect x="718" y="168" width="184" height="44" rx="10" fill="rgba(245,158,11,0.07)" stroke="rgba(245,158,11,0.18)"/>
-  <text x="810" y="187" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#fbbf24;">MCP Server (stdio)</text>
-  <text x="810" y="203" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">46 tools · Zod schemas</text>
+  <text x="810" y="187" text-anchor="middle" style="font-size:11px;font-weight:600;fill:#fbbf24;">Agent CLI</text>
+  <text x="810" y="203" text-anchor="middle" style="font-size:9px;font-weight:400;fill:#78716c;">49 commands · storyflow-cli</text>
 
   <!-- Agent Prompt -->
   <rect x="718" y="222" width="184" height="44" rx="10" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.18)"/>
@@ -202,10 +202,10 @@
   <rect x="272" y="284" width="66" height="22" rx="11" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.30)"/>
   <text x="305" y="299" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#34d399;letter-spacing:0.04em;">WS SYNC</text>
 
-  <!-- Claude Code → Server (HTTP/MCP) — horizontal -->
+  <!-- Claude Code → Server (CLI HTTP) — horizontal -->
   <line x1="700" y1="190" x2="610" y2="190" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5" marker-end="url(#arr-amber)"/>
   <rect x="624" y="168" width="66" height="22" rx="11" fill="rgba(245,158,11,0.12)" stroke="rgba(245,158,11,0.30)"/>
-  <text x="657" y="183" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#fbbf24;letter-spacing:0.04em;">MCP HTTP</text>
+  <text x="657" y="183" text-anchor="middle" style="font-size:9px;font-weight:600;fill:#fbbf24;letter-spacing:0.04em;">CLI HTTP</text>
 
   <!-- Server → SQLite — vertical, tighter -->
   <line x1="480" y1="430" x2="480" y2="450" stroke="#57534e" stroke-width="2" marker-end="url(#arr-muted)"/>
@@ -221,6 +221,6 @@
     <line x1="110" y1="6" x2="134" y2="6" stroke="#10b981" stroke-width="2" stroke-dasharray="8,5"/>
     <text x="142" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">WebSocket</text>
     <line x1="230" y1="6" x2="254" y2="6" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,5"/>
-    <text x="262" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">MCP (via HTTP)</text>
+    <text x="262" y="10" style="font-size:9px;font-weight:500;fill:#78716c;">CLI (via HTTP)</text>
   </g>
 </svg>

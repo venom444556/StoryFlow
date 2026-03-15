@@ -16,7 +16,7 @@ const MAX_MESSAGE_SIZE = 4096 // bytes
 const MAX_CONNECTIONS = 20 // max concurrent clients
 
 // Auth: reuse the same token as REST API
-const AUTH_TOKEN = process.env.STORYFLOW_MCP_TOKEN || null
+const AUTH_TOKEN = process.env.STORYFLOW_TOKEN || process.env.STORYFLOW_MCP_TOKEN || null
 
 // Origin verification: trust any localhost origin (private app), or use env override
 const CUSTOM_ORIGINS = process.env.STORYFLOW_CORS_ORIGINS

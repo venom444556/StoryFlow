@@ -1,88 +1,47 @@
 ---
 name: StoryFlow Project Management
 description: Use when managing project boards, creating or updating issues, planning sprints, tracking progress, or writing wiki documentation in StoryFlow. Activates when the user mentions StoryFlow, project boards, issue tracking, sprint planning, or wiki pages in the context of project management.
-version: 3.0.0
+version: 4.0.0
 ---
 
 # StoryFlow Project Management
 
-StoryFlow provides a visual board (like JIRA), wiki documentation (like Confluence), AI transparency (event log, steering, gates), and agent memory (sessions, self-knowledge wiki) — all via the `storyflow` CLI.
+All interaction happens through the `storyflow` CLI via Bash. Every command supports `--json` for structured output. If StoryFlow is not configured, run `/storyflow:setup`.
 
-## Configuration
-
-StoryFlow must be running and configured. If not set up, run `/storyflow:setup`.
-Config stored globally at `~/.config/storyflow/config.json`.
-
-## CLI Commands
-
-All interaction happens through the `storyflow` CLI via Bash. Every command supports `--json` for structured output.
+## CLI Surface — 49 Commands
 
 | Category | Commands |
 |----------|----------|
-| **Connection** | `storyflow status` |
-| **Projects** | `storyflow projects list/show/create/update` |
-| **Issues** | `storyflow issues list/show/create/update/done/block/comment` |
+| **Connection** | `storyflow status`, `storyflow config show/set-url/set-token/set-default` |
+| **Projects** | `storyflow projects list/show/create/update/delete` |
+| **Issues** | `storyflow issues list/show/create/update/done/block/comment/delete/nudge` |
 | **Board** | `storyflow board [project]`, `storyflow hygiene [project]` |
-| **Sprints** | `storyflow sprints list/create/update` |
-| **Wiki** | `storyflow pages list/show/create/update` |
-| **Events** | `storyflow events list` |
-| **AI** | `storyflow ai-status`, `storyflow steer "message"` |
-| **Safety** | `storyflow gates`, `storyflow snapshots` |
+| **Sprints** | `storyflow sprints list/create/update/delete` |
+| **Wiki** | `storyflow pages list/show/create/update/delete/templates` |
+| **Decisions** | `storyflow decisions list/show/create/update/delete` |
+| **Phases** | `storyflow phases list/create/update/delete` |
+| **Milestones** | `storyflow milestones list/create/update/toggle/delete` |
+| **Workflow** | `storyflow workflow list/show/create/update/delete/link/unlink` |
+| **Architecture** | `storyflow architecture list/show/create/update/delete` |
+| **Events** | `storyflow events list/create/respond/cleanup` |
+| **Sessions** | `storyflow sessions list/latest/save` |
+| **AI Status** | `storyflow ai-status show/set/acknowledge` |
+| **Safety** | `storyflow gates`, `storyflow snapshots list/restore`, `storyflow steer "message"` |
 
-### Quick Examples
+## Data Model
 
-```bash
-# Board summary
-storyflow board --json
-
-# Create a story
-storyflow issues create --title "Add login page" --type story --points 5 --priority high --json
-
-# Mark issue done
-storyflow issues done SC-42
-
-# List wiki pages
-storyflow pages list --json
-
-# Check board health
-storyflow hygiene --json
-```
-
-### REST API (for operations without CLI commands)
-
-Sessions, event recording, and AI status updates use the REST API directly:
-
-```bash
-# Save session
-curl -s -X POST http://localhost:3001/api/projects/<pid>/sessions \
-  -H 'Content-Type: application/json' -d '{"summary":"...","next_steps":"..."}'
-
-# Set AI status
-curl -s -X POST http://localhost:3001/api/projects/<pid>/ai-status \
-  -H 'Content-Type: application/json' -d '{"status":"working"}'
-
-# Get last session
-curl -s http://localhost:3001/api/projects/<pid>/sessions/latest
-```
-
-## Data Model Quick Reference
-
-See `references/data-model.md` for full field details.
+See `references/data-model.md` for complete field reference. Key rules:
 
 - **Issue types**: `epic`, `story`, `task`, `bug` (lowercase)
-- **Statuses**: `To Do` -> `In Progress` -> `Blocked` -> `Done` (title-case)
+- **Statuses**: `To Do`, `In Progress`, `Blocked`, `Done` (title-case, exact strings)
 - **Priorities**: `critical`, `high`, `medium`, `low`
-- **Key fields**: `epicId` (parent epic), `sprintId` (sprint), `storyPoints` (effort)
 - **Story points**: Fibonacci only — 1, 2, 3, 5, 8, 13
+- **Field names**: `storyPoints` (not `points`), `epicId` (not `parentId`), comment `body` (not `text`)
+
+## Wiki Templates
+
+When creating pages, use `--template <id>`: `blank`, `meeting-notes`, `technical-spec`, `requirements-doc`, `api-documentation`, `retrospective`, `adr`
 
 ## The StoryFlow Agent
 
-Board sync is handled by the **storyflow-agent** — an autonomous AI PM dispatched automatically by hooks. See `agents/storyflow-agent.md` for its genesis document. The agent handles:
-
-1. Feature planning (epics, stories, story points)
-2. Board lifecycle sync (hook-driven status updates)
-3. Sprint management (creation, metrics, velocity)
-4. Wiki & documentation (decisions, agent knowledge)
-5. Progress reporting & board hygiene
-6. Bug filing (auto-detect from errors/crashes)
-7. Git reconciliation (catch missed commits/PRs)
+Board sync is handled by the **storyflow-agent** — an autonomous AI PM dispatched by hooks. See `agents/storyflow-agent.md` for its genesis document and `agents/references/` for operational playbooks.

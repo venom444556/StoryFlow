@@ -77,6 +77,16 @@ export function register(program) {
       const result = await projects.update(id, data)
       out.success(`Updated project: ${result.name}`)
     })
+
+  cmd
+    .command('delete <id>')
+    .alias('rm')
+    .description('Delete a project')
+    .action(async (id) => {
+      id = await resolveProject(id)
+      await projects.delete(id)
+      out.success(`Deleted project ${id}`)
+    })
 }
 
 function shortDate(iso) {

@@ -4,13 +4,13 @@
  * Regression coverage for two related bugs:
  *
  * 1. "0 projects on fresh load" — IndexedDB is empty (data was written via
- *    MCP/REST with no browser tab open).  reloadFromServer() must hydrate the
+ *    CLI/REST with no browser tab open).  reloadFromServer() must hydrate the
  *    store from the server on startup.
  *
- * 2. "Browser refresh doesn't show MCP changes" — IndexedDB has stale data;
+ * 2. "Browser refresh doesn't show CLI changes" — IndexedDB has stale data;
  *    old code called syncToServer(stale) on startup, overwriting server-side
- *    MCP writes.  reloadFromServer() is now called unconditionally so the
- *    server (which has the MCP changes) always wins on startup.
+ *    CLI writes.  reloadFromServer() is now called unconditionally so the
+ *    server (which has the CLI changes) always wins on startup.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useProjectsStore, reloadFromServer } from './projectsStore'

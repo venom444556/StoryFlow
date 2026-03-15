@@ -46,7 +46,6 @@ const FEATURES = [
 
 export default function WelcomeModal() {
   const [isOpen, setIsOpen] = useState(false)
-  const [dontShowAgain, setDontShowAgain] = useState(false)
 
   useEffect(() => {
     try {
@@ -72,14 +71,7 @@ export default function WelcomeModal() {
 
   const handleClose = () => {
     setIsOpen(false)
-    if (dontShowAgain) {
-      localStorage.setItem(STORAGE_KEY, 'true')
-    }
-  }
-
-  const handleGetStarted = () => {
     localStorage.setItem(STORAGE_KEY, 'true')
-    setIsOpen(false)
   }
 
   return (
@@ -177,16 +169,8 @@ export default function WelcomeModal() {
 
             {/* Footer */}
             <div className="flex items-center justify-between border-t border-[var(--color-border-default)] px-6 py-4">
-              <label className="flex items-center gap-2 text-xs text-[var(--color-fg-muted)]">
-                <input
-                  type="checkbox"
-                  checked={dontShowAgain}
-                  onChange={(e) => setDontShowAgain(e.target.checked)}
-                  className="rounded"
-                />
-                Don&apos;t show again
-              </label>
-              <Button variant="primary" onClick={handleGetStarted}>
+              <div />
+              <Button variant="primary" onClick={handleClose}>
                 Get Started
               </Button>
             </div>

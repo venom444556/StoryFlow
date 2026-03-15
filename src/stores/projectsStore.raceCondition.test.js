@@ -3,7 +3,7 @@
  *
  * Scenario: a syncToServer debounce timer is scheduled, then reloadFromServer()
  * fires before the 500ms timer elapses. The stale timer must be cancelled so it
- * doesn't POST stale client state back to /api/sync, overwriting fresh MCP data.
+ * doesn't POST stale client state back to /api/sync, overwriting fresh server data.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useProjectsStore, reloadFromServer } from './projectsStore'

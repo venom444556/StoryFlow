@@ -186,4 +186,26 @@ export function register(program) {
       }
       out.success(`${key} marked as Blocked`)
     })
+
+  cmd
+    .command('delete <key>')
+    .alias('rm')
+    .description('Delete an issue by key')
+    .option('--project <project>', 'Override default project')
+    .action(async (key, opts) => {
+      const project = await resolveProject(opts.project)
+      const issue = await issues.getByKey(project, key)
+      await issues.delete(project, issue.id)
+      out.success(`Deleted ${key}: ${issue.title}`)
+    })
+
+  cmd
+    .command('nudge <key>')
+    .description('Reset staleness timer on an issue')
+    .option('--project <project>', 'Override default project')
+    .action(async (key, opts) => {
+      const project = await resolveProject(opts.project)
+      await issues.nudge(project, key)
+      out.success(`Nudged ${key}`)
+    })
 }

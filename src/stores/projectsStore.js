@@ -1068,9 +1068,9 @@ useProjectsStore.subscribe(
   (projects) => syncToServer(projects)
 )
 
-// Listen for external writes via WebSocket (replaces Vite HMR)
+// Listen for external writes via WebSocket
 // Also called on startup when IndexedDB is empty (no browser tab was open during
-// prior MCP / REST writes), so the client hydrates from the server on first load.
+// prior CLI / REST writes), so the client hydrates from the server on first load.
 let _reloadPromise = null
 
 export function reloadFromServer() {
@@ -1157,7 +1157,7 @@ function connectWebSocket() {
 // Initial sync: pull latest from server + connect WebSocket
 //
 // Always pull from server on startup so that a browser refresh picks up any
-// changes written by MCP tools or REST calls while the tab was away.
+// changes written by CLI or REST calls while the tab was away.
 // Merge strategy: server wins for shared project IDs; client-only projects
 // (IDs not on the server) are preserved.  Real-time push for user changes
 // during the session is handled by the projects subscribe() listener below.

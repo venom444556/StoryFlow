@@ -18,7 +18,6 @@ import {
   checkApprovalGates,
   getRejectedEvents,
   hasEntityGate,
-  getEventChain,
 } from './events.js'
 import {
   addSteeringDirective,
@@ -192,8 +191,8 @@ app.use((req, res, next) => {
   next()
 })
 
-// Token auth — if STORYFLOW_MCP_TOKEN is set, require it on mutating requests
-const AUTH_TOKEN = process.env.STORYFLOW_MCP_TOKEN || null
+// Token auth — if STORYFLOW_TOKEN is set, require it on mutating requests
+const AUTH_TOKEN = process.env.STORYFLOW_TOKEN || process.env.STORYFLOW_MCP_TOKEN || null
 
 function requireToken(req, res, next) {
   if (!AUTH_TOKEN) return next() // token not configured — skip auth
@@ -314,7 +313,7 @@ app.post('/api/sync', async (req, res) => {
   try {
     await db.syncAll(req.body.projects)
     res.json({ success: true, count: req.body.projects.length })
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Sync failed' })
   } finally {
     _syncInProgress = false
@@ -539,7 +538,7 @@ app.post('/api/projects/:id/issues/batch-update', (req, res) => {
         results.errors.push({ entry, error: 'Missing issue_id or issue_key' })
         continue
       }
-      // Map snake_case MCP fields to camelCase DB fields
+      // Map snake_case fields to camelCase DB fields
       const data = {}
       if (fields.title !== undefined) data.title = fields.title
       if (fields.status !== undefined) data.status = fields.status

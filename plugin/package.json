@@ -1,9 +1,0 @@
-{
-  "name": "storyflow-mcp",
-  "version": "2.0.0",
-  "type": "module",
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
-    "zod": "^3.25.17"
-  }
-}

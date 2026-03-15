@@ -2,7 +2,7 @@
 // storyflow events — event stream, steering, AI status
 // ---------------------------------------------------------------------------
 
-import { events, ai, safety, resolveProject } from '../client.js'
+import { events, ai, safety, sessions, resolveProject } from '../client.js'
 import * as out from '../output.js'
 import chalk from 'chalk'
 
@@ -42,6 +42,49 @@ export function register(program) {
       ])
     })
 
+  evtCmd
+    .command('create [project]')
+    .description('Record a custom event')
+    .requiredOption('--action <action>', 'Event action (e.g., deployed, reviewed)')
+    .option('--category <cat>', 'Event category')
+    .option('--entity-type <type>', 'Entity type')
+    .option('--entity-title <title>', 'Entity title')
+    .option('--actor <actor>', 'Actor (ai, human, system)', 'human')
+    .option('--detail <detail>', 'Additional detail')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const event = { action: opts.action, actor: opts.actor }
+      if (opts.category) event.category = opts.category
+      if (opts.entityType) event.entity_type = opts.entityType
+      if (opts.entityTitle) event.entity_title = opts.entityTitle
+      if (opts.detail) event.detail = opts.detail
+      await events.record(project, event)
+      out.success(`Event recorded: ${opts.action}`)
+    })
+
+  evtCmd
+    .command('respond <eventId>')
+    .description('Approve or reject an approval gate')
+    .requiredOption('--action <action>', 'Response: approve, reject, redirect')
+    .option('--project <project>', 'Override default project')
+    .option('--reason <reason>', 'Reason for decision')
+    .action(async (eventId, opts) => {
+      const project = await resolveProject(opts.project)
+      const data = { action: opts.action }
+      if (opts.reason) data.reason = opts.reason
+      await events.respond(project, eventId, data)
+      out.success(`Gate ${eventId}: ${opts.action}`)
+    })
+
+  evtCmd
+    .command('cleanup [project]')
+    .description('Delete events older than retention period')
+    .action(async (project) => {
+      project = await resolveProject(project)
+      const result = await events.cleanup(project)
+      out.success(`Cleaned up events: ${result.deleted || 0} removed`)
+    })
+
   // --- Steer ---
   program
     .command('steer <message>')
@@ -55,8 +98,11 @@ export function register(program) {
     })
 
   // --- AI Status ---
-  program
-    .command('ai-status [project]')
+  const aiCmd = program.command('ai-status').description('Manage AI agent status')
+
+  aiCmd
+    .command('show [project]')
+    .alias('get')
     .description('Check AI agent status')
     .action(async (project) => {
       project = await resolveProject(project)
@@ -66,7 +112,6 @@ export function register(program) {
       out.kv('Detail', status.detail || chalk.gray('none'))
       out.kv('Updated', status.updatedAt || chalk.gray('never'))
 
-      // Also show pending directives
       const directives = await ai.getDirectives(project)
       if (directives.length) {
         console.log()
@@ -81,6 +126,28 @@ export function register(program) {
           console.log(`  ${pri} ${d.text} ${chalk.gray(`(${shortTime(d.created_at)})`)}`)
         }
       }
+    })
+
+  aiCmd
+    .command('set <status>')
+    .description('Set AI agent status (idle, working, blocked, paused)')
+    .option('--project <project>', 'Override default project')
+    .option('-d, --detail <detail>', 'Status detail message')
+    .action(async (status, opts) => {
+      const project = await resolveProject(opts.project)
+      await ai.setStatus(project, status, opts.detail)
+      out.success(`AI status set to: ${status}`)
+    })
+
+  aiCmd
+    .command('acknowledge <directiveId>')
+    .alias('ack')
+    .description('Acknowledge a steering directive')
+    .option('--project <project>', 'Override default project')
+    .action(async (directiveId, opts) => {
+      const project = await resolveProject(opts.project)
+      await ai.acknowledge(project, directiveId)
+      out.success(`Directive ${directiveId} acknowledged`)
     })
 
   // --- Gates ---
@@ -117,8 +184,11 @@ export function register(program) {
     })
 
   // --- Snapshots ---
-  program
-    .command('snapshots [project]')
+  const snapCmd = program.command('snapshots').description('Manage undo snapshots')
+
+  snapCmd
+    .command('list [project]')
+    .alias('ls')
     .description('List undo snapshots')
     .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
@@ -134,6 +204,73 @@ export function register(program) {
         { header: 'Actor', value: (r) => actorColor(r.trigger_actor), maxWidth: 8 },
         { header: 'Time', value: (r) => shortTime(r.created_at), maxWidth: 18 },
       ])
+    })
+
+  snapCmd
+    .command('restore <snapshotId>')
+    .description('Restore project from a snapshot')
+    .option('--project <project>', 'Override default project')
+    .action(async (snapshotId, opts) => {
+      const project = await resolveProject(opts.project)
+      await safety.restore(project, snapshotId)
+      out.success(`Restored from snapshot ${snapshotId}`)
+    })
+
+  // --- Sessions ---
+  const sessCmd = program.command('sessions').alias('session').description('Manage agent sessions')
+
+  sessCmd
+    .command('list [project]')
+    .alias('ls')
+    .description('List agent sessions')
+    .option('--limit <n>', 'Limit results', '10')
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const list = await sessions.list(project, parseInt(opts.limit, 10))
+      if (opts.json) return out.json(list)
+
+      out.heading(`Sessions — ${project}`)
+      out.table(list, [
+        { header: 'ID', value: (r) => (r.id || '').slice(0, 8), maxWidth: 10 },
+        { header: 'Summary', value: (r) => (r.summary || '').slice(0, 60), maxWidth: 60 },
+        { header: 'Time', value: (r) => shortTime(r.createdAt || r.created_at), maxWidth: 18 },
+      ])
+    })
+
+  sessCmd
+    .command('latest [project]')
+    .description('Show the most recent session')
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const session = await sessions.latest(project)
+      if (opts.json) return out.json(session)
+
+      if (!session || !session.id) {
+        out.info('No sessions recorded yet')
+        return
+      }
+      out.heading('Latest Session')
+      out.kv('ID', session.id)
+      out.kv('Time', session.createdAt || session.created_at)
+      if (session.summary) {
+        console.log()
+        console.log(session.summary)
+      }
+    })
+
+  sessCmd
+    .command('save [project]')
+    .description('Save a session summary')
+    .requiredOption('-s, --summary <text>', 'Session summary text')
+    .option('--agent-id <id>', 'Agent ID')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const data = { summary: opts.summary }
+      if (opts.agentId) data.agentId = opts.agentId
+      await sessions.save(project, data)
+      out.success('Session saved')
     })
 }
 

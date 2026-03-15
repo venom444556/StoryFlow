@@ -67,6 +67,17 @@ export function register(program) {
       const result = await sprints.update(project, sprintId, data)
       out.success(`Updated sprint: ${result.name}`)
     })
+
+  cmd
+    .command('delete <sprintId>')
+    .alias('rm')
+    .description('Delete a sprint')
+    .option('--project <project>', 'Override default project')
+    .action(async (sprintId, opts) => {
+      const project = await resolveProject(opts.project)
+      await sprints.delete(project, sprintId)
+      out.success(`Deleted sprint ${sprintId}`)
+    })
 }
 
 function shortDate(iso) {

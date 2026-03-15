@@ -1,5 +1,5 @@
 {
-  "description": "StoryFlow closed-loop board sync — dispatches the storyflow-agent to keep the board in sync with actual work (CLI-based, zero MCP)",
+  "description": "StoryFlow closed-loop board sync — dispatches the storyflow-agent to keep the board in sync with actual work via CLI",
   "hooks": {
     "PostToolUse": [
       {
@@ -49,7 +49,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. Use the storyflow CLI (not MCP tools). If StoryFlow is not configured or unreachable, skip silently.'",
+            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session ending. Invoke the storyflow-agent to reconcile the StoryFlow board before stopping. Use the storyflow CLI (not MCP tools). If StoryFlow is not configured or unreachable, skip silently.'",
+            "command": "echo 'Session ending. Invoke the storyflow-agent to reconcile the StoryFlow board before stopping. If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]

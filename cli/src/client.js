@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------
 // StoryFlow HTTP client — talks directly to the Express API
-// Evolved from plugin/server/storyflow-client.js, zero MCP overhead
+// Direct HTTP client for the Express API
 // ---------------------------------------------------------------------------
 
 import { readFileSync, existsSync } from 'node:fs'
@@ -31,7 +31,7 @@ export function getBaseUrl() {
 }
 
 function getAuthToken() {
-  if (process.env.STORYFLOW_MCP_TOKEN) return process.env.STORYFLOW_MCP_TOKEN
+  if (process.env.STORYFLOW_TOKEN) return process.env.STORYFLOW_TOKEN
   const config = readConfig()
   return config.token || null
 }
@@ -245,12 +245,115 @@ export const pages = {
     request(`/api/projects/${enc(pid)}/pages/${enc(pageId)}`, { method: 'DELETE' }),
 }
 
+// --- Decisions ---
+
+export const decisions = {
+  list: (pid) => request(`/api/projects/${enc(pid)}/decisions`),
+  get: (pid, did) => request(`/api/projects/${enc(pid)}/decisions/${enc(did)}`),
+  create: (pid, data) =>
+    request(`/api/projects/${enc(pid)}/decisions`, { method: 'POST', body: JSON.stringify(data) }),
+  update: (pid, did, data) =>
+    request(`/api/projects/${enc(pid)}/decisions/${enc(did)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (pid, did) =>
+    request(`/api/projects/${enc(pid)}/decisions/${enc(did)}`, { method: 'DELETE' }),
+}
+
+// --- Timeline: Phases ---
+
+export const phases = {
+  list: (pid) => request(`/api/projects/${enc(pid)}/phases`),
+  create: (pid, data) =>
+    request(`/api/projects/${enc(pid)}/phases`, { method: 'POST', body: JSON.stringify(data) }),
+  update: (pid, phaseId, data) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (pid, phaseId) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}`, { method: 'DELETE' }),
+}
+
+// --- Timeline: Milestones ---
+
+export const milestones = {
+  list: (pid) => request(`/api/projects/${enc(pid)}/milestones`),
+  create: (pid, data) =>
+    request(`/api/projects/${enc(pid)}/milestones`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (pid, mid, data) =>
+    request(`/api/projects/${enc(pid)}/milestones/${enc(mid)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (pid, mid) =>
+    request(`/api/projects/${enc(pid)}/milestones/${enc(mid)}`, { method: 'DELETE' }),
+}
+
+// --- Workflow ---
+
+export const workflow = {
+  list: (pid) => request(`/api/projects/${enc(pid)}/workflow/nodes`),
+  get: (pid, nid) => request(`/api/projects/${enc(pid)}/workflow/nodes/${enc(nid)}`),
+  create: (pid, data) =>
+    request(`/api/projects/${enc(pid)}/workflow/nodes`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (pid, nid, data) =>
+    request(`/api/projects/${enc(pid)}/workflow/nodes/${enc(nid)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (pid, nid) =>
+    request(`/api/projects/${enc(pid)}/workflow/nodes/${enc(nid)}`, { method: 'DELETE' }),
+  link: (pid, nid, issueKey) =>
+    request(`/api/projects/${enc(pid)}/workflow/nodes/${enc(nid)}/link`, {
+      method: 'POST',
+      body: JSON.stringify({ issueKey }),
+    }),
+  unlink: (pid, nid, issueKey) =>
+    request(`/api/projects/${enc(pid)}/workflow/nodes/${enc(nid)}/unlink`, {
+      method: 'POST',
+      body: JSON.stringify({ issueKey }),
+    }),
+}
+
+// --- Architecture ---
+
+export const architecture = {
+  list: (pid) => request(`/api/projects/${enc(pid)}/architecture/components`),
+  get: (pid, cid) => request(`/api/projects/${enc(pid)}/architecture/components/${enc(cid)}`),
+  create: (pid, data) =>
+    request(`/api/projects/${enc(pid)}/architecture/components`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (pid, cid, data) =>
+    request(`/api/projects/${enc(pid)}/architecture/components/${enc(cid)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  delete: (pid, cid) =>
+    request(`/api/projects/${enc(pid)}/architecture/components/${enc(cid)}`, { method: 'DELETE' }),
+}
+
 // --- Events ---
 
 export const events = {
   query: (pid, filters = {}) => request(`/api/projects/${enc(pid)}/events${qs(filters)}`),
   record: (pid, event) =>
     request(`/api/projects/${enc(pid)}/events`, { method: 'POST', body: JSON.stringify(event) }),
+  respond: (pid, eventId, data) =>
+    request(`/api/projects/${enc(pid)}/events/${enc(eventId)}/respond`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  cleanup: (pid) => request(`/api/projects/${enc(pid)}/events/cleanup`, { method: 'DELETE' }),
 }
 
 // --- AI Status & Steering ---
@@ -264,6 +367,11 @@ export const ai = {
     }),
   getDirectives: (pid, consume = false) =>
     request(`/api/projects/${enc(pid)}/steering-queue${consume ? '?consume=true' : ''}`),
+  acknowledge: (pid, directiveId) =>
+    request(`/api/projects/${enc(pid)}/steering-queue/${enc(directiveId)}/acknowledge`, {
+      method: 'POST',
+      body: '{}',
+    }),
   steer: (pid, text, priority = 'normal') =>
     request(`/api/projects/${enc(pid)}/steer`, {
       method: 'POST',

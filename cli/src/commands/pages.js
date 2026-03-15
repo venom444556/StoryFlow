@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------
 
 import { pages, resolveProject } from '../client.js'
+import { PAGE_TEMPLATES } from '../templates.js'
 import * as out from '../output.js'
 import chalk from 'chalk'
 
@@ -50,12 +51,26 @@ export function register(program) {
     .description('Create a wiki page')
     .requiredOption('--title <title>', 'Page title')
     .option('-c, --content <content>', 'Page content')
+    .option(
+      '-t, --template <id>',
+      'Template: blank, meeting-notes, technical-spec, requirements-doc, api-documentation, retrospective, adr'
+    )
     .action(async (project, opts) => {
       project = await resolveProject(project)
-      const result = await pages.create(project, {
-        title: opts.title,
-        content: opts.content || '',
-      })
+      let content = opts.content || ''
+      let icon
+      if (opts.template) {
+        const tmpl = PAGE_TEMPLATES.find((t) => t.id === opts.template)
+        if (!tmpl) {
+          const ids = PAGE_TEMPLATES.map((t) => t.id).join(', ')
+          throw new Error(`Unknown template "${opts.template}". Available: ${ids}`)
+        }
+        if (!content) content = tmpl.content
+        icon = tmpl.icon
+      }
+      const data = { title: opts.title, content }
+      if (icon) data.icon = icon
+      const result = await pages.create(project, data)
       out.success(`Created page: ${result.title} (${result.id})`)
     })
 
@@ -72,6 +87,31 @@ export function register(program) {
       if (opts.content) data.content = opts.content
       const result = await pages.update(project, pageId, data)
       out.success(`Updated page: ${result.title}`)
+    })
+
+  cmd
+    .command('delete <pageId>')
+    .alias('rm')
+    .description('Delete a wiki page')
+    .option('--project <project>', 'Override default project')
+    .action(async (pageId, opts) => {
+      const project = await resolveProject(opts.project)
+      await pages.delete(project, pageId)
+      out.success(`Deleted page ${pageId}`)
+    })
+
+  cmd
+    .command('templates')
+    .description('List available page templates')
+    .action(() => {
+      out.heading('Page Templates')
+      out.table(PAGE_TEMPLATES, [
+        { header: '', value: (r) => r.icon, maxWidth: 3 },
+        { header: 'ID', value: (r) => chalk.bold(r.id), maxWidth: 20 },
+        { header: 'Name', value: (r) => r.name, maxWidth: 30 },
+        { header: 'Description', value: (r) => r.description, maxWidth: 45 },
+      ])
+      console.log(chalk.gray('\n  Usage: storyflow pages create --title "My Page" --template adr'))
     })
 }
 

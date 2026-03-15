@@ -1,13 +1,15 @@
-import { sanitizeColor } from '../../utils/sanitize'
+import { format, parseISO } from 'date-fns'
 
 const BAR_V_PADDING = 10
+const BAR_RADIUS = 6
+const FALLBACK_COLOR = '#a8a29e'
 
 export default function GanttBar({
   phase,
   rowIndex,
   rowHeight,
   dateToX,
-  labelWidth,
+  _labelWidth,
   headerHeight = 0,
   onPhaseClick,
 }) {
@@ -15,56 +17,85 @@ export default function GanttBar({
   const barHeight = rowHeight - BAR_V_PADDING * 2
   const barY = rowY + BAR_V_PADDING
 
-  // Calculate bar position from dates
-  const hasStart = Boolean(phase.startDate)
-  const hasEnd = Boolean(phase.endDate)
-
-  if (!hasStart || !hasEnd) return null
+  if (!phase.startDate || !phase.endDate) return null
 
   const x1 = dateToX(phase.startDate)
   const x2 = dateToX(phase.endDate)
-  const barWidth = Math.max(x2 - x1, 2)
+  const barWidth = Math.max(x2 - x1, 8)
   const progress = phase.progress || 0
   const fillWidth = barWidth * (progress / 100)
-  const color = sanitizeColor(phase.color)
+
+  const isComplete = phase.status === 'completed' || progress === 100
+  const isInProgress = phase.status === 'in-progress' || (progress > 0 && progress < 100)
+
+  const phaseColor = phase.color || FALLBACK_COLOR
+
+  // Date range label
+  const startLabel = format(parseISO(phase.startDate), 'MMM d')
+  const endLabel = format(parseISO(phase.endDate), 'MMM d')
+  const dateRange = `${startLabel} – ${endLabel}`
+
+  const statusLabel = isComplete ? 'Complete' : isInProgress ? `${progress}%` : 'Upcoming'
 
   return (
     <g className="cursor-pointer" onClick={() => onPhaseClick?.(phase)}>
-      {/* Row background on hover */}
+      {/* Row hover highlight */}
       <rect
         x={0}
         y={rowY}
         width="100%"
         height={rowHeight}
         fill="transparent"
-        className="hover:fill-white/[0.02]"
+        className="hover:fill-white/[0.03]"
       />
 
-      {/* Phase label in left gutter */}
+      {/* Color dot */}
+      <circle
+        cx={20}
+        cy={rowY + rowHeight / 2 - 6}
+        r={5}
+        fill={phaseColor}
+        opacity={isComplete ? 0.4 : 0.8}
+      />
+
+      {/* Phase name */}
       <text
-        x={labelWidth - 12}
-        y={rowY + rowHeight / 2}
-        textAnchor="end"
+        x={32}
+        y={rowY + rowHeight / 2 - 6}
         dominantBaseline="central"
-        fontSize={12}
+        fontSize={13}
         fontWeight={600}
         fontFamily="Inter, system-ui, sans-serif"
-        style={{ fill: 'var(--color-fg-muted)' }}
+        style={{ fill: isComplete ? 'var(--color-fg-subtle)' : 'var(--color-fg-default)' }}
         className="select-none"
       >
-        {phase.name.length > 18 ? phase.name.slice(0, 16) + '\u2026' : phase.name}
+        {phase.name}
       </text>
 
-      {/* Background bar */}
+      {/* Date range below name */}
+      <text
+        x={32}
+        y={rowY + rowHeight / 2 + 10}
+        dominantBaseline="central"
+        fontSize={10}
+        fontWeight={400}
+        fontFamily="Inter, system-ui, sans-serif"
+        style={{ fill: 'var(--color-fg-subtle)' }}
+        className="select-none"
+      >
+        {dateRange}
+      </text>
+
+      {/* Background track */}
       <rect
         x={x1}
         y={barY}
         width={barWidth}
         height={barHeight}
-        rx={5}
-        ry={5}
-        fill={color}
-        opacity={0.18}
+        rx={BAR_RADIUS}
+        ry={BAR_RADIUS}
+        fill={phaseColor}
+        opacity={isComplete ? 0.06 : 0.1}
       />
 
       {/* Progress fill */}
@@ -72,26 +103,40 @@ export default function GanttBar({
         <rect
           x={x1}
           y={barY}
-          width={fillWidth}
+          width={Math.min(fillWidth, barWidth)}
           height={barHeight}
-          rx={5}
-          ry={5}
-          fill={color}
-          opacity={0.65}
+          rx={BAR_RADIUS}
+          ry={BAR_RADIUS}
+          fill={phaseColor}
+          opacity={isComplete ? 0.2 : 0.4}
         />
       )}
 
-      {/* Progress text */}
+      {/* Bar border */}
+      <rect
+        x={x1}
+        y={barY}
+        width={barWidth}
+        height={barHeight}
+        rx={BAR_RADIUS}
+        ry={BAR_RADIUS}
+        fill="none"
+        stroke={phaseColor}
+        strokeWidth={1}
+        opacity={isComplete ? 0.2 : 0.5}
+      />
+
+      {/* Status label */}
       <text
-        x={x1 + barWidth + 8}
+        x={x1 + barWidth + 12}
         y={rowY + rowHeight / 2}
         dominantBaseline="central"
         fontSize={11}
-        fontWeight={500}
+        fontWeight={600}
         fontFamily="Inter, system-ui, sans-serif"
-        style={{ fill: 'var(--color-fg-muted)' }}
+        style={{ fill: isComplete ? 'var(--color-fg-subtle)' : 'var(--color-fg-muted)' }}
       >
-        {progress}%
+        {statusLabel}
       </text>
     </g>
   )

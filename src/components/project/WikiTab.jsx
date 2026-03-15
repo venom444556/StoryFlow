@@ -95,12 +95,13 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
 
   const handleConfirmDelete = useCallback(() => {
     if (!deleteTarget) return
-    deletePage(deleteTarget)
-    if (selectedPageId === deleteTarget) {
+    const target = deleteTarget
+    setDeleteTarget(null)
+    if (selectedPageId === target) {
       setSelectedPageId(null)
       setIsEditing(false)
     }
-    setDeleteTarget(null)
+    deletePage(target)
   }, [deleteTarget, deletePage, selectedPageId])
 
   // ----- Pin toggle -----

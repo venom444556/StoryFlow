@@ -46,9 +46,9 @@ CORS is restricted to an allowlist of known UI origins (`localhost:3000`, `local
 
 ### Token authentication
 
-Set `STORYFLOW_MCP_TOKEN` to require a bearer token on all mutating API requests (POST, PUT, DELETE). The token is validated via `Authorization: Bearer <token>` or `X-StoryFlow-Token` header. When not set, mutating requests are unauthenticated (suitable for trusted local-only use).
+Set `STORYFLOW_TOKEN` to require a bearer token on all mutating API requests (POST, PUT, DELETE). The token is validated via `Authorization: Bearer <token>` or `X-StoryFlow-Token` header. When not set, mutating requests are unauthenticated (suitable for trusted local-only use).
 
-The MCP plugin client reads the token from the same env var or from `~/.config/storyflow/config.json` (`"token"` field).
+The CLI reads the token from the same env var or from `~/.config/storyflow/config.json` (`"token"` field).
 
 ### Destructive operation safeguard
 
