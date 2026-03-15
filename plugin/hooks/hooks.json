@@ -1,5 +1,5 @@
 {
-  "description": "StoryFlow closed-loop board sync — dispatches the storyflow-agent to keep the board in sync with actual work via CLI",
+  "description": "StoryFlow closed-loop board sync + PM intervention nudges — dispatches the storyflow-agent to keep the board in sync with actual work via CLI, and nudges for PM check-in after sustained tool use",
   "hooks": {
     "PostToolUse": [
       {
@@ -13,11 +13,21 @@
         ]
       },
       {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat > /dev/null; SF_STATE=/tmp/storyflow-pm-state.json; [ ! -f \"$SF_STATE\" ] && echo '{\"counter\":0,\"nudged\":false}' > \"$SF_STATE\"; c=$(sed 's/.*\"counter\":\\([0-9]*\\).*/\\1/' \"$SF_STATE\"); n=$(sed 's/.*\"nudged\":\\([a-z]*\\).*/\\1/' \"$SF_STATE\"); c=$((c+1)); if [ \"$c\" -ge 5 ] && [ \"$n\" = 'false' ]; then n=true; echo '{\"counter\":'\"$c\"',\"nudged\":'\"$n\"'}' > \"$SF_STATE\"; echo 'PM Check-in: You have made 5+ tool calls since the last planning or StoryFlow sync. Consider pausing to update the StoryFlow board, check steering directives, or verify alignment with the current plan.'; else echo '{\"counter\":'\"$c\"',\"nudged\":'\"$n\"'}' > \"$SF_STATE\"; fi",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "ExitPlanMode",
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Plan approved. Invoke the storyflow-agent to create issues from the plan on the StoryFlow board using the CLI (storyflow issues create ...) and set them to In Progress. Pass it the plan details.'",
+            "command": "echo '{\"counter\":0,\"nudged\":false}' > /tmp/storyflow-pm-state.json; echo 'Plan approved. Invoke the storyflow-agent to create issues from the plan on the StoryFlow board using the CLI (storyflow issues create ...) and set them to In Progress. Pass it the plan details.'",
             "timeout": 5
           }
         ]
@@ -27,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -qE '\\.md\"?$'; then echo 'Markdown file written. Invoke the storyflow-agent to check if this should be synced to the StoryFlow wiki using the CLI (storyflow pages create/update).'; fi",
+            "command": "input=$(cat); SF_STATE=/tmp/storyflow-pm-state.json; [ ! -f \"$SF_STATE\" ] && echo '{\"counter\":0,\"nudged\":false}' > \"$SF_STATE\"; c=$(sed 's/.*\"counter\":\\([0-9]*\\).*/\\1/' \"$SF_STATE\"); n=$(sed 's/.*\"nudged\":\\([a-z]*\\).*/\\1/' \"$SF_STATE\"); c=$((c+1)); if [ \"$c\" -ge 5 ] && [ \"$n\" = 'false' ]; then n=true; echo '{\"counter\":'\"$c\"',\"nudged\":'\"$n\"'}' > \"$SF_STATE\"; echo 'PM Check-in: You have made 5+ tool calls since the last planning or StoryFlow sync. Consider pausing to update the StoryFlow board, check steering directives, or verify alignment with the current plan.'; else echo '{\"counter\":'\"$c\"',\"nudged\":'\"$n\"'}' > \"$SF_STATE\"; fi; if echo \"$input\" | grep -qE '\\.md\"?$'; then echo 'Markdown file written. Invoke the storyflow-agent to check if this should be synced to the StoryFlow wiki using the CLI (storyflow pages create/update).'; fi",
             "timeout": 5
           }
         ]
@@ -37,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board via CLI — pass it the commit message so it can mark completed issues as Done (storyflow issues done <key>).'; elif echo \"$input\" | grep -qE '(npm test|vitest|jest|pytest|cargo test)'; then if echo \"$input\" | grep -qiE '(passed|Tests:.*passed|OK)'; then echo 'Tests passed. Invoke the storyflow-agent to record a milestone nudge for in-progress issues via CLI.'; elif echo \"$input\" | grep -qiE '(FAIL|failed|error)'; then echo 'Tests failed. Invoke the storyflow-agent to file bugs for failing tests via CLI (storyflow issues create --type bug ...).'; fi; elif echo \"$input\" | grep -qE 'gh pr create'; then echo 'PR created. Invoke the storyflow-agent to link related issues and update their status via CLI.'; fi",
+            "command": "input=$(cat); if echo \"$input\" | grep -q 'storyflow'; then echo '{\"counter\":0,\"nudged\":false}' > /tmp/storyflow-pm-state.json; fi; if echo \"$input\" | grep -qE 'git commit'; then echo 'Commit detected. Invoke the storyflow-agent to update the StoryFlow board via CLI — pass it the commit message so it can mark completed issues as Done (storyflow issues done <key>).'; elif echo \"$input\" | grep -qE '(npm test|vitest|jest|pytest|cargo test)'; then if echo \"$input\" | grep -qiE '(passed|Tests:.*passed|OK)'; then echo 'Tests passed. Invoke the storyflow-agent to record a milestone nudge for in-progress issues via CLI.'; elif echo \"$input\" | grep -qiE '(FAIL|failed|error)'; then echo 'Tests failed. Invoke the storyflow-agent to file bugs for failing tests via CLI (storyflow issues create --type bug ...).'; fi; elif echo \"$input\" | grep -qE 'gh pr create'; then echo 'PR created. Invoke the storyflow-agent to link related issues and update their status via CLI.'; fi",
             "timeout": 5
           }
         ]
@@ -49,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. If StoryFlow is not configured or unreachable, skip silently.'",
+            "command": "echo '{\"counter\":0,\"nudged\":false}' > /tmp/storyflow-pm-state.json; echo 'Session started. Invoke the storyflow-agent to restore context: read last session summary, check Agent: wiki pages, check steering directives, check gates, and set AI status to working. If StoryFlow is not configured or unreachable, skip silently.'",
             "timeout": 5
           }
         ]
