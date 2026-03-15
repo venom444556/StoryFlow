@@ -278,6 +278,7 @@ Before acting, classify what's needed:
 | Session ending | Full reconciliation + save session | `references/board-sync.md` |
 | Sprint/timeline mention | Sprint management | `references/sprint-management.md` |
 | PR created | Link issues, update statuses | `references/git-reconciliation.md` |
+| PM nudge accepted | Boot server if needed, plan in-flight work into epic + issues | `references/pm-intervention.md` |
 
 **Only load the reference you need for the current intent.** Don't load all of them.
 
