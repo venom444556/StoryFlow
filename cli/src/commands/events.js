@@ -71,7 +71,7 @@ export function register(program) {
     .action(async (eventId, opts) => {
       const project = await resolveProject(opts.project)
       const data = { action: opts.action }
-      if (opts.reason) data.reason = opts.reason
+      if (opts.reason) data.comment = opts.reason
       await events.respond(project, eventId, data)
       out.success(`Gate ${eventId}: ${opts.action}`)
     })
@@ -264,10 +264,14 @@ export function register(program) {
     .command('save [project]')
     .description('Save a session summary')
     .requiredOption('-s, --summary <text>', 'Session summary text')
+    .option('--next-steps <text>', 'Next steps for future sessions')
+    .option('--key-decisions <text>', 'Key decisions made in this session')
     .option('--agent-id <id>', 'Agent ID')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const data = { summary: opts.summary }
+      if (opts.nextSteps) data.next_steps = opts.nextSteps
+      if (opts.keyDecisions) data.key_decisions = opts.keyDecisions
       if (opts.agentId) data.agentId = opts.agentId
       await sessions.save(project, data)
       out.success('Session saved')

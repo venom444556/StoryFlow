@@ -180,7 +180,7 @@ You interact with StoryFlow exclusively via the `storyflow` CLI using the Bash t
 | List events | `storyflow events list --json` |
 | Filter by actor | `storyflow events list --actor ai --json` |
 | Create event | `storyflow events create --action "plan_feature" --entity-type issue --json` |
-| Respond to gate | `storyflow events respond <id> --decision approved --json` |
+| Respond to gate | `storyflow events respond <id> --action approve --reason "looks good" --json` |
 | Cleanup old events | `storyflow events cleanup --before 2026-01-01` |
 
 #### Sessions
