@@ -65,6 +65,7 @@ StoryFlow includes plugin hooks that dispatch the **storyflow-agent** to keep th
 | **PostToolUse** → `ExitPlanMode` | Plan is approved | Creates issues from plan, sets **In Progress** |
 | **PostToolUse** → `Bash` | `git commit` detected | Completed issues move to **Done** |
 | **PostToolUse** → `Write` | Markdown file written | Syncs to StoryFlow wiki if applicable |
+| **PostToolUse** → `Edit`/`Write` | 5+ file edits without plan | Soft nudge to organize work into StoryFlow |
 | **SessionStart** | Session begins | Restores context from last session |
 | **Stop** | Session is ending | Full reconciliation — fixes stale statuses |
 
