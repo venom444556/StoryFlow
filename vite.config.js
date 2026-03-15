@@ -6,12 +6,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     port: 3000,
-    open: true,
+    strictPort: true,
     allowedHosts: ['host.docker.internal'],
-    proxy: {
-      '/api': 'http://localhost:3001',
-      '/ws': { target: 'http://localhost:3001', ws: true },
-    },
   },
   build: {
     rollupOptions: {

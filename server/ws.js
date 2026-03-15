@@ -68,9 +68,23 @@ function verifyClient(info) {
 /** Attach WebSocket server to an HTTP server instance */
 export function initWs(server) {
   wss = new WebSocketServer({
-    server,
+    noServer: true,
     maxPayload: MAX_MESSAGE_SIZE,
-    verifyClient,
+  })
+
+  // Handle upgrades only for /ws path — leave other paths (e.g. Vite HMR) alone
+  server.on('upgrade', (req, socket, head) => {
+    if (req.url === '/ws' || req.url.startsWith('/ws?')) {
+      const allowed = verifyClient({ req })
+      if (!allowed) {
+        socket.write('HTTP/1.1 403 Forbidden\r\n\r\n')
+        socket.destroy()
+        return
+      }
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req)
+      })
+    }
   })
 
   wss.on('connection', (ws, req) => {

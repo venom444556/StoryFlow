@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------------
 // StoryFlow Server — Entry point
 // Express HTTP + WebSocket server backed by SQLite
+// In dev mode, Vite runs as middleware inside Express (single process/port).
 // ---------------------------------------------------------------------------
 
 import { createServer } from 'node:http'
@@ -10,6 +11,7 @@ import { cleanupAllEvents } from './events.js'
 import app from './app.js'
 
 const PORT = process.env.STORYFLOW_PORT || 3001
+const isDev = process.env.NODE_ENV !== 'production'
 
 async function main() {
   // Initialize SQLite database (creates schema, auto-migrates from JSON)
@@ -43,6 +45,17 @@ async function main() {
   // Create HTTP server from Express app
   const server = createServer(app)
 
+  // --- Vite dev middleware (dev only) ---
+  // Runs inside Express: same process, same port, no separate Vite server to die.
+  if (isDev) {
+    const { createServer: createViteServer } = await import('vite')
+    const vite = await createViteServer({
+      server: { middlewareMode: true, hmr: { server } },
+      appType: 'spa',
+    })
+    app.use(vite.middlewares)
+  }
+
   // Attach WebSocket server
   initWs(server)
 
@@ -52,6 +65,10 @@ async function main() {
     console.log(`[StoryFlow Server] HTTP:      http://${HOST}:${PORT}`)
     console.log(`[StoryFlow Server] WebSocket: ws://${HOST}:${PORT}`)
     console.log(`[StoryFlow Server] API:       http://${HOST}:${PORT}/api/projects`)
+    if (isDev) {
+      console.log(`[StoryFlow Server] Vite HMR:  ws://${HOST}:${PORT}`)
+      console.log(`[StoryFlow Server] UI:        http://${HOST}:${PORT}`)
+    }
   })
 
   // Graceful shutdown — flush SQLite to disk

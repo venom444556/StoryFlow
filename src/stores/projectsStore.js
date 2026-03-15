@@ -1121,9 +1121,8 @@ let _ws = null
 let _wsReconnectTimer = null
 
 function connectWebSocket() {
-  // Determine WebSocket URL from current page origin
   const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const wsUrl = `${wsProtocol}//localhost:3001`
+  const wsUrl = `${wsProtocol}//${window.location.host}/ws`
 
   try {
     _ws = new WebSocket(wsUrl)

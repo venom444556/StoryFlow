@@ -138,7 +138,7 @@ setInterval(() => {
   }
 }, 5 * 60_000)
 
-app.use((req, res, next) => {
+app.use('/api', (req, res, next) => {
   const ip = req.ip || req.socket.remoteAddress
   const now = Date.now()
   const timestamps = (rateLimitMap.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
@@ -1489,7 +1489,7 @@ app.delete('/api/projects/:id/architecture/components/:compId', (req, res) => {
 })
 
 // --- Catch-all for production SPA serving ---
-// (only activated when dist/ exists and NODE_ENV=production)
+// In dev, Vite middleware (mounted in index.js) handles this instead.
 import { existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -1497,7 +1497,7 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DIST_DIR = join(__dirname, '../dist')
 
-if (existsSync(DIST_DIR)) {
+if (process.env.NODE_ENV === 'production' && existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR))
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
