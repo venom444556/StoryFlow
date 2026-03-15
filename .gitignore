@@ -55,6 +55,7 @@ docs/plans/
 
 # Archives
 *.zip
+!plugin.zip
 
 # Screenshots / design iteration (use docs/ subdirectories instead)
 *.png
