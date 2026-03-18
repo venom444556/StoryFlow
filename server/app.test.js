@@ -590,25 +590,7 @@ describe('Board summary handles undefined status (#25)', () => {
 // Sync
 // ---------------------------------------------------------------------------
 
-describe('Sync API', () => {
-  it('rejects sync without confirmation header', async () => {
-    const { status } = await api('/api/sync', {
-      method: 'POST',
-      body: JSON.stringify({ projects: [] }),
-    })
-    expect(status).toBe(400)
-  })
-
-  it('accepts sync with confirmation header', async () => {
-    const { status, body } = await api('/api/sync', {
-      method: 'POST',
-      headers: { 'X-Confirm': 'overwrite-all' },
-      body: JSON.stringify({ projects: [] }),
-    })
-    expect(status).toBe(200)
-    expect(body.success).toBe(true)
-  })
-})
+// Sync API removed — normalized SQL is the only storage path
 
 // ---------------------------------------------------------------------------
 // Error handling
