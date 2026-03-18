@@ -942,6 +942,28 @@ export function addSprint(projectId, sprint) {
   project.board.sprints.push(newSprint)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO sprints
+        (id, project_id, name, goal, start_date, end_date, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newSprint.id,
+        projectId,
+        newSprint.name || '',
+        newSprint.goal || null,
+        newSprint.startDate || null,
+        newSprint.endDate || null,
+        newSprint.status || 'planning',
+        newSprint.createdAt,
+        newSprint.updatedAt || newSprint.createdAt,
+      ]
+    )
+  }
+
   return newSprint
 }
 
@@ -955,6 +977,28 @@ export function updateSprint(projectId, sprintId, updates) {
   Object.assign(sprint, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO sprints
+        (id, project_id, name, goal, start_date, end_date, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        sprint.id,
+        projectId,
+        sprint.name || '',
+        sprint.goal || null,
+        sprint.startDate || null,
+        sprint.endDate || null,
+        sprint.status || 'planning',
+        sprint.createdAt || now,
+        sprint.updatedAt || now,
+      ]
+    )
+  }
+
   return sprint
 }
 
@@ -1036,6 +1080,17 @@ export function deleteSprint(projectId, sprintId) {
   project.board.sprints.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized tables
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('UPDATE issues SET sprint_id = NULL WHERE sprint_id = ? AND project_id = ?', [
+      sprintId,
+      projectId,
+    ])
+    db.run('DELETE FROM sprints WHERE id = ? AND project_id = ?', [sprintId, projectId])
+  }
+
   return true
 }
 
