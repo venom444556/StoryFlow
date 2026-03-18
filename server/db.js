@@ -2277,12 +2277,33 @@ export function unlinkIssueFromWorkflowNode(projectId, nodeId, issueKey) {
 // ---------------------------------------------------------------------------
 
 export function listArchitectureComponents(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _listArchComponentsRaw(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.architecture?.components || []
 }
 
 export function getArchitectureComponent(projectId, componentId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const row = _sqlQueryOne(
+      'SELECT * FROM architecture_components WHERE id = ? AND project_id = ?',
+      [componentId, projectId]
+    )
+    if (!row) return null
+    return mapArchComponentRow(row)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return (project.architecture?.components || []).find((c) => c.id === componentId) || null
