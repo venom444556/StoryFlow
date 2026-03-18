@@ -9,7 +9,7 @@ import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { initEvents } from './events.js'
 import { initSteering } from './intelligence.js'
-import { backfillAll } from './migrate.js'
+import { backfillAll, backfillProject } from './migrate.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -104,6 +104,28 @@ export async function initDb() {
   db.run(
     'CREATE INDEX IF NOT EXISTS idx_snapshots_project ON snapshots(project_id, created_at DESC)'
   )
+
+  // Add per-entity snapshot columns for normalized mode (idempotent via try/catch)
+  const snapshotEntityColumns = [
+    'project_data',
+    'issues_data',
+    'sprints_data',
+    'pages_data',
+    'decisions_data',
+    'phases_data',
+    'milestones_data',
+    'workflow_nodes_data',
+    'workflow_connections_data',
+    'arch_components_data',
+    'arch_connections_data',
+  ]
+  for (const col of snapshotEntityColumns) {
+    try {
+      db.run(`ALTER TABLE snapshots ADD COLUMN ${col} TEXT`)
+    } catch (_) {
+      // Column already exists — safe to ignore
+    }
+  }
 
   // -------------------------------------------------------------------------
   // Normalized entity tables (Phase 1: shadow-write migration)
@@ -2483,13 +2505,80 @@ export function createSnapshot(projectId, { action, entity, actor }) {
 
   const id = crypto.randomUUID()
   const now = new Date().toISOString()
+  const mode = getMigrationMode()
 
-  db.run(
-    `INSERT INTO snapshots (id, project_id, trigger_action, trigger_entity, trigger_actor, data, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [id, projectId, action, entity || null, actor || null, JSON.stringify(project), now]
-  )
+  if (mode === 'read_normalized' || mode === 'normalized') {
+    // Store per-entity data from normalized tables
+    const projRow = _sqlQueryOne(
+      'SELECT id, name, description, status, created_at, updated_at, is_seed, seed_version, next_issue_number FROM projects WHERE id = ? AND deleted_at IS NULL',
+      [projectId]
+    )
+    const projectMeta = projRow
+      ? {
+          name: projRow.name,
+          description: projRow.description,
+          status: projRow.status,
+          isSeed: projRow.is_seed === 1,
+          seedVersion: projRow.seed_version,
+          nextIssueNumber: projRow.next_issue_number || 1,
+          createdAt: projRow.created_at,
+          updatedAt: projRow.updated_at,
+        }
+      : {}
 
+    const issues = _listIssuesRaw(projectId)
+    const sprints = _listSprintsRaw(projectId)
+    const pages = _listPagesRaw(projectId)
+    const decisions = _listDecisionsRaw(projectId)
+    const phases = _listPhasesRaw(projectId)
+    const milestones = _listMilestonesRaw(projectId)
+    // Flat workflow nodes (not tree) — preserves parent_node_id for faithful restore
+    const workflowNodes = _sqlQuery(
+      'SELECT * FROM workflow_nodes WHERE project_id = ? ORDER BY created_at ASC',
+      [projectId]
+    ).map(mapWorkflowNodeRow)
+    const workflowConnections = _listWorkflowConnectionsRaw(projectId)
+    const archComponents = _listArchComponentsRaw(projectId)
+    const archConnections = _listArchConnectionsRaw(projectId)
+
+    db.run(
+      `INSERT INTO snapshots
+        (id, project_id, trigger_action, trigger_entity, trigger_actor, data, created_at,
+         project_data, issues_data, sprints_data, pages_data, decisions_data,
+         phases_data, milestones_data, workflow_nodes_data, workflow_connections_data,
+         arch_components_data, arch_connections_data)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id,
+        projectId,
+        action,
+        entity || null,
+        actor || null,
+        '{}', // placeholder — per-entity columns hold the real data
+        now,
+        JSON.stringify(projectMeta),
+        JSON.stringify(issues),
+        JSON.stringify(sprints),
+        JSON.stringify(pages),
+        JSON.stringify(decisions),
+        JSON.stringify(phases),
+        JSON.stringify(milestones),
+        JSON.stringify(workflowNodes),
+        JSON.stringify(workflowConnections),
+        JSON.stringify(archComponents),
+        JSON.stringify(archConnections),
+      ]
+    )
+  } else {
+    // shadow_write mode: store full JSON blob
+    db.run(
+      `INSERT INTO snapshots (id, project_id, trigger_action, trigger_entity, trigger_actor, data, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [id, projectId, action, entity || null, actor || null, JSON.stringify(project), now]
+    )
+  }
+
+  // LRU cap — keep at most MAX_SNAPSHOTS_PER_PROJECT
   const countResult = db.exec('SELECT COUNT(*) FROM snapshots WHERE project_id = ?', [projectId])
   const count = countResult.length > 0 ? countResult[0].values[0][0] : 0
   if (count > MAX_SNAPSHOTS_PER_PROJECT) {
@@ -2530,13 +2619,270 @@ export function listSnapshots(projectId) {
 }
 
 export function restoreSnapshot(projectId, snapshotId) {
-  const results = db.exec('SELECT data FROM snapshots WHERE id = ? AND project_id = ?', [
-    snapshotId,
-    projectId,
-  ])
-  if (results.length === 0 || results[0].values.length === 0) return null
-  const project = JSON.parse(results[0].values[0][0])
+  const row = _sqlQueryOne(
+    'SELECT data, project_data, issues_data, sprints_data, pages_data, decisions_data, phases_data, milestones_data, workflow_nodes_data, workflow_connections_data, arch_components_data, arch_connections_data FROM snapshots WHERE id = ? AND project_id = ?',
+    [snapshotId, projectId]
+  )
+  if (!row) return null
+
+  // Normalized-era snapshot: per-entity columns are populated
+  if (row.issues_data) {
+    const projectMeta = JSON.parse(row.project_data || '{}')
+    const issues = JSON.parse(row.issues_data)
+    const sprints = JSON.parse(row.sprints_data || '[]')
+    const pages = JSON.parse(row.pages_data || '[]')
+    const decisions = JSON.parse(row.decisions_data || '[]')
+    const phases = JSON.parse(row.phases_data || '[]')
+    const milestones = JSON.parse(row.milestones_data || '[]')
+    const workflowNodes = JSON.parse(row.workflow_nodes_data || '[]')
+    const workflowConnections = JSON.parse(row.workflow_connections_data || '[]')
+    const archComponents = JSON.parse(row.arch_components_data || '[]')
+    const archConnections = JSON.parse(row.arch_connections_data || '[]')
+
+    // Disable FK checks for bulk delete+insert
+    db.run('PRAGMA foreign_keys = OFF')
+
+    try {
+      // Delete all entity rows for this project (children before parents)
+      db.run('DELETE FROM comments WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM issues WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM sprints WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM workflow_connections WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM workflow_nodes WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM architecture_connections WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM architecture_components WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM pages WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM decisions WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM phases WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM milestones WHERE project_id = ?', [projectId])
+
+      // Restore project metadata
+      if (projectMeta.nextIssueNumber) {
+        db.run(
+          'UPDATE projects SET next_issue_number = ?, name = ?, description = ?, status = ?, updated_at = ? WHERE id = ?',
+          [
+            projectMeta.nextIssueNumber,
+            projectMeta.name || '',
+            projectMeta.description || '',
+            projectMeta.status || 'planning',
+            new Date().toISOString(),
+            projectId,
+          ]
+        )
+      }
+
+      // Re-insert all entities
+      const now = new Date().toISOString()
+
+      for (const s of sprints) {
+        db.run(
+          `INSERT OR REPLACE INTO sprints (id, project_id, name, goal, start_date, end_date, status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            s.id,
+            projectId,
+            s.name || '',
+            s.goal || null,
+            s.startDate || null,
+            s.endDate || null,
+            s.status || 'planning',
+            s.createdAt || now,
+            s.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const i of issues) {
+        db.run(
+          `INSERT OR REPLACE INTO issues
+            (id, project_id, key, title, description, type, status, priority,
+             story_points, assignee, epic_id, sprint_id, labels, linked_issue_keys,
+             created_by, created_by_reasoning, created_by_confidence,
+             todo_at, in_progress_at, blocked_at, done_at, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            i.id,
+            projectId,
+            i.key || '',
+            i.title || '',
+            i.description || null,
+            i.type || 'task',
+            i.status || 'To Do',
+            i.priority || 'medium',
+            i.storyPoints || null,
+            i.assignee || null,
+            i.epicId || null,
+            i.sprintId || null,
+            i.labels ? JSON.stringify(i.labels) : null,
+            i.linkedIssueKeys ? JSON.stringify(i.linkedIssueKeys) : null,
+            i.createdBy || null,
+            i.createdByReasoning || null,
+            i.createdByConfidence || null,
+            i.todoAt || null,
+            i.inProgressAt || null,
+            i.blockedAt || null,
+            i.doneAt || null,
+            i.createdAt || now,
+            i.updatedAt || now,
+          ]
+        )
+        // Restore comments embedded in issues
+        for (const c of i.comments || []) {
+          db.run(
+            `INSERT OR REPLACE INTO comments (id, issue_id, project_id, body, author, created_at)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [c.id, i.id, projectId, c.body || '', c.author || null, c.createdAt || now]
+          )
+        }
+      }
+
+      for (const p of pages) {
+        db.run(
+          `INSERT OR REPLACE INTO pages (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            p.id,
+            projectId,
+            p.title || '',
+            p.content || null,
+            p.parentId || null,
+            p.status || null,
+            p.createdBy || null,
+            p.createdAt || now,
+            p.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const d of decisions) {
+        db.run(
+          `INSERT OR REPLACE INTO decisions (id, project_id, title, description, rationale, status, author, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            d.id,
+            projectId,
+            d.title || '',
+            d.description || null,
+            d.rationale || null,
+            d.status || 'proposed',
+            d.author || null,
+            d.createdAt || now,
+            d.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const p of phases) {
+        db.run(
+          `INSERT OR REPLACE INTO phases (id, project_id, name, description, status, progress, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            p.id,
+            projectId,
+            p.name || '',
+            p.description || null,
+            p.status || 'pending',
+            p.progress || 0,
+            p.createdAt || now,
+            p.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const m of milestones) {
+        db.run(
+          `INSERT OR REPLACE INTO milestones (id, project_id, name, description, due_date, completed, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            m.id,
+            projectId,
+            m.name || '',
+            m.description || null,
+            m.dueDate || null,
+            m.completed ? 1 : 0,
+            m.createdAt || now,
+            m.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const n of workflowNodes) {
+        db.run(
+          `INSERT OR REPLACE INTO workflow_nodes
+            (id, project_id, parent_node_id, title, description, type, status, linked_issue_keys, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            n.id,
+            projectId,
+            n.parentNodeId || null,
+            n.title || '',
+            n.description || null,
+            n.type || null,
+            n.status || 'pending',
+            n.linkedIssueKeys ? JSON.stringify(n.linkedIssueKeys) : null,
+            n.createdAt || now,
+            n.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const c of workflowConnections) {
+        db.run(
+          `INSERT OR REPLACE INTO workflow_connections (id, project_id, from_node_id, to_node_id, type)
+           VALUES (?, ?, ?, ?, ?)`,
+          [c.id, projectId, c.from, c.to, c.type || null]
+        )
+      }
+
+      for (const c of archComponents) {
+        db.run(
+          `INSERT OR REPLACE INTO architecture_components (id, project_id, name, description, type, tech, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            c.id,
+            projectId,
+            c.name || '',
+            c.description || null,
+            c.type || null,
+            c.tech || null,
+            c.createdAt || now,
+            c.updatedAt || now,
+          ]
+        )
+      }
+
+      for (const c of archConnections) {
+        db.run(
+          `INSERT OR REPLACE INTO architecture_connections (id, project_id, from_component_id, to_component_id, type)
+           VALUES (?, ?, ?, ?, ?)`,
+          [c.id, projectId, c.from, c.to, c.type || null]
+        )
+      }
+    } finally {
+      db.run('PRAGMA foreign_keys = ON')
+    }
+
+    // Also update the JSON blob so both paths stay consistent
+    const restoredProject = getProject(projectId)
+    if (restoredProject) {
+      upsertProject(projectId, restoredProject)
+    }
+
+    scheduleSave()
+    return getProject(projectId)
+  }
+
+  // Blob-era snapshot: data column holds the full JSON
+  const project = JSON.parse(row.data)
   upsertProject(projectId, project)
+
+  // Backfill normalized tables from the restored blob
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized' || mode === 'normalized') {
+    backfillProject(db, project)
+  }
+
+  scheduleSave()
   return project
 }
 
