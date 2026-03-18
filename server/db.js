@@ -1223,6 +1223,28 @@ export function addDecision(projectId, decision) {
   project.decisions.push(newDecision)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO decisions
+        (id, project_id, title, description, rationale, status, author, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newDecision.id,
+        projectId,
+        newDecision.title || '',
+        newDecision.description || null,
+        newDecision.rationale || null,
+        newDecision.status || 'proposed',
+        newDecision.author || null,
+        newDecision.createdAt,
+        newDecision.updatedAt,
+      ]
+    )
+  }
+
   return newDecision
 }
 
@@ -1236,6 +1258,28 @@ export function updateDecision(projectId, decisionId, updates) {
   Object.assign(decision, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO decisions
+        (id, project_id, title, description, rationale, status, author, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        decision.id,
+        projectId,
+        decision.title || '',
+        decision.description || null,
+        decision.rationale || null,
+        decision.status || 'proposed',
+        decision.author || null,
+        decision.createdAt || now,
+        decision.updatedAt || now,
+      ]
+    )
+  }
+
   return decision
 }
 
@@ -1247,6 +1291,13 @@ export function deleteDecision(projectId, decisionId) {
   project.decisions.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('DELETE FROM decisions WHERE id = ? AND project_id = ?', [decisionId, projectId])
+  }
+
   return true
 }
 
