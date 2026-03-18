@@ -1811,6 +1811,16 @@ export function deleteDecision(projectId, decisionId) {
 // ---------------------------------------------------------------------------
 
 export function listPhases(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _listPhasesRaw(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.timeline?.phases || []
@@ -1913,6 +1923,16 @@ export function deletePhase(projectId, phaseId) {
 // ---------------------------------------------------------------------------
 
 export function listMilestones(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _listMilestonesRaw(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.timeline?.milestones || []
