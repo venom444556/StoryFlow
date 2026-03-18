@@ -1,5 +1,9 @@
 # StoryFlow Data Model Reference
 
+## Storage
+
+All entities are stored in **normalized SQL tables** (SQLite via sql.js) with foreign keys, indexes, and CASCADE deletes. Each entity type has its own table. The API returns camelCase JSON — the field names below are API-level, not SQL column names.
+
 ## Project
 
 | Field | Type | Description |
@@ -8,13 +12,7 @@
 | `name` | string | Display name |
 | `description` | string | Project description |
 | `status` | enum | `planning`, `in-progress`, `completed`, `on-hold` |
-| `overview` | object | Goals, constraints, tech stack, target audience |
-| `board` | object | Contains `issues[]`, `sprints[]`, `nextIssueNumber` |
-| `pages` | array | Wiki pages |
-| `timeline` | object | Contains `phases[]`, `milestones[]` |
-| `decisions` | array | Architecture decision records |
-| `architecture` | object | Component tree with dependencies |
-| `workflow` | object | Visual node graph |
+| `nextIssueNumber` | number | Counter for generating issue keys |
 | `createdAt` | ISO string | Creation timestamp |
 | `updatedAt` | ISO string | Last modified timestamp |
 
