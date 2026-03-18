@@ -9,6 +9,7 @@ import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { initEvents } from './events.js'
 import { initSteering } from './intelligence.js'
+import { backfillAll } from './migrate.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -329,6 +330,15 @@ export async function initDb() {
   if (countProjects() === 0 && existsSync(JSON_PATH)) {
     console.log('[DB] Migrating from JSON file...')
     migrateFromJson()
+  }
+
+  // Backfill normalized tables from existing project blobs (idempotent)
+  if (getMigrationMode() === 'shadow_write') {
+    const count = backfillAll(db, listProjects, getProject)
+    if (count > 0) {
+      console.log(`[DB] Backfilled ${count} projects into normalized tables`)
+      await saveToDisk()
+    }
   }
 }
 
