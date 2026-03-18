@@ -1294,6 +1294,16 @@ export function deleteIssue(projectId, issueId) {
 // ---------------------------------------------------------------------------
 
 export function listSprints(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _listSprintsRaw(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.board?.sprints || []
@@ -1379,6 +1389,25 @@ export function updateSprint(projectId, sprintId, updates) {
 // ---------------------------------------------------------------------------
 
 export function listPages(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    const rows = _sqlQuery(
+      'SELECT id, title, parent_id, updated_at, created_by, status FROM pages WHERE project_id = ? ORDER BY created_at ASC',
+      [projectId]
+    )
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      parentId: r.parent_id || null,
+      updatedAt: r.updated_at,
+    }))
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return (project.pages || []).map((p) => ({
@@ -1390,6 +1419,17 @@ export function listPages(projectId) {
 }
 
 export function getPage(projectId, pageId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const row = _sqlQueryOne('SELECT * FROM pages WHERE id = ? AND project_id = ?', [
+      pageId,
+      projectId,
+    ])
+    if (!row) return null
+    return mapPageRow(row)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return (project.pages || []).find((p) => p.id === pageId) || null
@@ -1658,6 +1698,16 @@ export function getBoardSummary(projectId) {
 // ---------------------------------------------------------------------------
 
 export function listDecisions(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _listDecisionsRaw(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.decisions || []
