@@ -56,14 +56,7 @@ export async function initDb() {
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_deleted ON projects(deleted_at)')
   db.run('CREATE INDEX IF NOT EXISTS idx_projects_updated ON projects(updated_at DESC)')
 
-  // Drop legacy columns from projects table (if upgrading from pre-normalized schema)
-  for (const col of ['data', 'issue_count', 'sprint_count']) {
-    try {
-      db.run(`ALTER TABLE projects DROP COLUMN ${col}`)
-    } catch (_) {
-      // Column doesn't exist or can't be dropped — safe to ignore
-    }
-  }
+  // NOTE: blob migration runs AFTER all normalized tables are created (below)
 
   // Drop legacy migration_state table (no longer needed)
   db.run('DROP TABLE IF EXISTS migration_state')
@@ -331,6 +324,10 @@ export async function initDb() {
     // Safe to ignore
   }
 
+  // Auto-migrate: if upgrading from pre-normalized (blob) schema, unpack blob data
+  // into normalized tables before dropping the legacy columns.
+  _migrateBlobsIfNeeded()
+
   // Initialize event stream table
   initEvents(db)
 
@@ -338,6 +335,285 @@ export async function initDb() {
   initSteering(db)
 
   await saveToDisk()
+}
+
+// ---------------------------------------------------------------------------
+// Auto-migration: blob to normalized tables (for upgrades from pre-v3 schema)
+// Runs once on startup if the legacy `data` column exists with non-empty blobs.
+// After migration, drops the legacy columns (data, issue_count, sprint_count).
+// ---------------------------------------------------------------------------
+
+function _migrateBlobsIfNeeded() {
+  // Check if the legacy `data` column exists on the projects table
+  let hasDataColumn = false
+  try {
+    const pragma = db.exec('PRAGMA table_info(projects)')
+    if (pragma.length > 0) {
+      hasDataColumn = pragma[0].values.some((row) => row[1] === 'data')
+    }
+  } catch (_) {
+    return
+  }
+
+  if (!hasDataColumn) return
+
+  // Read all project blobs
+  let rows
+  try {
+    rows = db.exec("SELECT id, data FROM projects WHERE data IS NOT NULL AND data != ''")
+  } catch (_) {
+    return
+  }
+
+  if (rows.length === 0 || rows[0].values.length === 0) {
+    _dropLegacyColumns()
+    return
+  }
+
+  console.log(
+    `[DB] Migrating ${rows[0].values.length} project(s) from blob to normalized tables...`
+  )
+
+  for (const [projectId, blobJson] of rows[0].values) {
+    let project
+    try {
+      project = JSON.parse(blobJson)
+    } catch (_) {
+      console.warn(`[DB] Skipping project ${projectId} — invalid JSON blob`)
+      continue
+    }
+    _backfillProjectFromBlob(projectId, project)
+  }
+
+  console.log('[DB] Blob migration complete')
+  _dropLegacyColumns()
+}
+
+function _backfillProjectFromBlob(projectId, project) {
+  const now = new Date().toISOString()
+  // sql.js rejects undefined — coerce all bind values to null
+  const n = (v) => (v === undefined ? null : v)
+  // Wrap db.run to sanitize all params
+  const safeRun = (sql, params) => db.run(sql, params.map(n))
+
+  try {
+    safeRun('UPDATE projects SET next_issue_number = ? WHERE id = ?', [
+      project.board?.nextIssueNumber || 1,
+      projectId,
+    ])
+  } catch (_) {
+    /* column may not exist yet */
+  }
+
+  for (const s of project.board?.sprints || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO sprints
+        (id, project_id, name, goal, start_date, end_date, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        s.id,
+        projectId,
+        s.name || '',
+        n(s.goal),
+        n(s.startDate),
+        n(s.endDate),
+        s.status || 'planning',
+        s.createdAt || now,
+        s.updatedAt || s.createdAt || now,
+      ]
+    )
+  }
+
+  for (const i of project.board?.issues || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO issues
+        (id, project_id, key, title, description, type, status, priority,
+         story_points, assignee, epic_id, sprint_id,
+         labels, linked_issue_keys,
+         created_by, created_by_reasoning, created_by_confidence,
+         todo_at, in_progress_at, blocked_at, done_at,
+         created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        i.id,
+        projectId,
+        i.key || '',
+        i.title || '',
+        n(i.description),
+        i.type || 'task',
+        i.status || 'To Do',
+        i.priority || 'medium',
+        n(i.storyPoints),
+        n(i.assignee),
+        n(i.epicId),
+        n(i.sprintId),
+        i.labels ? JSON.stringify(i.labels) : null,
+        i.linkedIssueKeys ? JSON.stringify(i.linkedIssueKeys) : null,
+        n(i.createdBy),
+        n(i.createdByReasoning),
+        n(i.createdByConfidence),
+        n(i.todoAt),
+        n(i.inProgressAt),
+        n(i.blockedAt),
+        n(i.doneAt),
+        i.createdAt || now,
+        i.updatedAt || i.createdAt || now,
+      ]
+    )
+    for (const c of i.comments || []) {
+      safeRun(
+        `INSERT OR IGNORE INTO comments (id, issue_id, project_id, body, author, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [c.id, i.id, projectId, c.body || '', n(c.author), c.createdAt || now]
+      )
+    }
+  }
+
+  for (const p of project.pages || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO pages
+        (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        p.id,
+        projectId,
+        p.title || '',
+        n(p.content),
+        n(p.parentId),
+        n(p.status),
+        n(p.createdBy),
+        p.createdAt || now,
+        p.updatedAt || p.createdAt || now,
+      ]
+    )
+  }
+
+  for (const d of project.decisions || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO decisions
+        (id, project_id, title, description, rationale, status, author, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        d.id,
+        projectId,
+        d.title || '',
+        n(d.description),
+        n(d.rationale),
+        d.status || 'proposed',
+        n(d.author),
+        d.createdAt || now,
+        d.updatedAt || d.createdAt || now,
+      ]
+    )
+  }
+
+  for (const p of project.timeline?.phases || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO phases
+        (id, project_id, name, description, status, progress, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        p.id,
+        projectId,
+        p.name || '',
+        n(p.description),
+        p.status || 'pending',
+        p.progress || 0,
+        p.createdAt || now,
+        p.updatedAt || p.createdAt || now,
+      ]
+    )
+  }
+
+  for (const m of project.timeline?.milestones || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO milestones
+        (id, project_id, name, description, due_date, completed, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        m.id,
+        projectId,
+        m.name || '',
+        n(m.description),
+        n(m.dueDate),
+        m.completed ? 1 : 0,
+        m.createdAt || now,
+        m.updatedAt || m.createdAt || now,
+      ]
+    )
+  }
+
+  function insertNode(node, parentNodeId) {
+    safeRun(
+      `INSERT OR IGNORE INTO workflow_nodes
+        (id, project_id, parent_node_id, title, description, type, status,
+         linked_issue_keys, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        node.id,
+        projectId,
+        n(parentNodeId),
+        node.title || '',
+        n(node.description),
+        n(node.type),
+        node.status || 'pending',
+        node.linkedIssueKeys ? JSON.stringify(node.linkedIssueKeys) : null,
+        node.createdAt || now,
+        node.updatedAt || node.createdAt || now,
+      ]
+    )
+    for (const child of node.children?.nodes || []) {
+      insertNode(child, node.id)
+    }
+  }
+  for (const wn of project.workflow?.nodes || []) {
+    insertNode(wn, null)
+  }
+
+  for (const c of project.workflow?.connections || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO workflow_connections (id, project_id, from_node_id, to_node_id, type)
+       VALUES (?, ?, ?, ?, ?)`,
+      [c.id, projectId, n(c.from), n(c.to), n(c.type)]
+    )
+  }
+
+  for (const comp of project.architecture?.components || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO architecture_components
+        (id, project_id, name, description, type, tech, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        comp.id,
+        projectId,
+        comp.name || '',
+        n(comp.description),
+        n(comp.type),
+        n(comp.tech),
+        comp.createdAt || now,
+        comp.updatedAt || comp.createdAt || now,
+      ]
+    )
+  }
+
+  for (const c of project.architecture?.connections || []) {
+    safeRun(
+      `INSERT OR IGNORE INTO architecture_connections
+        (id, project_id, from_component_id, to_component_id, type)
+       VALUES (?, ?, ?, ?, ?)`,
+      [c.id, projectId, n(c.from), n(c.to), n(c.type)]
+    )
+  }
+}
+
+function _dropLegacyColumns() {
+  for (const col of ['data', 'issue_count', 'sprint_count']) {
+    try {
+      db.run(`ALTER TABLE projects DROP COLUMN ${col}`)
+    } catch (_) {
+      /* Column doesn't exist or can't be dropped */
+    }
+  }
 }
 
 /** Persist database to disk asynchronously (non-blocking) */
