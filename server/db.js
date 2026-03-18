@@ -2035,12 +2035,45 @@ export function deleteMilestone(projectId, milestoneId) {
 // ---------------------------------------------------------------------------
 
 export function listWorkflowNodes(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+    return _buildWorkflowTree(projectId)
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return project.workflow?.nodes || []
 }
 
 export function getWorkflowNode(projectId, nodeId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const row = _sqlQueryOne('SELECT * FROM workflow_nodes WHERE id = ? AND project_id = ?', [
+      nodeId,
+      projectId,
+    ])
+    if (!row) return null
+    const node = mapWorkflowNodeRow(row)
+    // Attach children
+    const childRows = _sqlQuery(
+      'SELECT * FROM workflow_nodes WHERE parent_node_id = ? AND project_id = ? ORDER BY created_at ASC',
+      [nodeId, projectId]
+    )
+    if (childRows.length > 0) {
+      node.children = { nodes: childRows.map(mapWorkflowNodeRow) }
+      // Remove parentNodeId from children
+      for (const child of node.children.nodes) delete child.parentNodeId
+    }
+    delete node.parentNodeId
+    return node
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   return (project.workflow?.nodes || []).find((n) => n.id === nodeId) || null
