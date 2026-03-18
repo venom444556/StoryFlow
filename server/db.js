@@ -1521,6 +1521,34 @@ export function getWorkflowNode(projectId, nodeId) {
   return (project.workflow?.nodes || []).find((n) => n.id === nodeId) || null
 }
 
+// Helper: shadow-write a single workflow node (and its children recursively) to the normalized table
+function _shadowWriteWorkflowNode(projectId, node, parentNodeId) {
+  const now = new Date().toISOString()
+  db.run(
+    `INSERT OR REPLACE INTO workflow_nodes
+      (id, project_id, parent_node_id, title, description, type, status,
+       linked_issue_keys, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      node.id,
+      projectId,
+      parentNodeId || null,
+      node.title || '',
+      node.description || null,
+      node.type || null,
+      node.status || 'pending',
+      node.linkedIssueKeys ? JSON.stringify(node.linkedIssueKeys) : null,
+      node.createdAt || now,
+      node.updatedAt || now,
+    ]
+  )
+  // Recurse into children
+  const children = node.children?.nodes || []
+  for (const child of children) {
+    _shadowWriteWorkflowNode(projectId, child, node.id)
+  }
+}
+
 export function addWorkflowNode(projectId, node) {
   const project = getProject(projectId)
   if (!project) return null
@@ -1538,6 +1566,13 @@ export function addWorkflowNode(projectId, node) {
   project.workflow.nodes.push(newNode)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    _shadowWriteWorkflowNode(projectId, newNode, null)
+  }
+
   return newNode
 }
 
@@ -1581,6 +1616,13 @@ export function updateWorkflowNode(projectId, nodeId, updates) {
 
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table (full node + children)
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    _shadowWriteWorkflowNode(projectId, node, null)
+  }
+
   return node
 }
 
@@ -1598,6 +1640,22 @@ export function deleteWorkflowNode(projectId, nodeId) {
   }
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized tables (children cascade via FK, but be explicit)
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      'DELETE FROM workflow_connections WHERE (from_node_id = ? OR to_node_id = ?) AND project_id = ?',
+      [nodeId, nodeId, projectId]
+    )
+    // Delete children first (they reference parent), then the node itself
+    db.run('DELETE FROM workflow_nodes WHERE parent_node_id = ? AND project_id = ?', [
+      nodeId,
+      projectId,
+    ])
+    db.run('DELETE FROM workflow_nodes WHERE id = ? AND project_id = ?', [nodeId, projectId])
+  }
+
   return true
 }
 
@@ -1615,6 +1673,16 @@ export function linkIssueToWorkflowNode(projectId, nodeId, issueKey) {
   node.updatedAt = now
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      'UPDATE workflow_nodes SET linked_issue_keys = ?, updated_at = ? WHERE id = ? AND project_id = ?',
+      [JSON.stringify(node.linkedIssueKeys), now, nodeId, projectId]
+    )
+  }
+
   return node
 }
 
@@ -1629,6 +1697,20 @@ export function unlinkIssueFromWorkflowNode(projectId, nodeId, issueKey) {
   node.updatedAt = now
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode2 = getMigrationMode()
+  if (mode2 === 'shadow_write' || mode2 === 'read_normalized') {
+    db.run(
+      'UPDATE workflow_nodes SET linked_issue_keys = ?, updated_at = ? WHERE id = ? AND project_id = ?',
+      [
+        node.linkedIssueKeys.length > 0 ? JSON.stringify(node.linkedIssueKeys) : null,
+        now,
+        nodeId,
+        projectId,
+      ]
+    )
+  }
   return node
 }
 
