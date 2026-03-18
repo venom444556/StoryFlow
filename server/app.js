@@ -6,7 +6,6 @@
 import express from 'express'
 import { timingSafeEqual } from 'node:crypto'
 import * as db from './db.js'
-import { withProjectLock } from './db.js'
 import { notifyClients, broadcastEvent, broadcastAiStatus, broadcastGateUpdate } from './ws.js'
 import {
   recordEvent,
@@ -26,8 +25,6 @@ import {
   checkTitleDuplication,
   emitHygieneEvents,
 } from './intelligence.js'
-import { verifyAll } from './verify.js'
-
 const app = express()
 
 // --- Request body validation helpers ---
@@ -283,49 +280,7 @@ function validateProjectId(req, res, next) {
 app.param('id', validateProjectId)
 
 // ---------------------------------------------------------------------------
-// Migration endpoints — global (not project-scoped)
-// ---------------------------------------------------------------------------
-
-app.get('/api/migrate/status', (_req, res) => {
-  res.json({ mode: db.getMigrationMode() })
-})
-
-app.post('/api/migrate/verify', (_req, res) => {
-  try {
-    const rawDb = db.getRawDb()
-    const results = verifyAll(rawDb, db.listProjects, db.getProject)
-    res.json(results)
-  } catch (err) {
-    res.status(500).json({ error: 'Verification failed: ' + err.message })
-  }
-})
-
-const MIGRATION_SEQUENCE = ['shadow_write', 'read_normalized', 'normalized']
-
-app.post('/api/migrate/advance', (_req, res) => {
-  const current = db.getMigrationMode()
-  const idx = MIGRATION_SEQUENCE.indexOf(current)
-  if (idx === MIGRATION_SEQUENCE.length - 1) {
-    return res.status(400).json({ error: `Already at final mode: ${current}` })
-  }
-  const next = MIGRATION_SEQUENCE[idx + 1]
-  db.setMigrationMode(next)
-  res.json({ previous: current, mode: next })
-})
-
-app.post('/api/migrate/rollback', (_req, res) => {
-  const current = db.getMigrationMode()
-  const idx = MIGRATION_SEQUENCE.indexOf(current)
-  if (idx === 0) {
-    return res.status(400).json({ error: `Already at initial mode: ${current}` })
-  }
-  const prev = MIGRATION_SEQUENCE[idx - 1]
-  db.setMigrationMode(prev)
-  res.json({ previous: current, mode: prev })
-})
-
-// ---------------------------------------------------------------------------
-// Snapshot helper — Phase 3
+// Snapshot helper
 // Auto-snapshots before high-risk mutations (deletes, batch ops)
 // ---------------------------------------------------------------------------
 function maybeSnapshot(req, action, entityType, entityId) {
@@ -334,34 +289,6 @@ function maybeSnapshot(req, action, entityType, entityId) {
   const entity = entityId ? `${entityType}:${entityId}` : entityType
   return db.createSnapshot(projectId, { action, entity, actor })
 }
-
-// --- Sync endpoint (destructive: replaces all projects) ---
-// Global sync lock prevents concurrent sync + mutation races
-let _syncInProgress = false
-
-app.post('/api/sync', async (req, res) => {
-  // Require explicit confirmation header for this destructive operation
-  if (req.headers['x-confirm'] !== 'overwrite-all') {
-    return res.status(400).json({
-      error: 'Sync replaces all data. Set header X-Confirm: overwrite-all to proceed.',
-    })
-  }
-  if (!req.body.projects) {
-    return res.status(400).json({ error: 'Missing projects array' })
-  }
-  if (_syncInProgress) {
-    return res.status(409).json({ error: 'Sync already in progress' })
-  }
-  _syncInProgress = true
-  try {
-    await db.syncAll(req.body.projects)
-    res.json({ success: true, count: req.body.projects.length })
-  } catch {
-    res.status(500).json({ error: 'Sync failed' })
-  } finally {
-    _syncInProgress = false
-  }
-})
 
 // --- Projects ---
 app.get('/api/projects', (req, res) => {
@@ -396,46 +323,42 @@ app.get('/api/projects/:id', (req, res) => {
 app.put('/api/projects/:id', (req, res) => {
   const err = validateProjectBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const project = db.updateProject(req.params.id, req.body)
-    if (!project) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'update',
-      entityType: 'project',
-      entityId: req.params.id,
-      entityTitle: project.name,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(project)
+  const project = db.updateProject(req.params.id, req.body)
+  if (!project) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'update',
+    entityType: 'project',
+    entityId: req.params.id,
+    entityTitle: project.name,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(project)
 })
 
 app.delete('/api/projects/:id', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const project = db.getProject(req.params.id)
-    if (!project) return res.status(404).json({ error: 'Project not found' })
-    maybeSnapshot(req, 'delete_project', 'project', req.params.id)
-    db.softDeleteProject(req.params.id)
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'delete',
-      entityType: 'project',
-      entityId: req.params.id,
-      entityTitle: project.name,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true, message: `Project "${project.name}" deleted` })
+  const project = db.getProject(req.params.id)
+  if (!project) return res.status(404).json({ error: 'Project not found' })
+  maybeSnapshot(req, 'delete_project', 'project', req.params.id)
+  db.softDeleteProject(req.params.id)
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'delete',
+    entityType: 'project',
+    entityId: req.params.id,
+    entityTitle: project.name,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true, message: `Project "${project.name}" deleted` })
 })
 
 // --- Board summary ---
@@ -461,104 +384,98 @@ app.get('/api/projects/:id/issues', (req, res) => {
 app.post('/api/projects/:id/issues', (req, res) => {
   const err = validateIssueBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const provenance = extractProvenance(req)
+  const provenance = extractProvenance(req)
 
-    // Server-side dedup check — warn on near-matches but don't block
-    const project = db.getProject(req.params.id)
-    if (project) {
-      const existingIssues = project.board?.issues || []
-      const dedup = checkTitleDuplication(req.body.title, existingIssues)
-      if (dedup.isDuplicate) {
-        const topMatch = dedup.matches[0]
-        // Include a dedup_warning in the response (non-blocking)
-        req._dedupWarning = {
-          similar_to: topMatch.issue.key || topMatch.issue.id,
-          similar_title: topMatch.issue.title,
-          score: Math.round(topMatch.score * 100),
-        }
+  // Server-side dedup check — warn on near-matches but don't block
+  const project = db.getProject(req.params.id)
+  if (project) {
+    const existingIssues = project.board?.issues || []
+    const dedup = checkTitleDuplication(req.body.title, existingIssues)
+    if (dedup.isDuplicate) {
+      const topMatch = dedup.matches[0]
+      // Include a dedup_warning in the response (non-blocking)
+      req._dedupWarning = {
+        similar_to: topMatch.issue.key || topMatch.issue.id,
+        similar_title: topMatch.issue.title,
+        score: Math.round(topMatch.score * 100),
       }
     }
+  }
 
-    // Stamp provenance onto the entity itself so the UI can show badges
-    const issueData = { ...req.body }
-    if (provenance.actor !== 'human') {
-      issueData.createdBy = provenance.actor
-      issueData.createdByReasoning = provenance.reasoning
-      if (provenance.confidence !== null && provenance.confidence !== undefined) {
-        issueData.createdByConfidence = provenance.confidence
-      }
+  // Stamp provenance onto the entity itself so the UI can show badges
+  const issueData = { ...req.body }
+  if (provenance.actor !== 'human') {
+    issueData.createdBy = provenance.actor
+    issueData.createdByReasoning = provenance.reasoning
+    if (provenance.confidence !== null && provenance.confidence !== undefined) {
+      issueData.createdByConfidence = provenance.confidence
     }
-    const issue = db.addIssue(req.params.id, issueData)
-    if (!issue) return res.status(404).json({ error: 'Project not found' })
-    if (issue.error) return res.status(400).json({ error: issue.error })
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'create',
-      entityType: 'issue',
-      entityId: issue.id,
-      entityTitle: issue.title,
-      data: { key: issue.key, type: issue.type, status: issue.status },
-    })
-    broadcastEvent(event)
-    notifyClients()
-    const response = req._dedupWarning ? { ...issue, _dedup_warning: req._dedupWarning } : issue
-    res.status(201).json(response)
+  }
+  const issue = db.addIssue(req.params.id, issueData)
+  if (!issue) return res.status(404).json({ error: 'Project not found' })
+  if (issue.error) return res.status(400).json({ error: issue.error })
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'create',
+    entityType: 'issue',
+    entityId: issue.id,
+    entityTitle: issue.title,
+    data: { key: issue.key, type: issue.type, status: issue.status },
   })
+  broadcastEvent(event)
+  notifyClients()
+  const response = req._dedupWarning ? { ...issue, _dedup_warning: req._dedupWarning } : issue
+  res.status(201).json(response)
 })
 
 app.put('/api/projects/:id/issues/:issueId', (req, res) => {
   const err = validateIssueBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
-    if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
-    if (issue.error) return res.status(400).json({ error: issue.error })
-    const provenance = extractProvenance(req)
-    const action = req.body.status ? 'status_change' : 'update'
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action,
-      entityType: 'issue',
-      entityId: issue.id,
-      entityTitle: issue.title,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-      data: { key: issue.key, type: issue.type, status: issue.status },
-    })
-    broadcastEvent(event)
-
-    // #39 — Auto-update linked workflow nodes when issue moves to Done
-    if (req.body.status === 'Done' && issue.key) {
-      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
-    }
-
-    notifyClients()
-    res.json(issue)
+  const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
+  if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+  if (issue.error) return res.status(400).json({ error: issue.error })
+  const provenance = extractProvenance(req)
+  const action = req.body.status ? 'status_change' : 'update'
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action,
+    entityType: 'issue',
+    entityId: issue.id,
+    entityTitle: issue.title,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    data: { key: issue.key, type: issue.type, status: issue.status },
   })
+  broadcastEvent(event)
+
+  // #39 — Auto-update linked workflow nodes when issue moves to Done
+  if (req.body.status === 'Done' && issue.key) {
+    autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+  }
+
+  notifyClients()
+  res.json(issue)
 })
 
 app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_issue', 'issue', req.params.issueId)
-    const ok = db.deleteIssue(req.params.id, req.params.issueId)
-    if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'delete',
-      entityType: 'issue',
-      entityId: req.params.issueId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_issue', 'issue', req.params.issueId)
+  const ok = db.deleteIssue(req.params.id, req.params.issueId)
+  if (!ok) return res.status(404).json({ error: 'Issue or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'delete',
+    entityType: 'issue',
+    entityId: req.params.issueId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Batch issue update ---
@@ -570,65 +487,63 @@ app.post('/api/projects/:id/issues/batch-update', (req, res) => {
   if (updates.length > 50) {
     return res.status(400).json({ error: 'Maximum 50 updates per batch' })
   }
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'batch_update_issues', 'batch', null)
-    const provenance = extractProvenance(req)
-    const results = { updated: [], errors: [] }
+  maybeSnapshot(req, 'batch_update_issues', 'batch', null)
+  const provenance = extractProvenance(req)
+  const results = { updated: [], errors: [] }
 
-    for (const entry of updates) {
-      const { issue_id, issue_key, ...fields } = entry
-      if (!issue_id && !issue_key) {
-        results.errors.push({ entry, error: 'Missing issue_id or issue_key' })
-        continue
-      }
-      // Map snake_case fields to camelCase DB fields
-      const data = {}
-      if (fields.title !== undefined) data.title = fields.title
-      if (fields.status !== undefined) data.status = fields.status
-      if (fields.priority !== undefined) data.priority = fields.priority
-      if (fields.description !== undefined) data.description = fields.description
-      if (fields.story_points !== undefined) data.storyPoints = fields.story_points
-      if (fields.storyPoints !== undefined) data.storyPoints = fields.storyPoints
-      if (fields.epic_id !== undefined) data.epicId = fields.epic_id
-      if (fields.epicId !== undefined) data.epicId = fields.epicId
-      if (fields.sprint_id !== undefined) data.sprintId = fields.sprint_id
-      if (fields.sprintId !== undefined) data.sprintId = fields.sprintId
-      if (fields.assignee !== undefined) data.assignee = fields.assignee
-      if (fields.labels !== undefined) data.labels = fields.labels
-
-      const issue = issue_key
-        ? db.updateIssueByKey(req.params.id, issue_key, data)
-        : db.updateIssue(req.params.id, issue_id, data)
-
-      if (!issue) {
-        results.errors.push({
-          identifier: issue_key || issue_id,
-          error: 'Issue not found',
-        })
-      } else if (issue.error) {
-        results.errors.push({ identifier: issue_key || issue_id, error: issue.error })
-      } else {
-        results.updated.push({ id: issue.id, key: issue.key, title: issue.title })
-      }
+  for (const entry of updates) {
+    const { issue_id, issue_key, ...fields } = entry
+    if (!issue_id && !issue_key) {
+      results.errors.push({ entry, error: 'Missing issue_id or issue_key' })
+      continue
     }
+    // Map snake_case fields to camelCase DB fields
+    const data = {}
+    if (fields.title !== undefined) data.title = fields.title
+    if (fields.status !== undefined) data.status = fields.status
+    if (fields.priority !== undefined) data.priority = fields.priority
+    if (fields.description !== undefined) data.description = fields.description
+    if (fields.story_points !== undefined) data.storyPoints = fields.story_points
+    if (fields.storyPoints !== undefined) data.storyPoints = fields.storyPoints
+    if (fields.epic_id !== undefined) data.epicId = fields.epic_id
+    if (fields.epicId !== undefined) data.epicId = fields.epicId
+    if (fields.sprint_id !== undefined) data.sprintId = fields.sprint_id
+    if (fields.sprintId !== undefined) data.sprintId = fields.sprintId
+    if (fields.assignee !== undefined) data.assignee = fields.assignee
+    if (fields.labels !== undefined) data.labels = fields.labels
 
-    // Emit one summary mutation event
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'update',
-      entityType: 'batch',
-      entityTitle: `Batch update: ${results.updated.length} issues`,
-      data: {
-        updatedCount: results.updated.length,
-        errorCount: results.errors.length,
-      },
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(results)
+    const issue = issue_key
+      ? db.updateIssueByKey(req.params.id, issue_key, data)
+      : db.updateIssue(req.params.id, issue_id, data)
+
+    if (!issue) {
+      results.errors.push({
+        identifier: issue_key || issue_id,
+        error: 'Issue not found',
+      })
+    } else if (issue.error) {
+      results.errors.push({ identifier: issue_key || issue_id, error: issue.error })
+    } else {
+      results.updated.push({ id: issue.id, key: issue.key, title: issue.title })
+    }
+  }
+
+  // Emit one summary mutation event
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'update',
+    entityType: 'batch',
+    entityTitle: `Batch update: ${results.updated.length} issues`,
+    data: {
+      updatedCount: results.updated.length,
+      errorCount: results.errors.length,
+    },
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(results)
 })
 
 // --- Issues by key (e.g. SCA-43) ---
@@ -641,53 +556,49 @@ app.get('/api/projects/:id/issues/by-key/:key', (req, res) => {
 app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
   const err = validateIssueBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
-    if (!issue) return res.status(404).json({ error: 'Issue not found' })
-    if (issue.error) return res.status(400).json({ error: issue.error })
-    const provenance = extractProvenance(req)
-    const action = req.body.status ? 'status_change' : 'update'
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action,
-      entityType: 'issue',
-      entityId: issue.id,
-      entityTitle: issue.title,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-      data: { key: issue.key, type: issue.type, status: issue.status },
-    })
-    broadcastEvent(event)
-
-    // #39 — Auto-update linked workflow nodes when issue moves to Done
-    if (req.body.status === 'Done' && issue.key) {
-      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
-    }
-
-    notifyClients()
-    res.json(issue)
+  const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
+  if (!issue) return res.status(404).json({ error: 'Issue not found' })
+  if (issue.error) return res.status(400).json({ error: issue.error })
+  const provenance = extractProvenance(req)
+  const action = req.body.status ? 'status_change' : 'update'
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action,
+    entityType: 'issue',
+    entityId: issue.id,
+    entityTitle: issue.title,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+    data: { key: issue.key, type: issue.type, status: issue.status },
   })
+  broadcastEvent(event)
+
+  // #39 — Auto-update linked workflow nodes when issue moves to Done
+  if (req.body.status === 'Done' && issue.key) {
+    autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+  }
+
+  notifyClients()
+  res.json(issue)
 })
 
 app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_issue_by_key', 'issue', req.params.key)
-    const ok = db.deleteIssueByKey(req.params.id, req.params.key)
-    if (!ok) return res.status(404).json({ error: 'Issue not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'delete',
-      entityType: 'issue',
-      entityId: req.params.key,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_issue_by_key', 'issue', req.params.key)
+  const ok = db.deleteIssueByKey(req.params.id, req.params.key)
+  if (!ok) return res.status(404).json({ error: 'Issue not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'delete',
+    entityType: 'issue',
+    entityId: req.params.key,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Comments ---
@@ -695,75 +606,67 @@ app.post('/api/projects/:id/issues/:issueId/comments', (req, res) => {
   if (!req.body.body || typeof req.body.body !== 'string') {
     return res.status(400).json({ error: '"body" is required and must be a non-empty string' })
   }
-  withProjectLock(req.params.id, () => {
-    const comment = db.addComment(req.params.id, req.params.issueId, req.body)
-    if (!comment) return res.status(404).json({ error: 'Issue or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'comment',
-      entityType: 'issue',
-      entityId: req.params.issueId,
-      entityTitle: req.body.body.slice(0, 120),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(comment)
+  const comment = db.addComment(req.params.id, req.params.issueId, req.body)
+  if (!comment) return res.status(404).json({ error: 'Issue or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'comment',
+    entityType: 'issue',
+    entityId: req.params.issueId,
+    entityTitle: req.body.body.slice(0, 120),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(comment)
 })
 
 app.post('/api/projects/:id/issues/by-key/:key/comments', (req, res) => {
   if (!req.body.body || typeof req.body.body !== 'string') {
     return res.status(400).json({ error: '"body" is required and must be a non-empty string' })
   }
-  withProjectLock(req.params.id, () => {
-    const comment = db.addCommentByKey(req.params.id, req.params.key, req.body)
-    if (!comment) return res.status(404).json({ error: 'Issue not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'comment',
-      entityType: 'issue',
-      entityId: req.params.key,
-      entityTitle: req.body.body.slice(0, 120),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(comment)
+  const comment = db.addCommentByKey(req.params.id, req.params.key, req.body)
+  if (!comment) return res.status(404).json({ error: 'Issue not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'comment',
+    entityType: 'issue',
+    entityId: req.params.key,
+    entityTitle: req.body.body.slice(0, 120),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(comment)
 })
 
 // --- Nudge (reset staleness) ---
 app.post('/api/projects/:id/issues/:issueId/nudge', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const updates = {}
-    if (req.body.message) {
-      updates.lastNudgeMessage = req.body.message
-      updates.lastNudgeAuthor = req.body.author || 'system'
-    }
-    const issue = db.updateIssue(req.params.id, req.params.issueId, updates)
-    if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
-    notifyClients()
-    res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
-  })
+  const updates = {}
+  if (req.body.message) {
+    updates.lastNudgeMessage = req.body.message
+    updates.lastNudgeAuthor = req.body.author || 'system'
+  }
+  const issue = db.updateIssue(req.params.id, req.params.issueId, updates)
+  if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+  notifyClients()
+  res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
 })
 
 app.post('/api/projects/:id/issues/by-key/:key/nudge', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const updates = {}
-    if (req.body.message) {
-      updates.lastNudgeMessage = req.body.message
-      updates.lastNudgeAuthor = req.body.author || 'system'
-    }
-    const issue = db.updateIssueByKey(req.params.id, req.params.key, updates)
-    if (!issue) return res.status(404).json({ error: 'Issue not found' })
-    notifyClients()
-    res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
-  })
+  const updates = {}
+  if (req.body.message) {
+    updates.lastNudgeMessage = req.body.message
+    updates.lastNudgeAuthor = req.body.author || 'system'
+  }
+  const issue = db.updateIssueByKey(req.params.id, req.params.key, updates)
+  if (!issue) return res.status(404).json({ error: 'Issue not found' })
+  notifyClients()
+  res.json({ success: true, issueId: issue.id, updatedAt: issue.updatedAt })
 })
 
 // --- Sprints ---
@@ -776,23 +679,21 @@ app.get('/api/projects/:id/sprints', (req, res) => {
 app.post('/api/projects/:id/sprints', (req, res) => {
   const err = validateSprintBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const sprint = db.addSprint(req.params.id, req.body)
-    if (!sprint) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'create',
-      entityType: 'sprint',
-      entityId: sprint.id,
-      entityTitle: sprint.name,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(sprint)
+  const sprint = db.addSprint(req.params.id, req.body)
+  if (!sprint) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'create',
+    entityType: 'sprint',
+    entityId: sprint.id,
+    entityTitle: sprint.name,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(sprint)
 })
 
 // --- Pages ---
@@ -811,71 +712,65 @@ app.get('/api/projects/:id/pages/:pageId', (req, res) => {
 app.post('/api/projects/:id/pages', (req, res) => {
   const err = validatePageBody(req.body)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const provenance = extractProvenance(req)
-    const pageData = { ...req.body }
-    if (provenance.actor !== 'human') {
-      pageData.createdBy = provenance.actor
-      pageData.createdByReasoning = provenance.reasoning
-    }
-    const page = db.addPage(req.params.id, pageData)
-    if (!page) return res.status(404).json({ error: 'Project not found' })
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'wiki',
-      action: 'create',
-      entityType: 'page',
-      entityId: page.id,
-      entityTitle: page.title,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(page)
+  const provenance = extractProvenance(req)
+  const pageData = { ...req.body }
+  if (provenance.actor !== 'human') {
+    pageData.createdBy = provenance.actor
+    pageData.createdByReasoning = provenance.reasoning
+  }
+  const page = db.addPage(req.params.id, pageData)
+  if (!page) return res.status(404).json({ error: 'Project not found' })
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'wiki',
+    action: 'create',
+    entityType: 'page',
+    entityId: page.id,
+    entityTitle: page.title,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(page)
 })
 
 app.put('/api/projects/:id/pages/:pageId', (req, res) => {
   const err = validatePageBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  withProjectLock(req.params.id, () => {
-    const page = db.updatePage(req.params.id, req.params.pageId, req.body)
-    if (!page) return res.status(404).json({ error: 'Page or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'wiki',
-      action: 'update',
-      entityType: 'page',
-      entityId: page.id,
-      entityTitle: page.title,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(page)
+  const page = db.updatePage(req.params.id, req.params.pageId, req.body)
+  if (!page) return res.status(404).json({ error: 'Page or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'wiki',
+    action: 'update',
+    entityType: 'page',
+    entityId: page.id,
+    entityTitle: page.title,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(page)
 })
 
 app.delete('/api/projects/:id/pages/:pageId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_page', 'page', req.params.pageId)
-    const ok = db.deletePage(req.params.id, req.params.pageId)
-    if (!ok) return res.status(404).json({ error: 'Page or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'wiki',
-      action: 'delete',
-      entityType: 'page',
-      entityId: req.params.pageId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_page', 'page', req.params.pageId)
+  const ok = db.deletePage(req.params.id, req.params.pageId)
+  if (!ok) return res.status(404).json({ error: 'Page or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'wiki',
+    action: 'delete',
+    entityType: 'page',
+    entityId: req.params.pageId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Sprint update ---
@@ -885,51 +780,47 @@ app.put('/api/projects/:id/sprints/:sprintId', (req, res) => {
       .status(400)
       .json({ error: `"status" must be one of: ${VALID_SPRINT_STATUSES.join(', ')}` })
   }
-  withProjectLock(req.params.id, () => {
-    const data = {}
-    if (req.body.name !== undefined) data.name = req.body.name
-    if (req.body.goal !== undefined) data.goal = req.body.goal
-    if (req.body.startDate !== undefined) data.startDate = req.body.startDate
-    if (req.body.endDate !== undefined) data.endDate = req.body.endDate
-    if (req.body.status !== undefined) data.status = req.body.status
-    const sprint = db.updateSprint(req.params.id, req.params.sprintId, data)
-    if (!sprint) return res.status(404).json({ error: 'Sprint or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: req.body.status ? 'status_change' : 'update',
-      entityType: 'sprint',
-      entityId: sprint.id,
-      entityTitle: sprint.name,
-      changes: Object.keys(data).map((k) => ({ field: k, to: data[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(sprint)
+  const data = {}
+  if (req.body.name !== undefined) data.name = req.body.name
+  if (req.body.goal !== undefined) data.goal = req.body.goal
+  if (req.body.startDate !== undefined) data.startDate = req.body.startDate
+  if (req.body.endDate !== undefined) data.endDate = req.body.endDate
+  if (req.body.status !== undefined) data.status = req.body.status
+  const sprint = db.updateSprint(req.params.id, req.params.sprintId, data)
+  if (!sprint) return res.status(404).json({ error: 'Sprint or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: req.body.status ? 'status_change' : 'update',
+    entityType: 'sprint',
+    entityId: sprint.id,
+    entityTitle: sprint.name,
+    changes: Object.keys(data).map((k) => ({ field: k, to: data[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(sprint)
 })
 
 // --- Sprint deletion ---
 app.delete('/api/projects/:id/sprints/:sprintId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_sprint', 'sprint', req.params.sprintId)
-    const ok = db.deleteSprint(req.params.id, req.params.sprintId)
-    if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'board',
-      action: 'delete',
-      entityType: 'sprint',
-      entityId: req.params.sprintId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_sprint', 'sprint', req.params.sprintId)
+  const ok = db.deleteSprint(req.params.id, req.params.sprintId)
+  if (!ok) return res.status(404).json({ error: 'Sprint or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'board',
+    action: 'delete',
+    entityType: 'sprint',
+    entityId: req.params.sprintId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Decisions ---
@@ -942,64 +833,58 @@ app.get('/api/projects/:id/decisions', (req, res) => {
 app.post('/api/projects/:id/decisions', (req, res) => {
   const titleErr = requireString(req.body, 'title')
   if (titleErr) return res.status(400).json({ error: titleErr })
-  withProjectLock(req.params.id, () => {
-    const decision = db.addDecision(req.params.id, req.body)
-    if (!decision) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'create',
-      entityType: 'decision',
-      entityId: decision.id,
-      entityTitle: decision.title,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(decision)
+  const decision = db.addDecision(req.params.id, req.body)
+  if (!decision) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'create',
+    entityType: 'decision',
+    entityId: decision.id,
+    entityTitle: decision.title,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(decision)
 })
 
 app.put('/api/projects/:id/decisions/:decisionId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const decision = db.updateDecision(req.params.id, req.params.decisionId, req.body)
-    if (!decision) return res.status(404).json({ error: 'Decision or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'update',
-      entityType: 'decision',
-      entityId: decision.id,
-      entityTitle: decision.title,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(decision)
+  const decision = db.updateDecision(req.params.id, req.params.decisionId, req.body)
+  if (!decision) return res.status(404).json({ error: 'Decision or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'update',
+    entityType: 'decision',
+    entityId: decision.id,
+    entityTitle: decision.title,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(decision)
 })
 
 app.delete('/api/projects/:id/decisions/:decisionId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_decision', 'decision', req.params.decisionId)
-    const ok = db.deleteDecision(req.params.id, req.params.decisionId)
-    if (!ok) return res.status(404).json({ error: 'Decision or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'delete',
-      entityType: 'decision',
-      entityId: req.params.decisionId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_decision', 'decision', req.params.decisionId)
+  const ok = db.deleteDecision(req.params.id, req.params.decisionId)
+  if (!ok) return res.status(404).json({ error: 'Decision or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'delete',
+    entityType: 'decision',
+    entityId: req.params.decisionId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Timeline Phases ---
@@ -1012,64 +897,58 @@ app.get('/api/projects/:id/phases', (req, res) => {
 app.post('/api/projects/:id/phases', (req, res) => {
   const nameErr = requireString(req.body, 'name')
   if (nameErr) return res.status(400).json({ error: nameErr })
-  withProjectLock(req.params.id, () => {
-    const phase = db.addPhase(req.params.id, req.body)
-    if (!phase) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'create',
-      entityType: 'phase',
-      entityId: phase.id,
-      entityTitle: phase.name,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(phase)
+  const phase = db.addPhase(req.params.id, req.body)
+  if (!phase) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'create',
+    entityType: 'phase',
+    entityId: phase.id,
+    entityTitle: phase.name,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(phase)
 })
 
 app.put('/api/projects/:id/phases/:phaseId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const phase = db.updatePhase(req.params.id, req.params.phaseId, req.body)
-    if (!phase) return res.status(404).json({ error: 'Phase or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'update',
-      entityType: 'phase',
-      entityId: phase.id,
-      entityTitle: phase.name,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(phase)
+  const phase = db.updatePhase(req.params.id, req.params.phaseId, req.body)
+  if (!phase) return res.status(404).json({ error: 'Phase or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'update',
+    entityType: 'phase',
+    entityId: phase.id,
+    entityTitle: phase.name,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(phase)
 })
 
 app.delete('/api/projects/:id/phases/:phaseId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_phase', 'phase', req.params.phaseId)
-    const ok = db.deletePhase(req.params.id, req.params.phaseId)
-    if (!ok) return res.status(404).json({ error: 'Phase or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'delete',
-      entityType: 'phase',
-      entityId: req.params.phaseId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_phase', 'phase', req.params.phaseId)
+  const ok = db.deletePhase(req.params.id, req.params.phaseId)
+  if (!ok) return res.status(404).json({ error: 'Phase or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'delete',
+    entityType: 'phase',
+    entityId: req.params.phaseId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Timeline Milestones ---
@@ -1082,64 +961,58 @@ app.get('/api/projects/:id/milestones', (req, res) => {
 app.post('/api/projects/:id/milestones', (req, res) => {
   const nameErr = requireString(req.body, 'name')
   if (nameErr) return res.status(400).json({ error: nameErr })
-  withProjectLock(req.params.id, () => {
-    const milestone = db.addMilestone(req.params.id, req.body)
-    if (!milestone) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'create',
-      entityType: 'milestone',
-      entityId: milestone.id,
-      entityTitle: milestone.name,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(milestone)
+  const milestone = db.addMilestone(req.params.id, req.body)
+  if (!milestone) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'create',
+    entityType: 'milestone',
+    entityId: milestone.id,
+    entityTitle: milestone.name,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(milestone)
 })
 
 app.put('/api/projects/:id/milestones/:milestoneId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const milestone = db.updateMilestone(req.params.id, req.params.milestoneId, req.body)
-    if (!milestone) return res.status(404).json({ error: 'Milestone or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'update',
-      entityType: 'milestone',
-      entityId: milestone.id,
-      entityTitle: milestone.name,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(milestone)
+  const milestone = db.updateMilestone(req.params.id, req.params.milestoneId, req.body)
+  if (!milestone) return res.status(404).json({ error: 'Milestone or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'update',
+    entityType: 'milestone',
+    entityId: milestone.id,
+    entityTitle: milestone.name,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(milestone)
 })
 
 app.delete('/api/projects/:id/milestones/:milestoneId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    maybeSnapshot(req, 'delete_milestone', 'milestone', req.params.milestoneId)
-    const ok = db.deleteMilestone(req.params.id, req.params.milestoneId)
-    if (!ok) return res.status(404).json({ error: 'Milestone or project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'delete',
-      entityType: 'milestone',
-      entityId: req.params.milestoneId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ success: true })
+  maybeSnapshot(req, 'delete_milestone', 'milestone', req.params.milestoneId)
+  const ok = db.deleteMilestone(req.params.id, req.params.milestoneId)
+  if (!ok) return res.status(404).json({ error: 'Milestone or project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'delete',
+    entityType: 'milestone',
+    entityId: req.params.milestoneId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ success: true })
 })
 
 // --- Agent Sessions ---
@@ -1244,24 +1117,22 @@ app.post('/api/projects/:id/snapshots/:snapshotId/restore', (req, res) => {
   if (req.headers['x-confirm'] !== 'restore') {
     return res.status(400).json({ error: 'Restore requires X-Confirm: restore header' })
   }
-  withProjectLock(req.params.id, () => {
-    const project = db.restoreSnapshot(req.params.id, req.params.snapshotId)
-    if (!project) return res.status(404).json({ error: 'Snapshot not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'system',
-      action: 'update',
-      entityType: 'snapshot',
-      entityId: req.params.snapshotId,
-      entityTitle: 'Project restored from snapshot',
-      data: { snapshot_id: req.params.snapshotId },
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ restored: true, snapshot_id: req.params.snapshotId, project })
+  const project = db.restoreSnapshot(req.params.id, req.params.snapshotId)
+  if (!project) return res.status(404).json({ error: 'Snapshot not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'system',
+    action: 'update',
+    entityType: 'snapshot',
+    entityId: req.params.snapshotId,
+    entityTitle: 'Project restored from snapshot',
+    data: { snapshot_id: req.params.snapshotId },
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ restored: true, snapshot_id: req.params.snapshotId, project })
 })
 
 // --- Event Cleanup ---
@@ -1364,97 +1235,87 @@ app.get('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
 })
 
 app.post('/api/projects/:id/workflow/nodes', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const node = db.addWorkflowNode(req.params.id, req.body)
-    if (!node) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'workflow',
-      action: 'create',
-      entityType: 'workflow_node',
-      entityId: node.id,
-      entityTitle: node.title || node.id,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(node)
+  const node = db.addWorkflowNode(req.params.id, req.body)
+  if (!node) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'workflow',
+    action: 'create',
+    entityType: 'workflow_node',
+    entityId: node.id,
+    entityTitle: node.title || node.id,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(node)
 })
 
 app.put('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const result = db.updateWorkflowNode(req.params.id, req.params.nodeId, req.body)
-    if (!result) return res.status(404).json({ error: 'Node not found' })
-    if (result.error) return res.status(400).json({ error: result.error })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'workflow',
-      action: 'update',
-      entityType: 'workflow_node',
-      entityId: req.params.nodeId,
-      entityTitle: result.title || req.params.nodeId,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(result)
+  const result = db.updateWorkflowNode(req.params.id, req.params.nodeId, req.body)
+  if (!result) return res.status(404).json({ error: 'Node not found' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'workflow',
+    action: 'update',
+    entityType: 'workflow_node',
+    entityId: req.params.nodeId,
+    entityTitle: result.title || req.params.nodeId,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(result)
 })
 
 app.delete('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const ok = db.deleteWorkflowNode(req.params.id, req.params.nodeId)
-    if (!ok) return res.status(404).json({ error: 'Node not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'workflow',
-      action: 'delete',
-      entityType: 'workflow_node',
-      entityId: req.params.nodeId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ ok: true })
+  const ok = db.deleteWorkflowNode(req.params.id, req.params.nodeId)
+  if (!ok) return res.status(404).json({ error: 'Node not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'workflow',
+    action: 'delete',
+    entityType: 'workflow_node',
+    entityId: req.params.nodeId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ ok: true })
 })
 
 app.post('/api/projects/:id/workflow/nodes/:nodeId/link', (req, res) => {
   const { issueKey } = req.body
   if (!issueKey) return res.status(400).json({ error: 'issueKey is required' })
-  withProjectLock(req.params.id, () => {
-    const node = db.linkIssueToWorkflowNode(req.params.id, req.params.nodeId, issueKey)
-    if (!node) return res.status(404).json({ error: 'Node not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'workflow',
-      action: 'link',
-      entityType: 'workflow_node',
-      entityId: req.params.nodeId,
-      entityTitle: `${node.title || req.params.nodeId} ← ${issueKey}`,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(node)
+  const node = db.linkIssueToWorkflowNode(req.params.id, req.params.nodeId, issueKey)
+  if (!node) return res.status(404).json({ error: 'Node not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'workflow',
+    action: 'link',
+    entityType: 'workflow_node',
+    entityId: req.params.nodeId,
+    entityTitle: `${node.title || req.params.nodeId} ← ${issueKey}`,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(node)
 })
 
 app.post('/api/projects/:id/workflow/nodes/:nodeId/unlink', (req, res) => {
   const { issueKey } = req.body
   if (!issueKey) return res.status(400).json({ error: 'issueKey is required' })
-  withProjectLock(req.params.id, () => {
-    const node = db.unlinkIssueFromWorkflowNode(req.params.id, req.params.nodeId, issueKey)
-    if (!node) return res.status(404).json({ error: 'Node not found' })
-    notifyClients()
-    res.json(node)
-  })
+  const node = db.unlinkIssueFromWorkflowNode(req.params.id, req.params.nodeId, issueKey)
+  if (!node) return res.status(404).json({ error: 'Node not found' })
+  notifyClients()
+  res.json(node)
 })
 
 // --- Architecture components ---
@@ -1472,63 +1333,57 @@ app.get('/api/projects/:id/architecture/components/:compId', (req, res) => {
 })
 
 app.post('/api/projects/:id/architecture/components', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const comp = db.addArchitectureComponent(req.params.id, req.body)
-    if (!comp) return res.status(404).json({ error: 'Project not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'create',
-      entityType: 'architecture_component',
-      entityId: comp.id,
-      entityTitle: comp.name || comp.id,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.status(201).json(comp)
+  const comp = db.addArchitectureComponent(req.params.id, req.body)
+  if (!comp) return res.status(404).json({ error: 'Project not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'create',
+    entityType: 'architecture_component',
+    entityId: comp.id,
+    entityTitle: comp.name || comp.id,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(comp)
 })
 
 app.put('/api/projects/:id/architecture/components/:compId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const comp = db.updateArchitectureComponent(req.params.id, req.params.compId, req.body)
-    if (!comp) return res.status(404).json({ error: 'Component not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'update',
-      entityType: 'architecture_component',
-      entityId: req.params.compId,
-      entityTitle: comp.name || req.params.compId,
-      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json(comp)
+  const comp = db.updateArchitectureComponent(req.params.id, req.params.compId, req.body)
+  if (!comp) return res.status(404).json({ error: 'Component not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'update',
+    entityType: 'architecture_component',
+    entityId: req.params.compId,
+    entityTitle: comp.name || req.params.compId,
+    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(comp)
 })
 
 app.delete('/api/projects/:id/architecture/components/:compId', (req, res) => {
-  withProjectLock(req.params.id, () => {
-    const ok = db.deleteArchitectureComponent(req.params.id, req.params.compId)
-    if (!ok) return res.status(404).json({ error: 'Component not found' })
-    const provenance = extractProvenance(req)
-    const event = emitMutationEvent({
-      projectId: req.params.id,
-      provenance,
-      category: 'project',
-      action: 'delete',
-      entityType: 'architecture_component',
-      entityId: req.params.compId,
-    })
-    broadcastEvent(event)
-    notifyClients()
-    res.json({ ok: true })
+  const ok = db.deleteArchitectureComponent(req.params.id, req.params.compId)
+  if (!ok) return res.status(404).json({ error: 'Component not found' })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'project',
+    action: 'delete',
+    entityType: 'architecture_component',
+    entityId: req.params.compId,
   })
+  broadcastEvent(event)
+  notifyClients()
+  res.json({ ok: true })
 })
 
 // --- Catch-all for production SPA serving ---
