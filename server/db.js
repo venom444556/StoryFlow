@@ -862,6 +862,81 @@ export async function syncAll(projects) {
 // ---------------------------------------------------------------------------
 
 export function listIssues(projectId, filters = {}) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    // Check project exists
+    const projRow = _sqlQueryOne('SELECT id FROM projects WHERE id = ? AND deleted_at IS NULL', [
+      projectId,
+    ])
+    if (!projRow) return null
+
+    // Build dynamic WHERE clause
+    const conditions = ['project_id = ?']
+    const params = [projectId]
+
+    if (filters.status) {
+      conditions.push('status = ?')
+      params.push(filters.status)
+    }
+    if (filters.type) {
+      conditions.push('type = ?')
+      params.push(filters.type)
+    }
+    if (filters.epicId) {
+      conditions.push('epic_id = ?')
+      params.push(filters.epicId)
+    }
+    if (filters.sprintId) {
+      conditions.push('sprint_id = ?')
+      params.push(filters.sprintId)
+    }
+    if (filters.assignee) {
+      conditions.push('assignee = ?')
+      params.push(filters.assignee)
+    }
+    if (filters.search) {
+      conditions.push('(LOWER(title) LIKE ? OR LOWER(key) LIKE ? OR LOWER(description) LIKE ?)')
+      const q = '%' + filters.search.toLowerCase() + '%'
+      params.push(q, q, q)
+    }
+
+    const where = conditions.join(' AND ')
+
+    // Get total count
+    const countRow = _sqlQueryOne(`SELECT COUNT(*) as cnt FROM issues WHERE ${where}`, params)
+    const total = countRow ? countRow.cnt : 0
+
+    // Pagination
+    const page = Math.max(1, parseInt(filters.page, 10) || 1)
+    const limit = Math.min(500, Math.max(1, parseInt(filters.limit, 10) || 50))
+    const offset = (page - 1) * limit
+
+    const rows = _sqlQuery(
+      `SELECT * FROM issues WHERE ${where} ORDER BY created_at ASC LIMIT ? OFFSET ?`,
+      [...params, limit, offset]
+    )
+
+    let issues
+    if (filters.fields === 'summary') {
+      issues = rows.map((r) => ({
+        id: r.id,
+        key: r.key,
+        title: r.title,
+        status: r.status,
+        type: r.type,
+      }))
+    } else {
+      issues = rows.map(mapIssueRow)
+      // Populate comments for each issue
+      for (const issue of issues) {
+        issue.comments = _listCommentsForIssue(issue.id)
+      }
+    }
+
+    return { issues, total, page, limit, hasMore: offset + limit < total }
+  }
+
+  // --- Blob read path (shadow_write mode) ---
   const project = getProject(projectId)
   if (!project) return null
   let issues = project.board?.issues || []
@@ -1113,6 +1188,19 @@ export function updateIssue(projectId, issueId, updates) {
 }
 
 export function getIssueByKey(projectId, key) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const row = _sqlQueryOne(
+      'SELECT * FROM issues WHERE project_id = ? AND LOWER(key) = LOWER(?)',
+      [projectId, key]
+    )
+    if (!row) return null
+    const issue = mapIssueRow(row)
+    issue.comments = _listCommentsForIssue(issue.id)
+    return issue
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
   const issue = (project.board?.issues || []).find(
@@ -1434,6 +1522,89 @@ export function deleteSprint(projectId, sprintId) {
 // ---------------------------------------------------------------------------
 
 export function getBoardSummary(projectId) {
+  // --- Normalized SQL read path ---
+  if (_useNormalizedReads()) {
+    const projRow = _sqlQueryOne(
+      'SELECT id, name, status FROM projects WHERE id = ? AND deleted_at IS NULL',
+      [projectId]
+    )
+    if (!projRow) return null
+
+    // Aggregate status counts
+    const statusRows = _sqlQuery(
+      'SELECT status, COUNT(*) as cnt FROM issues WHERE project_id = ? GROUP BY status',
+      [projectId]
+    )
+    const byStatus = { 'To Do': 0, 'In Progress': 0, Done: 0, Blocked: 0 }
+    for (const r of statusRows) byStatus[r.status] = r.cnt
+
+    // Aggregate type counts
+    const typeRows = _sqlQuery(
+      'SELECT type, COUNT(*) as cnt FROM issues WHERE project_id = ? GROUP BY type',
+      [projectId]
+    )
+    const byType = {}
+    for (const r of typeRows) byType[r.type] = r.cnt
+
+    // Story points
+    const pointsRow = _sqlQueryOne(
+      `SELECT COALESCE(SUM(story_points), 0) as total,
+              COALESCE(SUM(CASE WHEN status = 'Done' THEN story_points ELSE 0 END), 0) as done
+       FROM issues WHERE project_id = ? AND story_points IS NOT NULL`,
+      [projectId]
+    )
+    const totalPoints = pointsRow ? pointsRow.total : 0
+    const donePoints = pointsRow ? pointsRow.done : 0
+
+    // Issue count
+    const countRow = _sqlQueryOne('SELECT COUNT(*) as cnt FROM issues WHERE project_id = ?', [
+      projectId,
+    ])
+    const issueCount = countRow ? countRow.cnt : 0
+
+    // Sprint count + active sprint
+    const sprintCountRow = _sqlQueryOne(
+      'SELECT COUNT(*) as cnt FROM sprints WHERE project_id = ?',
+      [projectId]
+    )
+    const sprintCount = sprintCountRow ? sprintCountRow.cnt : 0
+    const activeSprintRow = _sqlQueryOne(
+      "SELECT * FROM sprints WHERE project_id = ? AND status = 'active' LIMIT 1",
+      [projectId]
+    )
+    const activeSprint = activeSprintRow ? mapSprintRow(activeSprintRow) : null
+
+    // Stale "In Progress" issues (>4 hours since last update)
+    const STALE_THRESHOLD_MS = 4 * 60 * 60 * 1000
+    const staleThreshold = new Date(Date.now() - STALE_THRESHOLD_MS).toISOString()
+    const staleRows = _sqlQuery(
+      `SELECT id, key, title, updated_at FROM issues
+       WHERE project_id = ? AND status = 'In Progress' AND updated_at < ?`,
+      [projectId, staleThreshold]
+    )
+    const staleIssues = staleRows.map((r) => ({
+      id: r.id,
+      key: r.key,
+      title: r.title,
+      updatedAt: r.updated_at,
+    }))
+
+    return {
+      projectName: projRow.name,
+      projectStatus: projRow.status,
+      issueCount,
+      byStatus,
+      byType,
+      totalPoints,
+      donePoints,
+      sprintCount,
+      activeSprint,
+      staleIssues,
+      staleCount: staleIssues.length,
+    }
+  }
+
+  // --- Blob read path ---
   const project = getProject(projectId)
   if (!project) return null
 
