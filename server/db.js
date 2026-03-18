@@ -422,6 +422,285 @@ export function setMigrationMode(mode) {
 }
 
 // ---------------------------------------------------------------------------
+// SQL row mappers — convert snake_case SQL rows to camelCase API objects
+// ---------------------------------------------------------------------------
+
+function _sqlQuery(sql, params = []) {
+  const stmt = db.prepare(sql)
+  stmt.bind(params)
+  const rows = []
+  while (stmt.step()) rows.push(stmt.getAsObject())
+  stmt.free()
+  return rows
+}
+
+function _sqlQueryOne(sql, params = []) {
+  const rows = _sqlQuery(sql, params)
+  return rows.length > 0 ? rows[0] : null
+}
+
+function mapIssueRow(row) {
+  return {
+    id: row.id,
+    key: row.key,
+    title: row.title,
+    description: row.description || '',
+    type: row.type,
+    status: row.status,
+    priority: row.priority,
+    storyPoints: row.story_points || null,
+    assignee: row.assignee || null,
+    epicId: row.epic_id || null,
+    sprintId: row.sprint_id || null,
+    labels: row.labels ? JSON.parse(row.labels) : [],
+    linkedIssueKeys: row.linked_issue_keys ? JSON.parse(row.linked_issue_keys) : [],
+    createdBy: row.created_by || null,
+    createdByReasoning: row.created_by_reasoning || null,
+    createdByConfidence: row.created_by_confidence || null,
+    todoAt: row.todo_at || null,
+    inProgressAt: row.in_progress_at || null,
+    blockedAt: row.blocked_at || null,
+    doneAt: row.done_at || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    comments: [], // populated separately
+  }
+}
+
+function mapCommentRow(row) {
+  return {
+    id: row.id,
+    author: row.author || null,
+    body: row.body,
+    createdAt: row.created_at,
+  }
+}
+
+function mapSprintRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    goal: row.goal || null,
+    startDate: row.start_date || null,
+    endDate: row.end_date || null,
+    status: row.status || 'planning',
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapPageRow(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    content: row.content || '',
+    parentId: row.parent_id || null,
+    status: row.status || null,
+    createdBy: row.created_by || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapDecisionRow(row) {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description || '',
+    rationale: row.rationale || '',
+    status: row.status || 'proposed',
+    author: row.author || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapPhaseRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description || '',
+    status: row.status || 'pending',
+    progress: row.progress || 0,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapMilestoneRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description || '',
+    dueDate: row.due_date || null,
+    completed: row.completed === 1 || row.completed === true,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapWorkflowNodeRow(row) {
+  return {
+    id: row.id,
+    parentNodeId: row.parent_node_id || null,
+    title: row.title,
+    description: row.description || '',
+    type: row.type || null,
+    status: row.status || 'pending',
+    linkedIssueKeys: row.linked_issue_keys ? JSON.parse(row.linked_issue_keys) : [],
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapWorkflowConnectionRow(row) {
+  return {
+    id: row.id,
+    from: row.from_node_id,
+    to: row.to_node_id,
+    type: row.type || null,
+  }
+}
+
+function mapArchComponentRow(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description || '',
+    type: row.type || null,
+    tech: row.tech || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function mapArchConnectionRow(row) {
+  return {
+    id: row.id,
+    from: row.from_component_id,
+    to: row.to_component_id,
+    type: row.type || null,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Internal raw SQL helpers — always read from normalized tables (no mode check)
+// Used by getProject reconstruction and by read functions in normalized mode
+// ---------------------------------------------------------------------------
+
+function _listCommentsForIssue(issueId) {
+  const rows = _sqlQuery(
+    'SELECT id, body, author, created_at FROM comments WHERE issue_id = ? ORDER BY created_at ASC',
+    [issueId]
+  )
+  return rows.map(mapCommentRow)
+}
+
+function _listIssuesRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM issues WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  const issues = rows.map(mapIssueRow)
+  // Populate comments for each issue
+  for (const issue of issues) {
+    issue.comments = _listCommentsForIssue(issue.id)
+  }
+  return issues
+}
+
+function _listSprintsRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM sprints WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  return rows.map(mapSprintRow)
+}
+
+function _listPagesRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM pages WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  return rows.map(mapPageRow)
+}
+
+function _listDecisionsRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM decisions WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  return rows.map(mapDecisionRow)
+}
+
+function _listPhasesRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM phases WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  return rows.map(mapPhaseRow)
+}
+
+function _listMilestonesRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM milestones WHERE project_id = ? ORDER BY created_at ASC', [
+    projectId,
+  ])
+  return rows.map(mapMilestoneRow)
+}
+
+function _buildWorkflowTree(projectId) {
+  const rows = _sqlQuery(
+    'SELECT * FROM workflow_nodes WHERE project_id = ? ORDER BY created_at ASC',
+    [projectId]
+  )
+  const allNodes = rows.map(mapWorkflowNodeRow)
+
+  // Group children by parent_node_id
+  const childrenMap = new Map()
+  const topLevel = []
+  for (const node of allNodes) {
+    if (node.parentNodeId) {
+      if (!childrenMap.has(node.parentNodeId)) childrenMap.set(node.parentNodeId, [])
+      childrenMap.get(node.parentNodeId).push(node)
+    } else {
+      topLevel.push(node)
+    }
+  }
+
+  // Recursively attach children
+  function attachChildren(node) {
+    const kids = childrenMap.get(node.id) || []
+    if (kids.length > 0) {
+      node.children = { nodes: kids.map(attachChildren) }
+    }
+    // Remove the internal parentNodeId — the blob format doesn't include it at top level
+    delete node.parentNodeId
+    return node
+  }
+
+  return topLevel.map(attachChildren)
+}
+
+function _listWorkflowConnectionsRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM workflow_connections WHERE project_id = ?', [projectId])
+  return rows.map(mapWorkflowConnectionRow)
+}
+
+function _listArchComponentsRaw(projectId) {
+  const rows = _sqlQuery(
+    'SELECT * FROM architecture_components WHERE project_id = ? ORDER BY created_at ASC',
+    [projectId]
+  )
+  return rows.map(mapArchComponentRow)
+}
+
+function _listArchConnectionsRaw(projectId) {
+  const rows = _sqlQuery('SELECT * FROM architecture_connections WHERE project_id = ?', [projectId])
+  return rows.map(mapArchConnectionRow)
+}
+
+/** Check if we should read from normalized SQL tables */
+function _useNormalizedReads() {
+  const mode = getMigrationMode()
+  return mode === 'read_normalized' || mode === 'normalized'
+}
+
+// ---------------------------------------------------------------------------
 // Migration from JSON
 // ---------------------------------------------------------------------------
 
