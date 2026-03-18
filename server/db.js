@@ -379,6 +379,34 @@ export function withProjectLock(projectId, fn) {
 }
 
 // ---------------------------------------------------------------------------
+// Migration mode — controls read/write behavior during JSON → SQL migration
+// Modes: shadow_write → read_normalized → normalized
+// ---------------------------------------------------------------------------
+const VALID_MIGRATION_MODES = ['shadow_write', 'read_normalized', 'normalized']
+let _migrationModeCache = null
+
+export function getMigrationMode() {
+  if (_migrationModeCache) return _migrationModeCache
+  const result = db.exec("SELECT value FROM migration_state WHERE key = 'mode'")
+  _migrationModeCache = result.length > 0 ? result[0].values[0][0] : 'shadow_write'
+  return _migrationModeCache
+}
+
+export function setMigrationMode(mode) {
+  if (!VALID_MIGRATION_MODES.includes(mode)) {
+    throw new Error(
+      'Invalid migration mode: ' + mode + '. Must be one of: ' + VALID_MIGRATION_MODES.join(', ')
+    )
+  }
+  db.run("UPDATE migration_state SET value = ?, updated_at = ? WHERE key = 'mode'", [
+    mode,
+    new Date().toISOString(),
+  ])
+  _migrationModeCache = mode
+  scheduleSave()
+}
+
+// ---------------------------------------------------------------------------
 // Migration from JSON
 // ---------------------------------------------------------------------------
 
