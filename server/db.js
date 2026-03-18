@@ -1746,6 +1746,27 @@ export function addArchitectureComponent(projectId, component) {
   project.architecture.components.push(newComp)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO architecture_components
+        (id, project_id, name, description, type, tech, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newComp.id,
+        projectId,
+        newComp.name || '',
+        newComp.description || null,
+        newComp.type || null,
+        newComp.tech || null,
+        newComp.createdAt,
+        newComp.updatedAt,
+      ]
+    )
+  }
+
   return newComp
 }
 
@@ -1759,6 +1780,27 @@ export function updateArchitectureComponent(projectId, componentId, updates) {
   Object.assign(comp, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO architecture_components
+        (id, project_id, name, description, type, tech, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        comp.id,
+        projectId,
+        comp.name || '',
+        comp.description || null,
+        comp.type || null,
+        comp.tech || null,
+        comp.createdAt || now,
+        comp.updatedAt || now,
+      ]
+    )
+  }
+
   return comp
 }
 
@@ -1776,6 +1818,20 @@ export function deleteArchitectureComponent(projectId, componentId) {
   }
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized tables
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      'DELETE FROM architecture_connections WHERE (from_component_id = ? OR to_component_id = ?) AND project_id = ?',
+      [componentId, componentId, projectId]
+    )
+    db.run('DELETE FROM architecture_components WHERE id = ? AND project_id = ?', [
+      componentId,
+      projectId,
+    ])
+  }
+
   return true
 }
 
