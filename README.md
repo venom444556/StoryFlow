@@ -135,7 +135,7 @@ cli/                 Agent CLI (npm: storyflow-cli)
                      architecture, decisions, phases, milestones, events, etc.
 server/              Express backend
   app.js             API routes + middleware
-  db.js              SQLite data layer (sql.js, JSON blob per project)
+  db.js              SQLite data layer (sql.js, normalized tables per entity)
   events.js          Transparency event stream, causal chains
   intelligence.js    AI steering, confidence scoring, gate enforcement
   ws.js              WebSocket server for real-time updates
@@ -151,7 +151,7 @@ src/
     architecture/    Component tree (ComponentDetail, DependencyGraph)
     timeline/        Gantt chart (GanttChart, GanttBar, GanttMilestone, GanttTimeAxis)
     decisions/       Decision records (DecisionCard, DecisionForm)
-  stores/            Zustand stores (projects, events, UI)
+  stores/            Zustand stores (entity-specific: issues, sprints, pages, etc.)
   styles/            Design tokens (tokens.css)
   utils/             Markdown parser, sanitizer, export/import
 plugin/              Claude Code plugin (hooks, agent prompt, skills)
@@ -159,9 +159,24 @@ plugin/              Claude Code plugin (hooks, agent prompt, skills)
 
 ### Data Model
 
-Each project contains: board (issues + sprints), wiki pages, workflow (node graph), architecture (component tree), timeline (phases + milestones), and decisions. All stored as a JSON blob in SQLite with per-project write locks.
+Fully normalized SQL schema — 12 tables with foreign keys, indexes, and CASCADE deletes:
 
-Issue lifecycle timestamps (`todoAt`, `inProgressAt`, `blockedAt`, `doneAt`) enable cycle time and blocked time analytics.
+| Table | Description |
+|-------|-------------|
+| `projects` | Project metadata, status, next issue number |
+| `issues` | Board items with status timestamps, epic/sprint FKs |
+| `comments` | Issue comments (extracted from issue nesting) |
+| `sprints` | Sprint planning with goals and date ranges |
+| `pages` | Wiki pages with parent hierarchy |
+| `decisions` | Architecture Decision Records |
+| `phases` | Timeline phases with progress tracking |
+| `milestones` | Timeline milestones with due dates |
+| `workflow_nodes` | Workflow canvas nodes with nested children |
+| `workflow_connections` | Node-to-node edges |
+| `architecture_components` | System components with tech stack |
+| `architecture_connections` | Component dependencies |
+
+Issue lifecycle timestamps (`todoAt`, `inProgressAt`, `blockedAt`, `doneAt`) enable cycle time and blocked time analytics. Snapshots store per-entity state for granular undo.
 
 ### Design Tokens
 
@@ -178,7 +193,7 @@ Two themes via semantic CSS variables:
 | Backend | Express 4, sql.js (SQLite), WebSocket |
 | CLI | Commander.js, chalk |
 | Virtualization | @tanstack/react-virtual |
-| Persistence | SQLite (server), Dexie/IndexedDB (client) |
+| Persistence | SQLite (server, normalized tables — server is source of truth) |
 
 ## Commands
 
