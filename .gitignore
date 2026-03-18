@@ -50,6 +50,9 @@ workflow-execution-engine.jsx
 .chaos/
 .playwright-mcp/
 
+# Git worktrees
+.worktrees/
+
 # Internal planning docs
 docs/plans/
 
