@@ -1991,6 +1991,34 @@ export function addProject(project) {
   })
 
   upsertProject(id, newProject)
+
+  // Shadow write auto-scaffolded pages + next_issue_number to normalized tables
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('UPDATE projects SET next_issue_number = ? WHERE id = ?', [
+      newProject.board?.nextIssueNumber || 1,
+      id,
+    ])
+    for (const p of newProject.pages) {
+      db.run(
+        `INSERT OR REPLACE INTO pages
+          (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          p.id,
+          id,
+          p.title || '',
+          p.content || null,
+          p.parentId || null,
+          p.status || null,
+          p.createdBy || null,
+          p.createdAt || now,
+          p.updatedAt || now,
+        ]
+      )
+    }
+  }
+
   return newProject
 }
 
