@@ -19,6 +19,11 @@ const JSON_BACKUP_PATH = join(DATA_DIR, 'storyflow-data.json.backup')
 let db = null
 let _saveTimer = null
 
+/** Expose the raw sql.js database handle (for verify, migrate, etc.) */
+export function getRawDb() {
+  return db
+}
+
 // ---------------------------------------------------------------------------
 // Initialization
 // ---------------------------------------------------------------------------

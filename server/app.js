@@ -26,6 +26,7 @@ import {
   checkTitleDuplication,
   emitHygieneEvents,
 } from './intelligence.js'
+import { verifyAll } from './verify.js'
 
 const app = express()
 
@@ -280,6 +281,48 @@ function validateProjectId(req, res, next) {
   next()
 }
 app.param('id', validateProjectId)
+
+// ---------------------------------------------------------------------------
+// Migration endpoints — global (not project-scoped)
+// ---------------------------------------------------------------------------
+
+app.get('/api/migrate/status', (_req, res) => {
+  res.json({ mode: db.getMigrationMode() })
+})
+
+app.post('/api/migrate/verify', (_req, res) => {
+  try {
+    const rawDb = db.getRawDb()
+    const results = verifyAll(rawDb, db.listProjects, db.getProject)
+    res.json(results)
+  } catch (err) {
+    res.status(500).json({ error: 'Verification failed: ' + err.message })
+  }
+})
+
+const MIGRATION_SEQUENCE = ['shadow_write', 'read_normalized', 'normalized']
+
+app.post('/api/migrate/advance', (_req, res) => {
+  const current = db.getMigrationMode()
+  const idx = MIGRATION_SEQUENCE.indexOf(current)
+  if (idx === MIGRATION_SEQUENCE.length - 1) {
+    return res.status(400).json({ error: `Already at final mode: ${current}` })
+  }
+  const next = MIGRATION_SEQUENCE[idx + 1]
+  db.setMigrationMode(next)
+  res.json({ previous: current, mode: next })
+})
+
+app.post('/api/migrate/rollback', (_req, res) => {
+  const current = db.getMigrationMode()
+  const idx = MIGRATION_SEQUENCE.indexOf(current)
+  if (idx === 0) {
+    return res.status(400).json({ error: `Already at initial mode: ${current}` })
+  }
+  const prev = MIGRATION_SEQUENCE[idx - 1]
+  db.setMigrationMode(prev)
+  res.json({ previous: current, mode: prev })
+})
 
 // ---------------------------------------------------------------------------
 // Snapshot helper — Phase 3
