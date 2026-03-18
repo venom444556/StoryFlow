@@ -1327,6 +1327,27 @@ export function addPhase(projectId, phase) {
   project.timeline.phases.push(newPhase)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO phases
+        (id, project_id, name, description, status, progress, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newPhase.id,
+        projectId,
+        newPhase.name || '',
+        newPhase.description || null,
+        newPhase.status || 'pending',
+        newPhase.progress || 0,
+        newPhase.createdAt,
+        newPhase.updatedAt,
+      ]
+    )
+  }
+
   return newPhase
 }
 
@@ -1340,6 +1361,27 @@ export function updatePhase(projectId, phaseId, updates) {
   Object.assign(phase, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO phases
+        (id, project_id, name, description, status, progress, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        phase.id,
+        projectId,
+        phase.name || '',
+        phase.description || null,
+        phase.status || 'pending',
+        phase.progress || 0,
+        phase.createdAt || now,
+        phase.updatedAt || now,
+      ]
+    )
+  }
+
   return phase
 }
 
@@ -1351,6 +1393,13 @@ export function deletePhase(projectId, phaseId) {
   project.timeline.phases.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('DELETE FROM phases WHERE id = ? AND project_id = ?', [phaseId, projectId])
+  }
+
   return true
 }
 
@@ -1380,6 +1429,27 @@ export function addMilestone(projectId, milestone) {
   project.timeline.milestones.push(newMilestone)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO milestones
+        (id, project_id, name, description, due_date, completed, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newMilestone.id,
+        projectId,
+        newMilestone.name || '',
+        newMilestone.description || null,
+        newMilestone.dueDate || null,
+        newMilestone.completed ? 1 : 0,
+        newMilestone.createdAt,
+        newMilestone.updatedAt,
+      ]
+    )
+  }
+
   return newMilestone
 }
 
@@ -1393,6 +1463,27 @@ export function updateMilestone(projectId, milestoneId, updates) {
   Object.assign(milestone, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO milestones
+        (id, project_id, name, description, due_date, completed, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        milestone.id,
+        projectId,
+        milestone.name || '',
+        milestone.description || null,
+        milestone.dueDate || null,
+        milestone.completed ? 1 : 0,
+        milestone.createdAt || now,
+        milestone.updatedAt || now,
+      ]
+    )
+  }
+
   return milestone
 }
 
@@ -1404,6 +1495,13 @@ export function deleteMilestone(projectId, milestoneId) {
   project.timeline.milestones.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('DELETE FROM milestones WHERE id = ? AND project_id = ?', [milestoneId, projectId])
+  }
+
   return true
 }
 
