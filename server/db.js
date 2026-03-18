@@ -99,6 +99,224 @@ export async function initDb() {
     'CREATE INDEX IF NOT EXISTS idx_snapshots_project ON snapshots(project_id, created_at DESC)'
   )
 
+  // -------------------------------------------------------------------------
+  // Normalized entity tables (Phase 1: shadow-write migration)
+  // These tables mirror data currently stored in the projects.data JSON blob.
+  // During migration, writes go to both JSON and these tables.
+  // -------------------------------------------------------------------------
+
+  // Add next_issue_number to projects if missing (for normalized issue key generation)
+  try {
+    db.run('ALTER TABLE projects ADD COLUMN next_issue_number INTEGER DEFAULT 1')
+  } catch (_) {
+    // Column already exists — safe to ignore
+  }
+
+  // Sprints (must come before issues due to FK dependency)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS sprints (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      goal TEXT,
+      start_date TEXT,
+      end_date TEXT,
+      status TEXT DEFAULT 'planning',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_sprints_project ON sprints(project_id)')
+
+  // Issues
+  db.run(`
+    CREATE TABLE IF NOT EXISTS issues (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      key TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      type TEXT DEFAULT 'task',
+      status TEXT DEFAULT 'To Do',
+      priority TEXT DEFAULT 'medium',
+      story_points INTEGER,
+      assignee TEXT,
+      epic_id TEXT REFERENCES issues(id) ON DELETE SET NULL,
+      sprint_id TEXT REFERENCES sprints(id) ON DELETE SET NULL,
+      labels TEXT,
+      linked_issue_keys TEXT,
+      created_by TEXT,
+      created_by_reasoning TEXT,
+      created_by_confidence REAL,
+      todo_at TEXT,
+      in_progress_at TEXT,
+      blocked_at TEXT,
+      done_at TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE(project_id, key)
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_issues_project ON issues(project_id)')
+  db.run('CREATE INDEX IF NOT EXISTS idx_issues_status ON issues(project_id, status)')
+  db.run('CREATE INDEX IF NOT EXISTS idx_issues_epic ON issues(epic_id)')
+  db.run('CREATE INDEX IF NOT EXISTS idx_issues_sprint ON issues(sprint_id)')
+
+  // Comments
+  db.run(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id TEXT PRIMARY KEY,
+      issue_id TEXT NOT NULL REFERENCES issues(id) ON DELETE CASCADE,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      body TEXT NOT NULL,
+      author TEXT,
+      created_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_comments_issue ON comments(issue_id)')
+
+  // Pages (wiki)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS pages (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      content TEXT,
+      parent_id TEXT,
+      status TEXT,
+      created_by TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_pages_project ON pages(project_id)')
+
+  // Decisions
+  db.run(`
+    CREATE TABLE IF NOT EXISTS decisions (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT,
+      rationale TEXT,
+      status TEXT DEFAULT 'proposed',
+      author TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_decisions_project ON decisions(project_id)')
+
+  // Phases
+  db.run(`
+    CREATE TABLE IF NOT EXISTS phases (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      status TEXT DEFAULT 'pending',
+      progress REAL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_phases_project ON phases(project_id)')
+
+  // Milestones
+  db.run(`
+    CREATE TABLE IF NOT EXISTS milestones (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      due_date TEXT,
+      completed INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_milestones_project ON milestones(project_id)')
+
+  // Workflow nodes
+  db.run(`
+    CREATE TABLE IF NOT EXISTS workflow_nodes (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      parent_node_id TEXT REFERENCES workflow_nodes(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT,
+      type TEXT,
+      status TEXT DEFAULT 'pending',
+      linked_issue_keys TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_workflow_nodes_project ON workflow_nodes(project_id)')
+  db.run('CREATE INDEX IF NOT EXISTS idx_workflow_nodes_parent ON workflow_nodes(parent_node_id)')
+
+  // Workflow connections
+  db.run(`
+    CREATE TABLE IF NOT EXISTS workflow_connections (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      from_node_id TEXT NOT NULL REFERENCES workflow_nodes(id) ON DELETE CASCADE,
+      to_node_id TEXT NOT NULL REFERENCES workflow_nodes(id) ON DELETE CASCADE,
+      type TEXT
+    )
+  `)
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_workflow_connections_project ON workflow_connections(project_id)'
+  )
+
+  // Architecture components
+  db.run(`
+    CREATE TABLE IF NOT EXISTS architecture_components (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      type TEXT,
+      tech TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_arch_components_project ON architecture_components(project_id)'
+  )
+
+  // Architecture connections
+  db.run(`
+    CREATE TABLE IF NOT EXISTS architecture_connections (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      from_component_id TEXT NOT NULL REFERENCES architecture_components(id) ON DELETE CASCADE,
+      to_component_id TEXT NOT NULL REFERENCES architecture_components(id) ON DELETE CASCADE,
+      type TEXT
+    )
+  `)
+  db.run(
+    'CREATE INDEX IF NOT EXISTS idx_arch_connections_project ON architecture_connections(project_id)'
+  )
+
+  // Migration state — tracks which mode we're in (shadow_write → read_normalized → normalized)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS migration_state (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `)
+  // Seed default migration mode if table is empty
+  const modeCheck = db.exec("SELECT COUNT(*) FROM migration_state WHERE key = 'mode'")
+  if (modeCheck[0].values[0][0] === 0) {
+    db.run(
+      "INSERT INTO migration_state (key, value, updated_at) VALUES ('mode', 'shadow_write', ?)",
+      [new Date().toISOString()]
+    )
+  }
+
   // Initialize event stream table
   initEvents(db)
 
