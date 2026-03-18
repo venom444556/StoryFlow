@@ -785,8 +785,65 @@ export function listProjects() {
   }))
 }
 
-/** Get a single project by ID (full data — parses JSON blob) */
+/** Get a single project by ID (full data — parses JSON blob or reconstructs from SQL) */
 export function getProject(id) {
+  // --- Normalized mode: reconstruct full project from SQL tables ---
+  if (_useNormalizedReads()) {
+    const row = _sqlQueryOne(
+      'SELECT id, name, description, status, created_at, updated_at, deleted_at, is_seed, seed_version, next_issue_number FROM projects WHERE id = ? AND deleted_at IS NULL',
+      [id]
+    )
+    if (!row) return null
+
+    const project = {
+      id: row.id,
+      name: row.name,
+      description: row.description || '',
+      status: row.status || 'planning',
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      deletedAt: row.deleted_at || null,
+      isSeed: row.is_seed === 1,
+      seedVersion: row.seed_version || null,
+    }
+
+    // Board: issues + sprints + nextIssueNumber
+    const issues = _listIssuesRaw(id)
+    const sprints = _listSprintsRaw(id)
+    project.board = {
+      issues,
+      sprints,
+      nextIssueNumber: row.next_issue_number || 1,
+    }
+
+    // Pages
+    project.pages = _listPagesRaw(id)
+
+    // Decisions
+    project.decisions = _listDecisionsRaw(id)
+
+    // Timeline
+    project.timeline = {
+      phases: _listPhasesRaw(id),
+      milestones: _listMilestonesRaw(id),
+    }
+
+    // Workflow
+    project.workflow = {
+      nodes: _buildWorkflowTree(id),
+      connections: _listWorkflowConnectionsRaw(id),
+    }
+
+    // Architecture
+    project.architecture = {
+      components: _listArchComponentsRaw(id),
+      connections: _listArchConnectionsRaw(id),
+    }
+
+    return project
+  }
+
+  // --- Blob read path (shadow_write mode) ---
   const results = db.exec('SELECT data FROM projects WHERE id = ? AND deleted_at IS NULL', [id])
   if (results.length === 0 || results[0].values.length === 0) return null
   return JSON.parse(results[0].values[0][0])
