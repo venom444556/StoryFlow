@@ -401,6 +401,15 @@ export const safety = {
     }),
 }
 
+// --- Migration ---
+
+export const migrate = {
+  status: () => request('/api/migrate/status'),
+  verify: () => request('/api/migrate/verify', { method: 'POST', body: '{}' }),
+  advance: () => request('/api/migrate/advance', { method: 'POST', body: '{}' }),
+  rollback: () => request('/api/migrate/rollback', { method: 'POST', body: '{}' }),
+}
+
 // --- Health ---
 
 export async function checkConnection() {
