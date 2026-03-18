@@ -707,6 +707,51 @@ export function addIssue(projectId, issue) {
   project.updatedAt = now
   maybeAdvanceProjectPhase(project)
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO issues
+        (id, project_id, key, title, description, type, status, priority,
+         story_points, assignee, epic_id, sprint_id,
+         labels, linked_issue_keys,
+         created_by, created_by_reasoning, created_by_confidence,
+         todo_at, in_progress_at, blocked_at, done_at,
+         created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newIssue.id,
+        projectId,
+        newIssue.key,
+        newIssue.title || '',
+        newIssue.description || null,
+        newIssue.type || 'task',
+        newIssue.status || 'To Do',
+        newIssue.priority || 'medium',
+        newIssue.storyPoints || null,
+        newIssue.assignee || null,
+        newIssue.epicId || null,
+        newIssue.sprintId || null,
+        newIssue.labels ? JSON.stringify(newIssue.labels) : null,
+        newIssue.linkedIssueKeys ? JSON.stringify(newIssue.linkedIssueKeys) : null,
+        newIssue.createdBy || null,
+        newIssue.createdByReasoning || null,
+        newIssue.createdByConfidence || null,
+        newIssue.todoAt || null,
+        newIssue.inProgressAt || null,
+        newIssue.blockedAt || null,
+        newIssue.doneAt || null,
+        newIssue.createdAt,
+        newIssue.updatedAt,
+      ]
+    )
+    db.run('UPDATE projects SET next_issue_number = ? WHERE id = ?', [
+      project.board.nextIssueNumber,
+      projectId,
+    ])
+  }
+
   return newIssue
 }
 
@@ -739,6 +784,47 @@ export function updateIssue(projectId, issueId, updates) {
   project.updatedAt = now
   maybeAdvanceProjectPhase(project)
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO issues
+        (id, project_id, key, title, description, type, status, priority,
+         story_points, assignee, epic_id, sprint_id,
+         labels, linked_issue_keys,
+         created_by, created_by_reasoning, created_by_confidence,
+         todo_at, in_progress_at, blocked_at, done_at,
+         created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        issue.id,
+        projectId,
+        issue.key,
+        issue.title || '',
+        issue.description || null,
+        issue.type || 'task',
+        issue.status || 'To Do',
+        issue.priority || 'medium',
+        issue.storyPoints || null,
+        issue.assignee || null,
+        issue.epicId || null,
+        issue.sprintId || null,
+        issue.labels ? JSON.stringify(issue.labels) : null,
+        issue.linkedIssueKeys ? JSON.stringify(issue.linkedIssueKeys) : null,
+        issue.createdBy || null,
+        issue.createdByReasoning || null,
+        issue.createdByConfidence || null,
+        issue.todoAt || null,
+        issue.inProgressAt || null,
+        issue.blockedAt || null,
+        issue.doneAt || null,
+        issue.createdAt || now,
+        issue.updatedAt || now,
+      ]
+    )
+  }
+
   return issue
 }
 
@@ -781,6 +867,24 @@ export function addComment(projectId, issueId, comment) {
   issue.updatedAt = now
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO comments (id, issue_id, project_id, body, author, created_at)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        newComment.id,
+        issueId,
+        projectId,
+        newComment.body || '',
+        newComment.author || null,
+        newComment.createdAt,
+      ]
+    )
+  }
+
   return newComment
 }
 
@@ -795,9 +899,21 @@ export function deleteIssue(projectId, issueId) {
   if (!project || !project.board?.issues) return false
   const idx = project.board.issues.findIndex((i) => i.id === issueId)
   if (idx === -1) return false
+  const deletedIssueId = project.board.issues[idx].id
   project.board.issues.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized tables
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('DELETE FROM comments WHERE issue_id = ? AND project_id = ?', [
+      deletedIssueId,
+      projectId,
+    ])
+    db.run('DELETE FROM issues WHERE id = ? AND project_id = ?', [deletedIssueId, projectId])
+  }
+
   return true
 }
 
