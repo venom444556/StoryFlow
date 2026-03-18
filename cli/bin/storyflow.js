@@ -43,7 +43,6 @@ const commands = await Promise.all([
   import('../src/commands/events.js'),
   import('../src/commands/board.js'),
   import('../src/commands/agent.js'),
-  import('../src/commands/migrate.js'),
 ])
 
 for (const mod of commands) {
