@@ -1,9 +1,23 @@
 import { useCallback, useMemo } from 'react'
 import { useProjectsStore } from '../stores/projectsStore'
+// New entity stores — API-backed, will replace blob-based actions in Task 33
+import { useIssuesStore } from '../stores/issuesStore'
+import { useSprintsStore } from '../stores/sprintsStore'
+import { usePagesStore } from '../stores/pagesStore'
+import { useDecisionsStore } from '../stores/decisionsStore'
+import { useTimelineStore } from '../stores/timelineStore'
+import { useWorkflowStore } from '../stores/workflowStore'
+import { useArchitectureStore } from '../stores/architectureStore'
 
 /**
  * Hook for working with a single project
  * Now powered by Zustand for optimized re-renders
+ *
+ * Migration note (Task 31): This hook currently delegates entity mutations to
+ * the monolithic projectsStore (blob-based, in-memory). The new entity stores
+ * are imported and available via the `stores` property for components that want
+ * to start using API-backed mutations. In Task 33, all blob-based actions will
+ * be replaced with entity store actions.
  */
 export function useProject(projectId) {
   // Use a stable selector to avoid infinite loops
@@ -239,6 +253,24 @@ export function useProject(projectId) {
       updateSprint,
       deleteSprint,
       closeSprint,
+
+      // -----------------------------------------------------------------------
+      // New entity stores (API-backed) — migration prep for Task 33
+      // -----------------------------------------------------------------------
+      // Components can start using these directly for reads/mutations.
+      // Each store talks to per-entity REST endpoints and manages its own state.
+      // Usage: const { stores } = useProject(id)
+      //        stores.issues.fetchIssues(id)
+      //        stores.pages.createPage(id, { title: '...' })
+      stores: {
+        issues: useIssuesStore,
+        sprints: useSprintsStore,
+        pages: usePagesStore,
+        decisions: useDecisionsStore,
+        timeline: useTimelineStore,
+        workflow: useWorkflowStore,
+        architecture: useArchitectureStore,
+      },
     }),
     [
       project,
