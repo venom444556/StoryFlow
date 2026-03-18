@@ -182,7 +182,7 @@ export async function initDb() {
       project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
       title TEXT NOT NULL,
       content TEXT,
-      parent_id TEXT,
+      parent_id TEXT REFERENCES pages(id) ON DELETE SET NULL,
       status TEXT,
       created_by TEXT,
       created_at TEXT NOT NULL,
