@@ -1041,6 +1041,28 @@ export function addPage(projectId, page) {
   project.pages.push(newPage)
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO pages
+        (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        newPage.id,
+        projectId,
+        newPage.title || '',
+        newPage.content || null,
+        newPage.parentId || null,
+        newPage.status || null,
+        newPage.createdBy || null,
+        newPage.createdAt,
+        newPage.updatedAt,
+      ]
+    )
+  }
+
   return newPage
 }
 
@@ -1054,6 +1076,28 @@ export function updatePage(projectId, pageId, updates) {
   Object.assign(page, updates, { updatedAt: now })
   project.updatedAt = now
   upsertProject(projectId, project)
+
+  // Shadow write to normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run(
+      `INSERT OR REPLACE INTO pages
+        (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        page.id,
+        projectId,
+        page.title || '',
+        page.content || null,
+        page.parentId || null,
+        page.status || null,
+        page.createdBy || null,
+        page.createdAt || now,
+        page.updatedAt || now,
+      ]
+    )
+  }
+
   return page
 }
 
@@ -1065,6 +1109,13 @@ export function deletePage(projectId, pageId) {
   project.pages.splice(idx, 1)
   project.updatedAt = new Date().toISOString()
   upsertProject(projectId, project)
+
+  // Shadow delete from normalized table
+  const mode = getMigrationMode()
+  if (mode === 'shadow_write' || mode === 'read_normalized') {
+    db.run('DELETE FROM pages WHERE id = ? AND project_id = ?', [pageId, projectId])
+  }
+
   return true
 }
 
