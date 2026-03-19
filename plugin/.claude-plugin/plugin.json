@@ -1,7 +1,7 @@
 {
   "name": "storyflow",
-  "version": "3.0.0",
-  "description": "Integrate Claude Code with StoryFlow project management via CLI — issues, sprints, wiki, AI transparency, agent autonomy, and git reconciliation.",
+  "version": "4.0.0",
+  "description": "Integrate Claude Code with StoryFlow project management via CLI — enforcement hooks, auto-sync, pre-commit gates, and session lifecycle management.",
   "author": {
     "name": "StoryFlow",
     "url": "https://github.com/venom444556/StoryFlow"
