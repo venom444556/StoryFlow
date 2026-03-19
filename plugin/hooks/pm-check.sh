@@ -41,7 +41,10 @@ cmd_increment() {
     nudged=true
     write_state
     cat <<'NUDGE'
-PM Check-in: You've made 5+ file changes this session with no active plan or StoryFlow tracking. Want me to organize this work into a StoryFlow plan? I'll create an epic and issues from what you've been working on. Invoke the storyflow-agent with the PM intervention reference if the user accepts. (Say "yes" or keep going — I won't ask again until the next cycle.)
+5+ file changes with no StoryFlow tracking. Create an issue NOW for the work you are doing:
+  storyflow issues create --title "..." --type story --priority medium
+  storyflow issues update <key> --status "In Progress"
+You will not be able to commit without an In Progress issue.
 NUDGE
   else
     write_state
