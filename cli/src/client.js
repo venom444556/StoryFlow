@@ -401,6 +401,16 @@ export const safety = {
     }),
 }
 
+// --- Operational & Context ---
+
+export const operational = {
+  context: (pid) => request(`/api/projects/${enc(pid)}/context`),
+  get: (pid) => request(`/api/projects/${enc(pid)}/operational`),
+  search: (pid, q, opts = {}) =>
+    request(`/api/projects/${enc(pid)}/search${qs({ q, types: opts.types, limit: opts.limit })}`),
+  resolve: (pid, type, ref) => request(`/api/projects/${enc(pid)}/resolve${qs({ type, ref })}`),
+}
+
 // --- Health ---
 
 export async function checkConnection() {

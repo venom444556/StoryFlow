@@ -129,6 +129,32 @@ export async function initDb() {
     // Column already exists — safe to ignore
   }
 
+  // Wire-now: add missing columns identified by contract audit (2026-03-24)
+  const wireNowColumns = [
+    // I-1: Issues nudge fields
+    ['issues', 'last_nudge_message', 'TEXT'],
+    ['issues', 'last_nudge_author', 'TEXT'],
+    // P-1: Pages icon
+    ['pages', 'icon', 'TEXT'],
+    // PH-1/PH-2/PH-3: Phases timeline fields
+    ['phases', 'start_date', 'TEXT'],
+    ['phases', 'end_date', 'TEXT'],
+    ['phases', 'deliverables', 'TEXT'],
+    ['phases', 'color', 'TEXT'],
+    // MS-2: Milestones phase linkage and color
+    ['milestones', 'phase_id', 'TEXT'],
+    ['milestones', 'color', 'TEXT'],
+    // S-1: Sessions agent identity
+    ['agent_sessions', 'agent_id', 'TEXT'],
+  ]
+  for (const [table, col, type] of wireNowColumns) {
+    try {
+      db.run(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`)
+    } catch (_) {
+      // Column already exists — safe to ignore
+    }
+  }
+
   // Sprints (must come before issues due to FK dependency)
   db.run(`
     CREATE TABLE IF NOT EXISTS sprints (
@@ -675,6 +701,8 @@ function mapIssueRow(row) {
     inProgressAt: row.in_progress_at || null,
     blockedAt: row.blocked_at || null,
     doneAt: row.done_at || null,
+    lastNudgeMessage: row.last_nudge_message || null,
+    lastNudgeAuthor: row.last_nudge_author || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     comments: [], // populated separately
@@ -709,6 +737,7 @@ function mapPageRow(row) {
     title: row.title,
     content: row.content || '',
     parentId: row.parent_id || null,
+    icon: row.icon || null,
     status: row.status || null,
     createdBy: row.created_by || null,
     createdAt: row.created_at,
@@ -736,6 +765,10 @@ function mapPhaseRow(row) {
     description: row.description || '',
     status: row.status || 'pending',
     progress: row.progress || 0,
+    startDate: row.start_date || null,
+    endDate: row.end_date || null,
+    deliverables: row.deliverables ? JSON.parse(row.deliverables) : [],
+    color: row.color || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -748,6 +781,8 @@ function mapMilestoneRow(row) {
     description: row.description || '',
     dueDate: row.due_date || null,
     completed: row.completed === 1 || row.completed === true,
+    phaseId: row.phase_id || null,
+    color: row.color || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -1298,8 +1333,9 @@ export function updateIssue(projectId, issueId, updates) {
        labels, linked_issue_keys,
        created_by, created_by_reasoning, created_by_confidence,
        todo_at, in_progress_at, blocked_at, done_at,
+       last_nudge_message, last_nudge_author,
        created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       merged.id,
       projectId,
@@ -1322,6 +1358,8 @@ export function updateIssue(projectId, issueId, updates) {
       merged.inProgressAt || null,
       merged.blockedAt || null,
       merged.doneAt || null,
+      merged.lastNudgeMessage || null,
+      merged.lastNudgeAuthor || null,
       merged.createdAt || now,
       merged.updatedAt,
     ]
@@ -1543,14 +1581,15 @@ export function addPage(projectId, page) {
 
   db.run(
     `INSERT OR REPLACE INTO pages
-      (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, title, content, parent_id, icon, status, created_by, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newPage.id,
       projectId,
       newPage.title || '',
       newPage.content || null,
       newPage.parentId || null,
+      newPage.icon || null,
       newPage.status || null,
       newPage.createdBy || null,
       newPage.createdAt,
@@ -1575,14 +1614,15 @@ export function updatePage(projectId, pageId, updates) {
 
   db.run(
     `INSERT OR REPLACE INTO pages
-      (id, project_id, title, content, parent_id, status, created_by, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, title, content, parent_id, icon, status, created_by, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       merged.id,
       projectId,
       merged.title || '',
       merged.content || null,
       merged.parentId || null,
+      merged.icon || null,
       merged.status || null,
       merged.createdBy || null,
       merged.createdAt || now,
@@ -1800,8 +1840,8 @@ export function addPhase(projectId, phase) {
 
   db.run(
     `INSERT OR REPLACE INTO phases
-      (id, project_id, name, description, status, progress, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, status, progress, start_date, end_date, deliverables, color, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newPhase.id,
       projectId,
@@ -1809,6 +1849,10 @@ export function addPhase(projectId, phase) {
       newPhase.description || null,
       newPhase.status || 'pending',
       newPhase.progress || 0,
+      newPhase.startDate || null,
+      newPhase.endDate || null,
+      newPhase.deliverables ? JSON.stringify(newPhase.deliverables) : null,
+      newPhase.color || null,
       newPhase.createdAt,
       newPhase.updatedAt,
     ]
@@ -1831,8 +1875,8 @@ export function updatePhase(projectId, phaseId, updates) {
 
   db.run(
     `INSERT OR REPLACE INTO phases
-      (id, project_id, name, description, status, progress, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, status, progress, start_date, end_date, deliverables, color, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       merged.id,
       projectId,
@@ -1840,6 +1884,10 @@ export function updatePhase(projectId, phaseId, updates) {
       merged.description || null,
       merged.status || 'pending',
       merged.progress || 0,
+      merged.startDate || null,
+      merged.endDate || null,
+      merged.deliverables ? JSON.stringify(merged.deliverables) : null,
+      merged.color || null,
       merged.createdAt || now,
       merged.updatedAt,
     ]
@@ -1885,15 +1933,17 @@ export function addMilestone(projectId, milestone) {
 
   db.run(
     `INSERT OR REPLACE INTO milestones
-      (id, project_id, name, description, due_date, completed, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, due_date, completed, phase_id, color, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newMilestone.id,
       projectId,
       newMilestone.name || '',
       newMilestone.description || null,
-      newMilestone.dueDate || null,
+      newMilestone.dueDate || newMilestone.date || null,
       newMilestone.completed ? 1 : 0,
+      newMilestone.phaseId || null,
+      newMilestone.color || null,
       newMilestone.createdAt,
       newMilestone.updatedAt,
     ]
@@ -1916,15 +1966,17 @@ export function updateMilestone(projectId, milestoneId, updates) {
 
   db.run(
     `INSERT OR REPLACE INTO milestones
-      (id, project_id, name, description, due_date, completed, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, due_date, completed, phase_id, color, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       merged.id,
       projectId,
       merged.name || '',
       merged.description || null,
-      merged.dueDate || null,
+      merged.dueDate || merged.date || null,
       merged.completed ? 1 : 0,
+      merged.phaseId || null,
+      merged.color || null,
       merged.createdAt || now,
       merged.updatedAt,
     ]
@@ -2807,8 +2859,8 @@ export function saveSessionSummary(projectId, session) {
     `INSERT OR REPLACE INTO agent_sessions
       (id, project_id, started_at, ended_at, summary, work_done,
        issues_created, issues_updated, events_recorded,
-       key_decisions, learnings, wiki_pages_updated, next_steps, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       key_decisions, learnings, wiki_pages_updated, next_steps, agent_id, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       projectId,
@@ -2823,6 +2875,7 @@ export function saveSessionSummary(projectId, session) {
       session.learnings || '',
       session.wiki_pages_updated || '',
       session.next_steps || '',
+      session.agent_id || session.agentId || null,
       now,
     ]
   )
@@ -2855,4 +2908,588 @@ export function listSessions(projectId, limit = 10) {
     for (let i = 0; i < cols.length; i++) session[cols[i]] = row[i]
     return session
   })
+}
+
+// ---------------------------------------------------------------------------
+// Operational Summary — lightweight snapshot for Dashboard/Overview
+// ---------------------------------------------------------------------------
+export function getOperationalSummary(projectId, options = { includeHygiene: false }) {
+  const projRow = _sqlQueryOne(
+    'SELECT id, name, status FROM projects WHERE id = ? AND deleted_at IS NULL',
+    [projectId]
+  )
+  if (!projRow) return null
+
+  // --- Board counts (same logic as getBoardSummary, just counts) ---
+  const statusRows = _sqlQuery(
+    'SELECT status, COUNT(*) as cnt FROM issues WHERE project_id = ? GROUP BY status',
+    [projectId]
+  )
+  const byStatus = { 'To Do': 0, 'In Progress': 0, Blocked: 0, Done: 0 }
+  let issueCount = 0
+  for (const r of statusRows) {
+    byStatus[r.status] = r.cnt
+    issueCount += r.cnt
+  }
+
+  const pointsRow = _sqlQueryOne(
+    `SELECT COALESCE(SUM(story_points), 0) as total,
+            COALESCE(SUM(CASE WHEN status = 'Done' THEN story_points ELSE 0 END), 0) as done
+     FROM issues WHERE project_id = ? AND story_points IS NOT NULL`,
+    [projectId]
+  )
+
+  // --- Active sprint ---
+  const activeSprintRow = _sqlQueryOne(
+    "SELECT id, name, goal, start_date, end_date, status FROM sprints WHERE project_id = ? AND status = 'active' LIMIT 1",
+    [projectId]
+  )
+
+  // --- Active blockers (issues with status = 'Blocked') ---
+  const blockerRows = _sqlQuery(
+    `SELECT id, key, title, updated_at FROM issues
+     WHERE project_id = ? AND status = 'Blocked'
+     ORDER BY updated_at DESC`,
+    [projectId]
+  )
+
+  // --- Stale issues (In Progress > 4 hours) ---
+  const STALE_THRESHOLD_MS = 4 * 60 * 60 * 1000
+  const staleThreshold = new Date(Date.now() - STALE_THRESHOLD_MS).toISOString()
+  const staleRows = _sqlQuery(
+    `SELECT id, key, title, updated_at FROM issues
+     WHERE project_id = ? AND status = 'In Progress' AND updated_at < ?`,
+    [projectId, staleThreshold]
+  )
+
+  // --- Last session (lightweight: summary + next_steps only) ---
+  const sessionRow = _sqlQueryOne(
+    'SELECT id, summary, next_steps, key_decisions, created_at FROM agent_sessions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1',
+    [projectId]
+  )
+
+  // --- Agent:* wiki pages (titles + IDs only) ---
+  const agentPageRows = _sqlQuery(
+    "SELECT id, title, updated_at FROM pages WHERE project_id = ? AND title LIKE 'Agent:%' ORDER BY title ASC",
+    [projectId]
+  )
+
+  // --- Last agent activity (most recent AI event) ---
+  const lastAgentEventRow = _sqlQueryOne(
+    "SELECT timestamp, category, action, entity_type, entity_title FROM events WHERE project_id = ? AND actor = 'ai' ORDER BY timestamp DESC LIMIT 1",
+    [projectId]
+  )
+
+  const summary = {
+    project: {
+      id: projRow.id,
+      name: projRow.name,
+      status: projRow.status,
+    },
+    board: {
+      issueCount,
+      byStatus,
+      totalPoints: pointsRow ? pointsRow.total : 0,
+      donePoints: pointsRow ? pointsRow.done : 0,
+    },
+    activeSprint: activeSprintRow
+      ? {
+          id: activeSprintRow.id,
+          name: activeSprintRow.name,
+          goal: activeSprintRow.goal || null,
+          startDate: activeSprintRow.start_date || null,
+          endDate: activeSprintRow.end_date || null,
+        }
+      : null,
+    activeBlockers: blockerRows.map((r) => ({
+      id: r.id,
+      key: r.key,
+      title: r.title,
+      updatedAt: r.updated_at,
+    })),
+    staleIssues: staleRows.map((r) => ({
+      id: r.id,
+      key: r.key,
+      title: r.title,
+      updatedAt: r.updated_at,
+    })),
+    lastSession: sessionRow
+      ? {
+          id: sessionRow.id,
+          summary: sessionRow.summary,
+          nextSteps: sessionRow.next_steps || null,
+          keyDecisions: sessionRow.key_decisions || null,
+          createdAt: sessionRow.created_at,
+        }
+      : null,
+    agentPages: agentPageRows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      updatedAt: r.updated_at,
+    })),
+    lastAgentActivity: lastAgentEventRow
+      ? {
+          timestamp: lastAgentEventRow.timestamp,
+          category: lastAgentEventRow.category,
+          action: lastAgentEventRow.action,
+          entityType: lastAgentEventRow.entity_type,
+          entityTitle: lastAgentEventRow.entity_title,
+        }
+      : null,
+  }
+
+  if (options.includeHygiene) {
+    summary.hygiene = _getHygieneSummary(projectId)
+  }
+
+  return summary
+}
+
+// Lightweight SQL-based hygiene check (no full project load)
+function _getHygieneSummary(projectId) {
+  // Missing estimates: In Progress non-epic issues without story points
+  const missingEstimateRows = _sqlQuery(
+    `SELECT id, key, title FROM issues
+     WHERE project_id = ? AND status = 'In Progress' AND type != 'epic'
+       AND (story_points IS NULL)`,
+    [projectId]
+  )
+
+  // Orphaned stories: non-epic, non-Done issues without an epic, if epics exist
+  const epicCountRow = _sqlQueryOne(
+    "SELECT COUNT(*) as cnt FROM issues WHERE project_id = ? AND type = 'epic'",
+    [projectId]
+  )
+  let orphanedStories = []
+  if (epicCountRow && epicCountRow.cnt > 0) {
+    orphanedStories = _sqlQuery(
+      `SELECT id, key, title FROM issues
+       WHERE project_id = ? AND type != 'epic' AND epic_id IS NULL AND status != 'Done'
+       LIMIT 10`,
+      [projectId]
+    )
+  }
+
+  // Stuck issues: In Progress for 7+ days
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const stuckRows = _sqlQuery(
+    `SELECT id, key, title, updated_at FROM issues
+     WHERE project_id = ? AND status = 'In Progress' AND updated_at < ?
+     LIMIT 10`,
+    [projectId, sevenDaysAgo]
+  )
+
+  // Completable sprints: active sprints where all non-epic issues are Done
+  const completableSprintRows = _sqlQuery(
+    `SELECT s.id, s.name FROM sprints s
+     WHERE s.project_id = ? AND s.status = 'active'
+       AND NOT EXISTS (
+         SELECT 1 FROM issues i
+         WHERE i.sprint_id = s.id AND i.type != 'epic' AND i.status != 'Done'
+       )
+       AND EXISTS (
+         SELECT 1 FROM issues i WHERE i.sprint_id = s.id AND i.type != 'epic'
+       )`,
+    [projectId]
+  )
+
+  const findings =
+    missingEstimateRows.length +
+    (orphanedStories.length > 3 ? 1 : 0) +
+    stuckRows.length +
+    completableSprintRows.length
+
+  return {
+    findings,
+    missingEstimates: missingEstimateRows.map((r) => ({ id: r.id, key: r.key, title: r.title })),
+    orphanedStories:
+      orphanedStories.length > 3
+        ? orphanedStories.map((r) => ({ id: r.id, key: r.key, title: r.title }))
+        : [],
+    stuckIssues: stuckRows.map((r) => ({
+      id: r.id,
+      key: r.key,
+      title: r.title,
+      updatedAt: r.updated_at,
+    })),
+    completableSprints: completableSprintRows.map((r) => ({ id: r.id, name: r.name })),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Public project existence check
+// ---------------------------------------------------------------------------
+export function projectExists(projectId) {
+  return _projectExists(projectId)
+}
+
+// ---------------------------------------------------------------------------
+// Cross-entity search
+// ---------------------------------------------------------------------------
+export function searchEntities(projectId, query, { types = null, limit = 20 } = {}) {
+  const results = []
+  const like = `%${query}%`
+
+  if (!types || types.includes('issue')) {
+    const rows = _sqlQuery(
+      `SELECT id, key, title, status, type, priority FROM issues
+       WHERE project_id = ? AND (LOWER(title) LIKE LOWER(?) OR LOWER(key) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?))
+       LIMIT ?`,
+      [projectId, like, like, like, limit]
+    )
+    for (const r of rows) {
+      const titleMatch = r.title.toLowerCase().includes(query.toLowerCase())
+      const keyMatch = r.key.toLowerCase().includes(query.toLowerCase())
+      results.push({
+        type: 'issue',
+        id: r.id,
+        key: r.key,
+        title: r.title,
+        status: r.status,
+        score: keyMatch ? 1.0 : titleMatch ? 0.9 : 0.5,
+      })
+    }
+  }
+
+  if (!types || types.includes('page')) {
+    const rows = _sqlQuery(
+      `SELECT id, title FROM pages
+       WHERE project_id = ? AND (LOWER(title) LIKE LOWER(?) OR LOWER(content) LIKE LOWER(?))
+       LIMIT ?`,
+      [projectId, like, like, limit]
+    )
+    for (const r of rows) {
+      const titleMatch = r.title.toLowerCase().includes(query.toLowerCase())
+      results.push({
+        type: 'page',
+        id: r.id,
+        title: r.title,
+        score: titleMatch ? 0.9 : 0.4,
+      })
+    }
+  }
+
+  if (!types || types.includes('decision')) {
+    const rows = _sqlQuery(
+      `SELECT id, title, status FROM decisions
+       WHERE project_id = ? AND (LOWER(title) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?))
+       LIMIT ?`,
+      [projectId, like, like, limit]
+    )
+    for (const r of rows) {
+      results.push({
+        type: 'decision',
+        id: r.id,
+        title: r.title,
+        status: r.status,
+        score: r.title.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.4,
+      })
+    }
+  }
+
+  if (!types || types.includes('workflow_node')) {
+    const rows = _sqlQuery(
+      `SELECT id, title, status, type FROM workflow_nodes
+       WHERE project_id = ? AND (LOWER(title) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?))
+       LIMIT ?`,
+      [projectId, like, like, limit]
+    )
+    for (const r of rows) {
+      results.push({
+        type: 'workflow_node',
+        id: r.id,
+        title: r.title,
+        status: r.status,
+        score: r.title.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.4,
+      })
+    }
+  }
+
+  if (!types || types.includes('component')) {
+    const rows = _sqlQuery(
+      `SELECT id, name, type FROM architecture_components
+       WHERE project_id = ? AND (LOWER(name) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?))
+       LIMIT ?`,
+      [projectId, like, like, limit]
+    )
+    for (const r of rows) {
+      results.push({
+        type: 'component',
+        id: r.id,
+        title: r.name,
+        score: r.name.toLowerCase().includes(query.toLowerCase()) ? 0.85 : 0.4,
+      })
+    }
+  }
+
+  if (!types || types.includes('phase')) {
+    const rows = _sqlQuery(
+      `SELECT id, name, status FROM phases
+       WHERE project_id = ? AND LOWER(name) LIKE LOWER(?)
+       LIMIT ?`,
+      [projectId, like, limit]
+    )
+    for (const r of rows) {
+      results.push({ type: 'phase', id: r.id, title: r.name, status: r.status, score: 0.8 })
+    }
+  }
+
+  if (!types || types.includes('milestone')) {
+    const rows = _sqlQuery(
+      `SELECT id, name FROM milestones
+       WHERE project_id = ? AND LOWER(name) LIKE LOWER(?)
+       LIMIT ?`,
+      [projectId, like, limit]
+    )
+    for (const r of rows) {
+      results.push({ type: 'milestone', id: r.id, title: r.name, score: 0.8 })
+    }
+  }
+
+  // Sort by score descending, cap at limit
+  results.sort((a, b) => b.score - a.score)
+  return results.slice(0, limit)
+}
+
+// ---------------------------------------------------------------------------
+// Entity resolution — fuzzy ref → canonical entity
+// ---------------------------------------------------------------------------
+export function resolveEntity(projectId, type, ref) {
+  const resolvers = {
+    issue: () => {
+      // 1. Exact key match
+      const byKey = _sqlQueryOne(
+        'SELECT id, key, title FROM issues WHERE project_id = ? AND LOWER(key) = LOWER(?)',
+        [projectId, ref]
+      )
+      if (byKey)
+        return {
+          resolved: true,
+          type: 'issue',
+          id: byKey.id,
+          key: byKey.key,
+          title: byKey.title,
+          confidence: 1.0,
+        }
+
+      // 2. Exact UUID
+      const byId = _sqlQueryOne(
+        'SELECT id, key, title FROM issues WHERE id = ? AND project_id = ?',
+        [ref, projectId]
+      )
+      if (byId)
+        return {
+          resolved: true,
+          type: 'issue',
+          id: byId.id,
+          key: byId.key,
+          title: byId.title,
+          confidence: 1.0,
+        }
+
+      // 3. Title prefix/contains
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, key, title FROM issues WHERE project_id = ? AND LOWER(title) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1) {
+        return {
+          resolved: true,
+          type: 'issue',
+          id: candidates[0].id,
+          key: candidates[0].key,
+          title: candidates[0].title,
+          confidence: 0.8,
+        }
+      }
+      if (candidates.length > 1) {
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'issue',
+            id: c.id,
+            key: c.key,
+            title: c.title,
+            confidence: 0.6,
+          })),
+        }
+      }
+      return { resolved: false, candidates: [] }
+    },
+    page: () => {
+      const byId = _sqlQueryOne('SELECT id, title FROM pages WHERE id = ? AND project_id = ?', [
+        ref,
+        projectId,
+      ])
+      if (byId)
+        return { resolved: true, type: 'page', id: byId.id, title: byId.title, confidence: 1.0 }
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, title FROM pages WHERE project_id = ? AND LOWER(title) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1)
+        return {
+          resolved: true,
+          type: 'page',
+          id: candidates[0].id,
+          title: candidates[0].title,
+          confidence: 0.8,
+        }
+      if (candidates.length > 1)
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'page',
+            id: c.id,
+            title: c.title,
+            confidence: 0.6,
+          })),
+        }
+      return { resolved: false, candidates: [] }
+    },
+    sprint: () => {
+      const byId = _sqlQueryOne('SELECT id, name FROM sprints WHERE id = ? AND project_id = ?', [
+        ref,
+        projectId,
+      ])
+      if (byId)
+        return { resolved: true, type: 'sprint', id: byId.id, title: byId.name, confidence: 1.0 }
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, name FROM sprints WHERE project_id = ? AND LOWER(name) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1)
+        return {
+          resolved: true,
+          type: 'sprint',
+          id: candidates[0].id,
+          title: candidates[0].name,
+          confidence: 0.8,
+        }
+      if (candidates.length > 1)
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'sprint',
+            id: c.id,
+            title: c.name,
+            confidence: 0.6,
+          })),
+        }
+      return { resolved: false, candidates: [] }
+    },
+    node: () => {
+      const byId = _sqlQueryOne(
+        'SELECT id, title FROM workflow_nodes WHERE id = ? AND project_id = ?',
+        [ref, projectId]
+      )
+      if (byId)
+        return {
+          resolved: true,
+          type: 'workflow_node',
+          id: byId.id,
+          title: byId.title,
+          confidence: 1.0,
+        }
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, title FROM workflow_nodes WHERE project_id = ? AND LOWER(title) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1)
+        return {
+          resolved: true,
+          type: 'workflow_node',
+          id: candidates[0].id,
+          title: candidates[0].title,
+          confidence: 0.8,
+        }
+      if (candidates.length > 1)
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'workflow_node',
+            id: c.id,
+            title: c.title,
+            confidence: 0.6,
+          })),
+        }
+      return { resolved: false, candidates: [] }
+    },
+    component: () => {
+      const byId = _sqlQueryOne(
+        'SELECT id, name FROM architecture_components WHERE id = ? AND project_id = ?',
+        [ref, projectId]
+      )
+      if (byId)
+        return { resolved: true, type: 'component', id: byId.id, title: byId.name, confidence: 1.0 }
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, name FROM architecture_components WHERE project_id = ? AND LOWER(name) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1)
+        return {
+          resolved: true,
+          type: 'component',
+          id: candidates[0].id,
+          title: candidates[0].name,
+          confidence: 0.8,
+        }
+      if (candidates.length > 1)
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'component',
+            id: c.id,
+            title: c.name,
+            confidence: 0.6,
+          })),
+        }
+      return { resolved: false, candidates: [] }
+    },
+    decision: () => {
+      const byId = _sqlQueryOne('SELECT id, title FROM decisions WHERE id = ? AND project_id = ?', [
+        ref,
+        projectId,
+      ])
+      if (byId)
+        return { resolved: true, type: 'decision', id: byId.id, title: byId.title, confidence: 1.0 }
+      const like = `%${ref}%`
+      const candidates = _sqlQuery(
+        'SELECT id, title FROM decisions WHERE project_id = ? AND LOWER(title) LIKE LOWER(?) LIMIT 5',
+        [projectId, like]
+      )
+      if (candidates.length === 1)
+        return {
+          resolved: true,
+          type: 'decision',
+          id: candidates[0].id,
+          title: candidates[0].title,
+          confidence: 0.8,
+        }
+      if (candidates.length > 1)
+        return {
+          resolved: false,
+          candidates: candidates.map((c) => ({
+            type: 'decision',
+            id: c.id,
+            title: c.title,
+            confidence: 0.6,
+          })),
+        }
+      return { resolved: false, candidates: [] }
+    },
+  }
+
+  const resolver = resolvers[type]
+  if (!resolver)
+    return {
+      resolved: false,
+      error: `Unknown type "${type}". Valid: ${Object.keys(resolvers).join(', ')}`,
+    }
+  return resolver()
 }

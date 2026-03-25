@@ -113,7 +113,7 @@ export default function EpicSidebar({
 
   return (
     <div
-      className="relative flex shrink-0 flex-col border-r border-[var(--color-border-default)]"
+      className="workstation-sidebar relative flex flex-col"
       style={{
         width,
         backgroundColor: 'var(--th-panel-light)',

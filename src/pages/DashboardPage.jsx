@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FolderKanban, Plus, Trash2, RotateCcw, Trash } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -20,6 +20,169 @@ const STATUS_BADGE_VARIANT = {
 }
 
 const TECH_BADGE_VARIANTS = ['default']
+
+// Agent-priority dashboard card
+function ProjectCard({ project, index, navigate, setTrashTarget }) {
+  const [opData, setOpData] = useState(null)
+
+  useEffect(() => {
+    let mounted = true
+    fetch(`/api/projects/${encodeURIComponent(project.id)}/operational`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (mounted && data) setOpData(data)
+      })
+      .catch(() => {})
+    return () => {
+      mounted = false
+    }
+  }, [project.id])
+
+  const op = opData || {}
+  const issues = project.board?.issues || []
+  const doneCount = issues.filter((i) => i.status === 'Done').length
+  const progress = issues.length > 0 ? Math.round((doneCount / issues.length) * 100) : 0
+
+  const statusObj = op.agentState || {}
+  const agentStateStr = statusObj.status || 'unavailable'
+  const pendingGatesStr =
+    op.pendingGatesCount !== undefined ? `${op.pendingGatesCount} pending` : 'No live gate data'
+
+  const blockerCount = Array.isArray(op.activeBlockers) ? op.activeBlockers.length : undefined
+  const blockersStr =
+    blockerCount !== undefined ? `${blockerCount} active` : 'Blocker summary unavailable'
+
+  const lastActivityStr = op.lastAgentActivity?.timestamp
+    ? formatRelative(op.lastAgentActivity.timestamp)
+    : 'Last activity unavailable'
+
+  let agentStateClass =
+    'bg-[var(--color-bg-muted)] text-[var(--color-fg-muted)] border-[var(--color-border-muted)]'
+  if (agentStateStr === 'working')
+    agentStateClass = 'provenance-ai text-[var(--color-ai)] border-[var(--color-ai-border)]'
+  if (agentStateStr === 'blocked')
+    agentStateClass =
+      'state-gate-rejected text-[var(--color-danger)] border-[var(--color-gate-rejected-border)]'
+  if (agentStateStr === 'needs-review')
+    agentStateClass =
+      'state-gate-pending text-[var(--color-gate-pending)] border-[var(--color-gate-pending-border)]'
+
+  return (
+    <div
+      onClick={() => navigate(`/project/${project.id}`)}
+      className={[
+        'glass-card-elevated group cursor-pointer p-6 flex flex-col',
+        `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
+      ].join(' ')}
+    >
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h3
+            className="truncate text-lg font-semibold tracking-tight text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
+            style={{ transitionDuration: 'var(--duration-fast)' }}
+          >
+            {project.name}
+          </h3>
+        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            setTrashTarget(project)
+          }}
+          className="shrink-0 rounded-md p-1.5 text-[var(--color-fg-subtle)] opacity-0 group-hover:opacity-100 transition-all hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger-fg)]"
+          title="Move to trash"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 mb-6 bg-[var(--color-bg-glass)] rounded-md border border-[var(--color-border-muted)] p-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
+            Agent State
+          </span>
+          <span
+            className={`text-xs px-2 py-0.5 rounded border inline-flex items-center w-fit ${agentStateClass}`}
+          >
+            {agentStateStr}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
+            Gates
+          </span>
+          <span
+            className={`text-xs font-medium ${op.pendingGatesCount > 0 ? 'text-[var(--color-gate-pending)]' : 'text-[var(--color-fg-muted)]'}`}
+          >
+            {pendingGatesStr}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
+            Blockers
+          </span>
+          <span
+            className={`text-xs font-medium ${blockerCount > 0 ? 'text-[var(--color-danger)]' : 'text-[var(--color-fg-muted)]'}`}
+          >
+            {blockersStr}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
+            Last Activity
+          </span>
+          <span className="text-xs text-[var(--color-fg-muted)] truncate" title={lastActivityStr}>
+            {lastActivityStr}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex-1" />
+
+      {issues.length > 0 ? (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs text-[var(--color-fg-subtle)]">
+              {doneCount}/{issues.length} issues done
+            </span>
+            <span className="text-xs font-medium text-[var(--color-fg-muted)]">{progress}%</span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-[var(--color-border-muted)] overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500 ease-out"
+              style={{
+                width: `${progress}%`,
+                background: progress === 100 ? 'var(--color-success)' : 'var(--color-fg-subtle)',
+              }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="mb-4 text-xs text-[var(--color-fg-faint)] italic">No issues tracked</div>
+      )}
+
+      <div className="pt-3 border-t border-[var(--color-border-muted)] flex flex-col gap-2">
+        {project.techStack && project.techStack.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1">
+            {project.techStack.slice(0, 3).map((tech) => (
+              <span
+                key={tech}
+                className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-bg-subtle)] text-[var(--color-fg-subtle)] border border-[var(--color-border-muted)]"
+              >
+                {tech}
+              </span>
+            ))}
+            {project.techStack.length > 3 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--color-bg-subtle)] text-[var(--color-fg-subtle)] border border-[var(--color-border-muted)]">
+                +{project.techStack.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function DashboardPage() {
   const {
@@ -72,11 +235,10 @@ export default function DashboardPage() {
 
   return (
     <div className="h-full overflow-auto p-8 lg:p-12">
-      {/* Title row — title left, actions right */}
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-entrance">
         <div>
-          <h1 className="heading-accent text-4xl font-bold tracking-tight text-[var(--color-fg-default)]">
-            PROJECTS
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--color-fg-default)]">
+            Projects
           </h1>
           <p className="mt-3 text-base text-[var(--color-fg-muted)]">
             {projects.length} Project{projects.length !== 1 ? 's' : ''}
@@ -110,7 +272,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Trash section */}
       <AnimatePresence>
         {showTrash && trashedProjects.length > 0 && (
           <motion.div
@@ -182,107 +343,15 @@ export default function DashboardPage() {
       {/* Project grid */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((project, index) => {
-            const statusVariant = STATUS_BADGE_VARIANT[project.status] || 'default'
-            const issues = project.board?.issues || []
-            const doneCount = issues.filter((i) => i.status === 'Done').length
-            const openCount = issues.filter((i) => i.status !== 'Done').length
-            const progress = issues.length > 0 ? Math.round((doneCount / issues.length) * 100) : 0
-
-            return (
-              <div
-                key={project.id}
-                onClick={() => navigate(`/project/${project.id}`)}
-                className={[
-                  'glass-card-elevated group cursor-pointer p-7',
-                  `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
-                ].join(' ')}
-              >
-                {/* Header: name + status + trash */}
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <h3
-                      className="truncate text-lg font-bold tracking-tight text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
-                      style={{ transitionDuration: 'var(--duration-fast)' }}
-                    >
-                      {project.name}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge variant={statusVariant} dot size="sm">
-                      {project.status}
-                    </Badge>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setTrashTarget(project)
-                      }}
-                      className="rounded-md p-1 text-[var(--color-fg-subtle)] opacity-0 group-hover:opacity-100 transition-all hover:bg-[var(--color-danger-subtle)] hover:text-[var(--color-danger-fg)]"
-                      style={{ transitionDuration: 'var(--duration-fast)' }}
-                      title="Move to trash"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Tech stack */}
-                {project.techStack && project.techStack.length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-1">
-                    {project.techStack.slice(0, 3).map((tech, i) => (
-                      <Badge
-                        key={tech}
-                        variant={TECH_BADGE_VARIANTS[i % TECH_BADGE_VARIANTS.length]}
-                        size="sm"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
-                    {project.techStack.length > 3 && (
-                      <Badge variant="default" size="sm">
-                        +{project.techStack.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-
-                {/* Progress bar */}
-                {issues.length > 0 && (
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-[var(--color-fg-muted)]">
-                        {doneCount}/{issues.length} done
-                      </span>
-                      <span className="text-xs font-medium text-[var(--color-fg-muted)]">
-                        {progress}%
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-[var(--color-bg-muted)]">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${progress}%`,
-                          background:
-                            progress === 100 ? 'var(--color-success)' : 'var(--accent-default)',
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Footer: stats + timestamp */}
-                <div className="flex items-center justify-between text-xs text-[var(--color-fg-subtle)]">
-                  <span>
-                    {issues.length} issue{issues.length !== 1 ? 's' : ''}
-                    {openCount > 0 && (
-                      <span className="text-[var(--color-fg-muted)]"> · {openCount} open</span>
-                    )}
-                  </span>
-                  {project.updatedAt && <span>{formatRelative(project.updatedAt)}</span>}
-                </div>
-              </div>
-            )
-          })}
+          {filtered.map((project, index) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={index}
+              navigate={navigate}
+              setTrashTarget={setTrashTarget}
+            />
+          ))}
         </div>
       ) : projects.length === 0 ? (
         <EmptyState

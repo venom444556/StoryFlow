@@ -179,7 +179,7 @@ export default function ProjectPage() {
           </div>
         )}
 
-        <div className="flex-1 overflow-auto px-4 pb-20 md:px-8 md:pb-8">
+        <div className="flex-1 overflow-auto px-4 pb-32 md:px-8 md:pb-32">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0 }}

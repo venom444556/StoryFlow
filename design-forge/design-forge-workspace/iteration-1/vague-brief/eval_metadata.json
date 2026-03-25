@@ -1,0 +1,23 @@
+{
+  "eval_id": 2,
+  "eval_name": "vague-brief",
+  "prompt": "Make me a website",
+  "assertions": [
+    {
+      "text": "Response contains clarifying questions (question marks present)",
+      "type": "content_check"
+    },
+    {
+      "text": "Does NOT produce a full DDD without direction",
+      "type": "content_check"
+    },
+    {
+      "text": "Asks about site type or purpose",
+      "type": "content_check"
+    },
+    {
+      "text": "Asks about aesthetic direction, style, or references",
+      "type": "content_check"
+    }
+  ]
+}

@@ -187,7 +187,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
       {/* View content */}
       {view === 'graph' ? (
         components.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center min-h-0">
+          <div className="surface-workstation min-h-[600px] flex-1 flex items-center justify-center">
             <EmptyState
               icon={Boxes}
               title="No components yet"
@@ -199,7 +199,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
             />
           </div>
         ) : (
-          <div className="flex flex-1 gap-4 min-h-0">
+          <div className="surface-workstation min-h-[600px] flex-1 flex gap-4 p-1">
             <DependencyGraph
               components={components}
               selectedId={selectedId}
@@ -224,7 +224,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
           </div>
         )
       ) : (
-        <div className="flex flex-1 flex-col gap-4 md:flex-row min-h-0">
+        <div className="surface-workstation min-h-[600px] flex-1 flex flex-col gap-4 md:flex-row p-1">
           <div className="flex w-full shrink-0 flex-col max-h-64 md:max-h-none md:w-80">
             <ComponentTree
               components={components}

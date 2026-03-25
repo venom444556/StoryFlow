@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies purple-to-pink gradient as anti-pattern",
+      "passed": false,
+      "evidence": "Issue #4 discusses the gradient as a 'Moderate Issue' and says it 'introduces several risks' around brand perception, contrast inconsistency, and saturation fatigue. But it does NOT identify it as an anti-pattern or common AI-generated signal. It treats it as a legitimate design choice with caveats, saying 'if keeping the gradient, desaturate it slightly'. This is a missed detection."
+    },
+    {
+      "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+      "passed": true,
+      "evidence": "Issue #2 'Inter at 400 weight on a gradient background': 'The thin strokes of a 400-weight font can visually vibrate against a busy or saturated background'. Also Issue #6 mentions 'muted gray palette alongside a saturated gradient' creates 'tonal disconnect'. The weight and palette weakness is flagged, though framed more as legibility than genericism."
+    },
+    {
+      "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+      "passed": true,
+      "evidence": "Issue #3 'Full-width text spanning 1440px': 'Centered text that spans the entire 1440px container produces extremely long line lengths. Comfortable reading requires line lengths of 45-75 characters (roughly 600-800px).' Recommends constraining to 680-800px max-width."
+    },
+    {
+      "text": "Flags stock photo of people in office",
+      "passed": true,
+      "evidence": "Issue #5 'Stock photo of people in an office': 'Generic office stock photography is one of the most overused patterns on the web. It communicates nothing specific about your product and actively undermines trust.' Recommends product screenshots, custom illustrations, or no image."
+    },
+    {
+      "text": "Flags 12px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue #1 'Extreme typographic scale imbalance': '12px body text is too small for comfortable reading on the web' and '12px falls below the widely accepted floor of 16px for body text'. Accessibility table marks 'Minimum font size: Failing (practical) — 12px body text is below the practical 16px floor'."
+    },
+    {
+      "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+      "passed": true,
+      "evidence": "Issue #4 recommends 'desaturate it slightly or darken both endpoints' or 'add a semi-transparent dark overlay (rgba(0,0,0,0.3))'. Issue #3 recommends 'Constrain the text content to a max-width of 680-800px'. Issue #1 recommends 'Increase body text to 18-20px minimum. Push the heading to 56-64px'. Specific numeric alternatives provided."
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 5,
+    "failed": 1,
+    "pass_rate": 0.83
+  }
+}

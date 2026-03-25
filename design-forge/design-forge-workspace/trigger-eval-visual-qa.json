@@ -1,0 +1,82 @@
+[
+  {
+    "query": "I just took a screenshot of my Framer canvas — can you tell me if the design looks professional? the file is at ~/Desktop/homepage-v3.png",
+    "should_trigger": true
+  },
+  {
+    "query": "rate this layout: dark bg, 3 column feature grid, hero with gradient, Inter font everywhere. does it pass the anti-slop checklist?",
+    "should_trigger": true
+  },
+  {
+    "query": "what's wrong with this design? I've got #FFFFFF text on #1A1A1A, mixed border radius (some 8px some 16px), and my body text is set to 13px.",
+    "should_trigger": true
+  },
+  {
+    "query": "forge-review my current canvas state. I want to know the grade before I publish.",
+    "should_trigger": true
+  },
+  {
+    "query": "does this hero section look good? purple to pink gradient background, centered text spanning full width, stock office photo below. heading is 42px Inter.",
+    "should_trigger": true
+  },
+  {
+    "query": "evaluate my color palette — I'm using #0A0A0A base, #141414 for cards, #4F46E5 for CTAs, #E8E8E8 for text. Dark mode SaaS landing page.",
+    "should_trigger": true
+  },
+  {
+    "query": "check the contrast ratios on my design. heading is Space Grotesk #E8E8E8 on #0A0A0A, subhead is DM Sans #888888 on #0A0A0A, CTA is white on #4F46E5.",
+    "should_trigger": true
+  },
+  {
+    "query": "is my spacing consistent? I'm using 32px padding inside cards, 24px gaps between them, 96px between sections, 16px for button padding. Everything on 8px grid?",
+    "should_trigger": true
+  },
+  {
+    "query": "I finished building my landing page in Framer. Before I publish, can you do a full visual QA pass? Grade each dimension and tell me what to fix.",
+    "should_trigger": true
+  },
+  {
+    "query": "grade this design against the comparison rubric — I want to know if it's A-tier (ship it) or if there are issues holding it back.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you review my pull request? it's PR #42 on our github repo. Changes are in src/components/Dashboard.tsx and adds a new chart widget.",
+    "should_trigger": false
+  },
+  {
+    "query": "write me a Python script that resizes images in a folder to 800x600px. Use Pillow and preserve aspect ratio with padding.",
+    "should_trigger": false
+  },
+  {
+    "query": "help me optimize this SQL query — it's doing a full table scan on the orders table which has 2M rows. Here's the EXPLAIN output...",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to add dark mode support to my React app. I'm using Tailwind and want to respect the user's system preference.",
+    "should_trigger": false
+  },
+  {
+    "query": "set up ESLint and Prettier for my TypeScript project. I want strict rules, no semicolons, single quotes, and 2-space indent.",
+    "should_trigger": false
+  },
+  {
+    "query": "review my API endpoint for security vulnerabilities — it takes user input and runs a database query. I'm worried about SQL injection.",
+    "should_trigger": false
+  },
+  {
+    "query": "can you explain the difference between server components and client components in Next.js? I keep getting hydration errors.",
+    "should_trigger": false
+  },
+  {
+    "query": "help me write a Dockerfile for my Node.js app. It uses pnpm, needs to build the frontend, and should run on port 3000.",
+    "should_trigger": false
+  },
+  {
+    "query": "I want to A/B test two different hero sections on my marketing site. How do I set up feature flags with LaunchDarkly?",
+    "should_trigger": false
+  },
+  {
+    "query": "look at this error in my terminal — npm install is failing with ERESOLVE and peer dependency conflicts between react 18 and some old library.",
+    "should_trigger": false
+  }
+]

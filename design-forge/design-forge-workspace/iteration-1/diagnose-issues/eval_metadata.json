@@ -1,0 +1,35 @@
+{
+  "eval_id": 4,
+  "eval_name": "diagnose-issues",
+  "prompt": "Evaluate this design: a landing page with 3 different fonts (Inter, Playfair Display, and Fira Code used for body text), cards with mixed border-radius (8px on some, 16px on others, 24px on the CTA), #FFFFFF text on #1A1A1A background, section spacing of 45px, button padding of 11px, and a purple-to-pink gradient hero background. The body text is 13px.",
+  "assertions": [
+    {
+      "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags 13px body text as below 14px minimum",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags purple-to-pink gradient as anti-pattern",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags 45px or 11px spacing as not on 8px grid",
+      "type": "detection_check"
+    },
+    {
+      "text": "Overall grade is D or F",
+      "type": "accuracy_check"
+    },
+    {
+      "text": "Provides specific fix recommendations",
+      "type": "content_check"
+    }
+  ]
+}

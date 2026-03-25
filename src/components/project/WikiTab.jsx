@@ -136,7 +136,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
   // ----- Render -----
 
   return (
-    <div className="relative flex h-full gap-0 overflow-hidden rounded-xl">
+    <div className="surface-workstation flex-1 min-h-[750px] flex md:flex-row gap-0">
       {/* Mobile backdrop for page tree */}
       {showTree && (
         <div
@@ -148,7 +148,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
       {/* Sidebar tree — hidden on mobile, toggle-controlled */}
       <div
         className={[
-          'absolute inset-y-0 left-0 z-20 md:relative md:z-auto',
+          'workstation-sidebar w-64 absolute inset-y-0 left-0 z-20 md:relative md:z-auto',
           showTree ? 'block' : 'hidden md:block',
         ].join(' ')}
       >

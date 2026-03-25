@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+      "passed": true,
+      "evidence": "Typography grade F states: '3 fonts used (Inter, Playfair Display, Fira Code for body)' and 'Three fonts from three entirely different families (geometric sans, transitional serif, monospace) creates visual chaos'"
+    },
+    {
+      "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+      "passed": true,
+      "evidence": "Polish grade D states: 'Three different border-radius values (8px, 16px, 24px) on the same page with no systematic reason' and 'Mixed radii at 8/16/24px is the exact C-grade example'"
+    },
+    {
+      "text": "Flags 13px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Typography grade states: 'Body text at 13px is below the 14px minimum' and anti-slop checklist marks FAIL for 'No text < 14px — Body text is 13px, below the 14px floor'"
+    },
+    {
+      "text": "Flags purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Color grade C states: 'The purple-to-pink gradient hero is the single most flagged anti-pattern in the design system.' Anti-slop checklist: 'FAIL — Purple-to-pink gradient is present on the hero. This is the #1 AI made this signal.'"
+    },
+    {
+      "text": "Flags 45px or 11px spacing as not on 8px grid",
+      "passed": true,
+      "evidence": "Spacing grade D states: '45px section spacing is not on the 8px grid (not divisible by 8)' and '11px button padding is also off-grid (nearest valid values: 8px or 16px)'. Anti-slop checklist: 'FAIL — 45px section spacing and 11px button padding are both off-grid.'"
+    },
+    {
+      "text": "Overall grade is D or F",
+      "passed": true,
+      "evidence": "Overall grade is explicitly 'D' at the top of the report"
+    },
+    {
+      "text": "Provides specific fix recommendations",
+      "passed": true,
+      "evidence": "Fixes Required section provides 4 specific fix categories with actionable recommendations: '1. Reduce to 2 fonts, increase body size' (set body to 16px min), '2. Kill the gradient, fix white' (replace #FFFFFF with #E8E8E8), '3. Snap to 8px grid' (replace 45px with 96px, 11px with 16px), '4. Unify border-radius' (pick 12px or 16px)"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

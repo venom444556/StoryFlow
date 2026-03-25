@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Response contains clarifying questions (question marks present)",
+      "passed": true,
+      "evidence": "Response contains multiple question marks: '1. What does this website DO?' and '2. Who is it for?' as section headings with question marks"
+    },
+    {
+      "text": "Does NOT produce a full DDD without direction",
+      "passed": true,
+      "evidence": "Response explicitly states 'HOLDING — Brief Too Vague to Commit Design Resources' and lists what it will deliver once answers are provided, but does not produce a DDD"
+    },
+    {
+      "text": "Asks about site type or purpose",
+      "passed": true,
+      "evidence": "Section '1. What does this website DO?' with a table listing: Personal portfolio, SaaS product landing, Business/agency site, E-commerce/store, Blog/content site, Web application, Event/launch page"
+    },
+    {
+      "text": "Asks about aesthetic direction, style, or references",
+      "passed": false,
+      "evidence": "Response asks about site type and audience but does not explicitly ask about aesthetic direction, style preferences, or reference sites. The 'Exploration Mode' section mentions presenting visual directions but does not ask the user about their style preferences."
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 3,
+    "failed": 1,
+    "pass_rate": 0.75
+  }
+}

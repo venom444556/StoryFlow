@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Response contains clarifying questions (question marks present)",
+      "passed": true,
+      "evidence": "Response contains multiple question marks across 5 numbered sections with questions like 'What is this website for?', 'Who is the audience?', 'Any references or preferences?'"
+    },
+    {
+      "text": "Does NOT produce a full DDD without direction",
+      "passed": true,
+      "evidence": "Response explicitly avoids producing a design. States 'I could throw together a generic hero section with placeholder text right now, but you'd immediately want to change everything about it.' No DDD, color palette, or typography spec is produced."
+    },
+    {
+      "text": "Asks about site type or purpose",
+      "passed": true,
+      "evidence": "Question 1 asks 'What is this website for?' with options: Personal portfolio, Business/landing page, Blog/content site, SaaS product page, Something else"
+    },
+    {
+      "text": "Asks about aesthetic direction, style, or references",
+      "passed": true,
+      "evidence": "Question 4 asks 'Any references or preferences?' including 'Sites you admire or want to feel like?', 'Dark mode, light mode, colorful, minimal?', 'Any dealbreakers?'"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

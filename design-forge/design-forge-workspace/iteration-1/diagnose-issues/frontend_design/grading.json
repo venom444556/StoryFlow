@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+      "passed": true,
+      "evidence": "Issue 1 titled 'Three competing typefaces with no hierarchy logic' identifies Inter, Playfair Display, and Fira Code, calling it Critical severity and noting 'Using three fonts is not inherently wrong, but these three have no shared DNA'"
+    },
+    {
+      "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+      "passed": true,
+      "evidence": "Issue 3 titled 'Inconsistent border-radius across cards and CTA' identifies 'Three different border-radius values (8px, 16px, 24px)' as High severity"
+    },
+    {
+      "text": "Flags 13px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue 2 titled '13px body text is below the accessibility floor' states '16px (1rem) is the universally accepted baseline for body copy on the web' and rates it Critical severity"
+    },
+    {
+      "text": "Flags purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Issue 4 titled 'Purple-to-pink gradient hero is a design cliche' states 'the single most overused background treatment in AI-generated and template-driven landing pages', rated High severity"
+    },
+    {
+      "text": "Flags 45px or 11px spacing as not on 8px grid",
+      "passed": true,
+      "evidence": "Issue 5 titled '45px section spacing breaks the 8-point grid' and Issue 6 titled '11px button padding is too thin and off-grid' both flag these values as not on the 8-point scale"
+    },
+    {
+      "text": "Overall grade is D or F",
+      "passed": true,
+      "evidence": "Overall grade is explicitly stated as 'D+' — 'Needs a systemic rework, not incremental patches.'"
+    },
+    {
+      "text": "Provides specific fix recommendations",
+      "passed": true,
+      "evidence": "Each issue includes detailed fix recommendations with specific values, e.g., 'Set body text to 16px minimum (1rem)', 'Use 48px for section gaps', 'button padding to 12px/16px', and a complete CSS design tokens block"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

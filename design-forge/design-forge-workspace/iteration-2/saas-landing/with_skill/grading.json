@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "passed": true,
+      "evidence": "DDD defines 10 color tokens with hex codes: #0A0A0A (Background), #141414 (Surface), #1A1A1A (Surface Elevated), #2A2A2A (Border), #E8E8E8 (Text Primary), #888888 (Text Secondary), #555555 (Text Tertiary), #22D3EE (Brand), #1A9FB4 (Brand Muted), #A78BFA (Accent). All section specs reference these hex values directly."
+    },
+    {
+      "text": "DDD names specific font families, not generic 'sans-serif'",
+      "passed": true,
+      "evidence": "DDD specifies three named font families: Clash Display (display), Geist (body), JetBrains Mono (monospace for code). No generic fallbacks like 'sans-serif' appear anywhere in the typography section or section specs."
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "passed": true,
+      "evidence": "Typography scale lists exact sizes: 12px, 14px, 16px, 18px, 20px, 24px, 40px, 48px, 64px. Spacing tokens define 9 levels from 4px (xs) to 128px (5xl). Every section spec includes precise px values for padding, margins, gaps, widths, and heights (e.g., nav height 64px, hero padding 128px, card padding 32px, screenshot 960x480px)."
+    },
+    {
+      "text": "DDD specifies at most 2 typefaces (display + body) — a monospace font for code/terminal is allowed as exception",
+      "passed": true,
+      "evidence": "DDD uses exactly 2 regular typefaces: Clash Display (display/headings) and Geist (body/UI text). JetBrains Mono is the third font but is explicitly scoped to 'code snippets and terminal references in feature descriptions.' The DDD's own anti-slop table confirms: 'No >2 fonts (+mono exception) | PASS'."
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8",
+      "passed": true,
+      "evidence": "Every spacing value in the DDD is a multiple of 8 (or 4px for the declared xs exception): 4px (xs, icon padding only), 8px (sm), 16px (md), 24px (lg), 32px (xl), 48px (2xl), 64px (3xl), 96px (4xl), 128px (5xl). Button padding: 16px 24px, 16px 32px. Badge padding: 4px 8px, 8px 16px. Section padding: 64px, 96px, 128px. All margins: 8px, 16px, 24px, 32px, 48px, 64px. No off-grid values like 14px, 11px, 28px, or 45px appear."
+    },
+    {
+      "text": "Build plan contains forge CLI commands",
+      "passed": true,
+      "evidence": "Build plan is structured entirely around forge CLI commands across 8 sections (0-8). Commands include: forge connect, forge create-project, forge insert frame/text/stack, forge style, forge set-text, forge set-layout, forge screenshot, forge publish. Approximately 150+ forge commands in total."
+    },
+    {
+      "text": "Build plan includes forge screenshot after sections",
+      "passed": true,
+      "evidence": "Build plan includes 'forge screenshot' after every major section: step-0-blank.png (setup), step-1-nav.png (nav), step-2-hero.png (hero), step-3-features.png (features), step-4-logos.png (social proof), step-5-pricing.png (pricing), step-6-footer.png (footer), full-page-qa.png (full page QA), final-live.png (after publish). 9 screenshots total."
+    },
+    {
+      "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+      "passed": true,
+      "evidence": "Build plan contains all 5 sections: Section 2 = Hero Section, Section 3 = Features Grid (3-column with AI-Powered Analysis, Inline Comments, CI/CD Native cards), Section 4 = Social Proof / Logo Bar (6 placeholder logos), Section 5 = Pricing Table (Starter/Pro/Enterprise tiers), Section 6 = Footer (4-column grid with brand, product, company, legal). Also includes Navigation (Section 1) as a bonus."
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

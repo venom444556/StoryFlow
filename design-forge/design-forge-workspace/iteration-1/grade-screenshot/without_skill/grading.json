@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+      "passed": false,
+      "evidence": "Report has numbered sections for Typography (1), Color System (2), Spacing & Layout (3), Card Component (4), Accessibility (5). It covers typography, color, spacing, and layout but does NOT have a 'polish' dimension or letter grades per section. Sections have verdicts like 'Strong', 'Good pairing', 'Correct approach' but not formal letter grades for each dimension."
+    },
+    {
+      "text": "Overall grade is A or B (the described design follows best practices)",
+      "passed": true,
+      "evidence": "Overall grade is 'B+' stated at the top of the report, which falls within the A or B range"
+    },
+    {
+      "text": "Report includes anti-slop checklist",
+      "passed": false,
+      "evidence": "Report does not include an anti-slop checklist. It mentions 'purple-to-pink' or gradient concerns nowhere, and has no checklist-style section evaluating common anti-patterns."
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 1,
+    "failed": 2,
+    "pass_rate": 0.33
+  }
+}

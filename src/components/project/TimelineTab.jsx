@@ -257,13 +257,15 @@ export default function TimelineTab({
                     sub={`${milestones.length - stats.completedMilestones} pending`}
                   />
                 </div>
-                <GanttChart
-                  phases={phases}
-                  milestones={milestones}
-                  onPhaseClick={handlePhaseClick}
-                  onMilestoneClick={handleMilestoneClick}
-                  timeScale={timeScale}
-                />
+                <div className="surface-workstation min-h-[600px] p-4">
+                  <GanttChart
+                    phases={phases}
+                    milestones={milestones}
+                    onPhaseClick={handlePhaseClick}
+                    onMilestoneClick={handleMilestoneClick}
+                    timeScale={timeScale}
+                  />
+                </div>
               </motion.div>
             ) : (
               <motion.div
@@ -275,7 +277,7 @@ export default function TimelineTab({
                 className="flex gap-6"
               >
                 {/* Phase Overview: timeline + sidebar */}
-                <div className="min-w-0 flex-1">
+                <div className="surface-workstation min-h-[600px] min-w-0 flex-1 p-4">
                   <TimelineView
                     phases={phases}
                     milestones={milestones}

@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+      "passed": true,
+      "evidence": "Issue 1 titled 'Three Font Families — Typographic Chaos' explicitly identifies Inter, Playfair Display, and Fira Code as the three problematic fonts, calling it Critical severity and noting the anti-pattern 'Typography using more than 2 font families'"
+    },
+    {
+      "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+      "passed": true,
+      "evidence": "Issue 2 titled 'Inconsistent Border-Radius Across Components' identifies 'Three different border-radius values: Cards: some at 8px, others at 16px; CTA button: 24px' as High severity"
+    },
+    {
+      "text": "Flags 13px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue 4 titled '13px Body Text — Below Minimum Readable Size' states '13px body text falls between defined scale stops and sits below the 14px minimum for secondary body text', rated Critical severity"
+    },
+    {
+      "text": "Flags purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Issue 3 titled 'Purple-to-Pink Gradient Hero Background' calls it High severity and states 'Purple-to-pink gradients are the single most overused aesthetic in post-2023 web design'"
+    },
+    {
+      "text": "Flags 45px or 11px spacing as not on 8px grid",
+      "passed": true,
+      "evidence": "Issue 5 flags '45px section spacing — Off the 8px Grid' as High severity, and Issue 6 flags '11px button padding — Off-Grid and Undersized' as Medium severity"
+    },
+    {
+      "text": "Overall grade is D or F",
+      "passed": false,
+      "evidence": "No explicit overall letter grade is given. The report uses severity classifications (Critical/High/Medium) and states 'Overall: 1 pass, 1 warning, 6 failures' but never assigns a D or F letter grade"
+    },
+    {
+      "text": "Provides specific fix recommendations",
+      "passed": true,
+      "evidence": "Each of the 7 issues includes a 'Fix:' section with specific recommendations, e.g., 'Set body text to 16px minimum', 'Use 48px for major section breaks', 'Set button padding to 12px vertical, 16px horizontal'"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 6,
+    "failed": 1,
+    "pass_rate": 0.86
+  }
+}

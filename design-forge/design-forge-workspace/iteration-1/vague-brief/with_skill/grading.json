@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Response contains clarifying questions (question marks present)",
+      "passed": true,
+      "evidence": "Response contains multiple question marks: 'What does this website need to DO?', 'What should it FEEL like?', 'Who is the AUDIENCE?'"
+    },
+    {
+      "text": "Does NOT produce a full DDD without direction",
+      "passed": true,
+      "evidence": "Response is titled 'Status: Needs Direction' and explicitly states it needs answers before producing a DDD. No color palette, typography spec, or spacing system is defined."
+    },
+    {
+      "text": "Asks about site type or purpose",
+      "passed": true,
+      "evidence": "Question 1 asks 'What does this website need to DO?' with options: Landing page, Portfolio, SaaS product site, Agency, Blog, Documentation, Something else"
+    },
+    {
+      "text": "Asks about aesthetic direction, style, or references",
+      "passed": true,
+      "evidence": "Question 2 asks 'What should it FEEL like?' with options: Minimal, Bold, Editorial, Playful, Corporate, Brutalist. Also says 'If you have any reference sites, screenshots, or brand assets, share those'"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "passed": true,
+      "evidence": "DDD contains hex codes: #0A0A0F, #12121A, #1A1A26, #2A2A3C, #1E1E2E, #F0F0F5, #8B8BA3, #5C5C73, #6C5CE7, #7C6EF7, #00D68F, #FFFFFF"
+    },
+    {
+      "text": "DDD names specific font families, not generic 'sans-serif'",
+      "passed": true,
+      "evidence": "DDD specifies 'Inter' and 'JetBrains Mono' — both specific named font families"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "passed": true,
+      "evidence": "Font sizes: 64px, 36px, 22px, 18px, 15px, 14px, 13px, 12px, 40px. Spacing: 4px, 8px, 16px, 24px, 32px, 48px, 64px, 96px, 120px"
+    },
+    {
+      "text": "DDD specifies at most 2 font families",
+      "passed": true,
+      "evidence": "DDD specifies Inter (primary) and JetBrains Mono (code/CLI) — exactly 2 font families"
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8",
+      "passed": false,
+      "evidence": "DDD spacing table includes 120px (5xl) which is not a multiple of 8 (120/8=15). Also uses 12px gap for CTA buttons, 10px gap for feature list items, and 13px font sizes. Features grid uses 16px gap. The 120px spacing value breaks the 8px grid."
+    },
+    {
+      "text": "Build plan contains forge CLI commands",
+      "passed": true,
+      "evidence": "Build plan uses forge insert frame, forge style, forge insert text, forge insert stack, forge set-layout, forge move, forge screenshot throughout all phases"
+    },
+    {
+      "text": "Build plan includes forge screenshot after sections",
+      "passed": false,
+      "evidence": "Only one screenshot at the very end in Phase 8 ('forge screenshot --name devforge-landing-full'). No per-section screenshots after Phases 2-7."
+    },
+    {
+      "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+      "passed": true,
+      "evidence": "Build plan includes: Phase 3 Hero Section, Phase 5 Features Grid (3 cards), Phase 4 Social Proof Section, Phase 6 Pricing Table (3 tiers), Phase 7 Footer. All 5 requested sections present."
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 6,
+    "failed": 2,
+    "pass_rate": 0.75
+  }
+}

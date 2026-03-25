@@ -266,13 +266,25 @@ export function register(program) {
     .requiredOption('-s, --summary <text>', 'Session summary text')
     .option('--next-steps <text>', 'Next steps for future sessions')
     .option('--key-decisions <text>', 'Key decisions made in this session')
+    .option('--work-done <text>', 'Description of work completed')
+    .option('--learnings <text>', 'Lessons learned during session')
+    .option('--wiki-pages-updated <text>', 'Comma-separated page IDs or titles updated')
+    .option('--issues-created <n>', 'Count of issues created', parseInt)
+    .option('--issues-updated <n>', 'Count of issues updated', parseInt)
+    .option('--events-recorded <n>', 'Count of events recorded', parseInt)
     .option('--agent-id <id>', 'Agent ID')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const data = { summary: opts.summary }
       if (opts.nextSteps) data.next_steps = opts.nextSteps
       if (opts.keyDecisions) data.key_decisions = opts.keyDecisions
-      if (opts.agentId) data.agentId = opts.agentId
+      if (opts.workDone) data.work_done = opts.workDone
+      if (opts.learnings) data.learnings = opts.learnings
+      if (opts.wikiPagesUpdated) data.wiki_pages_updated = opts.wikiPagesUpdated
+      if (opts.issuesCreated !== undefined) data.issues_created = opts.issuesCreated
+      if (opts.issuesUpdated !== undefined) data.issues_updated = opts.issuesUpdated
+      if (opts.eventsRecorded !== undefined) data.events_recorded = opts.eventsRecorded
+      if (opts.agentId) data.agent_id = opts.agentId
       await sessions.save(project, data)
       out.success('Session saved')
     })

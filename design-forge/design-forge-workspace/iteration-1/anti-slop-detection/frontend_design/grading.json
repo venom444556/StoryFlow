@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Issue 1 titled 'Purple-to-Pink Gradient Background' identifies it as High severity, calling it 'the single most overused color treatment in AI-generated and template web design' and stating '#8B5CF6-to-#EC4899 gradient (violet-to-pink) has become the default modern tech background'"
+    },
+    {
+      "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+      "passed": true,
+      "evidence": "Issue 2 titled 'Inter at 400 Weight' states 'Inter is explicitly called out in the skill guidelines as a generic, overused font to avoid' and 'Weight 400 (regular) compounds this: it is the most neutral weight of the most neutral font. Nothing about it communicates a point of view.'"
+    },
+    {
+      "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+      "passed": true,
+      "evidence": "Issue 4 titled 'Full-Width Centered Text on 1440px' states 'Body text spanning the full 1440px container means line lengths far exceed the optimal 45-75 character range' and recommends 'max-width: 680px'"
+    },
+    {
+      "text": "Flags stock photo of people in office",
+      "passed": true,
+      "evidence": "Issue 5 titled 'Stock Photo of People in an Office' states 'People smiling in an office is the most common hero image on the internet. Users have developed banner blindness to it.'"
+    },
+    {
+      "text": "Flags 12px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue 3 identifies '42px Heading / 12px Body Text — Broken Type Scale' as Critical severity, stating '12px body text is genuinely hard to read on most screens' and 'The WCAG recommendation is a minimum of 16px for body text'"
+    },
+    {
+      "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+      "passed": true,
+      "evidence": "Provides specific alternatives: for gradient 'warm amber (#F59E0B) to deep coral (#DC2626)' or 'deep navy (#0F172A)'; for fonts 'Playfair Display or Fraunces, Clash Display, Recoleta'; for alignment 'max-width: 65ch (~680px)'; for image 'Product screenshot/UI mockup'"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

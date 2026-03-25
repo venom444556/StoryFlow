@@ -1,0 +1,82 @@
+[
+  {
+    "query": "I need a portfolio site for my design agency. We do mostly branding work for fintech startups. Can you build something in Framer that feels premium? Dark mode, minimal, think Linear meets Pentagram.",
+    "should_trigger": true
+  },
+  {
+    "query": "build me a landing page for my new saas product called TaskHive — it's a project management tool for remote teams. I want hero, features, pricing, testimonials. Dark and techy.",
+    "should_trigger": true
+  },
+  {
+    "query": "I have Framer open right now with a blank project. Can you help me design a personal blog layout? I want it editorial, lots of whitespace, serif fonts.",
+    "should_trigger": true
+  },
+  {
+    "query": "forge me a website for a coffee roastery. earthy tones, warm, inviting. needs an online shop section and an about page with the team photos.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you create a DDD for a developer documentation site? i need specific hex codes, font choices, spacing values. the audience is backend engineers.",
+    "should_trigger": true
+  },
+  {
+    "query": "make this look good in framer — right now it's just a bunch of unstyled frames. I need a proper nav bar, hero section, and footer. dark mode.",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to redesign my startup's landing page. Currently it looks super generic — purple gradients, Inter font, stock photos. Help me make it actually distinctive.",
+    "should_trigger": true
+  },
+  {
+    "query": "set up a new framer project and build out a 3-page marketing site for an AI writing tool. home, pricing, about. modern dark aesthetic.",
+    "should_trigger": true
+  },
+  {
+    "query": "design a website that converts. I'm launching a waitlist for a new fitness app targeting busy professionals. Need a single-page site with email capture.",
+    "should_trigger": true
+  },
+  {
+    "query": "help me build a portfolio in framer for my UX case studies. I have 6 projects to showcase. Should feel like a high-end design studio site.",
+    "should_trigger": true
+  },
+  {
+    "query": "can you help me write a React component that renders a card grid? I'm using Tailwind CSS and Next.js 14 with the app router.",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to set up a CI/CD pipeline for my project using GitHub Actions. It should run tests, build, and deploy to Vercel on push to main.",
+    "should_trigger": false
+  },
+  {
+    "query": "debug this Python script — it's throwing a KeyError when I try to access the 'users' field in the API response. Here's the traceback...",
+    "should_trigger": false
+  },
+  {
+    "query": "review my PR on github — it adds authentication to the /api/users endpoint using JWT tokens. Check for security issues.",
+    "should_trigger": false
+  },
+  {
+    "query": "write unit tests for the UserService class in src/services/user.ts. It has methods for create, update, delete, and findByEmail.",
+    "should_trigger": false
+  },
+  {
+    "query": "I'm getting CORS errors when my React frontend at localhost:3000 tries to fetch from my Express API at localhost:4000. How do I fix this?",
+    "should_trigger": false
+  },
+  {
+    "query": "can you explain how the useEffect cleanup function works in React? I keep getting memory leak warnings.",
+    "should_trigger": false
+  },
+  {
+    "query": "refactor this 200-line function into smaller pieces. It handles user registration, sends a welcome email, creates a stripe customer, and sets up default preferences.",
+    "should_trigger": false
+  },
+  {
+    "query": "I need to migrate my database from PostgreSQL to MySQL. Can you generate the migration scripts for these 12 tables?",
+    "should_trigger": false
+  },
+  {
+    "query": "help me pick colors for my terminal theme — i use iTerm2 with tmux and want something easy on the eyes for long coding sessions.",
+    "should_trigger": false
+  }
+]

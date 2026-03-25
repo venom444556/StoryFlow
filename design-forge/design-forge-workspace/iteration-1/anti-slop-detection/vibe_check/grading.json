@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Issue 1 titled 'AI Purple Gradient — Instant Commoditization' explicitly identifies '#8B5CF6-to-#EC4899 is the default gradient of AI landing pages' as High severity, referencing the Universal Anti-Patterns rule"
+    },
+    {
+      "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+      "passed": true,
+      "evidence": "Issue 3 titled 'Inter 400 on Muted Gray — Legibility Failure' flags it as High severity, noting 'Inter at weight 400 is already a light-reading font. Pair it with muted gray text on a purple-to-pink gradient background, and you have a contrast problem'"
+    },
+    {
+      "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+      "passed": true,
+      "evidence": "Issue 4 titled 'Full-Width Text at 1440px — Unreadable Lines' states 'At 1440px container width with 18px text, you are looking at 160+ characters per line' and recommends 'Constrain the text block to max-width 680px'"
+    },
+    {
+      "text": "Flags stock photo of people in office",
+      "passed": true,
+      "evidence": "Issue 5 titled 'Stock Office Photo — Generic and Trust-Eroding' states 'A stock photo of people in an office communicates nothing about the product. It is the visual equivalent of lorem ipsum.'"
+    },
+    {
+      "text": "Flags 12px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue 2 identifies the broken type scale with '12px body text fails accessibility standards' and states 'Body text minimum 16px (Inter 400). For a hero section specifically, 18px is the floor'"
+    },
+    {
+      "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+      "passed": true,
+      "evidence": "Report provides specific alternatives: for gradient 'Pick one brand color. Build a tonal palette'; for typography 'Inter 600 at 48px heading, Inter 400 at 18px body'; for layout 'max-width 680px centered'; for image 'Product screenshot or UI mockup'"
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

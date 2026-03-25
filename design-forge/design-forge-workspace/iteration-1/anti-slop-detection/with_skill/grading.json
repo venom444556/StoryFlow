@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Identifies purple-to-pink gradient as anti-pattern",
+      "passed": true,
+      "evidence": "Color grade F: 'Purple-to-pink gradient (#8B5CF6 to #EC4899) is the single most recognized AI made this signal in web design. It is explicitly banned in the anti-slop checklist'. Anti-slop check #1 FAIL: '#8B5CF6 to #EC4899 is exactly this pattern'"
+    },
+    {
+      "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+      "passed": true,
+      "evidence": "Typography grade F: 'Inter at 400 weight on a muted gray palette is the definition of generic AI output -- Inter requires bold brand colors to avoid looking templated.' Anti-slop check #2 FAIL: 'Inter 400 on muted gray -- textbook generic'"
+    },
+    {
+      "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+      "passed": true,
+      "evidence": "Spacing grade D: 'Centered text spanning the full 1440px container violates the max center-aligned width rule (600px max). At 12px font size, a 1440px container produces lines of ~240+ characters -- roughly 4x the recommended 65-75 character max line width.' Anti-slop check #5 FAIL."
+    },
+    {
+      "text": "Flags stock photo of people in office",
+      "passed": true,
+      "evidence": "Anti-slop check #6 FAIL: 'Generic people in an office stock photo'. Layout grade D: 'stock photo of people in an office answers none of them'. Fix #4: 'Stock photos of people in an office communicate nothing about your product' with 4 ranked alternatives."
+    },
+    {
+      "text": "Flags 12px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Typography grade F: '12px body text is below the 14px minimum for any content that isn't a badge or tag'. Anti-slop check #4 FAIL: '12px body text violates the minimum'. Fix table shows: Body size current 12px, fix to 16-18px."
+    },
+    {
+      "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+      "passed": true,
+      "evidence": "Fix #1 offers 3 gradient alternatives (solid dark, subtle brand-tinted, no gradient). Fix #2 suggests specific display fonts: Space Grotesk, Cabinet Grotesk, Clash Display. Fix #3: 'Max content width for centered text: 600px' or 'left-align in 600-700px column'. Each fix has concrete values."
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

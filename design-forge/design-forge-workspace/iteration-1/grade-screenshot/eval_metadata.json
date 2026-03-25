@@ -1,0 +1,19 @@
+{
+  "eval_id": 3,
+  "eval_name": "grade-screenshot",
+  "prompt": "Review this design for me. It's a dark-mode SaaS landing page with: a hero section using 64px Space Grotesk headline on #0A0A0A background with #E8E8E8 text, 18px DM Sans subhead in #888888, a #4F46E5 CTA button with 12px border-radius. Below is a features grid with 3 cards at 32px padding, #141414 background, 16px border-radius, 1px border at rgba(255,255,255,0.06). Section spacing is 96px. All spacing is on 8px grid. Contrast ratios all pass AA.",
+  "assertions": [
+    {
+      "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+      "type": "structure_check"
+    },
+    {
+      "text": "Overall grade is A or B (the described design follows best practices)",
+      "type": "accuracy_check"
+    },
+    {
+      "text": "Report includes anti-slop checklist",
+      "type": "structure_check"
+    }
+  ]
+}

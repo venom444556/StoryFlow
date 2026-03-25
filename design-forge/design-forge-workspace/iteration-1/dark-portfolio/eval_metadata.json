@@ -1,0 +1,39 @@
+{
+  "eval_id": 0,
+  "eval_name": "dark-portfolio",
+  "prompt": "Build me a minimal dark portfolio site for a product designer. I want it to feel premium and refined, like Linear or Vercel's site. Focus on clean typography and generous white space. The designer's name is Mika Chen, they specialize in SaaS product design.",
+  "assertions": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD specifies at most 2 typefaces (display + body) \u2014 a monospace font for code/terminal is allowed as exception",
+      "type": "content_check"
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+      "type": "content_check"
+    },
+    {
+      "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+      "type": "content_check"
+    },
+    {
+      "text": "Build plan includes forge screenshot commands after major sections",
+      "type": "content_check"
+    },
+    {
+      "text": "Colors and fonts in forge commands match the DDD values",
+      "type": "consistency_check"
+    }
+  ]
+}

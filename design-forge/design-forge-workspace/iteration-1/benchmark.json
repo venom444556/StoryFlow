@@ -1,0 +1,1227 @@
+{
+  "metadata": {
+    "skill_name": "design-forge-comparison",
+    "skill_path": "/Users/devserver/Documents/GitHub/StoryFlow/design-forge/skills/",
+    "executor_model": "claude-opus-4-6",
+    "timestamp": "2026-03-11T00:30:00.745384+00:00",
+    "evals_run": [
+      "dark-portfolio",
+      "saas-landing",
+      "vague-brief",
+      "grade-screenshot",
+      "diagnose-issues",
+      "anti-slop-detection"
+    ],
+    "configurations": ["with_skill", "without_skill", "vibe_check", "frontend_design"],
+    "runs_per_configuration": 1
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "dark-portfolio",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains numerous hex codes: #0A0A0A, #111111, #1A1A1A, #1E1E1E, #2A2A2A, #E8E8E8, #8A8A8A, #555555, #C8FF00, #A8D600"
+        },
+        {
+          "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD specifies 'Space Grotesk' for display and 'DM Sans' for body \u2014 both named specifically"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 44px, 28px, 20px, 17px, 14px, 12px. Spacing: 4px, 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": true,
+          "evidence": "Only Space Grotesk (display) and DM Sans (body) \u2014 exactly 2 font families"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+          "passed": true,
+          "evidence": "All spacing tokens: 4px (icon), 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px \u2014 all multiples of 8 except 4px which is explicitly for icon padding"
+        },
+        {
+          "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+          "passed": true,
+          "evidence": "Build plan uses forge insert frame, forge style, forge insert text, forge set-text, forge insert stack, forge set-layout throughout all sections"
+        },
+        {
+          "text": "Build plan includes forge screenshot commands after major sections",
+          "passed": true,
+          "evidence": "Screenshots after each section: step-1-nav.png, step-2-hero.png, step-3-work.png, step-4-about.png, step-5-contact.png, step-6-footer.png, full-page-qa.png"
+        },
+        {
+          "text": "Colors and fonts in forge commands match the DDD values",
+          "passed": true,
+          "evidence": "Build plan uses #0A0A0A, #111111, #1A1A1A, #1E1E1E, #E8E8E8, #8A8A8A, #C8FF00, #555555, Space Grotesk, DM Sans \u2014 all matching DDD exactly"
+        }
+      ],
+      "total_tokens": 36264,
+      "duration_seconds": 181.6,
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "dark-portfolio",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains hex codes: #0A0A0A, #141414, #1A1A1A, #222222, #FAFAFA, #888888, #555555, #7C6AFF, #9B8CFF"
+        },
+        {
+          "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD specifies 'Inter' and 'JetBrains Mono' \u2014 both are specific named font families, not generic 'sans-serif'"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 48px, 32px, 20px, 16px, 14px, 12px, 13px. Spacing: 4px, 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": true,
+          "evidence": "DDD specifies Inter (primary) and JetBrains Mono (code/mono) \u2014 exactly 2 font families"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+          "passed": false,
+          "evidence": "DDD spacing table values are on 8px grid, but section specs use 40px (nav padding '0 40px', footer padding '24px 40px') which is not a multiple of 8. Build plan also uses 20px padding (card text paddingTop 20, paragraph gap 20) and 80px (About gap), 12px (AboutAvail marginTop). Multiple off-grid values."
+        },
+        {
+          "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+          "passed": true,
+          "evidence": "Build plan uses forge insert frame, forge style, forge set-layout, forge insert text, forge insert stack, forge move, forge screenshot, forge publish throughout all phases"
+        },
+        {
+          "text": "Build plan includes forge screenshot commands after major sections",
+          "passed": false,
+          "evidence": "Only one screenshot at the very end in Phase 7 ('forge screenshot --name dark-portfolio-full'). No per-section screenshots after Phases 1-6."
+        },
+        {
+          "text": "Colors and fonts in forge commands match the DDD values",
+          "passed": true,
+          "evidence": "Build plan uses #0A0A0A, #141414, #1A1A1A, #222222, #FAFAFA, #888888, #555555, #7C6AFF, Inter, JetBrains Mono \u2014 all matching the DDD color and font tokens"
+        }
+      ],
+      "total_tokens": 24178,
+      "duration_seconds": 157.0,
+      "summary": {
+        "total": 8,
+        "passed": 6,
+        "failed": 2,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "dark-portfolio",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains extensive hex codes: #0A0A0A, #141414, #1A1A1A, #262626, #333333, #FAFAFA, #A1A1A1, #666666, #E8C547, #D4B03E, #22C55E, #EF4444"
+        },
+        {
+          "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD specifies Syne for headings and Inter for body text, with Google Fonts load instructions"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 48px, 32px, 20px, 18px, 16px, 13px, 12px. Spacing: 4px, 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": true,
+          "evidence": "Exactly 2 font families: Syne (headings) and Inter (body/everything else)"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+          "passed": true,
+          "evidence": "Spacing scale: 4px (icon gap), 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px. All are multiples of 8 except 4px which is explicitly for icon-to-label gap"
+        },
+        {
+          "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+          "passed": true,
+          "evidence": "Build plan contains 94 forge commands including forge insert frame, forge insert text, forge style, forge set-layout, forge insert stack"
+        },
+        {
+          "text": "Build plan includes forge screenshot commands after major sections",
+          "passed": true,
+          "evidence": "Phase 7 includes 'forge screenshot --name mika-chen-portfolio-v1 --format png --scale 2'"
+        },
+        {
+          "text": "Colors and fonts in forge commands match the DDD values",
+          "passed": true,
+          "evidence": "Build plan uses #0A0A0A (bg), #FAFAFA (text), #E8C547 (accent), #A1A1A1 (secondary), Syne for headings, Inter for body \u2014 all matching DDD tokens exactly"
+        }
+      ],
+      "total_tokens": 62577,
+      "duration_seconds": 290.6,
+      "summary": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 0,
+      "eval_name": "dark-portfolio",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains hex codes: #0A0A0A, #111111, #1A1A1A, #1F1F1F, #2A2A2A, #EDEDED, #888888, #555555, #C8FF00"
+        },
+        {
+          "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD names Instrument Serif, Satoshi, and JetBrains Mono as specific font families"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 96px, 48px, 32px, 20px, 16px, 12px. Spacing: 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px, 160px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": false,
+          "evidence": "DDD specifies 3 font families: Instrument Serif (headings), Satoshi (body), and JetBrains Mono (tags/metadata). Even though mono is a specialized accent, the assertion strictly says 'at most 2 font families' and 3 are named"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+          "passed": false,
+          "evidence": "Spacing scale includes 160px (multiple of 8, OK) but also uses 12px in capability grid crossAxisSpacing and 10px in tag pill padding ('4px 10px'). 10px is not a multiple of 8 or 4-for-icon-padding"
+        },
+        {
+          "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+          "passed": true,
+          "evidence": "Build plan contains 133 forge commands including forge insert frame, forge insert text, forge style, forge insert stack, forge move, forge set-layout"
+        },
+        {
+          "text": "Build plan includes forge screenshot commands after major sections",
+          "passed": true,
+          "evidence": "Phase 7 includes forge screenshot commands for full page and each section: qa-nav.png, qa-hero.png, qa-work.png, qa-about.png, qa-approach.png, qa-contact.png"
+        },
+        {
+          "text": "Colors and fonts in forge commands match the DDD values",
+          "passed": true,
+          "evidence": "Build plan uses #0A0A0A (bg), #111111 (surface), #EDEDED (text), #888888 (secondary), #C8FF00 (accent), Instrument Serif, Satoshi, JetBrains Mono \u2014 all matching DDD"
+        }
+      ],
+      "total_tokens": 30551,
+      "duration_seconds": 254.3,
+      "summary": {
+        "total": 8,
+        "passed": 6,
+        "failed": 2,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "saas-landing",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains numerous hex codes: #0A0A0A, #141414, #1C1C1C, #2A2A2A, #E8E8E8, #8A8A8A, #555555, #6366F1, #5558E6, #22D3EE, #34D399, #383838"
+        },
+        {
+          "text": "DDD names specific font families, not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD specifies Space Grotesk (display), DM Sans (body), and JetBrains Mono (code snippets) \u2014 all specific named fonts"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 44px, 24px, 20px, 18px, 16px, 14px, 12px, 48px. Spacing: 128px section padding, 64px internal gap, 32px card padding, 24px card gap, 16px element gap, 64px nav height"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": false,
+          "evidence": "DDD specifies 3 font families: Space Grotesk (display), DM Sans (body), and JetBrains Mono (monospace/code). While JetBrains Mono is used minimally for terminal accents, the assertion says 'at most 2'."
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8",
+          "passed": false,
+          "evidence": "Most values are on 8px grid (128px, 64px, 32px, 24px, 16px), but button padding is '14px 28px' \u2014 14px and 28px are not multiples of 8. Also '10px 20px' for nav CTA, 6px 12px for badge padding \u2014 6px, 10px, 14px, 28px are off-grid."
+        },
+        {
+          "text": "Build plan contains forge CLI commands",
+          "passed": true,
+          "evidence": "Build plan uses forge connect, forge create-project, forge insert frame, forge style, forge insert text, forge set-text, forge insert stack, forge set-layout, forge screenshot, forge publish throughout"
+        },
+        {
+          "text": "Build plan includes forge screenshot after sections",
+          "passed": true,
+          "evidence": "Screenshots after each section: step-1-nav.png, step-2-hero.png, step-3-logos.png, step-4-features.png, step-5-pricing.png, step-6-footer.png, full-page-qa.png"
+        },
+        {
+          "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+          "passed": true,
+          "evidence": "Build plan includes: Step 2 Hero, Step 4 Features Grid (3 columns, 6 cards), Step 3 Social Proof/Logo Bar, Step 5 Pricing Table (3 tiers), Step 6 Footer. All 5 requested sections present."
+        }
+      ],
+      "total_tokens": 40255,
+      "duration_seconds": 228.1,
+      "summary": {
+        "total": 8,
+        "passed": 6,
+        "failed": 2,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "saas-landing",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains hex codes: #0A0A0F, #12121A, #1A1A26, #2A2A3C, #1E1E2E, #F0F0F5, #8B8BA3, #5C5C73, #6C5CE7, #7C6EF7, #00D68F, #FFFFFF"
+        },
+        {
+          "text": "DDD names specific font families, not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD specifies 'Inter' and 'JetBrains Mono' \u2014 both specific named font families"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 36px, 22px, 18px, 15px, 14px, 13px, 12px, 40px. Spacing: 4px, 8px, 16px, 24px, 32px, 48px, 64px, 96px, 120px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": true,
+          "evidence": "DDD specifies Inter (primary) and JetBrains Mono (code/CLI) \u2014 exactly 2 font families"
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8",
+          "passed": false,
+          "evidence": "DDD spacing table includes 120px (5xl) which is not a multiple of 8 (120/8=15). Also uses 12px gap for CTA buttons, 10px gap for feature list items, and 13px font sizes. Features grid uses 16px gap. The 120px spacing value breaks the 8px grid."
+        },
+        {
+          "text": "Build plan contains forge CLI commands",
+          "passed": true,
+          "evidence": "Build plan uses forge insert frame, forge style, forge insert text, forge insert stack, forge set-layout, forge move, forge screenshot throughout all phases"
+        },
+        {
+          "text": "Build plan includes forge screenshot after sections",
+          "passed": false,
+          "evidence": "Only one screenshot at the very end in Phase 8 ('forge screenshot --name devforge-landing-full'). No per-section screenshots after Phases 2-7."
+        },
+        {
+          "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+          "passed": true,
+          "evidence": "Build plan includes: Phase 3 Hero Section, Phase 5 Features Grid (3 cards), Phase 4 Social Proof Section, Phase 6 Pricing Table (3 tiers), Phase 7 Footer. All 5 requested sections present."
+        }
+      ],
+      "total_tokens": 29484,
+      "duration_seconds": 218.1,
+      "summary": {
+        "total": 8,
+        "passed": 6,
+        "failed": 2,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "saas-landing",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 0.875,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains extensive hex codes: #0B0F19, #131927, #1A2236, #1E293B, #334155, #F1F5F9, #94A3B8, #64748B, #10B981, #059669, #06B6D4, #F59E0B, #EF4444"
+        },
+        {
+          "text": "DDD names specific font families, not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD names Inter for headlines/body and JetBrains Mono for code/monospace"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 48px, 32px, 24px, 18px, 16px, 14px, 12px. Spacing: 4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px, 80px, 120px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": true,
+          "evidence": "Two font families: Inter (headlines + body) and JetBrains Mono (code/CLI). Only 2 families."
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8",
+          "passed": false,
+          "evidence": "Spacing scale includes 12px (space-3) and 80px (space-12) and 120px (space-16). While 80 and 120 are multiples of 8, 12px is not a multiple of 8 (12/8 = 1.5)"
+        },
+        {
+          "text": "Build plan contains forge CLI commands",
+          "passed": true,
+          "evidence": "Build plan contains ~150 forge commands including forge insert frame, forge insert text, forge style, forge set-layout, forge insert stack, forge move"
+        },
+        {
+          "text": "Build plan includes forge screenshot after sections",
+          "passed": true,
+          "evidence": "Phase 7 includes 'forge screenshot DevForge-Landing --output devforge-landing-v1.png'"
+        },
+        {
+          "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+          "passed": true,
+          "evidence": "Build plan has Phase 2: Hero Section, Phase 3: Social Proof Logos, Phase 4: Features Grid (3x2), Phase 5: Pricing Table (3 tiers), Phase 6: Footer"
+        }
+      ],
+      "total_tokens": 73965,
+      "duration_seconds": 376.7,
+      "summary": {
+        "total": 8,
+        "passed": 7,
+        "failed": 1,
+        "pass_rate": 0.875
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "saas-landing",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "DDD contains actual hex color codes (#XXXXXX format)",
+          "passed": true,
+          "evidence": "DDD contains hex codes: #0A0A0B, #111113, #1A1A1E, #2A2A30, #3A3A44, #EDEDEF, #8B8B96, #5C5C66, #6366F1, #818CF8, #22C55E, #F59E0B, #EF4444"
+        },
+        {
+          "text": "DDD names specific font families, not generic 'sans-serif'",
+          "passed": true,
+          "evidence": "DDD names Instrument Sans (headings), Geist (body/nav/buttons), and JetBrains Mono (code/terminal)"
+        },
+        {
+          "text": "DDD has specific pixel values for spacing and font sizes",
+          "passed": true,
+          "evidence": "Font sizes: 64px, 36px, 20px, 16px, 15px, 14px, 12px, 10px. Spacing: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160px"
+        },
+        {
+          "text": "DDD specifies at most 2 font families",
+          "passed": false,
+          "evidence": "DDD specifies 3 font families: Instrument Sans (headings), Geist (body), and JetBrains Mono (code/terminal). Three distinct font families are named."
+        },
+        {
+          "text": "All spacing values in DDD are multiples of 8",
+          "passed": false,
+          "evidence": "Spacing scale includes 12px and 20px which are not multiples of 8. The base unit is stated as 4px, not 8px."
+        },
+        {
+          "text": "Build plan contains forge CLI commands",
+          "passed": true,
+          "evidence": "Build plan contains forge insert frame, forge insert text, forge style, forge set-layout, forge insert stack, forge move, forge screenshot, forge publish commands"
+        },
+        {
+          "text": "Build plan includes forge screenshot after sections",
+          "passed": true,
+          "evidence": "Phase 7 includes 'forge screenshot --id page', 'forge screenshot --id hero', 'forge screenshot --id pricing' commands"
+        },
+        {
+          "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+          "passed": true,
+          "evidence": "Build plan covers Phase 2: Hero, Phase 3: Social Proof Logos, Phase 4: Features Grid (3x2), Phase 5: Pricing Table (3 tiers), Phase 6: Footer"
+        }
+      ],
+      "total_tokens": 33933,
+      "duration_seconds": 243.1,
+      "summary": {
+        "total": 8,
+        "passed": 6,
+        "failed": 2,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vague-brief",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Response contains clarifying questions (question marks present)",
+          "passed": true,
+          "evidence": "Response contains multiple question marks: 'What does this website need to DO?', 'What should it FEEL like?', 'Who is the AUDIENCE?'"
+        },
+        {
+          "text": "Does NOT produce a full DDD without direction",
+          "passed": true,
+          "evidence": "Response is titled 'Status: Needs Direction' and explicitly states it needs answers before producing a DDD. No color palette, typography spec, or spacing system is defined."
+        },
+        {
+          "text": "Asks about site type or purpose",
+          "passed": true,
+          "evidence": "Question 1 asks 'What does this website need to DO?' with options: Landing page, Portfolio, SaaS product site, Agency, Blog, Documentation, Something else"
+        },
+        {
+          "text": "Asks about aesthetic direction, style, or references",
+          "passed": true,
+          "evidence": "Question 2 asks 'What should it FEEL like?' with options: Minimal, Bold, Editorial, Playful, Corporate, Brutalist. Also says 'If you have any reference sites, screenshots, or brand assets, share those'"
+        }
+      ],
+      "total_tokens": 27718,
+      "duration_seconds": 42.3,
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vague-brief",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Response contains clarifying questions (question marks present)",
+          "passed": true,
+          "evidence": "Response contains multiple question marks across 5 numbered sections with questions like 'What is this website for?', 'Who is the audience?', 'Any references or preferences?'"
+        },
+        {
+          "text": "Does NOT produce a full DDD without direction",
+          "passed": true,
+          "evidence": "Response explicitly avoids producing a design. States 'I could throw together a generic hero section with placeholder text right now, but you'd immediately want to change everything about it.' No DDD, color palette, or typography spec is produced."
+        },
+        {
+          "text": "Asks about site type or purpose",
+          "passed": true,
+          "evidence": "Question 1 asks 'What is this website for?' with options: Personal portfolio, Business/landing page, Blog/content site, SaaS product page, Something else"
+        },
+        {
+          "text": "Asks about aesthetic direction, style, or references",
+          "passed": true,
+          "evidence": "Question 4 asks 'Any references or preferences?' including 'Sites you admire or want to feel like?', 'Dark mode, light mode, colorful, minimal?', 'Any dealbreakers?'"
+        }
+      ],
+      "total_tokens": 15408,
+      "duration_seconds": 29.9,
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vague-brief",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 0.75,
+      "expectations": [
+        {
+          "text": "Response contains clarifying questions (question marks present)",
+          "passed": true,
+          "evidence": "Response contains multiple question marks: '1. What does this website DO?' and '2. Who is it for?' as section headings with question marks"
+        },
+        {
+          "text": "Does NOT produce a full DDD without direction",
+          "passed": true,
+          "evidence": "Response explicitly states 'HOLDING \u2014 Brief Too Vague to Commit Design Resources' and lists what it will deliver once answers are provided, but does not produce a DDD"
+        },
+        {
+          "text": "Asks about site type or purpose",
+          "passed": true,
+          "evidence": "Section '1. What does this website DO?' with a table listing: Personal portfolio, SaaS product landing, Business/agency site, E-commerce/store, Blog/content site, Web application, Event/launch page"
+        },
+        {
+          "text": "Asks about aesthetic direction, style, or references",
+          "passed": false,
+          "evidence": "Response asks about site type and audience but does not explicitly ask about aesthetic direction, style preferences, or reference sites. The 'Exploration Mode' section mentions presenting visual directions but does not ask the user about their style preferences."
+        }
+      ],
+      "total_tokens": 32753,
+      "duration_seconds": 87.8,
+      "summary": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1,
+        "pass_rate": 0.75
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "vague-brief",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Response contains clarifying questions (question marks present)",
+          "passed": true,
+          "evidence": "Response contains numerous question marks: 'What is this website for?', 'Who is the audience?', 'What should a visitor DO on this site?', 'What is the tone?', 'Are there existing brand assets?', etc."
+        },
+        {
+          "text": "Does NOT produce a full DDD without direction",
+          "passed": true,
+          "evidence": "Response states the brief is 'too open-ended to produce something meaningful' and only asks questions, providing no design system, colors, typography, or build plan"
+        },
+        {
+          "text": "Asks about site type or purpose",
+          "passed": true,
+          "evidence": "Question 1: 'What is this website for? A personal portfolio? A product landing page? A SaaS dashboard? A restaurant? An artist collective? A dev tool?'"
+        },
+        {
+          "text": "Asks about aesthetic direction, style, or references",
+          "passed": true,
+          "evidence": "Question 4: 'What is the tone? Serious and corporate? Playful and experimental? Luxurious and restrained? Raw and brutalist?' and Question 7: 'What sites do you admire? Even 2-3 reference URLs tell me more about your taste than a 10-page brief.'"
+        }
+      ],
+      "total_tokens": 17036,
+      "duration_seconds": 38.5,
+      "summary": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "grade-screenshot",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+          "passed": true,
+          "evidence": "Report has a grading table with separate grades for all 5 dimensions: Typography (A), Color (A), Spacing (A), Layout (A), Polish (B+)"
+        },
+        {
+          "text": "Overall grade is A or B (the described design follows best practices)",
+          "passed": true,
+          "evidence": "Overall grade is explicitly 'A' at the top of the report"
+        },
+        {
+          "text": "Report includes anti-slop checklist",
+          "passed": true,
+          "evidence": "Report includes a full 'Anti-Slop Checklist' section with 9 checkboxes covering: no purple-to-pink gradients, no generic Inter, max 2 fonts, no text < 14px, no wide centered text, spacing on 8px grid, contrast passes AA, no pure white/black, icon consistency"
+        }
+      ],
+      "total_tokens": 23730,
+      "duration_seconds": 75.5,
+      "summary": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "grade-screenshot",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 0.33,
+      "expectations": [
+        {
+          "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+          "passed": false,
+          "evidence": "Report has numbered sections for Typography (1), Color System (2), Spacing & Layout (3), Card Component (4), Accessibility (5). It covers typography, color, spacing, and layout but does NOT have a 'polish' dimension or letter grades per section. Sections have verdicts like 'Strong', 'Good pairing', 'Correct approach' but not formal letter grades for each dimension."
+        },
+        {
+          "text": "Overall grade is A or B (the described design follows best practices)",
+          "passed": true,
+          "evidence": "Overall grade is 'B+' stated at the top of the report, which falls within the A or B range"
+        },
+        {
+          "text": "Report includes anti-slop checklist",
+          "passed": false,
+          "evidence": "Report does not include an anti-slop checklist. It mentions 'purple-to-pink' or gradient concerns nowhere, and has no checklist-style section evaluating common anti-patterns."
+        }
+      ],
+      "total_tokens": 18630,
+      "duration_seconds": 91.5,
+      "summary": {
+        "total": 3,
+        "passed": 1,
+        "failed": 2,
+        "pass_rate": 0.33
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "grade-screenshot",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+          "passed": true,
+          "evidence": "Report includes separate graded sections: Color System (B+), Typography (A-), Spacing & Layout (A), Components (B), Dark Mode (A-), Accessibility (B). Covers all requested dimensions with individual grades."
+        },
+        {
+          "text": "Overall grade is A or B (the described design follows best practices)",
+          "passed": true,
+          "evidence": "Overall grade is B+, which falls within the A/B range. Report notes 'Solid foundation with professional choices across typography, color, and spacing.'"
+        },
+        {
+          "text": "Report includes anti-slop checklist",
+          "passed": true,
+          "evidence": "Section '7. Anti-Pattern Check' contains a table checking: AI purple gradients (TRIGGERED), more than 2 accent colors (PASS), no loading states, thin fonts for data (PASS), color-only information, placeholder-as-label, generated SVG icons, inconsistent icon stroke weight"
+        }
+      ],
+      "total_tokens": 66260,
+      "duration_seconds": 162.7,
+      "summary": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "grade-screenshot",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 0.67,
+      "expectations": [
+        {
+          "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+          "passed": true,
+          "evidence": "Report includes separate graded sections: Typography (D+), Color (C), Layout & Spacing (B+), Visual Details & Atmosphere (D), Accessibility (A-), Differentiation (F). Each has an individual letter grade."
+        },
+        {
+          "text": "Overall grade is A or B (the described design follows best practices)",
+          "passed": false,
+          "evidence": "Overall grade is C+. Report states 'It will not break anything, but it will not be remembered either. The design reads as AI-generated dark SaaS template.' The described design objectively follows best practices (8px grid, AA contrast, good fonts), so a C+ is too harsh."
+        },
+        {
+          "text": "Report includes anti-slop checklist",
+          "passed": true,
+          "evidence": "The 'Anti-Slop Detection Summary' table at end of report checks: Generic purple/blue gradient hero (FAIL), Typography > 2 families (PASS), Color palette with no semantic meaning (FAIL), Placeholder content (UNKNOWN), Cards with inconsistent border radius (N/A), Buttons with no hover/focus (UNKNOWN), Stock illustration (FAIL)"
+        }
+      ],
+      "total_tokens": 18669,
+      "duration_seconds": 82.6,
+      "summary": {
+        "total": 3,
+        "passed": 2,
+        "failed": 1,
+        "pass_rate": 0.67
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "diagnose-issues",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+          "passed": true,
+          "evidence": "Typography grade F states: '3 fonts used (Inter, Playfair Display, Fira Code for body)' and 'Three fonts from three entirely different families (geometric sans, transitional serif, monospace) creates visual chaos'"
+        },
+        {
+          "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+          "passed": true,
+          "evidence": "Polish grade D states: 'Three different border-radius values (8px, 16px, 24px) on the same page with no systematic reason' and 'Mixed radii at 8/16/24px is the exact C-grade example'"
+        },
+        {
+          "text": "Flags 13px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Typography grade states: 'Body text at 13px is below the 14px minimum' and anti-slop checklist marks FAIL for 'No text < 14px \u2014 Body text is 13px, below the 14px floor'"
+        },
+        {
+          "text": "Flags purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Color grade C states: 'The purple-to-pink gradient hero is the single most flagged anti-pattern in the design system.' Anti-slop checklist: 'FAIL \u2014 Purple-to-pink gradient is present on the hero. This is the #1 AI made this signal.'"
+        },
+        {
+          "text": "Flags 45px or 11px spacing as not on 8px grid",
+          "passed": true,
+          "evidence": "Spacing grade D states: '45px section spacing is not on the 8px grid (not divisible by 8)' and '11px button padding is also off-grid (nearest valid values: 8px or 16px)'. Anti-slop checklist: 'FAIL \u2014 45px section spacing and 11px button padding are both off-grid.'"
+        },
+        {
+          "text": "Overall grade is D or F",
+          "passed": true,
+          "evidence": "Overall grade is explicitly 'D' at the top of the report"
+        },
+        {
+          "text": "Provides specific fix recommendations",
+          "passed": true,
+          "evidence": "Fixes Required section provides 4 specific fix categories with actionable recommendations: '1. Reduce to 2 fonts, increase body size' (set body to 16px min), '2. Kill the gradient, fix white' (replace #FFFFFF with #E8E8E8), '3. Snap to 8px grid' (replace 45px with 96px, 11px with 16px), '4. Unify border-radius' (pick 12px or 16px)"
+        }
+      ],
+      "total_tokens": 23270,
+      "duration_seconds": 72.3,
+      "summary": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "diagnose-issues",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 0.71,
+      "expectations": [
+        {
+          "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+          "passed": true,
+          "evidence": "Issue 1 (High Severity): 'The design uses three different fonts \u2014 Inter, Playfair Display, and Fira Code \u2014 with Fira Code (a monospace font) assigned to body text.' Identifies all 3 fonts by name and explains why 3 is too many."
+        },
+        {
+          "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+          "passed": true,
+          "evidence": "Issue 3 (Medium Severity): 'Cards use mixed border-radius values \u2014 8px on some, 16px on others, and 24px on the CTA.' States 'A 3x range (8px to 24px) is too wide to read as intentional variation \u2014 it reads as accidental.'"
+        },
+        {
+          "text": "Flags 13px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue 2 (High Severity): 'Body text is set at 13px.' States 'The widely accepted minimum for body text on the web is 16px' and '13px falls below the widely accepted floor of 16px'. Note: flags as below 16px, not 14px specifically, but does clearly flag 13px as too small."
+        },
+        {
+          "text": "Flags purple-to-pink gradient as anti-pattern",
+          "passed": false,
+          "evidence": "Issue 6 (Low Severity) discusses the gradient but says 'A purple-to-pink gradient is a common pattern and not inherently problematic' and only flags potential brand conflict and visual transition issues. Does NOT identify it as an anti-pattern \u2014 rates it Low Severity and treats it as acceptable with caveats."
+        },
+        {
+          "text": "Flags 45px or 11px spacing as not on 8px grid",
+          "passed": true,
+          "evidence": "Issue 4 (Medium Severity): 'These values do not align with any standard spacing scale (4px, 8px, multiples of 4, or multiples of 8). A 45px gap and 11px padding are odd numbers that break grid alignment.'"
+        },
+        {
+          "text": "Overall grade is D or F",
+          "passed": false,
+          "evidence": "No overall letter grade is given. The report has a 'Summary Table' with severity ratings per issue and an 'Overall Assessment' paragraph, but no D or F grade. The assessment says 'strong foundations... but suffers from inconsistency' which implies a middling grade, not D or F."
+        },
+        {
+          "text": "Provides specific fix recommendations",
+          "passed": true,
+          "evidence": "Each of the 6 issues includes a 'Recommendation' section with specific fixes: 'Use Inter for body text... Remove Fira Code', 'Increase body text to 16px minimum', 'Standardize cards to a single border-radius (8px)', 'Use 48px or 64px for section spacing', 'Soften the white to #E8E8E8 or #F0F0F0'"
+        }
+      ],
+      "total_tokens": 16855,
+      "duration_seconds": 54.9,
+      "summary": {
+        "total": 7,
+        "passed": 5,
+        "failed": 2,
+        "pass_rate": 0.71
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "diagnose-issues",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 0.86,
+      "expectations": [
+        {
+          "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+          "passed": true,
+          "evidence": "Issue 1 titled 'Three Font Families \u2014 Typographic Chaos' explicitly identifies Inter, Playfair Display, and Fira Code as the three problematic fonts, calling it Critical severity and noting the anti-pattern 'Typography using more than 2 font families'"
+        },
+        {
+          "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+          "passed": true,
+          "evidence": "Issue 2 titled 'Inconsistent Border-Radius Across Components' identifies 'Three different border-radius values: Cards: some at 8px, others at 16px; CTA button: 24px' as High severity"
+        },
+        {
+          "text": "Flags 13px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue 4 titled '13px Body Text \u2014 Below Minimum Readable Size' states '13px body text falls between defined scale stops and sits below the 14px minimum for secondary body text', rated Critical severity"
+        },
+        {
+          "text": "Flags purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Issue 3 titled 'Purple-to-Pink Gradient Hero Background' calls it High severity and states 'Purple-to-pink gradients are the single most overused aesthetic in post-2023 web design'"
+        },
+        {
+          "text": "Flags 45px or 11px spacing as not on 8px grid",
+          "passed": true,
+          "evidence": "Issue 5 flags '45px section spacing \u2014 Off the 8px Grid' as High severity, and Issue 6 flags '11px button padding \u2014 Off-Grid and Undersized' as Medium severity"
+        },
+        {
+          "text": "Overall grade is D or F",
+          "passed": false,
+          "evidence": "No explicit overall letter grade is given. The report uses severity classifications (Critical/High/Medium) and states 'Overall: 1 pass, 1 warning, 6 failures' but never assigns a D or F letter grade"
+        },
+        {
+          "text": "Provides specific fix recommendations",
+          "passed": true,
+          "evidence": "Each of the 7 issues includes a 'Fix:' section with specific recommendations, e.g., 'Set body text to 16px minimum', 'Use 48px for major section breaks', 'Set button padding to 12px vertical, 16px horizontal'"
+        }
+      ],
+      "total_tokens": 45896,
+      "duration_seconds": 135.8,
+      "summary": {
+        "total": 7,
+        "passed": 6,
+        "failed": 1,
+        "pass_rate": 0.86
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "diagnose-issues",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+          "passed": true,
+          "evidence": "Issue 1 titled 'Three competing typefaces with no hierarchy logic' identifies Inter, Playfair Display, and Fira Code, calling it Critical severity and noting 'Using three fonts is not inherently wrong, but these three have no shared DNA'"
+        },
+        {
+          "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+          "passed": true,
+          "evidence": "Issue 3 titled 'Inconsistent border-radius across cards and CTA' identifies 'Three different border-radius values (8px, 16px, 24px)' as High severity"
+        },
+        {
+          "text": "Flags 13px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue 2 titled '13px body text is below the accessibility floor' states '16px (1rem) is the universally accepted baseline for body copy on the web' and rates it Critical severity"
+        },
+        {
+          "text": "Flags purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Issue 4 titled 'Purple-to-pink gradient hero is a design cliche' states 'the single most overused background treatment in AI-generated and template-driven landing pages', rated High severity"
+        },
+        {
+          "text": "Flags 45px or 11px spacing as not on 8px grid",
+          "passed": true,
+          "evidence": "Issue 5 titled '45px section spacing breaks the 8-point grid' and Issue 6 titled '11px button padding is too thin and off-grid' both flag these values as not on the 8-point scale"
+        },
+        {
+          "text": "Overall grade is D or F",
+          "passed": true,
+          "evidence": "Overall grade is explicitly stated as 'D+' \u2014 'Needs a systemic rework, not incremental patches.'"
+        },
+        {
+          "text": "Provides specific fix recommendations",
+          "passed": true,
+          "evidence": "Each issue includes detailed fix recommendations with specific values, e.g., 'Set body text to 16px minimum (1rem)', 'Use 48px for section gaps', 'button padding to 12px/16px', and a complete CSS design tokens block"
+        }
+      ],
+      "total_tokens": 19162,
+      "duration_seconds": 87.6,
+      "summary": {
+        "total": 7,
+        "passed": 7,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "anti-slop-detection",
+      "configuration": "with_skill",
+      "configuration_label": "Design Forge",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Identifies purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Color grade F: 'Purple-to-pink gradient (#8B5CF6 to #EC4899) is the single most recognized AI made this signal in web design. It is explicitly banned in the anti-slop checklist'. Anti-slop check #1 FAIL: '#8B5CF6 to #EC4899 is exactly this pattern'"
+        },
+        {
+          "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+          "passed": true,
+          "evidence": "Typography grade F: 'Inter at 400 weight on a muted gray palette is the definition of generic AI output -- Inter requires bold brand colors to avoid looking templated.' Anti-slop check #2 FAIL: 'Inter 400 on muted gray -- textbook generic'"
+        },
+        {
+          "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+          "passed": true,
+          "evidence": "Spacing grade D: 'Centered text spanning the full 1440px container violates the max center-aligned width rule (600px max). At 12px font size, a 1440px container produces lines of ~240+ characters -- roughly 4x the recommended 65-75 character max line width.' Anti-slop check #5 FAIL."
+        },
+        {
+          "text": "Flags stock photo of people in office",
+          "passed": true,
+          "evidence": "Anti-slop check #6 FAIL: 'Generic people in an office stock photo'. Layout grade D: 'stock photo of people in an office answers none of them'. Fix #4: 'Stock photos of people in an office communicate nothing about your product' with 4 ranked alternatives."
+        },
+        {
+          "text": "Flags 12px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Typography grade F: '12px body text is below the 14px minimum for any content that isn't a badge or tag'. Anti-slop check #4 FAIL: '12px body text violates the minimum'. Fix table shows: Body size current 12px, fix to 16-18px."
+        },
+        {
+          "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+          "passed": true,
+          "evidence": "Fix #1 offers 3 gradient alternatives (solid dark, subtle brand-tinted, no gradient). Fix #2 suggests specific display fonts: Space Grotesk, Cabinet Grotesk, Clash Display. Fix #3: 'Max content width for centered text: 600px' or 'left-align in 600-700px column'. Each fix has concrete values."
+        }
+      ],
+      "total_tokens": 23526,
+      "duration_seconds": 83.6,
+      "summary": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "anti-slop-detection",
+      "configuration": "without_skill",
+      "configuration_label": "No Skill (Baseline)",
+      "pass_rate": 0.83,
+      "expectations": [
+        {
+          "text": "Identifies purple-to-pink gradient as anti-pattern",
+          "passed": false,
+          "evidence": "Issue #4 discusses the gradient as a 'Moderate Issue' and says it 'introduces several risks' around brand perception, contrast inconsistency, and saturation fatigue. But it does NOT identify it as an anti-pattern or common AI-generated signal. It treats it as a legitimate design choice with caveats, saying 'if keeping the gradient, desaturate it slightly'. This is a missed detection."
+        },
+        {
+          "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+          "passed": true,
+          "evidence": "Issue #2 'Inter at 400 weight on a gradient background': 'The thin strokes of a 400-weight font can visually vibrate against a busy or saturated background'. Also Issue #6 mentions 'muted gray palette alongside a saturated gradient' creates 'tonal disconnect'. The weight and palette weakness is flagged, though framed more as legibility than genericism."
+        },
+        {
+          "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+          "passed": true,
+          "evidence": "Issue #3 'Full-width text spanning 1440px': 'Centered text that spans the entire 1440px container produces extremely long line lengths. Comfortable reading requires line lengths of 45-75 characters (roughly 600-800px).' Recommends constraining to 680-800px max-width."
+        },
+        {
+          "text": "Flags stock photo of people in office",
+          "passed": true,
+          "evidence": "Issue #5 'Stock photo of people in an office': 'Generic office stock photography is one of the most overused patterns on the web. It communicates nothing specific about your product and actively undermines trust.' Recommends product screenshots, custom illustrations, or no image."
+        },
+        {
+          "text": "Flags 12px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue #1 'Extreme typographic scale imbalance': '12px body text is too small for comfortable reading on the web' and '12px falls below the widely accepted floor of 16px for body text'. Accessibility table marks 'Minimum font size: Failing (practical) \u2014 12px body text is below the practical 16px floor'."
+        },
+        {
+          "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+          "passed": true,
+          "evidence": "Issue #4 recommends 'desaturate it slightly or darken both endpoints' or 'add a semi-transparent dark overlay (rgba(0,0,0,0.3))'. Issue #3 recommends 'Constrain the text content to a max-width of 680-800px'. Issue #1 recommends 'Increase body text to 18-20px minimum. Push the heading to 56-64px'. Specific numeric alternatives provided."
+        }
+      ],
+      "total_tokens": 16753,
+      "duration_seconds": 70.9,
+      "summary": {
+        "total": 6,
+        "passed": 5,
+        "failed": 1,
+        "pass_rate": 0.83
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "anti-slop-detection",
+      "configuration": "vibe_check",
+      "configuration_label": "Vibe Check",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Identifies purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Issue 1 titled 'AI Purple Gradient \u2014 Instant Commoditization' explicitly identifies '#8B5CF6-to-#EC4899 is the default gradient of AI landing pages' as High severity, referencing the Universal Anti-Patterns rule"
+        },
+        {
+          "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+          "passed": true,
+          "evidence": "Issue 3 titled 'Inter 400 on Muted Gray \u2014 Legibility Failure' flags it as High severity, noting 'Inter at weight 400 is already a light-reading font. Pair it with muted gray text on a purple-to-pink gradient background, and you have a contrast problem'"
+        },
+        {
+          "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+          "passed": true,
+          "evidence": "Issue 4 titled 'Full-Width Text at 1440px \u2014 Unreadable Lines' states 'At 1440px container width with 18px text, you are looking at 160+ characters per line' and recommends 'Constrain the text block to max-width 680px'"
+        },
+        {
+          "text": "Flags stock photo of people in office",
+          "passed": true,
+          "evidence": "Issue 5 titled 'Stock Office Photo \u2014 Generic and Trust-Eroding' states 'A stock photo of people in an office communicates nothing about the product. It is the visual equivalent of lorem ipsum.'"
+        },
+        {
+          "text": "Flags 12px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue 2 identifies the broken type scale with '12px body text fails accessibility standards' and states 'Body text minimum 16px (Inter 400). For a hero section specifically, 18px is the floor'"
+        },
+        {
+          "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+          "passed": true,
+          "evidence": "Report provides specific alternatives: for gradient 'Pick one brand color. Build a tonal palette'; for typography 'Inter 600 at 48px heading, Inter 400 at 18px body'; for layout 'max-width 680px centered'; for image 'Product screenshot or UI mockup'"
+        }
+      ],
+      "total_tokens": 44079,
+      "duration_seconds": 136.1,
+      "summary": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    },
+    {
+      "eval_id": 5,
+      "eval_name": "anti-slop-detection",
+      "configuration": "frontend_design",
+      "configuration_label": "Frontend Design",
+      "pass_rate": 1.0,
+      "expectations": [
+        {
+          "text": "Identifies purple-to-pink gradient as anti-pattern",
+          "passed": true,
+          "evidence": "Issue 1 titled 'Purple-to-Pink Gradient Background' identifies it as High severity, calling it 'the single most overused color treatment in AI-generated and template web design' and stating '#8B5CF6-to-#EC4899 gradient (violet-to-pink) has become the default modern tech background'"
+        },
+        {
+          "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+          "passed": true,
+          "evidence": "Issue 2 titled 'Inter at 400 Weight' states 'Inter is explicitly called out in the skill guidelines as a generic, overused font to avoid' and 'Weight 400 (regular) compounds this: it is the most neutral weight of the most neutral font. Nothing about it communicates a point of view.'"
+        },
+        {
+          "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+          "passed": true,
+          "evidence": "Issue 4 titled 'Full-Width Centered Text on 1440px' states 'Body text spanning the full 1440px container means line lengths far exceed the optimal 45-75 character range' and recommends 'max-width: 680px'"
+        },
+        {
+          "text": "Flags stock photo of people in office",
+          "passed": true,
+          "evidence": "Issue 5 titled 'Stock Photo of People in an Office' states 'People smiling in an office is the most common hero image on the internet. Users have developed banner blindness to it.'"
+        },
+        {
+          "text": "Flags 12px body text as below 14px minimum",
+          "passed": true,
+          "evidence": "Issue 3 identifies '42px Heading / 12px Body Text \u2014 Broken Type Scale' as Critical severity, stating '12px body text is genuinely hard to read on most screens' and 'The WCAG recommendation is a minimum of 16px for body text'"
+        },
+        {
+          "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+          "passed": true,
+          "evidence": "Provides specific alternatives: for gradient 'warm amber (#F59E0B) to deep coral (#DC2626)' or 'deep navy (#0F172A)'; for fonts 'Playfair Display or Fraunces, Clash Display, Recoleta'; for alignment 'max-width: 65ch (~680px)'; for image 'Product screenshot/UI mockup'"
+        }
+      ],
+      "total_tokens": 18676,
+      "duration_seconds": 92.7,
+      "summary": {
+        "total": 6,
+        "passed": 6,
+        "failed": 0,
+        "pass_rate": 1.0
+      }
+    }
+  ],
+  "aggregates": {
+    "with_skill": {
+      "label": "Design Forge",
+      "pass_rate": {
+        "mean": 0.958,
+        "stddev": 0.093
+      },
+      "tokens": {
+        "mean": 29127,
+        "stddev": 6728
+      },
+      "duration_seconds": {
+        "mean": 113.9,
+        "stddev": 66.9
+      }
+    },
+    "without_skill": {
+      "label": "No Skill (Baseline)",
+      "pass_rate": {
+        "mean": 0.728,
+        "stddev": 0.202
+      },
+      "tokens": {
+        "mean": 20218,
+        "stddev": 5009
+      },
+      "duration_seconds": {
+        "mean": 103.7,
+        "stddev": 64.5
+      }
+    },
+    "vibe_check": {
+      "label": "Vibe Check",
+      "pass_rate": {
+        "mean": 0.914,
+        "stddev": 0.094
+      },
+      "tokens": {
+        "mean": 54255,
+        "stddev": 14362
+      },
+      "duration_seconds": {
+        "mean": 198.3,
+        "stddev": 101.3
+      }
+    },
+    "frontend_design": {
+      "label": "Frontend Design",
+      "pass_rate": {
+        "mean": 0.862,
+        "stddev": 0.141
+      },
+      "tokens": {
+        "mean": 23004,
+        "stddev": 6637
+      },
+      "duration_seconds": {
+        "mean": 133.1,
+        "stddev": 83.7
+      }
+    }
+  },
+  "run_summary": {
+    "delta_vs_baseline": {
+      "design_forge": "+0.23",
+      "vibe_check": "+0.186",
+      "frontend_design": "+0.133"
+    }
+  },
+  "notes": [
+    "4-way comparison: Design Forge vs Vibe Check vs Frontend Design vs No Skill",
+    "Design Forge: 95.8% pass rate, 29127 avg tokens",
+    "Vibe Check: 91.4% pass rate, 54255 avg tokens",
+    "Frontend Design: 86.2% pass rate, 23004 avg tokens",
+    "No Skill: 72.8% pass rate, 20218 avg tokens",
+    "Design Forge leads on pass rate but Vibe Check and Frontend Design produce more creative/thorough outputs",
+    "All three skills use ~2-3x more tokens than baseline but produce measurably better structure",
+    "Font count assertion (max 2) trips all skills that add monospace for code \u2014 may need revision"
+  ]
+}

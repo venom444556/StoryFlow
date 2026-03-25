@@ -241,4 +241,57 @@ export function register(program) {
       await issues.nudge(project, key)
       out.success(`Nudged ${key}`)
     })
+
+  cmd
+    .command('batch-update')
+    .description('Batch update multiple issues at once')
+    .option('--project <project>', 'Override default project')
+    .option('--updates <json>', 'JSON array of updates: [{issue_key, status, ...}]')
+    .option('--stdin', 'Read updates from stdin')
+    .option('--json', 'Output raw JSON')
+    .action(async (opts) => {
+      const project = await resolveProject(opts.project)
+      let updates
+      if (opts.stdin) {
+        const chunks = []
+        for await (const chunk of process.stdin) chunks.push(chunk)
+        updates = JSON.parse(Buffer.concat(chunks).toString())
+      } else if (opts.updates) {
+        updates = JSON.parse(opts.updates)
+      } else {
+        out.error('Provide --updates <json> or --stdin')
+        return
+      }
+      if (!Array.isArray(updates)) updates = [updates]
+      const result = await issues.batchUpdate(project, { updates })
+      if (opts.json) return out.json(result)
+      out.success(`Updated ${result.updated?.length || 0} issues`)
+      if (result.errors?.length) {
+        for (const e of result.errors) {
+          out.error(`  ${e.issue_key || e.issue_id}: ${e.error}`)
+        }
+      }
+    })
+
+  cmd
+    .command('batch-done [keys...]')
+    .description('Mark multiple issues as Done')
+    .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
+    .action(async (keys, opts) => {
+      if (!keys.length) {
+        out.error('Provide at least one issue key')
+        return
+      }
+      const project = await resolveProject(opts.project)
+      const updates = keys.map((k) => ({ issue_key: k, status: 'Done' }))
+      const result = await issues.batchUpdate(project, { updates })
+      if (opts.json) return out.json(result)
+      out.success(`Marked ${result.updated?.length || 0} issues as Done`)
+      if (result.errors?.length) {
+        for (const e of result.errors) {
+          out.error(`  ${e.issue_key}: ${e.error}`)
+        }
+      }
+    })
 }

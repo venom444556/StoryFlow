@@ -130,6 +130,73 @@
 }
 
 /* =====================================================
+   SEMANTIC UX LAYER — PROVENANCE & STATES
+   Surfaces specifically prioritized for Agent operations
+   ===================================================== */
+
+/* Agent-critical surfaces - The highest visual priority */
+.surface-critical {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-emphasis);
+  box-shadow: var(--shadow-elevated);
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-default);
+}
+
+.surface-critical:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Provenance Blocks */
+.provenance-ai {
+  background: var(--color-ai-bg);
+  border: 1px solid var(--color-ai-border);
+  box-shadow: var(--color-ai-glow);
+  color: var(--color-ai);
+}
+
+.provenance-human {
+  background: var(--color-human-bg);
+  border: 1px solid var(--color-human-border);
+  box-shadow: var(--color-human-glow);
+  color: var(--color-human);
+}
+
+.provenance-system {
+  background: var(--color-system-bg);
+  border: 1px solid var(--color-system-border);
+  box-shadow: var(--color-system-glow);
+  color: var(--color-system);
+}
+
+/* Strong Operational States */
+.state-gate-pending {
+  background: var(--color-gate-pending-bg);
+  border: 1px solid var(--color-gate-pending-border);
+}
+.state-gate-rejected {
+  background: var(--color-gate-rejected-bg);
+  border: 1px solid var(--color-gate-rejected-border);
+}
+.state-gate-approved {
+  background: var(--color-gate-approved-bg);
+  border: 1px solid var(--color-gate-approved-border);
+}
+
+/* Canonical Page Shell */
+.surface-workstation {
+  @apply relative overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] shadow-sm;
+}
+
+/* Canonical Page Sidebar (usually inside a surface-workstation) */
+.workstation-sidebar {
+  @apply shrink-0 overflow-y-auto border-r border-[var(--color-border-default)] bg-[var(--color-bg-glass-subtle)];
+}
+
+/* =====================================================
    LIGHT MODE OVERRIDES — "Quiet Luxury"
    Solid surfaces, crisp borders, no glass effects.
    Inspired by: Orderze, Revior, Flowa, Apple.
@@ -169,6 +236,13 @@
 .theme-light .glass-sidebar {
   background: #ffffff;
   border-color: var(--color-border-default);
+}
+
+.theme-light .surface-workstation {
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--shadow-card);
 }
 
 /* -------------------------------------------------

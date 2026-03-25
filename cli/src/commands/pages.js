@@ -55,10 +55,11 @@ export function register(program) {
       '-t, --template <id>',
       'Template: blank, meeting-notes, technical-spec, requirements-doc, api-documentation, retrospective, adr'
     )
+    .option('--icon <emoji>', 'Page icon (emoji)')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       let content = opts.content || ''
-      let icon
+      let icon = opts.icon
       if (opts.template) {
         const tmpl = PAGE_TEMPLATES.find((t) => t.id === opts.template)
         if (!tmpl) {
@@ -66,7 +67,7 @@ export function register(program) {
           throw new Error(`Unknown template "${opts.template}". Available: ${ids}`)
         }
         if (!content) content = tmpl.content
-        icon = tmpl.icon
+        if (!icon) icon = tmpl.icon
       }
       const data = { title: opts.title, content }
       if (icon) data.icon = icon

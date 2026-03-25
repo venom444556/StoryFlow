@@ -266,7 +266,7 @@ export default function WorkflowTab({ project, onUpdate }) {
       />
 
       {/* 3-panel layout: sidebar | canvas | properties */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="surface-workstation flex-1 min-h-[700px] flex">
         {/* Left sidebar: palette + layers + templates */}
         <WorkflowSidebar onAddNode={handleAddNode} nodes={nodes} isExecuting={isExecuting} />
 

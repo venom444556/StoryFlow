@@ -1,0 +1,39 @@
+{
+  "eval_id": 1,
+  "eval_name": "saas-landing",
+  "prompt": "Create a landing page for 'DevForge', a developer CLI tool that automates code reviews. Inspired by Linear and Raycast. Dark mode, technical audience. Needs hero with product screenshot area, features grid (3 columns), social proof logos section, pricing table (3 tiers), and footer. The tagline is 'Code reviews on autopilot.'",
+  "assertions": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD names specific font families, not generic 'sans-serif'",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "type": "content_check"
+    },
+    {
+      "text": "DDD specifies at most 2 typefaces (display + body) \u2014 a monospace font for code/terminal is allowed as exception",
+      "type": "content_check"
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8",
+      "type": "content_check"
+    },
+    {
+      "text": "Build plan contains forge CLI commands",
+      "type": "content_check"
+    },
+    {
+      "text": "Build plan includes forge screenshot after sections",
+      "type": "content_check"
+    },
+    {
+      "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+      "type": "completeness_check"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # session-boot.sh — SessionStart enforcement hook
-# Fetches real StoryFlow context and sets AI status.
-# Outputs data, not reminders. The agent gets context it can act on.
+# Single-call context boot via `storyflow context boot --json`.
+# Outputs structured data the agent can act on immediately.
 # Graceful: if StoryFlow is offline or CLI missing, says so and exits.
 
 set -euo pipefail
@@ -27,121 +27,96 @@ fi
 # Set AI status to working
 storyflow ai-status set working &>/dev/null 2>&1 || true
 
-# Fetch last session context
-session=$(storyflow sessions latest --json 2>/dev/null) || session='{}'
+# --- Single-call context boot ---
+ctx=$(storyflow context boot --json 2>/dev/null) || ctx=''
 
-# Fetch in-progress issues
-in_progress=$(storyflow issues list -s "In Progress" --json 2>/dev/null) || in_progress='[]'
+if [ -z "$ctx" ]; then
+  echo "StoryFlow session boot complete. AI status: working."
+  echo "Context boot returned empty — falling back to basic mode."
+  exit 0
+fi
 
-# Fetch blocked issues
-blocked=$(storyflow issues list -s "Blocked" --json 2>/dev/null) || blocked='[]'
+# Parse and format context output
+echo "$ctx" | python3 -c "
+import json, sys
 
-# Format output concisely — real data, not reminders
-echo "StoryFlow session boot complete. AI status: working."
+try:
+    d = json.load(sys.stdin)
+except:
+    print('StoryFlow session boot complete. AI status: working.')
+    print('Context parse failed — falling back to basic mode.')
+    sys.exit(0)
+
+print('StoryFlow session boot complete. AI status: working.')
 
 # Last session next steps
-echo "$session" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    ns = d.get('next_steps', d.get('nextSteps', ''))
-    if ns:
-        print(f'Last session next steps: {ns}')
-    else:
-        print('No previous session context.')
-except:
+session = d.get('lastSession')
+if session and session.get('nextSteps'):
+    print(f'Last session next steps: {session[\"nextSteps\"]}')
+else:
     print('No previous session context.')
-" 2>/dev/null || echo "No previous session context."
 
-# In Progress summary
-echo "$in_progress" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    items = d.get('issues', d) if isinstance(d, dict) else d
-    if not items:
-        print('In Progress: none')
-    else:
-        print(f'In Progress ({len(items)}):')
-        for i in items:
-            key = i.get('key', '?')
-            title = i.get('title', '?')
-            print(f'  {key}: {title}')
-except:
-    print('In Progress: unknown')
-" 2>/dev/null || echo "In Progress: unknown"
+# In Progress / Blocked from board counts
+board = d.get('board', {})
+by_status = board.get('byStatus', {})
+in_prog = by_status.get('In Progress', 0)
+blocked_count = by_status.get('Blocked', 0)
+print(f'In Progress: {\"none\" if in_prog == 0 else in_prog}')
+print(f'Blocked: {\"none\" if blocked_count == 0 else blocked_count}')
 
-# Blocked summary
-echo "$blocked" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    items = d.get('issues', d) if isinstance(d, dict) else d
-    if not items:
-        print('Blocked: none')
-    else:
-        print(f'Blocked ({len(items)}):')
-        for i in items:
-            key = i.get('key', '?')
-            title = i.get('title', '?')
-            reason = i.get('blockedReason', '')
-            line = f'  {key}: {title}'
-            if reason:
-                line += f' — {reason}'
-            print(line)
-except:
-    print('Blocked: unknown')
-" 2>/dev/null || echo "Blocked: unknown"
+# Active blockers with details
+blockers = d.get('activeBlockers', [])
+if blockers:
+    for b in blockers:
+        print(f'  {b.get(\"key\", \"?\")}: {b.get(\"title\", \"?\")}')
 
-# --- A-GRADE: Agent:* wiki pages ---
-pages=$(storyflow pages list --json 2>/dev/null) || pages='[]'
-echo "$pages" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    items = d.get('pages', d) if isinstance(d, dict) else d
-    agent = [p for p in items if p.get('title', '').startswith('Agent:')]
-    if agent:
-        print(f'Agent wiki pages ({len(agent)}):')
-        for p in agent:
-            print(f'  [{p.get(\"id\", \"?\")}] {p[\"title\"]}')
-    else:
-        print('Agent wiki pages: none')
-except:
-    print('Agent wiki pages: unknown')
-" 2>/dev/null || echo "Agent wiki pages: unknown"
+# Pending gates
+gates = d.get('pendingGates', [])
+gate_count = d.get('pendingGatesCount', 0)
+if gate_count > 0:
+    print(f'GATES: {gate_count} pending')
+    for g in gates:
+        print(f'  {g.get(\"entityTitle\", g.get(\"entityType\", \"?\"))} — {g.get(\"reasoning\", \"\")}')
 
-# --- A-GRADE: Board hygiene ---
-hygiene=$(storyflow hygiene --json 2>/dev/null) || hygiene='{}'
-echo "$hygiene" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    stale = d.get('staleIssues', d.get('stale', []))
-    orphans = d.get('orphanedStories', d.get('orphans', []))
-    dupes = d.get('duplicateCandidates', d.get('duplicates', []))
+# Steering directives
+directives = d.get('directives', [])
+dir_count = d.get('directivesCount', 0)
+if dir_count > 0:
+    print(f'DIRECTIVES: {dir_count} pending')
+    for dr in directives:
+        pri = dr.get('priority', 'normal')
+        print(f'  [{pri}] {dr.get(\"text\", \"\")}')
+
+# Agent wiki pages
+pages = d.get('agentPages', [])
+if pages:
+    print(f'Agent wiki pages ({len(pages)}):')
+    for p in pages:
+        print(f'  [{p.get(\"id\", \"?\")}] {p[\"title\"]}')
+
+# Hygiene
+hygiene = d.get('hygiene', {})
+findings = hygiene.get('findings', 0)
+if findings > 0:
     problems = []
-    if stale:
-        problems.append(f'{len(stale)} stale (In Progress >3 days)')
-        for s in stale[:3]:
-            problems.append(f'  {s.get(\"key\", \"?\")}: {s.get(\"title\", \"?\")}')
+    missing = hygiene.get('missingEstimates', [])
+    orphans = hygiene.get('orphanedStories', [])
+    stuck = hygiene.get('stuckIssues', [])
+    sprints = hygiene.get('completableSprints', [])
+    if missing:
+        problems.append(f'{len(missing)} missing estimates')
     if orphans:
-        problems.append(f'{len(orphans)} orphaned stories (no epic)')
-        for o in orphans[:3]:
-            problems.append(f'  {o.get(\"key\", \"?\")}: {o.get(\"title\", \"?\")}')
-    if dupes:
-        problems.append(f'{len(dupes)} possible duplicates')
-    if problems:
-        print('HYGIENE ISSUES:')
-        for p in problems:
-            print(f'  {p}')
-    else:
-        print('HYGIENE: Board is clean.')
-except:
-    print('HYGIENE: Could not run check.')
-" 2>/dev/null || echo "HYGIENE: Could not run check."
+        problems.append(f'{len(orphans)} orphaned stories')
+    if stuck:
+        problems.append(f'{len(stuck)} stuck 7+ days')
+    if sprints:
+        problems.append(f'{len(sprints)} completable sprint(s)')
+    print(f'HYGIENE: {\"  \".join(problems)}')
+else:
+    print('HYGIENE: Board is clean.')
+" 2>/dev/null || echo "StoryFlow session boot complete. AI status: working."
 
-# --- A-GRADE: Git cross-reference — auto-close stale To Do items ---
+# --- Git cross-reference — auto-close stale To Do items ---
 recent_keys=$(git log --oneline -20 2>/dev/null | grep -oE '\b[A-Z]{1,5}-[0-9]{1,4}\b' | sort -u) || recent_keys=''
 
 if [ -n "$recent_keys" ]; then

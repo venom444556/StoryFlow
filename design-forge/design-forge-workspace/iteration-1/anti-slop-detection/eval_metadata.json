@@ -1,0 +1,31 @@
+{
+  "eval_id": 5,
+  "eval_name": "anti-slop-detection",
+  "prompt": "I built a hero section with a purple-to-pink gradient background (#8B5CF6 to #EC4899), Inter font at 400 weight on a muted gray palette, centered text spanning the full 1440px container width, and a stock photo of people in an office. The heading is 42px and the body text is 12px. What do you think?",
+  "assertions": [
+    {
+      "text": "Identifies purple-to-pink gradient as anti-pattern",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags Inter at 400 weight on muted palette as generic/timid",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags centered text spanning full 1440px as too wide for center alignment",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags stock photo of people in office",
+      "type": "detection_check"
+    },
+    {
+      "text": "Flags 12px body text as below 14px minimum",
+      "type": "detection_check"
+    },
+    {
+      "text": "Suggests specific alternative choices (different gradient, font, alignment)",
+      "type": "content_check"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "passed": true,
+      "evidence": "DDD contains numerous hex codes: #0A0A0A, #141414, #1C1C1C, #2A2A2A, #E8E8E8, #8A8A8A, #555555, #6366F1, #5558E6, #22D3EE, #34D399, #383838"
+    },
+    {
+      "text": "DDD names specific font families, not generic 'sans-serif'",
+      "passed": true,
+      "evidence": "DDD specifies Space Grotesk (display), DM Sans (body), and JetBrains Mono (code snippets) — all specific named fonts"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "passed": true,
+      "evidence": "Font sizes: 64px, 44px, 24px, 20px, 18px, 16px, 14px, 12px, 48px. Spacing: 128px section padding, 64px internal gap, 32px card padding, 24px card gap, 16px element gap, 64px nav height"
+    },
+    {
+      "text": "DDD specifies at most 2 font families",
+      "passed": false,
+      "evidence": "DDD specifies 3 font families: Space Grotesk (display), DM Sans (body), and JetBrains Mono (monospace/code). While JetBrains Mono is used minimally for terminal accents, the assertion says 'at most 2'."
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8",
+      "passed": false,
+      "evidence": "Most values are on 8px grid (128px, 64px, 32px, 24px, 16px), but button padding is '14px 28px' — 14px and 28px are not multiples of 8. Also '10px 20px' for nav CTA, 6px 12px for badge padding — 6px, 10px, 14px, 28px are off-grid."
+    },
+    {
+      "text": "Build plan contains forge CLI commands",
+      "passed": true,
+      "evidence": "Build plan uses forge connect, forge create-project, forge insert frame, forge style, forge insert text, forge set-text, forge insert stack, forge set-layout, forge screenshot, forge publish throughout"
+    },
+    {
+      "text": "Build plan includes forge screenshot after sections",
+      "passed": true,
+      "evidence": "Screenshots after each section: step-1-nav.png, step-2-hero.png, step-3-logos.png, step-4-features.png, step-5-pricing.png, step-6-footer.png, full-page-qa.png"
+    },
+    {
+      "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+      "passed": true,
+      "evidence": "Build plan includes: Step 2 Hero, Step 4 Features Grid (3 columns, 6 cards), Step 3 Social Proof/Logo Bar, Step 5 Pricing Table (3 tiers), Step 6 Footer. All 5 requested sections present."
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 6,
+    "failed": 2,
+    "pass_rate": 0.75
+  }
+}

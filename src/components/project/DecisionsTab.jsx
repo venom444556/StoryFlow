@@ -131,11 +131,11 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
   }, [decisions])
 
   return (
-    <div className="flex h-full flex-col gap-4 md:flex-row">
+    <div className="surface-workstation flex-col md:flex-row min-h-[750px] flex">
       {/* Sidebar list — resizable */}
       <div
         className={[
-          'relative flex shrink-0 flex-col border-r border-[var(--color-border-default)]',
+          'workstation-sidebar relative flex py-4 flex-col',
           activeDecision ? 'hidden md:flex' : 'w-full max-w-3xl mx-auto md:flex',
         ].join(' ')}
         style={{

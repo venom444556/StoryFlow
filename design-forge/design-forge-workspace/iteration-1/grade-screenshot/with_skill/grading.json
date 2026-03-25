@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+      "passed": true,
+      "evidence": "Report has a grading table with separate grades for all 5 dimensions: Typography (A), Color (A), Spacing (A), Layout (A), Polish (B+)"
+    },
+    {
+      "text": "Overall grade is A or B (the described design follows best practices)",
+      "passed": true,
+      "evidence": "Overall grade is explicitly 'A' at the top of the report"
+    },
+    {
+      "text": "Report includes anti-slop checklist",
+      "passed": true,
+      "evidence": "Report includes a full 'Anti-Slop Checklist' section with 9 checkboxes covering: no purple-to-pink gradients, no generic Inter, max 2 fonts, no text < 14px, no wide centered text, spacing on 8px grid, contrast passes AA, no pure white/black, icon consistency"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "passed": true,
+      "evidence": "DDD contains hex codes: #0A0A0A, #111111, #1A1A1A, #1F1F1F, #2A2A2A, #EDEDED, #888888, #555555, #C8FF00"
+    },
+    {
+      "text": "DDD names specific font families (e.g. Space Grotesk, DM Sans), not generic 'sans-serif'",
+      "passed": true,
+      "evidence": "DDD names Instrument Serif, Satoshi, and JetBrains Mono as specific font families"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "passed": true,
+      "evidence": "Font sizes: 96px, 48px, 32px, 20px, 16px, 12px. Spacing: 8px, 16px, 24px, 32px, 48px, 64px, 96px, 128px, 160px"
+    },
+    {
+      "text": "DDD specifies at most 2 font families",
+      "passed": false,
+      "evidence": "DDD specifies 3 font families: Instrument Serif (headings), Satoshi (body), and JetBrains Mono (tags/metadata). Even though mono is a specialized accent, the assertion strictly says 'at most 2 font families' and 3 are named"
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8 (or 4 for icon padding)",
+      "passed": false,
+      "evidence": "Spacing scale includes 160px (multiple of 8, OK) but also uses 12px in capability grid crossAxisSpacing and 10px in tag pill padding ('4px 10px'). 10px is not a multiple of 8 or 4-for-icon-padding"
+    },
+    {
+      "text": "Build plan contains forge CLI commands (forge insert, forge style, etc.)",
+      "passed": true,
+      "evidence": "Build plan contains 133 forge commands including forge insert frame, forge insert text, forge style, forge insert stack, forge move, forge set-layout"
+    },
+    {
+      "text": "Build plan includes forge screenshot commands after major sections",
+      "passed": true,
+      "evidence": "Phase 7 includes forge screenshot commands for full page and each section: qa-nav.png, qa-hero.png, qa-work.png, qa-about.png, qa-approach.png, qa-contact.png"
+    },
+    {
+      "text": "Colors and fonts in forge commands match the DDD values",
+      "passed": true,
+      "evidence": "Build plan uses #0A0A0A (bg), #111111 (surface), #EDEDED (text), #888888 (secondary), #C8FF00 (accent), Instrument Serif, Satoshi, JetBrains Mono — all matching DDD"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 6,
+    "failed": 2,
+    "pass_rate": 0.75
+  }
+}

@@ -56,13 +56,18 @@ Plus: events, steering_directives, agent_sessions, snapshots (all separate SQL t
 All agent interaction with StoryFlow goes through the `storyflow` CLI via Bash. One command = one operation. Never use MCP tools — they don't exist anymore.
 
 ```bash
+storyflow context boot --json             # Single-call agent boot (preferred)
+storyflow search "auth" --json            # Cross-entity search
+storyflow resolve issue "SC-42" --json    # Fuzzy entity resolution
 storyflow status                          # Connection check
 storyflow board                           # Visual board summary
 storyflow issues list --json              # All issues (parseable)
 storyflow issues create --title "..." --type story --points 3 --priority medium
 storyflow issues done SC-42               # Mark done
+storyflow issues batch-done SC-42 SC-43   # Mark multiple done
 storyflow issues block SC-42 -r "reason"  # Mark blocked with reason
 storyflow pages show <id>                 # Read wiki page
+storyflow pages create --title "..." --icon "📝"  # Create with icon
 storyflow sessions latest --json          # Last session context
 storyflow steer "message"                 # Steering directive
 storyflow ai-status set working           # Signal agent is active
@@ -77,17 +82,22 @@ All project knowledge lives inside StoryFlow: wiki pages, events, sessions. On s
 ### Boot sequence
 
 1. `storyflow status` — if offline, stop
-2. `storyflow projects list --json` — match project to current repo
-3. `storyflow sessions latest --json` — read next_steps from last session
-4. Read "Agent:*" wiki pages for persistent context
-5. `storyflow gates --json` — check pending approval gates
-6. `storyflow ai-status set working`
+2. `storyflow context boot --json` — single atomic call returning project state, AI status, gates, directives, board summary, last session, agent wiki pages, and hygiene
+3. `storyflow ai-status set working`
+
+The session-boot hook handles this automatically. If `context boot` fails, fall back to individual calls.
 
 ### Session end
 
-1. `storyflow sessions save --summary "..." --next-steps "..." --key-decisions "..."`
-2. Update "Agent:*" wiki pages with new knowledge
-3. `storyflow ai-status set idle`
+1. `storyflow sessions save --summary "..." --next-steps "..." --key-decisions "..." --work-done "..." --learnings "..."` — include all applicable fields
+2. Reconcile board: `storyflow issues batch-done <key1> <key2>` for completed work
+3. Update "Agent:*" wiki pages with new knowledge
+4. `storyflow ai-status set idle`
+
+### Finding things
+
+- `storyflow search "query" --json` — cross-entity search (issues, pages, decisions, nodes, components)
+- `storyflow resolve issue "SC-42" --json` — fuzzy resolution by key, title prefix, or UUID
 
 ## Conventions
 

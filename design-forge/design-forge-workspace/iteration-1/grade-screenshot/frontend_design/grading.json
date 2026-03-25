@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+      "passed": true,
+      "evidence": "Report includes separate graded sections: Typography (D+), Color (C), Layout & Spacing (B+), Visual Details & Atmosphere (D), Accessibility (A-), Differentiation (F). Each has an individual letter grade."
+    },
+    {
+      "text": "Overall grade is A or B (the described design follows best practices)",
+      "passed": false,
+      "evidence": "Overall grade is C+. Report states 'It will not break anything, but it will not be remembered either. The design reads as AI-generated dark SaaS template.' The described design objectively follows best practices (8px grid, AA contrast, good fonts), so a C+ is too harsh."
+    },
+    {
+      "text": "Report includes anti-slop checklist",
+      "passed": true,
+      "evidence": "The 'Anti-Slop Detection Summary' table at end of report checks: Generic purple/blue gradient hero (FAIL), Typography > 2 families (PASS), Color palette with no semantic meaning (FAIL), Placeholder content (UNKNOWN), Cards with inconsistent border radius (N/A), Buttons with no hover/focus (UNKNOWN), Stock illustration (FAIL)"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1,
+    "pass_rate": 0.67
+  }
+}

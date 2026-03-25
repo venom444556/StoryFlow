@@ -1,0 +1,25 @@
+{
+  "expectations": [
+    {
+      "text": "Report includes separate grades for typography, color, spacing, layout, and polish",
+      "passed": true,
+      "evidence": "Report includes separate graded sections: Color System (B+), Typography (A-), Spacing & Layout (A), Components (B), Dark Mode (A-), Accessibility (B). Covers all requested dimensions with individual grades."
+    },
+    {
+      "text": "Overall grade is A or B (the described design follows best practices)",
+      "passed": true,
+      "evidence": "Overall grade is B+, which falls within the A/B range. Report notes 'Solid foundation with professional choices across typography, color, and spacing.'"
+    },
+    {
+      "text": "Report includes anti-slop checklist",
+      "passed": true,
+      "evidence": "Section '7. Anti-Pattern Check' contains a table checking: AI purple gradients (TRIGGERED), more than 2 accent colors (PASS), no loading states, thin fonts for data (PASS), color-only information, placeholder-as-label, generated SVG icons, inconsistent icon stroke weight"
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

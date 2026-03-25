@@ -29,7 +29,7 @@ const app = express()
 
 // --- Request body validation helpers ---
 const VALID_ISSUE_TYPES = ['epic', 'story', 'task', 'bug', 'subtask']
-// const VALID_ISSUE_STATUSES = ['To Do', 'In Progress', 'Done']
+const VALID_ISSUE_PRIORITIES = ['critical', 'high', 'medium', 'low']
 const VALID_PROJECT_STATUSES = ['planning', 'in-progress', 'completed', 'on-hold']
 const VALID_SPRINT_STATUSES = ['planning', 'active', 'completed']
 
@@ -53,6 +53,9 @@ function validateIssueBody(body, isUpdate = false) {
     if (body.type !== undefined && !VALID_ISSUE_TYPES.includes(body.type)) {
       return `"type" must be one of: ${VALID_ISSUE_TYPES.join(', ')}`
     }
+  }
+  if (body.priority !== undefined && !VALID_ISSUE_PRIORITIES.includes(body.priority)) {
+    return `"priority" must be one of: ${VALID_ISSUE_PRIORITIES.join(', ')}`
   }
   if (body.storyPoints !== undefined && typeof body.storyPoints !== 'number') {
     return '"storyPoints" must be a number'
@@ -366,6 +369,85 @@ app.get('/api/projects/:id/board-summary', (req, res) => {
   const summary = db.getBoardSummary(req.params.id)
   if (!summary) return res.status(404).json({ error: 'Project not found' })
   res.json(summary)
+})
+
+// --- Context boot (agent contract — accepted schema) ---
+app.get('/api/projects/:id/context', (req, res) => {
+  const summary = db.getOperationalSummary(req.params.id, { includeHygiene: true })
+  if (!summary) return res.status(404).json({ error: 'Project not found' })
+
+  const status = aiStatus[req.params.id] || { status: 'idle', detail: '', updatedAt: null }
+  summary.agentState = status
+
+  const pending = checkApprovalGates(req.params.id)
+  summary.pendingGatesCount = pending.length
+  summary.pendingGates = pending.map((g) => ({
+    id: g.id,
+    entityType: g.entity_type,
+    entityTitle: g.entity_title,
+    reasoning: g.reasoning || null,
+    confidence: g.confidence || 0,
+    createdAt: g.timestamp,
+  }))
+
+  const directives = getSteeringDirectives(req.params.id)
+  summary.directivesCount = directives.length
+  summary.directives = directives
+
+  res.json(summary)
+})
+
+// --- Operational summary (Dashboard / Overview) ---
+app.get('/api/projects/:id/operational', (req, res) => {
+  const summary = db.getOperationalSummary(req.params.id)
+  if (!summary) return res.status(404).json({ error: 'Project not found' })
+
+  // Merge in-memory AI status (not in SQLite)
+  const status = aiStatus[req.params.id] || { status: 'idle', detail: '', updatedAt: null }
+  summary.agentState = status
+
+  // Merge gates from events system
+  const pending = checkApprovalGates(req.params.id)
+  summary.pendingGatesCount = pending.length
+  summary.pendingGates = pending.map((g) => ({
+    id: g.id,
+    entityType: g.entity_type,
+    entityTitle: g.entity_title,
+    reasoning: g.reasoning,
+    confidence: g.confidence,
+    createdAt: g.timestamp,
+  }))
+
+  // Merge unconsumed steering directives
+  const directives = getSteeringDirectives(req.params.id)
+  summary.directivesCount = directives.length
+  summary.directives = directives
+
+  res.json(summary)
+})
+
+// --- Cross-entity search ---
+app.get('/api/projects/:id/search', (req, res) => {
+  const query = (req.query.q || '').trim()
+  if (!query) return res.status(400).json({ error: '"q" query parameter is required' })
+  if (!db.projectExists(req.params.id)) return res.status(404).json({ error: 'Project not found' })
+
+  const types = req.query.types ? req.query.types.split(',') : null
+  const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100)
+  const results = db.searchEntities(req.params.id, query, { types, limit })
+  res.json({ query, results, total: results.length })
+})
+
+// --- Entity resolution ---
+app.get('/api/projects/:id/resolve', (req, res) => {
+  const type = req.query.type
+  const ref = (req.query.ref || '').trim()
+  if (!type || !ref)
+    return res.status(400).json({ error: '"type" and "ref" query parameters are required' })
+  if (!db.projectExists(req.params.id)) return res.status(404).json({ error: 'Project not found' })
+
+  const result = db.resolveEntity(req.params.id, type, ref)
+  res.json(result)
 })
 
 // --- Issues ---

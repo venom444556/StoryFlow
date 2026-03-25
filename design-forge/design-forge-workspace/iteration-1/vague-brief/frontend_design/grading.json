@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "text": "Response contains clarifying questions (question marks present)",
+      "passed": true,
+      "evidence": "Response contains numerous question marks: 'What is this website for?', 'Who is the audience?', 'What should a visitor DO on this site?', 'What is the tone?', 'Are there existing brand assets?', etc."
+    },
+    {
+      "text": "Does NOT produce a full DDD without direction",
+      "passed": true,
+      "evidence": "Response states the brief is 'too open-ended to produce something meaningful' and only asks questions, providing no design system, colors, typography, or build plan"
+    },
+    {
+      "text": "Asks about site type or purpose",
+      "passed": true,
+      "evidence": "Question 1: 'What is this website for? A personal portfolio? A product landing page? A SaaS dashboard? A restaurant? An artist collective? A dev tool?'"
+    },
+    {
+      "text": "Asks about aesthetic direction, style, or references",
+      "passed": true,
+      "evidence": "Question 4: 'What is the tone? Serious and corporate? Playful and experimental? Luxurious and restrained? Raw and brutalist?' and Question 7: 'What sites do you admire? Even 2-3 reference URLs tell me more about your taste than a 10-page brief.'"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "pass_rate": 1.0
+  }
+}

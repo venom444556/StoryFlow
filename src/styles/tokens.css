@@ -236,15 +236,36 @@
   --accent-default-rgb: var(--accent-active-rgb, 6, 182, 212);
 
   /* -------------------------------------------------
-     AI TRANSPARENCY TOKENS
-     Colors for distinguishing AI vs human activity
+     SEMANTIC UX LAYER: PROVENANCE
+     Colors distinguishing the origin of actions/content
      ------------------------------------------------- */
-  --color-ai-accent: #06b6d4; /* cyan — AI-authored content */
-  --color-ai-accent-rgb: 6, 182, 212;
-  --color-human-accent: #8b5cf6; /* purple — human-authored content */
-  --color-human-accent-rgb: 139, 92, 246;
-  --color-system-accent: #64748b; /* slate — system-generated */
-  --color-system-accent-rgb: 100, 116, 139;
+  --color-ai: #06b6d4; /* AI-authored */
+  --color-ai-rgb: 6, 182, 212;
+  --color-human: #8b5cf6; /* Human-authored */
+  --color-human-rgb: 139, 92, 246;
+  --color-system: #64748b; /* System-generated */
+  --color-system-rgb: 100, 116, 139;
+
+  /* -------------------------------------------------
+     SEMANTIC UX LAYER: OPERATIONAL STATES
+     State of the agent and gates
+     ------------------------------------------------- */
+  --color-state-working: #22c55e;
+  --color-state-idle: #64748b;
+  --color-state-blocked: #ef4444;
+  --color-state-needs-review: #f59e0b;
+
+  --color-gate-pending: #f59e0b;
+  --color-gate-rejected: #ef4444;
+  --color-gate-approved: #22c55e;
+
+  /* -------------------------------------------------
+     SEMANTIC UX LAYER: CONFIDENCE
+     Agent execution certainty
+     ------------------------------------------------- */
+  --color-confidence-high: #22c55e;
+  --color-confidence-medium: #f59e0b;
+  --color-confidence-low: #ef4444;
 }
 
 /* =====================================================
@@ -401,17 +422,40 @@
   --th-text-secondary: #8b92a5;
 
   /* -------------------------------------------------
-     AI TRANSPARENCY (themed)
+     SEMANTIC UX LAYER (Dark Theme)
      ------------------------------------------------- */
-  --color-ai-glow: rgba(6, 182, 212, 0.15); /* subtle glow on AI-created items */
-  --color-ai-border: rgba(6, 182, 212, 0.3);
-  --color-ai-bg: rgba(6, 182, 212, 0.08);
-  --color-human-glow: rgba(139, 92, 246, 0.15);
-  --color-human-border: rgba(139, 92, 246, 0.3);
-  --color-human-bg: rgba(139, 92, 246, 0.08);
-  --color-ai-working: #22c55e; /* green — AI is actively working */
-  --color-ai-idle: #64748b; /* muted — AI is idle */
-  --color-ai-blocked: #f59e0b; /* yellow — AI needs input */
+  /* Provenance */
+  --color-ai-glow: rgba(var(--color-ai-rgb), 0.15);
+  --color-ai-border: rgba(var(--color-ai-rgb), 0.3);
+  --color-ai-bg: rgba(var(--color-ai-rgb), 0.08);
+
+  --color-human-glow: rgba(var(--color-human-rgb), 0.15);
+  --color-human-border: rgba(var(--color-human-rgb), 0.3);
+  --color-human-bg: rgba(var(--color-human-rgb), 0.08);
+
+  --color-system-glow: rgba(var(--color-system-rgb), 0.1);
+  --color-system-border: rgba(var(--color-system-rgb), 0.2);
+  --color-system-bg: rgba(var(--color-system-rgb), 0.05);
+
+  /* Operational States */
+  --color-state-working-bg: rgba(34, 197, 94, 0.12);
+  --color-state-blocked-bg: rgba(239, 68, 68, 0.12);
+  --color-state-needs-review-bg: rgba(245, 158, 11, 0.12);
+
+  --color-gate-pending-bg: rgba(245, 158, 11, 0.15);
+  --color-gate-pending-border: rgba(245, 158, 11, 0.4);
+  --color-gate-rejected-bg: rgba(239, 68, 68, 0.15);
+  --color-gate-rejected-border: rgba(239, 68, 68, 0.4);
+  --color-gate-approved-bg: rgba(34, 197, 94, 0.15);
+  --color-gate-approved-border: rgba(34, 197, 94, 0.4);
+
+  /* Confidence */
+  --color-confidence-high-bg: rgba(34, 197, 94, 0.12);
+  --color-confidence-high-border: rgba(34, 197, 94, 0.3);
+  --color-confidence-medium-bg: rgba(245, 158, 11, 0.12);
+  --color-confidence-medium-border: rgba(245, 158, 11, 0.3);
+  --color-confidence-low-bg: rgba(239, 68, 68, 0.12);
+  --color-confidence-low-border: rgba(239, 68, 68, 0.3);
 
   /* Node & canvas tokens */
   --shadow-node-active:
@@ -431,20 +475,6 @@
     rgba(148, 163, 194, 0.03) 100%
   );
   --color-bg-obsidian-border: rgba(148, 163, 194, 0.1);
-
-  /* Confidence level tokens */
-  --color-confidence-high: #22c55e;
-  --color-confidence-high-bg: rgba(34, 197, 94, 0.12);
-  --color-confidence-high-border: rgba(34, 197, 94, 0.3);
-  --color-confidence-medium: #f59e0b;
-  --color-confidence-medium-bg: rgba(245, 158, 11, 0.12);
-  --color-confidence-medium-border: rgba(245, 158, 11, 0.3);
-  --color-confidence-low: #ef4444;
-  --color-confidence-low-bg: rgba(239, 68, 68, 0.12);
-  --color-confidence-low-border: rgba(239, 68, 68, 0.3);
-  --color-ai-glow-high: rgba(6, 182, 212, 0.15);
-  --color-ai-glow-medium: rgba(6, 182, 212, 0.08);
-  --color-ai-glow-low: rgba(239, 68, 68, 0.12);
 
   /* -------------------------------------------------
      BADGE COLORS
@@ -633,17 +663,40 @@
   --th-text-secondary: #7c8294;
 
   /* -------------------------------------------------
-     AI TRANSPARENCY (themed)
+     SEMANTIC UX LAYER (Light Theme)
      ------------------------------------------------- */
-  --color-ai-glow: rgba(8, 145, 178, 0.1);
-  --color-ai-border: rgba(8, 145, 178, 0.3);
-  --color-ai-bg: rgba(8, 145, 178, 0.06);
-  --color-human-glow: rgba(124, 58, 237, 0.1);
-  --color-human-border: rgba(124, 58, 237, 0.3);
-  --color-human-bg: rgba(124, 58, 237, 0.06);
-  --color-ai-working: #15803d;
-  --color-ai-idle: #7c8294;
-  --color-ai-blocked: #c2410c;
+  /* Provenance */
+  --color-ai-glow: rgba(var(--color-ai-rgb), 0.1);
+  --color-ai-border: rgba(var(--color-ai-rgb), 0.3);
+  --color-ai-bg: rgba(var(--color-ai-rgb), 0.06);
+
+  --color-human-glow: rgba(var(--color-human-rgb), 0.1);
+  --color-human-border: rgba(var(--color-human-rgb), 0.3);
+  --color-human-bg: rgba(var(--color-human-rgb), 0.06);
+
+  --color-system-glow: rgba(var(--color-system-rgb), 0.05);
+  --color-system-border: rgba(var(--color-system-rgb), 0.2);
+  --color-system-bg: rgba(var(--color-system-rgb), 0.04);
+
+  /* Operational States */
+  --color-state-working-bg: rgba(22, 163, 74, 0.08);
+  --color-state-blocked-bg: rgba(220, 38, 38, 0.08);
+  --color-state-needs-review-bg: rgba(202, 138, 4, 0.08);
+
+  --color-gate-pending-bg: rgba(202, 138, 4, 0.1);
+  --color-gate-pending-border: rgba(202, 138, 4, 0.35);
+  --color-gate-rejected-bg: rgba(220, 38, 38, 0.1);
+  --color-gate-rejected-border: rgba(220, 38, 38, 0.35);
+  --color-gate-approved-bg: rgba(22, 163, 74, 0.1);
+  --color-gate-approved-border: rgba(22, 163, 74, 0.35);
+
+  /* Confidence */
+  --color-confidence-high-bg: rgba(22, 163, 74, 0.1);
+  --color-confidence-high-border: rgba(22, 163, 74, 0.3);
+  --color-confidence-medium-bg: rgba(202, 138, 4, 0.1);
+  --color-confidence-medium-border: rgba(202, 138, 4, 0.3);
+  --color-confidence-low-bg: rgba(220, 38, 38, 0.1);
+  --color-confidence-low-border: rgba(220, 38, 38, 0.3);
 
   /* Node & canvas tokens (light) */
   --shadow-node-active:
@@ -663,20 +716,6 @@
     rgba(26, 29, 40, 0.01) 100%
   );
   --color-bg-obsidian-border: rgba(26, 29, 40, 0.08);
-
-  /* Confidence level tokens (light) */
-  --color-confidence-high: #15803d;
-  --color-confidence-high-bg: rgba(22, 163, 74, 0.1);
-  --color-confidence-high-border: rgba(22, 163, 74, 0.3);
-  --color-confidence-medium: #c2410c;
-  --color-confidence-medium-bg: rgba(202, 138, 4, 0.1);
-  --color-confidence-medium-border: rgba(202, 138, 4, 0.3);
-  --color-confidence-low: #dc2626;
-  --color-confidence-low-bg: rgba(220, 38, 38, 0.1);
-  --color-confidence-low-border: rgba(220, 38, 38, 0.3);
-  --color-ai-glow-high: rgba(8, 145, 178, 0.04);
-  --color-ai-glow-medium: rgba(8, 145, 178, 0.02);
-  --color-ai-glow-low: rgba(220, 38, 38, 0.03);
 
   /* -------------------------------------------------
      BADGE COLORS

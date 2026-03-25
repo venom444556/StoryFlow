@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "DDD contains actual hex color codes (#XXXXXX format)",
+      "passed": true,
+      "evidence": "DDD contains hex codes: #0A0A0B, #111113, #1A1A1E, #2A2A30, #3A3A44, #EDEDEF, #8B8B96, #5C5C66, #6366F1, #818CF8, #22C55E, #F59E0B, #EF4444"
+    },
+    {
+      "text": "DDD names specific font families, not generic 'sans-serif'",
+      "passed": true,
+      "evidence": "DDD names Instrument Sans (headings), Geist (body/nav/buttons), and JetBrains Mono (code/terminal)"
+    },
+    {
+      "text": "DDD has specific pixel values for spacing and font sizes",
+      "passed": true,
+      "evidence": "Font sizes: 64px, 36px, 20px, 16px, 15px, 14px, 12px, 10px. Spacing: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 120, 160px"
+    },
+    {
+      "text": "DDD specifies at most 2 font families",
+      "passed": false,
+      "evidence": "DDD specifies 3 font families: Instrument Sans (headings), Geist (body), and JetBrains Mono (code/terminal). Three distinct font families are named."
+    },
+    {
+      "text": "All spacing values in DDD are multiples of 8",
+      "passed": false,
+      "evidence": "Spacing scale includes 12px and 20px which are not multiples of 8. The base unit is stated as 4px, not 8px."
+    },
+    {
+      "text": "Build plan contains forge CLI commands",
+      "passed": true,
+      "evidence": "Build plan contains forge insert frame, forge insert text, forge style, forge set-layout, forge insert stack, forge move, forge screenshot, forge publish commands"
+    },
+    {
+      "text": "Build plan includes forge screenshot after sections",
+      "passed": true,
+      "evidence": "Phase 7 includes 'forge screenshot --id page', 'forge screenshot --id hero', 'forge screenshot --id pricing' commands"
+    },
+    {
+      "text": "Build plan covers all 5 requested sections: hero, features grid, social proof, pricing, footer",
+      "passed": true,
+      "evidence": "Build plan covers Phase 2: Hero, Phase 3: Social Proof Logos, Phase 4: Features Grid (3x2), Phase 5: Pricing Table (3 tiers), Phase 6: Footer"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "passed": 6,
+    "failed": 2,
+    "pass_rate": 0.75
+  }
+}

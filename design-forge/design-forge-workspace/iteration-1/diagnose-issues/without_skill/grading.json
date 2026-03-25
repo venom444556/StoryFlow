@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "Flags the 3-font violation (Inter + Playfair Display + Fira Code)",
+      "passed": true,
+      "evidence": "Issue 1 (High Severity): 'The design uses three different fonts — Inter, Playfair Display, and Fira Code — with Fira Code (a monospace font) assigned to body text.' Identifies all 3 fonts by name and explains why 3 is too many."
+    },
+    {
+      "text": "Flags inconsistent border-radius (8px/16px/24px mixed)",
+      "passed": true,
+      "evidence": "Issue 3 (Medium Severity): 'Cards use mixed border-radius values — 8px on some, 16px on others, and 24px on the CTA.' States 'A 3x range (8px to 24px) is too wide to read as intentional variation — it reads as accidental.'"
+    },
+    {
+      "text": "Flags 13px body text as below 14px minimum",
+      "passed": true,
+      "evidence": "Issue 2 (High Severity): 'Body text is set at 13px.' States 'The widely accepted minimum for body text on the web is 16px' and '13px falls below the widely accepted floor of 16px'. Note: flags as below 16px, not 14px specifically, but does clearly flag 13px as too small."
+    },
+    {
+      "text": "Flags purple-to-pink gradient as anti-pattern",
+      "passed": false,
+      "evidence": "Issue 6 (Low Severity) discusses the gradient but says 'A purple-to-pink gradient is a common pattern and not inherently problematic' and only flags potential brand conflict and visual transition issues. Does NOT identify it as an anti-pattern — rates it Low Severity and treats it as acceptable with caveats."
+    },
+    {
+      "text": "Flags 45px or 11px spacing as not on 8px grid",
+      "passed": true,
+      "evidence": "Issue 4 (Medium Severity): 'These values do not align with any standard spacing scale (4px, 8px, multiples of 4, or multiples of 8). A 45px gap and 11px padding are odd numbers that break grid alignment.'"
+    },
+    {
+      "text": "Overall grade is D or F",
+      "passed": false,
+      "evidence": "No overall letter grade is given. The report has a 'Summary Table' with severity ratings per issue and an 'Overall Assessment' paragraph, but no D or F grade. The assessment says 'strong foundations... but suffers from inconsistency' which implies a middling grade, not D or F."
+    },
+    {
+      "text": "Provides specific fix recommendations",
+      "passed": true,
+      "evidence": "Each of the 6 issues includes a 'Recommendation' section with specific fixes: 'Use Inter for body text... Remove Fira Code', 'Increase body text to 16px minimum', 'Standardize cards to a single border-radius (8px)', 'Use 48px or 64px for section spacing', 'Soften the white to #E8E8E8 or #F0F0F0'"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "passed": 5,
+    "failed": 2,
+    "pass_rate": 0.71
+  }
+}
