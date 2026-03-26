@@ -1,9 +1,10 @@
-import { createContext, useContext, useMemo } from 'react'
+import { createContext, useContext, useMemo, useEffect } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import {
   useProjectsStore,
   selectActiveProjects,
   selectTrashedProjects,
+  reloadFromServer,
 } from '../stores/projectsStore'
 
 // ---------------------------------------------------------------------------
@@ -27,6 +28,13 @@ export function ProjectsProvider({ children }) {
   // because filter() creates new arrays on every call; shallow compares elements
   const projects = useProjectsStore(useShallow(selectActiveProjects))
   const trashedProjects = useProjectsStore(useShallow(selectTrashedProjects))
+
+  // Always attempt a fresh server hydration on provider mount.
+  // The module-level bootstrap in projectsStore can miss during server restarts,
+  // which leaves the dashboard showing zero projects until another sync arrives.
+  useEffect(() => {
+    reloadFromServer()
+  }, [])
 
   // Get stable action references directly from store
   const addProject = useProjectsStore((state) => state.addProject)

@@ -68,6 +68,12 @@ storyflow issues batch-done SC-42 SC-43   # Mark multiple done
 storyflow issues block SC-42 -r "reason"  # Mark blocked with reason
 storyflow pages show <id>                 # Read wiki page
 storyflow pages create --title "..." --icon "📝"  # Create with icon
+storyflow pages audit --json             # Missing/stale core wiki pages
+storyflow pages ensure-core              # Create required core pages
+storyflow phases hot-wash generate <phase-ref>   # Generate phase hot wash
+storyflow phases hot-wash show <phase-ref>       # View hot wash report
+storyflow phases hot-wash finalize <phase-ref>   # Lock as final
+storyflow phases hot-wash lessons                # Project-level lessons learned rollup
 storyflow sessions latest --json          # Last session context
 storyflow steer "message"                 # Steering directive
 storyflow ai-status set working           # Signal agent is active
@@ -82,7 +88,7 @@ All project knowledge lives inside StoryFlow: wiki pages, events, sessions. On s
 ### Boot sequence
 
 1. `storyflow status` — if offline, stop
-2. `storyflow context boot --json` — single atomic call returning project state, AI status, gates, directives, board summary, last session, agent wiki pages, and hygiene
+2. `storyflow context boot --json` — single atomic call returning project state, AI status, gates, directives, board summary, last session, agent wiki pages, wiki audit, lessons learned rollup, and hygiene
 3. `storyflow ai-status set working`
 
 The session-boot hook handles this automatically. If `context boot` fails, fall back to individual calls.
@@ -91,8 +97,13 @@ The session-boot hook handles this automatically. If `context boot` fails, fall 
 
 1. `storyflow sessions save --summary "..." --next-steps "..." --key-decisions "..." --work-done "..." --learnings "..."` — include all applicable fields
 2. Reconcile board: `storyflow issues batch-done <key1> <key2>` for completed work
-3. Update "Agent:*" wiki pages with new knowledge
-4. `storyflow ai-status set idle`
+3. If any phase was completed this session, check hot wash: `storyflow phases hot-wash generate <phase-ref>`
+4. Review project-level lessons learned when hot washes changed: `storyflow phases hot-wash lessons --json`
+5. Run `storyflow pages audit --json`
+6. If required core pages are missing, run `storyflow pages ensure-core`
+7. Update stale or impacted wiki pages in the same session as the change
+8. Update "Agent:*" wiki pages with new knowledge
+9. `storyflow ai-status set idle`
 
 ### Finding things
 
@@ -122,6 +133,7 @@ The session-boot hook handles this automatically. If `context boot` fails, fall 
 - Never delete issues — only humans delete
 - Always provide confidence (0-1) and reasoning when recording events
 - Use `--template` when creating wiki pages that match a template (technical-spec, adr, retrospective)
+- Treat wiki freshness as a real operating responsibility, not a cleanup chore. Missing or stale core pages are agent failures.
 - When an issue moves to Done, update any linked workflow node to `success`
 - Comments use `body` field (not `text`)
 - Board summary uses `issueCount` (not `total`)

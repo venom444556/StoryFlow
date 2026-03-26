@@ -40,12 +40,16 @@ export default function GanttChart({
       const allDates = []
 
       const sorted = [...phases]
-        .filter((p) => p.startDate && p.endDate)
-        .sort((a, b) => a.startDate.localeCompare(b.startDate))
+        .filter((p) => p.startDate || p.endDate)
+        .sort((a, b) => {
+          const aDate = a.startDate || a.endDate || ''
+          const bDate = b.startDate || b.endDate || ''
+          return aDate.localeCompare(bDate)
+        })
 
       for (const p of sorted) {
-        allDates.push(parseISO(p.startDate))
-        allDates.push(parseISO(p.endDate))
+        allDates.push(parseISO(p.startDate || p.endDate))
+        allDates.push(parseISO(p.endDate || p.startDate))
       }
       for (const m of milestones) {
         if (m.date) allDates.push(parseISO(m.date))
@@ -101,8 +105,7 @@ export default function GanttChart({
       }
     }, [phases, milestones, containerWidth])
 
-  // No phases with dates at all — show empty state (no container needed)
-  const hasPhasesWithDates = phases.some((p) => p.startDate && p.endDate)
+  const hasPhasesWithDates = phases.some((p) => p.startDate || p.endDate)
   if (!hasPhasesWithDates) {
     return (
       <GlassCard>

@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-03-25T12:40:10.626Z",
+  "hooks": {
+    "sessionStart": "hooks/session-start.sh",
+    "sessionStop": "hooks/session-stop.sh",
+    "preMutation": "hooks/pre-mutation.sh",
+    "postMutation": "hooks/post-mutation.sh"
+  }
+}

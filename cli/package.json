@@ -6,6 +6,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
+    "storyflow": "bin/storyflow.js",
     "storyflow-cli": "bin/storyflow.js"
   },
   "files": [

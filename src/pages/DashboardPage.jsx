@@ -69,13 +69,13 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
 
   return (
     <div
-      onClick={() => navigate(`/project/${project.id}`)}
+      onClick={() => navigate(`/project/${project.id}/overview`)}
       className={[
-        'glass-card-elevated group cursor-pointer p-6 flex flex-col',
+        'glass-card-elevated group flex h-full min-h-[25rem] cursor-pointer flex-col p-6',
         `animate-entrance-scale stagger-${Math.min(index + 2, 8)}`,
       ].join(' ')}
     >
-      <div className="mb-4 flex items-start justify-between gap-3">
+      <div className="mb-4 flex min-h-12 items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3
             className="truncate text-lg font-semibold tracking-tight text-[var(--color-fg-default)] group-hover:text-[var(--accent-default)] transition-colors"
@@ -96,8 +96,8 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-6 bg-[var(--color-bg-glass)] rounded-md border border-[var(--color-border-muted)] p-3">
-        <div className="flex flex-col gap-1">
+      <div className="mb-6 grid auto-rows-fr grid-cols-2 gap-3 rounded-md border border-[var(--color-border-muted)] bg-[var(--color-bg-glass)] p-3">
+        <div className="flex min-h-[4.5rem] flex-col gap-1">
           <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
             Agent State
           </span>
@@ -107,7 +107,7 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
             {agentStateStr}
           </span>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex min-h-[4.5rem] flex-col gap-1">
           <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
             Gates
           </span>
@@ -117,7 +117,7 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
             {pendingGatesStr}
           </span>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex min-h-[4.5rem] flex-col gap-1">
           <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
             Blockers
           </span>
@@ -127,11 +127,14 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
             {blockersStr}
           </span>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex min-h-[4.5rem] flex-col gap-1">
           <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
             Last Activity
           </span>
-          <span className="text-xs text-[var(--color-fg-muted)] truncate" title={lastActivityStr}>
+          <span
+            className="line-clamp-2 text-xs leading-5 text-[var(--color-fg-muted)]"
+            title={lastActivityStr}
+          >
             {lastActivityStr}
           </span>
         </div>
@@ -140,7 +143,7 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
       <div className="flex-1" />
 
       {issues.length > 0 ? (
-        <div className="mb-4">
+        <div className="mb-4 min-h-[3.25rem]">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-[var(--color-fg-subtle)]">
               {doneCount}/{issues.length} issues done
@@ -158,10 +161,12 @@ function ProjectCard({ project, index, navigate, setTrashTarget }) {
           </div>
         </div>
       ) : (
-        <div className="mb-4 text-xs text-[var(--color-fg-faint)] italic">No issues tracked</div>
+        <div className="mb-4 flex min-h-[3.25rem] items-end text-xs italic text-[var(--color-fg-faint)]">
+          No issues tracked
+        </div>
       )}
 
-      <div className="pt-3 border-t border-[var(--color-border-muted)] flex flex-col gap-2">
+      <div className="flex min-h-[3.5rem] flex-col justify-end gap-2 border-t border-[var(--color-border-muted)] pt-3">
         {project.techStack && project.techStack.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1">
             {project.techStack.slice(0, 3).map((tech) => (
@@ -226,7 +231,7 @@ export default function DashboardPage() {
     setShowNewModal(false)
     setNewProjectName('')
     setNewProjectTechStack('')
-    navigate(`/project/${project.id}`)
+    navigate(`/project/${project.id}/overview`)
   }
 
   const handleKeyDown = (e) => {
@@ -342,7 +347,7 @@ export default function DashboardPage() {
 
       {/* Project grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((project, index) => (
             <ProjectCard
               key={project.id}

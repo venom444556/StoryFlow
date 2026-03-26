@@ -5,20 +5,11 @@ import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
 import { shortEpicTitle } from '../../utils/constants'
 
-const EPIC_COLORS = [
-  'bg-purple-400',
-  'bg-blue-400',
-  'bg-cyan-400',
-  'bg-green-400',
-  'bg-yellow-400',
-  'bg-orange-400',
-  'bg-pink-400',
-  'bg-red-400',
-]
+const EPIC_COLORS = ['bg-[var(--color-fg-muted)]']
 
-const MIN_WIDTH = 200
-const MAX_WIDTH = 480
-const DEFAULT_WIDTH = 256
+const MIN_WIDTH = 280
+const MAX_WIDTH = 600
+const DEFAULT_WIDTH = 320
 const COLLAPSED_WIDTH = 40
 const STORAGE_KEY = 'storyflow-epic-sidebar-width'
 
@@ -155,7 +146,7 @@ export default function EpicSidebar({
               <div className="flex items-center gap-2">
                 <Layers size={14} style={{ color: 'var(--accent-default)' }} />
                 <h3 className="text-sm font-semibold text-[var(--color-fg-muted)]">Epics</h3>
-                <Badge variant="purple" size="sm">
+                <Badge variant="default" size="sm">
                   {epicData.length}
                 </Badge>
               </div>

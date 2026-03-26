@@ -90,10 +90,21 @@ export function register(program) {
       const data = { name: opts.name, type: opts.type }
       if (opts.description) data.description = opts.description
       if (opts.parent) data.parentId = opts.parent
-      if (opts.deps) data.dependencies = opts.deps.split(',').map((s) => s.trim())
+      const deps = opts.deps ? opts.deps.split(',').map((s) => s.trim()) : []
       const result = await architecture.create(project, data)
+      if (opts.json && !deps.length) return out.json(result)
+      // Wire --deps to real architecture connections
+      if (deps.length) {
+        for (const depId of deps) {
+          await architecture.connections
+            .create(project, { fromComponentId: result.id, toComponentId: depId })
+            .catch(() => {})
+        }
+      }
       if (opts.json) return out.json(result)
-      out.success(`Created component: ${result.name} (${result.id})`)
+      out.success(
+        `Created component: ${result.name} (${result.id})${deps.length ? ` with ${deps.length} dep(s)` : ''}`
+      )
     })
 
   cmd
@@ -113,8 +124,23 @@ export function register(program) {
       if (opts.type) data.type = opts.type
       if (opts.description) data.description = opts.description
       if (opts.parent) data.parentId = opts.parent
-      if (opts.deps) data.dependencies = opts.deps.split(',').map((s) => s.trim())
+      const deps = opts.deps ? opts.deps.split(',').map((s) => s.trim()) : null
       const result = await architecture.update(project, componentId, data)
+      // Wire --deps to real architecture connections (replace existing)
+      if (deps) {
+        // Delete old outbound connections, create new ones
+        const existingConns = await architecture.connections.list(project)
+        for (const c of existingConns.filter(
+          (c) => (c.fromComponentId || c.from) === componentId
+        )) {
+          await architecture.connections.delete(project, c.id).catch(() => {})
+        }
+        for (const depId of deps) {
+          await architecture.connections
+            .create(project, { fromComponentId: componentId, toComponentId: depId })
+            .catch(() => {})
+        }
+      }
       if (opts.json) return out.json(result)
       out.success(`Updated component: ${result.name}`)
     })
@@ -129,6 +155,8 @@ export function register(program) {
       await architecture.delete(project, componentId)
       out.success(`Deleted component ${componentId}`)
     })
+
+  registerConnections(cmd)
 }
 
 function compType(t) {
@@ -143,4 +171,64 @@ function compType(t) {
     cache: chalk.yellow,
   }
   return (colors[t] || chalk.white)(t || '?')
+}
+
+export function registerConnections(cmd) {
+  const conn = cmd
+    .command('connections')
+    .alias('conn')
+    .description('Manage architecture dependency edges')
+
+  conn
+    .command('list [project]')
+    .alias('ls')
+    .description('List architecture connections')
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const list = await architecture.connections.list(project)
+      if (opts.json) return out.json(list)
+      out.heading('Architecture Connections')
+      if (!list.length) return console.log(chalk.gray('  No connections.'))
+      out.table(list, [
+        { header: 'ID', value: (r) => r.id.slice(0, 8), maxWidth: 10 },
+        {
+          header: 'From',
+          value: (r) => (r.fromComponentId || r.from || '').slice(0, 8),
+          maxWidth: 10,
+        },
+        { header: 'To', value: (r) => (r.toComponentId || r.to || '').slice(0, 8), maxWidth: 10 },
+        { header: 'Type', value: (r) => r.type || '-', maxWidth: 12 },
+      ])
+    })
+
+  conn
+    .command('create')
+    .description('Create an architecture connection')
+    .requiredOption('--from <componentId>', 'Source component ID')
+    .requiredOption('--to <componentId>', 'Target component ID')
+    .option('--type <type>', 'Connection type')
+    .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
+    .action(async (opts) => {
+      const project = await resolveProject(opts.project)
+      const result = await architecture.connections.create(project, {
+        fromComponentId: opts.from,
+        toComponentId: opts.to,
+        type: opts.type,
+      })
+      if (opts.json) return out.json(result)
+      out.success(`Created connection ${result.id.slice(0, 8)}`)
+    })
+
+  conn
+    .command('delete <connectionId>')
+    .alias('rm')
+    .description('Delete an architecture connection')
+    .option('--project <project>', 'Override default project')
+    .action(async (connectionId, opts) => {
+      const project = await resolveProject(opts.project)
+      await architecture.connections.delete(project, connectionId)
+      out.success(`Deleted connection ${connectionId.slice(0, 8)}`)
+    })
 }

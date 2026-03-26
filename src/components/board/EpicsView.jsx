@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, Layers } from 'lucide-react'
+import { ChevronRight, Layers, MoreHorizontal, Trash2, Pencil } from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
 import { BacklogRow } from './BacklogView'
 import ProgressBar from '../ui/ProgressBar'
 import Badge from '../ui/Badge'
 import EmptyState from '../ui/EmptyState'
 import GlassCard from '../ui/GlassCard'
+import DropdownMenu from '../ui/DropdownMenu'
 import { shortEpicTitle } from '../../utils/constants'
 
 export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) {
@@ -58,7 +59,7 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
               <button
                 type="button"
                 onClick={() => setExpandedEpicId(isExpanded ? null : epic.id)}
-                className="w-full cursor-pointer p-4 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)]"
+                className="group/epic w-full cursor-pointer p-4 text-left transition-colors hover:bg-[var(--color-bg-glass-hover)]"
               >
                 {/* Title row */}
                 <div className="flex items-center gap-2">
@@ -72,6 +73,31 @@ export default function EpicsView({ issues = [], onIssueClick, onDeleteIssue }) 
                   >
                     {shortEpicTitle(epic.title)}
                   </span>
+                  <div
+                    className="opacity-0 transition-opacity group-hover/epic:opacity-100"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <DropdownMenu
+                      trigger={
+                        <button className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]">
+                          <MoreHorizontal size={14} />
+                        </button>
+                      }
+                      items={[
+                        {
+                          icon: Pencil,
+                          label: 'View Details',
+                          onClick: () => onIssueClick?.(epic),
+                        },
+                        {
+                          icon: Trash2,
+                          label: 'Delete Epic',
+                          danger: true,
+                          onClick: () => onDeleteIssue?.(epic.id),
+                        },
+                      ]}
+                    />
+                  </div>
                   <motion.div
                     animate={{ rotate: isExpanded ? 90 : 0 }}
                     transition={{ duration: 0.15 }}

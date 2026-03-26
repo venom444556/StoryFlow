@@ -94,6 +94,38 @@ if pages:
     for p in pages:
         print(f'  [{p.get(\"id\", \"?\")}] {p[\"title\"]}')
 
+# Wiki audit
+wiki = d.get('wiki', {})
+missing_core = wiki.get('missingCorePages', [])
+stale_core = wiki.get('staleCorePages', [])
+if missing_core or stale_core:
+    print(f'WIKI: {wiki.get(\"findings\", len(missing_core) + len(stale_core))} documentation finding(s)')
+    if missing_core:
+        print('  Missing core pages:')
+        for p in missing_core:
+            print(f'    - {p.get(\"title\", \"?\")}')
+    if stale_core:
+        print('  Stale core pages:')
+        for p in stale_core:
+            print(f'    - {p.get(\"title\", \"?\")} ({p.get(\"daysStale\", \"?\")}d stale)')
+else:
+    print('WIKI: Core documentation is current.')
+
+# Lessons learned rollup
+lessons = d.get('lessons', {})
+lesson_summary = lessons.get('summary', {})
+reports_count = lesson_summary.get('reportsCount', 0)
+lessons_count = lesson_summary.get('lessonsCount', 0)
+follow_up_count = lesson_summary.get('followUpActionsCount', 0)
+draft_count = lesson_summary.get('draftCount', 0)
+if reports_count > 0:
+    print(
+        f'LESSONS: {reports_count} report(s), {lessons_count} lesson(s), {follow_up_count} follow-up action(s)'
+        + (f', {draft_count} draft(s)' if draft_count else '')
+    )
+else:
+    print('LESSONS: No project-level lessons captured yet.')
+
 # Hygiene
 hygiene = d.get('hygiene', {})
 findings = hygiene.get('findings', 0)

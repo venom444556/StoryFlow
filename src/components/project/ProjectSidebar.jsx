@@ -72,6 +72,7 @@ const TAB_KEY_MAP = {
   wiki: 'docs',
   decisions: 'docs',
   timeline: 'insights',
+  lessons: 'insights',
 }
 
 export default function ProjectSidebar({ activeTab, projectId, onTabChange }) {

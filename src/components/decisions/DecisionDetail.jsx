@@ -36,15 +36,16 @@ const STATUS_VARIANT = {
   deprecated: 'red',
 }
 
-function InlineTextArea({ value, onChange, placeholder, rows = 3, className = '' }) {
+function InlineTextArea({ value, onChange, placeholder, className = '' }) {
+  const rowCount = Math.max(1, (value || '').split('\n').length)
   return (
     <textarea
       value={value || ''}
       onChange={onChange}
       placeholder={placeholder}
-      rows={rows}
+      rows={rowCount}
       className={[
-        'glass-input w-full resize-none px-3 py-2 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]',
+        'w-full resize-none bg-transparent px-2 py-1.5 -ml-2 rounded-md text-[13px] leading-relaxed text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] hover:bg-[var(--color-bg-subtle)] focus:bg-[var(--color-bg-subtle)] focus:ring-1 focus:ring-[var(--color-border-emphasis)] outline-none transition-colors border-none',
         className,
       ]
         .filter(Boolean)
@@ -57,7 +58,7 @@ function SectionHeader({ children, className = '' }) {
   return (
     <h4
       className={[
-        'mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]',
+        'mb-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-subtle)]',
         className,
       ]
         .filter(Boolean)
@@ -72,55 +73,65 @@ function AlternativeItem({ alt, index, onUpdate, onRemove }) {
   const [expanded, setExpanded] = useState(true)
 
   return (
-    <div className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-3">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-transparent p-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <button
           type="button"
           onClick={() => setExpanded((prev) => !prev)}
-          className="flex items-center gap-2 text-sm font-medium text-[var(--color-fg-default)] transition-colors hover:text-[var(--color-fg-default)]"
+          className="flex items-center gap-2 text-[13px] font-semibold text-[var(--color-fg-default)] transition-colors hover:text-[var(--color-accent)]"
         >
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span className="text-[var(--color-fg-subtle)]">
+            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </span>
           <span>{alt.name || `Alternative ${index + 1}`}</span>
         </button>
         <button
           type="button"
           onClick={onRemove}
-          className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/20 hover:text-red-400"
+          className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-red-500/10 hover:text-red-400"
         >
           <Trash2 size={13} />
         </button>
       </div>
 
       {expanded && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-4 space-y-4">
           <div>
-            <label className="mb-1 block text-xs text-[var(--color-fg-muted)]">Name</label>
+            <label className="mb-1.5 block text-[11px] font-medium text-[var(--color-fg-muted)]">
+              Name
+            </label>
             <input
               value={alt.name || ''}
               onChange={(e) => onUpdate({ ...alt, name: e.target.value })}
               placeholder="Alternative name"
-              className="glass-input w-full px-3 py-1.5 text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)]"
+              className="w-full bg-transparent border border-[var(--color-border-default)] rounded-lg px-3 py-2 text-[13px] text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] hover:border-[var(--color-border-emphasis)] focus:border-[var(--accent-default)] focus:ring-1 focus:ring-[var(--accent-default)] outline-none transition-all"
             />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs text-green-400/80">Pros</label>
-              <InlineTextArea
-                value={alt.pros}
-                onChange={(e) => onUpdate({ ...alt, pros: e.target.value })}
-                placeholder="Advantages of this option..."
-                rows={2}
-              />
+              <label className="mb-1.5 block text-[11px] font-medium text-[var(--color-success)] opacity-90">
+                Pros
+              </label>
+              <div className="rounded-lg border border-[var(--color-success)]/20 bg-[var(--color-success)]/5 p-1 px-2">
+                <InlineTextArea
+                  value={alt.pros}
+                  onChange={(e) => onUpdate({ ...alt, pros: e.target.value })}
+                  placeholder="Advantages of this option..."
+                />
+              </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs text-red-400/80">Cons</label>
-              <InlineTextArea
-                value={alt.cons}
-                onChange={(e) => onUpdate({ ...alt, cons: e.target.value })}
-                placeholder="Disadvantages of this option..."
-                rows={2}
-              />
+              <label className="mb-1.5 block text-[11px] font-medium text-[var(--color-danger)] opacity-90">
+                Cons
+              </label>
+              <div className="rounded-lg border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/5 p-1 px-2">
+                <InlineTextArea
+                  value={alt.cons}
+                  onChange={(e) => onUpdate({ ...alt, cons: e.target.value })}
+                  placeholder="Disadvantages of this option..."
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -234,14 +245,19 @@ export default function DecisionDetail({ decision, index = 0, onUpdate, onClose 
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       className="flex h-full flex-col"
     >
-      <GlassCard padding="none" className="flex flex-1 flex-col overflow-hidden">
+      <GlassCard
+        padding="none"
+        className="flex flex-1 flex-col overflow-hidden border-0 border-l border-[var(--color-bg-obsidian-border)] rounded-none rounded-r-[var(--radius-lg)]"
+      >
         {/* Header — ADR number + title + status */}
         <div className="border-b border-[var(--color-border-default)] px-5 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-fg-subtle)]">
-                  ADR-{String(index + 1).padStart(3, '0')}
+                  {decision.sequenceNumber
+                    ? `ADR-${String(decision.sequenceNumber).padStart(3, '0')}`
+                    : 'ADR'}
                 </span>
                 <Badge variant={statusVariant} size="sm" outline>
                   {decision.status || 'proposed'}
@@ -259,7 +275,7 @@ export default function DecisionDetail({ decision, index = 0, onUpdate, onClose 
                 value={decision.title || ''}
                 onChange={handleFieldChange('title')}
                 placeholder="Decision title"
-                className="w-full bg-transparent text-lg font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] outline-none"
+                className="w-full bg-transparent text-lg font-semibold text-[var(--color-fg-default)] placeholder-[var(--color-fg-muted)] hover:bg-[var(--color-bg-subtle)] focus:bg-[var(--color-bg-subtle)] px-2 -ml-2 py-1 mt-1 rounded transition-colors outline-none border-none"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -367,32 +383,34 @@ export default function DecisionDetail({ decision, index = 0, onUpdate, onClose 
               <SectionHeader>Consequences</SectionHeader>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 flex items-center gap-1.5 text-xs text-[var(--color-success)]">
+                  <label className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-success)]">
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-success)]" />
                     Positive
                   </label>
-                  <InlineTextArea
-                    value={decision.consequencesPositive || decision.consequences || ''}
-                    onChange={(e) =>
-                      onUpdate(decision.id, { consequencesPositive: e.target.value })
-                    }
-                    placeholder="Benefits and positive outcomes..."
-                    rows={3}
-                  />
+                  <div className="rounded-lg border border-[var(--color-success)]/20 bg-[var(--color-success)]/5 px-2 py-1">
+                    <InlineTextArea
+                      value={decision.consequencesPositive || decision.consequences || ''}
+                      onChange={(e) =>
+                        onUpdate(decision.id, { consequencesPositive: e.target.value })
+                      }
+                      placeholder="Benefits and positive outcomes..."
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="mb-1 flex items-center gap-1.5 text-xs text-[var(--color-danger)]">
+                  <label className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-danger)]">
                     <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-danger)]" />
                     Negative
                   </label>
-                  <InlineTextArea
-                    value={decision.consequencesNegative || ''}
-                    onChange={(e) =>
-                      onUpdate(decision.id, { consequencesNegative: e.target.value })
-                    }
-                    placeholder="Trade-offs and risks..."
-                    rows={3}
-                  />
+                  <div className="rounded-lg border border-[var(--color-danger)]/20 bg-[var(--color-danger)]/5 px-2 py-1">
+                    <InlineTextArea
+                      value={decision.consequencesNegative || ''}
+                      onChange={(e) =>
+                        onUpdate(decision.id, { consequencesNegative: e.target.value })
+                      }
+                      placeholder="Trade-offs and risks..."
+                    />
+                  </div>
                 </div>
               </div>
             </div>

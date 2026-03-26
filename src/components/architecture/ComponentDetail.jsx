@@ -134,7 +134,7 @@ function MiniDepGraph({ component, allComponents }) {
   const rightStartY = centerY - ((rightNodes.length - 1) * gapY) / 2
 
   return (
-    <div className="mb-3 overflow-hidden rounded-lg bg-[var(--color-bg-glass)] p-2">
+    <div className="mb-3 overflow-hidden px-1">
       <svg
         width="100%"
         height={svgHeight}

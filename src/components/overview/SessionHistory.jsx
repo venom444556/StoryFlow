@@ -192,19 +192,26 @@ export default function SessionHistory({ projectId }) {
 
   if (sessions.length === 0) {
     return (
-      <div className="glass-card overflow-hidden">
-        <EmptyState
-          icon={History}
-          title="No agent sessions yet"
-          description="Session history will appear here after the AI agent completes work on your project"
-        />
+      <div className="glass-card overflow-hidden h-[400px] flex flex-col">
+        <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+          <SectionHeader icon={History} color="var(--color-ai-accent)" className="mb-0">
+            Session History
+          </SectionHeader>
+        </div>
+        <div className="flex-1 flex flex-col justify-center">
+          <EmptyState
+            icon={History}
+            title="No agent sessions yet"
+            description="Session history will appear here after the AI agent completes work on your project"
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="glass-card flex flex-col overflow-hidden">
-      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+    <div className="glass-card flex flex-col overflow-hidden h-[400px]">
+      <div className="border-b border-[var(--color-border-default)] px-5 py-4 shrink-0">
         <SectionHeader
           icon={History}
           color="var(--color-ai-accent)"
@@ -214,7 +221,7 @@ export default function SessionHistory({ projectId }) {
           Session History
         </SectionHeader>
       </div>
-      <div className="max-h-[400px] overflow-y-auto py-2">
+      <div className="flex-1 overflow-y-auto py-2">
         {sessions.map((session) => (
           <SessionCard key={session.id} session={session} />
         ))}

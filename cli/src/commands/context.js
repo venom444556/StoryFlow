@@ -115,6 +115,28 @@ export function register(program) {
         }
       }
 
+      // Wiki audit
+      if (ctx.wiki) {
+        const missing = ctx.wiki.missingCorePages || []
+        const stale = ctx.wiki.staleCorePages || []
+        if (missing.length > 0 || stale.length > 0) {
+          console.log()
+          console.log(chalk.yellow(`  Wiki findings: ${ctx.wiki.findings}`))
+          if (missing.length > 0) {
+            console.log(
+              chalk.red(`    Missing core pages: ${missing.map((p) => p.title).join(', ')}`)
+            )
+          }
+          if (stale.length > 0) {
+            console.log(
+              chalk.yellow(
+                `    Stale core pages: ${stale.map((p) => `${p.title} (${p.daysStale}d)`).join(', ')}`
+              )
+            )
+          }
+        }
+      }
+
       // Hygiene
       if (ctx.hygiene && ctx.hygiene.findings > 0) {
         console.log()

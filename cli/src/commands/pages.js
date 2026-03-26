@@ -6,6 +6,7 @@ import { pages, resolveProject } from '../client.js'
 import { PAGE_TEMPLATES } from '../templates.js'
 import * as out from '../output.js'
 import chalk from 'chalk'
+import { CORE_WIKI_PAGES, buildCoreWikiPageContent } from '../../../shared/wikiCorePages.js'
 
 export function register(program) {
   const cmd = program.command('pages').alias('page').alias('wiki').description('Manage wiki pages')
@@ -81,13 +82,108 @@ export function register(program) {
     .option('--project <project>', 'Override default project')
     .option('--title <title>', 'New title')
     .option('-c, --content <content>', 'New content')
+    .option('--icon <emoji>', 'Update icon')
     .action(async (pageId, opts) => {
       const project = await resolveProject(opts.project)
       const data = {}
       if (opts.title) data.title = opts.title
       if (opts.content) data.content = opts.content
+      if (opts.icon !== undefined) data.icon = opts.icon
       const result = await pages.update(project, pageId, data)
       out.success(`Updated page: ${result.title}`)
+    })
+
+  cmd
+    .command('audit [project]')
+    .description('Audit wiki freshness and required core pages')
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const audit = await pages.audit(project)
+      if (opts.json) return out.json(audit)
+
+      out.heading(`Wiki Audit — ${project}`)
+      console.log(
+        `  Findings: ${audit.findings} (threshold: ${audit.staleThresholdDays} day${audit.staleThresholdDays === 1 ? '' : 's'})`
+      )
+
+      if (audit.missingCorePages?.length) {
+        console.log()
+        console.log(chalk.red(`  Missing core pages (${audit.missingCorePages.length}):`))
+        for (const page of audit.missingCorePages) {
+          console.log(`    • ${page.title}`)
+        }
+      }
+
+      if (audit.staleCorePages?.length) {
+        console.log()
+        console.log(chalk.yellow(`  Stale core pages (${audit.staleCorePages.length}):`))
+        for (const page of audit.staleCorePages) {
+          console.log(`    • ${page.title} — ${page.daysStale} day(s) stale`)
+        }
+      }
+
+      if (!audit.findings) {
+        console.log(chalk.green('  Wiki backbone is current.'))
+      }
+    })
+
+  cmd
+    .command('ensure-core [project]')
+    .description('Create any missing required core wiki pages')
+    .option('--json', 'Output raw JSON')
+    .option('--dry-run', 'Show what would be created without writing')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const audit = await pages.audit(project)
+      const missing = audit.missingCorePages || []
+      const created = []
+
+      if (!opts.dryRun) {
+        for (const page of missing) {
+          const def = CORE_WIKI_PAGES.find((candidate) => candidate.slug === page.slug)
+          if (!def) continue
+          const result = await pages.create(project, {
+            title: def.title,
+            icon: def.icon,
+            content: buildCoreWikiPageContent(def),
+            status: 'draft',
+          })
+          created.push({ id: result.id, title: result.title, slug: def.slug })
+        }
+      }
+
+      if (opts.json) {
+        return out.json({
+          project,
+          dryRun: Boolean(opts.dryRun),
+          missing,
+          created,
+        })
+      }
+
+      if (opts.dryRun) {
+        out.heading(`Ensure Core Wiki Pages — ${project}`)
+        if (missing.length === 0) {
+          console.log(chalk.green('  No missing core pages.'))
+          return
+        }
+        console.log(chalk.yellow(`  Would create ${missing.length} page(s):`))
+        for (const page of missing) {
+          console.log(`    • ${page.title}`)
+        }
+        return
+      }
+
+      if (created.length === 0) {
+        out.success('No missing core wiki pages.')
+        return
+      }
+
+      out.success(`Created ${created.length} core wiki page(s).`)
+      for (const page of created) {
+        console.log(`  • ${page.title} (${page.id})`)
+      }
     })
 
   cmd

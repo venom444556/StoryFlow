@@ -11,10 +11,15 @@ export default function SectionHeader({
   const accentColor = color || 'var(--accent-default)'
 
   return (
-    <div className={['flex items-center gap-3', 'mb-[var(--space-4)]', className].join(' ')}>
-      <div className="h-5 w-1 shrink-0 rounded-full" style={{ backgroundColor: accentColor }} />
-      {Icon && <Icon size={16} style={{ color: accentColor }} />}
-      <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-fg-default)]">
+    <div className={['flex items-center gap-2.5', 'mb-[var(--space-4)]', className].join(' ')}>
+      {Icon && (
+        <Icon
+          size={15}
+          style={color ? { color } : undefined}
+          className={!color ? 'text-[var(--color-fg-muted)]' : ''}
+        />
+      )}
+      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-fg-subtle)]">
         {children}
       </h3>
       {count !== undefined && count !== null && (

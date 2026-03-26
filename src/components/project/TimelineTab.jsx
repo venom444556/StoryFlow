@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import {
   Plus,
   Flag,
@@ -32,15 +32,36 @@ const TIME_SCALES = [
   { key: 'months', label: 'Months' },
 ]
 
-export default function TimelineTab({
-  project,
-  addPhase,
-  updatePhase,
-  deletePhase,
-  addMilestone,
-  updateMilestone,
-  deleteMilestone,
-}) {
+function normalizeMilestone(milestone) {
+  if (!milestone) return milestone
+  const date = milestone.date || milestone.dueDate || null
+  return {
+    ...milestone,
+    date,
+    dueDate: milestone.dueDate || date,
+  }
+}
+
+function normalizeMilestones(milestones) {
+  return Array.isArray(milestones) ? milestones.map(normalizeMilestone) : []
+}
+
+function derivePhaseStatus(phase) {
+  const progress = Number(phase?.progress ?? 0)
+  if (progress >= 100) return 'completed'
+  if (progress > 0) return 'in-progress'
+  return phase?.status || 'pending'
+}
+
+function hasHotWashDetails(report) {
+  return (
+    !!report &&
+    Object.prototype.hasOwnProperty.call(report, 'lessonsLearned') &&
+    Object.prototype.hasOwnProperty.call(report, 'followUpActions')
+  )
+}
+
+export default function TimelineTab({ project }) {
   const [view, setView] = useState('list')
   const [timeScale, setTimeScale] = useState('weeks')
 
@@ -54,10 +75,145 @@ export default function TimelineTab({
   const [editingMilestone, setEditingMilestone] = useState(null)
   const [deletingMilestone, setDeletingMilestone] = useState(null)
 
-  const phases = project?.timeline?.phases || []
-  const milestones = project?.timeline?.milestones || []
+  const [phases, setPhases] = useState(() => project?.timeline?.phases || [])
+  const [milestones, setMilestones] = useState(() =>
+    normalizeMilestones(project?.timeline?.milestones || [])
+  )
 
-  // Compute summary stats
+  // Hot Wash State & Network
+  const [hotWashesMap, setHotWashesMap] = useState({})
+  const [generatingPhases, setGeneratingPhases] = useState(new Set())
+
+  const loadTimeline = useCallback(async () => {
+    if (!project?.id) return
+    try {
+      const [phasesRes, milestonesRes] = await Promise.all([
+        fetch(`/api/projects/${project.id}/phases`),
+        fetch(`/api/projects/${project.id}/milestones`),
+      ])
+      if (!phasesRes.ok || !milestonesRes.ok) {
+        throw new Error('Failed to refresh timeline data')
+      }
+      const [phasesData, milestonesData] = await Promise.all([
+        phasesRes.json(),
+        milestonesRes.json(),
+      ])
+      setPhases(Array.isArray(phasesData) ? phasesData : [])
+      setMilestones(normalizeMilestones(milestonesData))
+    } catch (err) {
+      console.error('Failed to load timeline:', err)
+    }
+  }, [project?.id])
+
+  const loadHotWashes = useCallback(async () => {
+    if (!project?.id) return
+    try {
+      const res = await fetch(`/api/projects/${project.id}/hot-washes`)
+      if (!res.ok) throw new Error('Failed to load hot washes')
+      const list = await res.json()
+      if (!Array.isArray(list)) return
+      const map = {}
+      for (const hw of list) map[hw.phase_id || hw.phaseId] = hw
+      setHotWashesMap(map)
+    } catch (err) {
+      console.error('Failed to load hot washes:', err)
+    }
+  }, [project?.id])
+
+  useEffect(() => {
+    setPhases(project?.timeline?.phases || [])
+    setMilestones(normalizeMilestones(project?.timeline?.milestones || []))
+    setHotWashesMap({})
+    setGeneratingPhases(new Set())
+  }, [project?.id])
+
+  useEffect(() => {
+    if (!project?.id) return
+    void loadTimeline()
+    void loadHotWashes()
+  }, [project?.id, loadTimeline, loadHotWashes])
+
+  const handleOpenHotWash = useCallback(
+    async (phaseId) => {
+      if (!project?.id) return
+      const current = hotWashesMap[phaseId]
+      if (!current || current.loading || hasHotWashDetails(current)) return
+
+      setHotWashesMap((prev) => ({
+        ...prev,
+        [phaseId]: { ...current, loading: true },
+      }))
+
+      try {
+        const res = await fetch(`/api/projects/${project.id}/phases/${phaseId}/hot-wash`)
+        if (!res.ok) throw new Error('Failed to load hot wash detail')
+        const report = await res.json()
+        setHotWashesMap((prev) => ({ ...prev, [phaseId]: report }))
+      } catch (err) {
+        console.error('Failed to load hot wash detail:', err)
+        setHotWashesMap((prev) => ({
+          ...prev,
+          [phaseId]: { ...current, loading: false },
+        }))
+      }
+    },
+    [hotWashesMap, project?.id]
+  )
+
+  const handleGenerateHotWash = useCallback(
+    async (phaseId) => {
+      if (!project?.id) return
+      setGeneratingPhases((prev) => new Set(prev).add(phaseId))
+      try {
+        const res = await fetch(`/api/projects/${project.id}/phases/${phaseId}/hot-wash/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        })
+        if (res.ok) {
+          const hw = await res.json()
+          setHotWashesMap((prev) => ({ ...prev, [phaseId]: hw }))
+        }
+      } catch (err) {
+        console.error('Failed to generate hot wash:', err)
+      } finally {
+        setGeneratingPhases((prev) => {
+          const next = new Set(prev)
+          next.delete(phaseId)
+          return next
+        })
+      }
+    },
+    [project?.id]
+  )
+
+  const handleFinalizeHotWash = useCallback(
+    async (phaseId) => {
+      if (!project?.id) return
+      try {
+        const res = await fetch(`/api/projects/${project.id}/phases/${phaseId}/hot-wash/finalize`, {
+          method: 'POST',
+        })
+        if (res.ok) {
+          const hw = await res.json()
+          setHotWashesMap((prev) => ({ ...prev, [phaseId]: hw }))
+        }
+      } catch (err) {
+        console.error('Failed to finalize hot wash:', err)
+      }
+    },
+    [project?.id]
+  )
+
+  const mergedPhases = useMemo(() => {
+    return phases.map((p) => {
+      const hw = hotWashesMap[p.id]
+      const generating = generatingPhases.has(p.id)
+      return {
+        ...p,
+        hotWash: hw || (generating ? { status: 'generating' } : null),
+      }
+    })
+  }, [phases, hotWashesMap, generatingPhases])
   const stats = useMemo(() => {
     const today = new Date()
     let earliest = null
@@ -106,55 +262,148 @@ export default function TimelineTab({
 
   // Phase handlers
   const handleCreatePhase = useCallback(
-    (data) => {
-      addPhase(data)
+    async (data) => {
+      if (!project?.id) return
+      const payload = {
+        ...data,
+        progress: Number(data.progress ?? 0),
+        status: derivePhaseStatus(data),
+      }
+      try {
+        const res = await fetch(`/api/projects/${project.id}/phases`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        const created = await res.json()
+        setPhases((prev) => [...prev, created])
+      } catch (err) {
+        console.error('Failed to create phase:', err)
+      }
     },
-    [addPhase]
+    [project?.id]
   )
 
   const handleUpdatePhase = useCallback(
-    (data) => {
+    async (data) => {
       if (!editingPhase) return
-      updatePhase(editingPhase.id, data)
-      setEditingPhase(null)
+      const payload = {
+        ...data,
+        progress: Number(data.progress ?? 0),
+        status: derivePhaseStatus(data),
+      }
+      try {
+        const res = await fetch(`/api/projects/${project.id}/phases/${editingPhase.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        const updated = await res.json()
+        setPhases((prev) => prev.map((phase) => (phase.id === editingPhase.id ? updated : phase)))
+        if (payload.status === 'completed') {
+          await loadHotWashes()
+        }
+        setEditingPhase(null)
+      } catch (err) {
+        console.error('Failed to update phase:', err)
+      }
     },
-    [editingPhase, updatePhase]
+    [editingPhase, loadHotWashes, project?.id]
   )
 
-  const handleDeletePhase = useCallback(() => {
+  const handleDeletePhase = useCallback(async () => {
     if (!deletingPhase) return
-    deletePhase(deletingPhase.id)
-    setDeletingPhase(null)
-  }, [deletingPhase, deletePhase])
+    try {
+      const res = await fetch(`/api/projects/${project.id}/phases/${deletingPhase.id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error(await res.text())
+      setPhases((prev) => prev.filter((phase) => phase.id !== deletingPhase.id))
+      setHotWashesMap((prev) => {
+        const next = { ...prev }
+        delete next[deletingPhase.id]
+        return next
+      })
+      setDeletingPhase(null)
+    } catch (err) {
+      console.error('Failed to delete phase:', err)
+    }
+  }, [deletingPhase, project?.id])
 
   // Milestone handlers
   const handleCreateMilestone = useCallback(
-    (data) => {
-      addMilestone(data)
+    async (data) => {
+      if (!project?.id) return
+      try {
+        const res = await fetch(`/api/projects/${project.id}/milestones`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        const created = normalizeMilestone(await res.json())
+        setMilestones((prev) => [...prev, created])
+      } catch (err) {
+        console.error('Failed to create milestone:', err)
+      }
     },
-    [addMilestone]
+    [project?.id]
   )
 
   const handleUpdateMilestone = useCallback(
-    (data) => {
+    async (data) => {
       if (!editingMilestone) return
-      updateMilestone(editingMilestone.id, data)
-      setEditingMilestone(null)
+      try {
+        const res = await fetch(`/api/projects/${project.id}/milestones/${editingMilestone.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        const updated = normalizeMilestone(await res.json())
+        setMilestones((prev) =>
+          prev.map((milestone) => (milestone.id === editingMilestone.id ? updated : milestone))
+        )
+        setEditingMilestone(null)
+      } catch (err) {
+        console.error('Failed to update milestone:', err)
+      }
     },
-    [editingMilestone, updateMilestone]
+    [editingMilestone, project?.id]
   )
 
-  const handleDeleteMilestone = useCallback(() => {
+  const handleDeleteMilestone = useCallback(async () => {
     if (!deletingMilestone) return
-    deleteMilestone(deletingMilestone.id)
-    setDeletingMilestone(null)
-  }, [deletingMilestone, deleteMilestone])
+    try {
+      const res = await fetch(`/api/projects/${project.id}/milestones/${deletingMilestone.id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error(await res.text())
+      setMilestones((prev) => prev.filter((milestone) => milestone.id !== deletingMilestone.id))
+      setDeletingMilestone(null)
+    } catch (err) {
+      console.error('Failed to delete milestone:', err)
+    }
+  }, [deletingMilestone, project?.id])
 
   const handleToggleMilestone = useCallback(
-    (milestone) => {
-      updateMilestone(milestone.id, { completed: !milestone.completed })
+    async (milestone) => {
+      try {
+        const res = await fetch(`/api/projects/${project.id}/milestones/${milestone.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed: !milestone.completed }),
+        })
+        if (!res.ok) throw new Error(await res.text())
+        const updated = normalizeMilestone(await res.json())
+        setMilestones((prev) => prev.map((item) => (item.id === milestone.id ? updated : item)))
+      } catch (err) {
+        console.error('Failed to toggle milestone:', err)
+      }
     },
-    [updateMilestone]
+    [project?.id]
   )
 
   // Click handlers from chart
@@ -257,7 +506,7 @@ export default function TimelineTab({
                     sub={`${milestones.length - stats.completedMilestones} pending`}
                   />
                 </div>
-                <div className="surface-workstation min-h-[600px] p-4">
+                <div className="surface-workstation with-steering-clearance min-h-[600px] p-4">
                   <GanttChart
                     phases={phases}
                     milestones={milestones}
@@ -277,12 +526,16 @@ export default function TimelineTab({
                 className="flex gap-6"
               >
                 {/* Phase Overview: timeline + sidebar */}
-                <div className="surface-workstation min-h-[600px] min-w-0 flex-1 p-4">
+                <div className="surface-workstation with-steering-clearance min-h-[600px] min-w-0 flex-1 p-4">
                   <TimelineView
-                    phases={phases}
+                    phases={mergedPhases}
                     milestones={milestones}
+                    projectId={project?.id}
                     onEditPhase={(phase) => setEditingPhase(phase)}
                     onDeletePhase={(phase) => setDeletingPhase(phase)}
+                    onOpenHotWash={handleOpenHotWash}
+                    onGenerateHotWash={handleGenerateHotWash}
+                    onFinalizeHotWash={handleFinalizeHotWash}
                     onEditMilestone={(milestone) => setEditingMilestone(milestone)}
                     onDeleteMilestone={(milestone) => setDeletingMilestone(milestone)}
                     onToggleMilestone={handleToggleMilestone}

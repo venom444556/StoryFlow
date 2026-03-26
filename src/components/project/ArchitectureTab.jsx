@@ -187,7 +187,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
       {/* View content */}
       {view === 'graph' ? (
         components.length === 0 ? (
-          <div className="surface-workstation min-h-[600px] flex-1 flex items-center justify-center">
+          <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 items-center justify-center">
             <EmptyState
               icon={Boxes}
               title="No components yet"
@@ -199,7 +199,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
             />
           </div>
         ) : (
-          <div className="surface-workstation min-h-[600px] flex-1 flex gap-4 p-1">
+          <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 gap-4 p-1">
             <DependencyGraph
               components={components}
               selectedId={selectedId}
@@ -224,8 +224,15 @@ export default function ArchitectureTab({ project, onUpdate }) {
           </div>
         )
       ) : (
-        <div className="surface-workstation min-h-[600px] flex-1 flex flex-col gap-4 md:flex-row p-1">
-          <div className="flex w-full shrink-0 flex-col max-h-64 md:max-h-none md:w-80">
+        <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 flex-col gap-4 overflow-hidden p-1 md:flex-row">
+          <div
+            className={[
+              'flex shrink-0 flex-col max-h-64 transition-all duration-300 md:max-h-none',
+              selected
+                ? 'w-full md:w-[320px] lg:w-[400px] border-r border-[var(--color-border-default)] pr-4'
+                : 'w-full max-w-4xl mx-auto',
+            ].join(' ')}
+          >
             <ComponentTree
               components={components}
               selectedId={selectedId}
@@ -235,9 +242,9 @@ export default function ArchitectureTab({ project, onUpdate }) {
             />
           </div>
 
-          <div className="flex-1">
+          <div className={selected ? 'flex-1 overflow-y-auto' : 'hidden'}>
             <AnimatePresence mode="wait">
-              {selected ? (
+              {selected && (
                 <ComponentDetail
                   key={selected.id}
                   component={selected}
@@ -246,27 +253,6 @@ export default function ArchitectureTab({ project, onUpdate }) {
                   onDelete={handleDeleteSelected}
                   parentOptions={parentOptions}
                 />
-              ) : (
-                <motion.div
-                  key="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="flex h-full items-center justify-center"
-                >
-                  <div className="text-center">
-                    <Network
-                      size={48}
-                      className="mx-auto mb-4 text-[var(--color-fg-subtle)]"
-                      strokeWidth={1.5}
-                    />
-                    <p className="text-sm text-[var(--color-fg-muted)]">
-                      {components.length > 0
-                        ? 'Select a component to view details'
-                        : 'Add your first component to get started'}
-                    </p>
-                  </div>
-                </motion.div>
               )}
             </AnimatePresence>
           </div>

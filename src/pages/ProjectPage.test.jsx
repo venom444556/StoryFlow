@@ -64,6 +64,12 @@ vi.mock('../components/project/DecisionsTab', () => ({
   default: ({ project }) => <div data-testid="decisions-tab">Decisions Tab - {project?.name}</div>,
 }))
 
+vi.mock('../components/project/LessonsLearnedTab', () => ({
+  default: ({ project }) => (
+    <div data-testid="lessons-tab">Lessons Learned Tab - {project?.name}</div>
+  ),
+}))
+
 // Mock useProject hook to bypass Zustand store
 const mockUpdateProject = vi.fn()
 const mockHooks = {
@@ -108,6 +114,7 @@ vi.mock('../hooks/useKeyboardShortcuts', () => ({
     TAB_WIKI: 'alt+5',
     TAB_TIMELINE: 'alt+6',
     TAB_DECISIONS: 'alt+7',
+    TAB_LESSONS: 'alt+8',
   },
 }))
 
@@ -310,6 +317,15 @@ describe('ProjectPage', () => {
 
       await waitFor(() => {
         expect(screen.getByTestId('timeline-tab')).toBeInTheDocument()
+      })
+    })
+
+    it('renders Lessons Learned tab on /insights/lessons route', async () => {
+      const project = createMockProject()
+      renderProjectPage({ project, initialPath: 'insights/lessons' })
+
+      await waitFor(() => {
+        expect(screen.getByTestId('lessons-tab')).toBeInTheDocument()
       })
     })
 
@@ -552,7 +568,7 @@ describe('ProjectPage', () => {
 
       // Input should appear
       await waitFor(() => {
-        expect(screen.getByRole('textbox')).toBeInTheDocument()
+        expect(screen.getByDisplayValue('Editable Project')).toBeInTheDocument()
       })
     })
   })

@@ -24,6 +24,14 @@ export default defineConfig({
           env: { STORYFLOW_RATE_LIMIT_MAX: '500' },
         },
       },
+      {
+        test: {
+          name: 'cli',
+          globals: true,
+          environment: 'node',
+          include: ['cli/**/*.{test,spec}.{js,ts}'],
+        },
+      },
     ],
     coverage: {
       provider: 'v8',

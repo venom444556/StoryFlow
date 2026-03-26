@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus,
@@ -149,9 +149,35 @@ function FeedItem({ event }) {
   )
 }
 
-export default function EventFeed({ className = '' }) {
+export default function EventFeed({ className = '', projectId = null }) {
   const [activeFilter, setActiveFilter] = useState('all')
-  const events = useEventStore(selectEvents)
+  const liveEvents = useEventStore(selectEvents)
+  const [baselineEvents, setBaselineEvents] = useState([])
+
+  useEffect(() => {
+    if (!projectId) return
+    let cancelled = false
+    fetch(`/api/projects/${encodeURIComponent(projectId)}/events?limit=100`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((events) => {
+        if (!cancelled) setBaselineEvents(Array.isArray(events) ? events : [])
+      })
+      .catch(() => {
+        if (!cancelled) setBaselineEvents([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [projectId])
+
+  const events = useMemo(() => {
+    const merged = [...liveEvents]
+    const seen = new Set(liveEvents.map((event) => event.id))
+    for (const event of baselineEvents) {
+      if (!seen.has(event.id)) merged.push(event)
+    }
+    return merged.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+  }, [liveEvents, baselineEvents])
 
   const filteredEvents = useMemo(() => {
     const filter = FILTERS.find((f) => f.key === activeFilter)
@@ -161,9 +187,9 @@ export default function EventFeed({ className = '' }) {
   }, [events, activeFilter])
 
   return (
-    <div className={`glass-card flex flex-col overflow-hidden ${className}`}>
+    <div className={`glass-card flex flex-col overflow-hidden h-full ${className}`}>
       {/* Header with filters */}
-      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+      <div className="border-b border-[var(--color-border-default)] px-5 py-4 shrink-0">
         <SectionHeader
           icon={Zap}
           color="var(--accent-default)"
@@ -195,13 +221,15 @@ export default function EventFeed({ className = '' }) {
       </div>
 
       {/* Event list */}
-      <div className="max-h-[400px] overflow-y-auto py-2">
+      <div className="flex-1 overflow-y-auto py-2">
         {filteredEvents.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+          <div className="flex flex-col items-center justify-center px-6 text-center h-full gap-1">
             <Zap size={28} className="mb-2 text-[var(--color-fg-faint)]" />
-            <p className="text-sm font-medium text-[var(--color-fg-muted)]">No activity yet</p>
+            <p className="text-sm font-medium text-[var(--color-fg-muted)]">No recent activity</p>
             <p className="mt-1 text-xs text-[var(--color-fg-subtle)]">
-              Events will appear here as the AI agent works on your project
+              {activeFilter === 'all'
+                ? 'Recent events will appear here as the agent works on your project. Historical events must be loaded manually.'
+                : 'Try changing your filter.'}
             </p>
           </div>
         ) : (

@@ -114,22 +114,39 @@ export function autoLayout(components) {
 
   // Group by layer
   const layerGroups = new Map()
+  let maxAssignedLayer = 0
   components.forEach((c) => {
-    const layer = layers.get(c.id)
+    const layer = layers.get(c.id) || 0
     if (!layerGroups.has(layer)) layerGroups.set(layer, [])
     layerGroups.get(layer).push(c.id)
+    if (layer > maxAssignedLayer) maxAssignedLayer = layer
   })
 
-  // Position each layer
-  for (const [layer, nodeIds] of layerGroups) {
-    const x = snapToGrid(60 + layer * (NODE_WIDTH + HORIZONTAL_GAP))
-    const totalHeight = nodeIds.length * NODE_HEIGHT + (nodeIds.length - 1) * VERTICAL_GAP
-    const startY = snapToGrid(Math.max(60, 200 - totalHeight / 2))
+  // Position each layer with grid-wrapping for massive disconnected sets
+  const MAX_PER_COLUMN = 6
+  let currentStartX = 60
 
-    nodeIds.forEach((id, index) => {
-      const y = snapToGrid(startY + index * (NODE_HEIGHT + VERTICAL_GAP))
-      positions.set(id, { x, y })
-    })
+  for (let layer = 0; layer <= maxAssignedLayer; layer++) {
+    const nodeIds = layerGroups.get(layer) || []
+    if (nodeIds.length === 0) continue
+
+    // Break massive layers into sub-columns
+    const numCols = Math.ceil(nodeIds.length / MAX_PER_COLUMN)
+
+    for (let col = 0; col < numCols; col++) {
+      const colNodes = nodeIds.slice(col * MAX_PER_COLUMN, (col + 1) * MAX_PER_COLUMN)
+      const x = snapToGrid(currentStartX)
+
+      const totalHeight = colNodes.length * NODE_HEIGHT + (colNodes.length - 1) * VERTICAL_GAP
+      const startY = snapToGrid(Math.max(60, 300 - totalHeight / 2))
+
+      colNodes.forEach((id, index) => {
+        const y = snapToGrid(startY + index * (NODE_HEIGHT + VERTICAL_GAP))
+        positions.set(id, { x, y })
+      })
+
+      currentStartX += NODE_WIDTH + HORIZONTAL_GAP
+    }
   }
 
   return positions

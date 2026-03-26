@@ -8,6 +8,7 @@ const DEFAULT_WIDTH = 380
 const STORAGE_KEY = 'storyflow-decisions-sidebar-width'
 import Button from '../ui/Button'
 import EmptyState from '../ui/EmptyState'
+import Select from '../ui/Select'
 import DecisionCard from '../decisions/DecisionCard'
 import DecisionDetail from '../decisions/DecisionDetail'
 import DecisionForm from '../decisions/DecisionForm'
@@ -123,15 +124,10 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
     return c
   }, [decisions])
 
-  // Compute original index for ADR numbering (based on creation order)
-  const decisionIndexMap = useMemo(() => {
-    const map = new Map()
-    decisions.forEach((d, i) => map.set(d.id, i))
-    return map
-  }, [decisions])
+  // ADR numbering now comes from immutable backend sequenceNumber values.
 
   return (
-    <div className="surface-workstation flex-col md:flex-row min-h-[750px] flex">
+    <div className="surface-workstation with-steering-clearance flex min-h-[750px] flex-col md:flex-row">
       {/* Sidebar list — resizable */}
       <div
         className={[
@@ -144,42 +140,37 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
         }}
       >
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between pr-4">
-          <h2 className="text-sm font-semibold text-[var(--color-fg-default)]">Decisions</h2>
+        <div className="mb-4 flex items-center justify-between px-4">
+          <h2 className="text-[13px] uppercase tracking-wider font-semibold text-[var(--color-fg-muted)]">
+            Decisions
+          </h2>
           <Button variant="ghost" size="sm" icon={Plus} onClick={() => setShowCreateForm(true)}>
             New
           </Button>
         </div>
 
-        {/* Filter tabs */}
-        <div className="mb-3 flex flex-wrap items-center gap-1 pr-4">
-          {FILTER_TABS.map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setStatusFilter(tab.value)}
-              className={[
-                'flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium transition-colors',
-                statusFilter === tab.value
-                  ? 'text-[var(--color-fg-default)]'
-                  : 'text-[var(--color-fg-muted)] hover:text-[var(--color-fg-default)]',
-              ].join(' ')}
-            >
-              {tab.label}
-              <span className="text-[10px] text-[var(--color-fg-subtle)]">{counts[tab.value]}</span>
-            </button>
-          ))}
+        {/* Filter Selection */}
+        <div className="mb-3 px-4">
+          <Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            options={FILTER_TABS.map((tab) => ({
+              value: tab.value,
+              label: `${tab.label} (${counts[tab.value]})`,
+            }))}
+            className="w-full text-[13px]"
+          />
         </div>
 
         {/* Decision list */}
-        <div className="flex-1 overflow-y-auto pr-2">
+        <div className="flex-1 overflow-y-auto">
           {filtered.length > 0 ? (
             <AnimatePresence mode="popLayout">
-              <div className="space-y-1">
+              <div className="flex flex-col border-t border-[var(--color-border-subtle)]">
                 {filtered.map((decision) => (
                   <DecisionCard
                     key={decision.id}
                     decision={decision}
-                    index={decisionIndexMap.get(decision.id) ?? 0}
                     isActive={activeDecision?.id === decision.id}
                     onEdit={handleCardClick}
                     onClick={handleCardClick}
@@ -243,7 +234,6 @@ export default function DecisionsTab({ project, addDecision, updateDecision }) {
               <DecisionDetail
                 key={activeDecision.id}
                 decision={activeDecision}
-                index={decisionIndexMap.get(activeDecision.id) ?? 0}
                 onUpdate={updateDecision}
                 onClose={handleCloseDetail}
               />

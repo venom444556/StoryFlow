@@ -134,6 +134,8 @@ export function register(program) {
       await workflow.unlink(project, nodeId, issueKey)
       out.success(`Unlinked ${issueKey} from node ${nodeId}`)
     })
+
+  registerConnections(cmd)
 }
 
 function nodeType(t) {
@@ -148,4 +150,62 @@ function nodeType(t) {
     group: chalk.gray,
   }
   return (colors[t] || chalk.white)(t || '?')
+}
+
+// --- Connection subcommands ---
+export function registerConnections(cmd) {
+  const conn = cmd.command('connections').alias('conn').description('Manage workflow edges')
+
+  conn
+    .command('list [project]')
+    .alias('ls')
+    .description('List workflow connections')
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
+      project = await resolveProject(project)
+      const list = await workflow.connections.list(project)
+      if (opts.json) return out.json(list)
+      out.heading('Workflow Connections')
+      if (!list.length) return console.log(chalk.gray('  No connections.'))
+      out.table(list, [
+        { header: 'ID', value: (r) => r.id.slice(0, 8), maxWidth: 10 },
+        {
+          header: 'From',
+          value: (r) => r.fromNodeId?.slice(0, 8) || r.from?.slice(0, 8),
+          maxWidth: 10,
+        },
+        { header: 'To', value: (r) => r.toNodeId?.slice(0, 8) || r.to?.slice(0, 8), maxWidth: 10 },
+        { header: 'Type', value: (r) => r.type || '-', maxWidth: 12 },
+      ])
+    })
+
+  conn
+    .command('create')
+    .description('Create a workflow connection')
+    .requiredOption('--from <nodeId>', 'Source node ID')
+    .requiredOption('--to <nodeId>', 'Target node ID')
+    .option('--type <type>', 'Connection type')
+    .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
+    .action(async (opts) => {
+      const project = await resolveProject(opts.project)
+      const result = await workflow.connections.create(project, {
+        fromNodeId: opts.from,
+        toNodeId: opts.to,
+        type: opts.type,
+      })
+      if (opts.json) return out.json(result)
+      out.success(`Created connection ${result.id.slice(0, 8)}`)
+    })
+
+  conn
+    .command('delete <connectionId>')
+    .alias('rm')
+    .description('Delete a workflow connection')
+    .option('--project <project>', 'Override default project')
+    .action(async (connectionId, opts) => {
+      const project = await resolveProject(opts.project)
+      await workflow.connections.delete(project, connectionId)
+      out.success(`Deleted connection ${connectionId.slice(0, 8)}`)
+    })
 }

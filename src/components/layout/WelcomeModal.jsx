@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 import { LayoutGrid, GitBranch, BookOpen, Clock, Scale, Boxes, Sparkles, X } from 'lucide-react'
 import Button from '../ui/Button'
 
@@ -46,8 +47,12 @@ const FEATURES = [
 
 export default function WelcomeModal() {
   const [isOpen, setIsOpen] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
+    if (location.pathname.startsWith('/project/')) {
+      return undefined
+    }
     try {
       const welcomed = localStorage.getItem(STORAGE_KEY)
       if (!welcomed) {
@@ -60,7 +65,7 @@ export default function WelcomeModal() {
       const timer = setTimeout(() => setIsOpen(true), 600)
       return () => clearTimeout(timer)
     }
-  }, [])
+  }, [location.pathname])
 
   // Listen for re-open events from Help button in sidebar
   useEffect(() => {

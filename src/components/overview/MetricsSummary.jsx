@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { LayoutGrid } from 'lucide-react'
 import Sparkline from '../ui/Sparkline'
+import SectionHeader from '../ui/SectionHeader'
 
 export function MetricTile({ icon: Icon, label, value, subtext, color, trend }) {
   return (
@@ -48,7 +49,7 @@ export function MetricTile({ icon: Icon, label, value, subtext, color, trend }) 
 function HeroStat({ value, label, color }) {
   return (
     <div
-      className="relative flex flex-col items-center justify-center overflow-hidden rounded-2xl px-6 py-8"
+      className="relative flex min-h-[7rem] flex-col items-center justify-center overflow-hidden rounded-2xl px-4 py-5"
       style={{
         background: 'var(--color-bg-glass)',
         border: '1px solid var(--color-border-default)',
@@ -58,43 +59,80 @@ function HeroStat({ value, label, color }) {
       <div
         className="absolute inset-0 opacity-[0.06]"
         style={{
-          background: `radial-gradient(circle at 50% 60%, ${color || 'var(--accent-default)'}, transparent 70%)`,
+          background: `radial-gradient(circle at 50% 60%, ${color || 'var(--accent-default)'}, transparent 80%)`,
         }}
       />
       <p
-        className="relative text-5xl font-bold leading-none tracking-tight"
+        className="relative text-3xl font-bold leading-none tracking-tight"
         style={{ color: color || 'var(--color-fg-default)' }}
       >
         {value}
       </p>
-      <p className="relative mt-3 text-sm font-medium text-[var(--color-fg-muted)]">{label}</p>
+      <p className="relative mt-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
+        {label}
+      </p>
     </div>
   )
 }
 
-export default function MetricsSummary({ project }) {
-  const metrics = useMemo(() => {
-    const issues = project?.board?.issues || []
-    const doneIssues = issues.filter((i) => i.status === 'Done')
-    const inProgressIssues = issues.filter((i) => i.status === 'In Progress')
-    const donePoints = doneIssues.reduce((s, i) => s + (i.storyPoints ?? 0), 0)
-    const completionPct =
-      issues.length > 0 ? Math.round((doneIssues.length / issues.length) * 100) : 0
+export default function MetricsSummary({ analytics, embedded = false }) {
+  const content = analytics ? (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <HeroStat value={analytics.completion?.totalIssues ?? 0} label="Total Issues" />
+      <HeroStat
+        value={`${analytics.completion?.percent ?? 0}%`}
+        label="Complete"
+        color="var(--color-success)"
+      />
+      <HeroStat
+        value={analytics.velocity?.completedPoints ?? 0}
+        label="Points Done"
+        color="var(--accent-cyan)"
+      />
+      <HeroStat
+        value={analytics.byStatus?.['In Progress'] ?? 0}
+        label="In Progress"
+        color="var(--color-info)"
+      />
+    </div>
+  ) : (
+    <div className="grid grid-cols-2 gap-4 opacity-60 grayscale-[0.5] sm:grid-cols-4">
+      <HeroStat value="--" label="Total Issues" />
+      <HeroStat value="--%" label="Complete" color="var(--color-success)" />
+      <HeroStat value="--" label="Points Done" color="var(--accent-cyan)" />
+      <HeroStat value="--" label="In Progress" color="var(--color-info)" />
+    </div>
+  )
 
-    return {
-      totalIssues: issues.length,
-      issuesInProgress: inProgressIssues.length,
-      velocity: donePoints,
-      completionPct,
-    }
-  }, [project])
+  if (!analytics) {
+    return (
+      <div className={embedded ? 'flex flex-col' : 'glass-card flex flex-col overflow-hidden'}>
+        <div
+          className={
+            embedded ? 'px-5 py-4' : 'border-b border-[var(--color-border-default)] px-5 py-4'
+          }
+        >
+          <SectionHeader icon={LayoutGrid} color="var(--accent-default)" className="mb-0">
+            Delivery Snapshot
+          </SectionHeader>
+        </div>
+        <div className="p-5 opacity-60 pointer-events-none">{content}</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-      <HeroStat value={metrics.totalIssues} label="Total Issues" />
-      <HeroStat value={`${metrics.completionPct}%`} label="Complete" color="var(--color-success)" />
-      <HeroStat value={metrics.velocity} label="Points Done" color="var(--accent-cyan)" />
-      <HeroStat value={metrics.issuesInProgress} label="In Progress" color="var(--color-info)" />
+    <div className={embedded ? 'flex flex-col' : 'glass-card flex flex-col overflow-hidden'}>
+      <div
+        className={
+          embedded ? 'px-5 py-4' : 'border-b border-[var(--color-border-default)] px-5 py-4'
+        }
+      >
+        <SectionHeader icon={LayoutGrid} color="var(--accent-default)" className="mb-0">
+          Delivery Snapshot
+        </SectionHeader>
+      </div>
+      <div className="p-5">{content}</div>
     </div>
   )
 }

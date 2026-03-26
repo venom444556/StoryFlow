@@ -1,38 +1,52 @@
-import AIStatusCard from '../overview/AIStatusCard'
+import AgentCommandCenter from '../overview/AgentCommandCenter'
 import GatePanel from '../overview/GatePanel'
 import EventFeed from '../overview/EventFeed'
 import MetricsSummary from '../overview/MetricsSummary'
 import SprintMetricsPanel from '../overview/SprintMetricsPanel'
 import SessionHistory from '../overview/SessionHistory'
 import { formatRelative } from '../../utils/dates'
-import {
-  useEventStore,
-  selectAiStatus,
-  selectPendingGates,
-  selectEvents,
-} from '../../stores/eventStore'
+import { useEventStore, selectGateCount, selectEvents } from '../../stores/eventStore'
 import { useState, useEffect } from 'react'
+
+function CommandMetric({ label, value, accentClass = 'text-[var(--color-fg-default)]', title }) {
+  return (
+    <div className="glass-card flex min-h-[6.25rem] flex-col justify-between rounded-xl px-4 py-4">
+      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
+        {label}
+      </span>
+      <span className={`text-sm leading-relaxed ${accentClass}`} title={title}>
+        {value}
+      </span>
+    </div>
+  )
+}
 
 export default function OverviewTab({ project }) {
   const [opData, setOpData] = useState(null)
+  const [analyticsData, setAnalyticsData] = useState(null)
 
   useEffect(() => {
     let mounted = true
     if (!project?.id) return
-    fetch(`/api/projects/${encodeURIComponent(project.id)}/operational`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (mounted && data) setOpData(data)
-      })
-      .catch(() => {})
+    Promise.all([
+      fetch(`/api/projects/${encodeURIComponent(project.id)}/operational`)
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+      fetch(`/api/projects/${encodeURIComponent(project.id)}/analytics`)
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+    ]).then(([op, analytics]) => {
+      if (!mounted) return
+      if (op) setOpData(op)
+      if (analytics) setAnalyticsData(analytics)
+    })
     return () => {
       mounted = false
     }
   }, [project?.id])
 
   // Live enhancement: the websocket event store
-  const aiStatus = useEventStore(selectAiStatus)
-  const pendingGates = useEventStore(selectPendingGates)
+  const liveGateCount = useEventStore(selectGateCount)
   const events = useEventStore(selectEvents)
 
   if (!project) return null
@@ -41,14 +55,6 @@ export default function OverviewTab({ project }) {
   const op = opData || {}
 
   const lastAiEvent = events?.find((e) => e.actor === 'ai')
-
-  // Contract: agentState is an object
-  const statusObj = op.agentState || {}
-  // Enhancement: reflect live transient "working" state if applicable, else rely on contract
-  const agentStateStr =
-    aiStatus?.status && aiStatus.status !== 'idle'
-      ? aiStatus.status
-      : statusObj.status || 'unavailable'
 
   // Contract: activeBlockers is a list (never use aiStatus === 'blocked' to compute this count)
   const activeBlockersCount = Array.isArray(op.activeBlockers)
@@ -60,9 +66,11 @@ export default function OverviewTab({ project }) {
       : 'Blocker summary unavailable'
 
   // Contract: pendingGatesCount is a number
-  const pendingGatesCount = pendingGates?.length ?? op.pendingGatesCount
+  const pendingGatesCount = liveGateCount ?? op.pendingGatesCount
   const pendingGatesStr =
     pendingGatesCount !== undefined ? `${pendingGatesCount} pending` : 'No live gate data'
+  const directivesCount = op.directivesCount ?? 0
+  const directivesStr = `${directivesCount} open`
 
   // Contract: lastAgentActivity is an object
   // Enhancement: prefer the most recent AI-authored event from the live store if available
@@ -78,104 +86,91 @@ export default function OverviewTab({ project }) {
     ? formatRelative(latestActivityTimestamp)
     : 'Last activity unavailable'
 
-  // Agent State Semantic Styling
-  let agentStateClass =
-    'bg-[var(--color-bg-muted)] text-[var(--color-fg-muted)] border-[var(--color-border-muted)]'
-  if (agentStateStr === 'working')
-    agentStateClass = 'provenance-ai text-[var(--color-ai)] border-[var(--color-ai-border)]'
-  if (agentStateStr === 'blocked')
-    agentStateClass =
-      'state-gate-rejected text-[var(--color-danger)] border-[var(--color-gate-rejected-border)]'
-  if (agentStateStr === 'needs-review')
-    agentStateClass =
-      'state-gate-pending text-[var(--color-gate-pending)] border-[var(--color-gate-pending-border)]'
-
   return (
-    <div className="space-y-8 pb-8">
-      {/* 1. MISSION CONTROL CONSOLE - Top Priority */}
-      <div className="surface-critical p-6 animate-entrance stagger-1 flex flex-col gap-6">
+    <div className="space-y-6 pb-8">
+      {/* 1. PROJECT-SCOPED OPERATIONS */}
+      <div className="surface-critical animate-entrance stagger-1 flex flex-col gap-5 p-5">
         <div className="flex items-center justify-between border-b border-[var(--color-border-muted)] pb-4">
           <h2 className="text-xl font-semibold text-[var(--color-fg-default)]">
-            Operational Command Center
+            Project Operations
           </h2>
-          <div className={`px-3 py-1 rounded text-sm font-medium border ${agentStateClass}`}>
-            ● {agentStateStr}
-          </div>
+          <span className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-fg-faint)]">
+            Current Flow
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fg-faint)]">
-              Pending Gates
-            </span>
-            <span
-              className={`text-sm ${
-                pendingGatesCount > 0
-                  ? 'font-semibold text-[var(--color-gate-pending)]'
-                  : 'italic text-[var(--color-fg-muted)]'
-              }`}
-            >
-              {pendingGatesStr}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fg-faint)]">
-              Active Blockers
-            </span>
-            <span
-              className={`text-sm ${
-                activeBlockersCount > 0
-                  ? 'font-semibold text-[var(--color-danger)]'
-                  : 'italic text-[var(--color-fg-muted)]'
-              }`}
-            >
-              {blockersStr}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-fg-faint)]">
-              Last Activity
-            </span>
-            <span
-              className="truncate text-sm text-[var(--color-fg-subtle)]"
-              title={latestActivityTitle || lastActivityStr}
-            >
-              {latestActivityTitle
-                ? `${latestActivityTitle} (${lastActivityStr})`
-                : lastActivityStr}
-            </span>
-          </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <CommandMetric
+            label="Open Directives"
+            value={directivesStr}
+            accentClass={
+              directivesCount > 0
+                ? 'font-semibold text-[var(--color-info)]'
+                : 'italic text-[var(--color-fg-muted)]'
+            }
+          />
+          <CommandMetric
+            label="Pending Gates"
+            value={pendingGatesStr}
+            accentClass={
+              pendingGatesCount > 0
+                ? 'font-semibold text-[var(--color-gate-pending)]'
+                : 'italic text-[var(--color-fg-muted)]'
+            }
+          />
+          <CommandMetric
+            label="Active Blockers"
+            value={blockersStr}
+            accentClass={
+              activeBlockersCount > 0
+                ? 'font-semibold text-[var(--color-danger)]'
+                : 'italic text-[var(--color-fg-muted)]'
+            }
+          />
+          <CommandMetric
+            label="Last Activity"
+            value={
+              latestActivityTitle ? `${latestActivityTitle} (${lastActivityStr})` : lastActivityStr
+            }
+            accentClass="line-clamp-2 text-[var(--color-fg-subtle)]"
+            title={latestActivityTitle || lastActivityStr}
+          />
         </div>
-        {/* Note: nextRecommendedAction has been completely removed to honor the deferred contract */}
       </div>
 
-      {/* 2. LEGACY AI WIDGETS & MODALS (Will be integrated/replaced over time) */}
-      <div className="animate-entrance stagger-2 transition-opacity hover:opacity-100 opacity-80">
-        <AIStatusCard />
+      {/* 2. WORKSPACE-SCOPED AGENT RUNTIME HEALTH */}
+      <div className="animate-entrance stagger-2">
+        <AgentCommandCenter projectId={project.id} />
       </div>
 
-      {/* 3. Two-Column Workspace: Left Feed vs Right Analytics */}
-      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[1fr_420px]">
-        {/* Left Column: Events & Approvals */}
-        <div className="space-y-8">
-          <div className="animate-entrance stagger-3">
-            <GatePanel projectId={project.id} />
-          </div>
-          <div className="animate-entrance stagger-4">
-            <EventFeed />
+      <div className="animate-entrance stagger-3">
+        <GatePanel projectId={project.id} />
+      </div>
+
+      {/* 3. OVERVIEW WORKSPACE */}
+      <div
+        className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.95fr)]"
+        style={{
+          marginBottom: 'calc(var(--steering-bar-clearance, 0px) + var(--space-2))',
+        }}
+      >
+        <div className="min-w-0 relative h-full">
+          <div className="absolute inset-0">
+            <EventFeed projectId={project.id} />
           </div>
         </div>
 
-        {/* Right Column: Sessions & Traditional Analytics */}
-        <div className="space-y-8">
-          <div className="animate-entrance stagger-5">
+        <div className="min-w-0 space-y-6">
+          <div className="xl:h-[400px]">
             <SessionHistory projectId={project.id} />
           </div>
-          <div className="animate-entrance stagger-6">
-            <SprintMetricsPanel project={project} />
+
+          <div className="xl:h-[17rem]">
+            <SprintMetricsPanel analytics={analyticsData} />
           </div>
-          <div className="animate-entrance stagger-7">
-            <MetricsSummary project={project} />
+
+          <div className="xl:h-[15rem]" style={{ marginTop: '2.5rem' }}>
+            <MetricsSummary analytics={analyticsData} />
           </div>
         </div>
       </div>

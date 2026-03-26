@@ -1,18 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldAlert, Check, XCircle, MessageSquare, AlertTriangle } from 'lucide-react'
 import GlassCard from '../ui/GlassCard'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
-import { useEventStore, selectPendingGates, selectAiStatus } from '../../stores/eventStore'
+import { useEventStore, selectAiStatus } from '../../stores/eventStore'
 
-function GateCard({ gate }) {
+function GateCard({ gate, onResponded }) {
   const respondToEvent = useEventStore((s) => s.respondToEvent)
   const [showRejectInput, setShowRejectInput] = useState(false)
   const [rejectComment, setRejectComment] = useState('')
 
   const handleApprove = () => {
     respondToEvent(gate.id, 'approve')
+    if (onResponded) onResponded(gate.id)
   }
 
   const handleReject = () => {
@@ -23,6 +24,7 @@ function GateCard({ gate }) {
     respondToEvent(gate.id, 'reject', rejectComment || undefined)
     setShowRejectInput(false)
     setRejectComment('')
+    if (onResponded) onResponded(gate.id)
   }
 
   return (
@@ -38,7 +40,7 @@ function GateCard({ gate }) {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-[var(--color-fg-default)]">
-            {gate.entity_title || gate.action || 'Approval required'}
+            {gate.entityTitle || gate.entity_title || gate.action || 'Approval required'}
           </p>
           {gate.reasoning && (
             <p className="mt-1 text-xs leading-relaxed text-[var(--color-fg-muted)]">
@@ -170,10 +172,37 @@ function EscalationCard({ aiStatus, projectId }) {
 }
 
 export default function GatePanel({ projectId }) {
-  const pendingGates = useEventStore(useShallow(selectPendingGates))
   const aiStatus = useEventStore(useShallow(selectAiStatus))
   const isBlocked = aiStatus.status === 'blocked'
 
+  const [pendingGates, setPendingGates] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!projectId) return
+    let cancelled = false
+    setLoading(true)
+    fetch(`/api/projects/${encodeURIComponent(projectId)}/gates`)
+      .then((res) => (res.ok ? res.json() : { pending: [] }))
+      .then((data) => {
+        if (!cancelled) setPendingGates(Array.isArray(data?.pending) ? data.pending : [])
+      })
+      .catch(() => {
+        // Silently default to empty array
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [projectId])
+
+  const handleGateResponded = (gateId) => {
+    setPendingGates((prev) => prev.filter((g) => g.id !== gateId))
+  }
+
+  if (loading) return null
   if (pendingGates.length === 0 && !isBlocked) return null
 
   return (
@@ -192,7 +221,7 @@ export default function GatePanel({ projectId }) {
         {isBlocked && <EscalationCard aiStatus={aiStatus} projectId={projectId} />}
         <AnimatePresence>
           {pendingGates.map((gate) => (
-            <GateCard key={gate.id} gate={gate} />
+            <GateCard key={gate.id} gate={gate} onResponded={handleGateResponded} />
           ))}
         </AnimatePresence>
       </div>

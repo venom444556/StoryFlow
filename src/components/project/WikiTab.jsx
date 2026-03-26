@@ -1,8 +1,11 @@
 import { useState, useCallback, useMemo } from 'react'
+import { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { BookOpen, PanelLeft } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import EmptyState from '../ui/EmptyState'
 import ConfirmDialog from '../ui/ConfirmDialog'
+import GlassCard from '../ui/GlassCard'
 import PageTree from '../wiki/PageTree'
 import BreadcrumbTrail from '../wiki/BreadcrumbTrail'
 import TableOfContents from '../wiki/TableOfContents'
@@ -12,6 +15,7 @@ import PageEditor from '../wiki/PageEditor'
 import VersionHistory from '../wiki/VersionHistory'
 
 export default function WikiTab({ project, addPage, updatePage, deletePage }) {
+  const { pageId: routePageId } = useParams()
   const pages = useMemo(() => project?.pages || [], [project?.pages])
 
   // -- Local UI state --
@@ -22,8 +26,42 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
   const [pendingParentId, setPendingParentId] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [showTree, setShowTree] = useState(false)
+  const [remotePage, setRemotePage] = useState(null)
 
-  const selectedPage = pages.find((p) => p.id === selectedPageId) || null
+  const selectedPage = pages.find((p) => p.id === selectedPageId) || remotePage || null
+
+  useEffect(() => {
+    if (!routePageId) return
+    if (pages.some((page) => page.id === routePageId)) {
+      setSelectedPageId(routePageId)
+      setIsEditing(false)
+      setRemotePage(null)
+    }
+  }, [pages, routePageId])
+
+  useEffect(() => {
+    if (!routePageId || !project?.id) return
+    if (pages.some((page) => page.id === routePageId)) return
+
+    const controller = new AbortController()
+    setSelectedPageId(routePageId)
+
+    fetch(`/api/projects/${project.id}/pages/${routePageId}`, { signal: controller.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((page) => {
+        if (page) {
+          setRemotePage(page)
+          setIsEditing(false)
+        }
+      })
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          console.error('Failed to load wiki page by route:', err)
+        }
+      })
+
+    return () => controller.abort()
+  }, [pages, project?.id, routePageId])
 
   // ----- Page creation -----
 
@@ -136,7 +174,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
   // ----- Render -----
 
   return (
-    <div className="surface-workstation flex-1 min-h-[750px] flex md:flex-row gap-0">
+    <div className="surface-workstation flex-1 min-h-[750px] flex md:flex-row gap-4 p-4">
       {/* Mobile backdrop for page tree */}
       {showTree && (
         <div
@@ -148,25 +186,30 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
       {/* Sidebar tree — hidden on mobile, toggle-controlled */}
       <div
         className={[
-          'workstation-sidebar w-64 absolute inset-y-0 left-0 z-20 md:relative md:z-auto',
+          'w-[280px] shrink-0 absolute inset-y-0 left-0 z-20 md:relative md:z-auto h-full',
           showTree ? 'block' : 'hidden md:block',
         ].join(' ')}
       >
-        <PageTree
-          pages={pages}
-          selectedPageId={selectedPageId}
-          onSelectPage={(id) => {
-            setSelectedPageId(id)
-            setIsEditing(false)
-            setShowTree(false)
-          }}
-          onAddPage={handleAddPage}
-          onDeletePage={handleRequestDelete}
-        />
+        <GlassCard padding="none" className="h-[calc(100vh-140px)] flex flex-col overflow-hidden">
+          <PageTree
+            pages={pages}
+            selectedPageId={selectedPageId}
+            onSelectPage={(id) => {
+              setSelectedPageId(id)
+              setIsEditing(false)
+              setShowTree(false)
+            }}
+            onAddPage={handleAddPage}
+            onDeletePage={handleRequestDelete}
+          />
+        </GlassCard>
       </div>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <GlassCard
+        padding="none"
+        className="flex min-w-0 flex-1 flex-col h-[calc(100vh-140px)] overflow-hidden"
+      >
         {/* Mobile page-tree toggle + Breadcrumb */}
         <div className="flex shrink-0 items-center gap-2 border-b border-[var(--color-border-default)] px-3 py-2 md:px-5">
           <button
@@ -188,7 +231,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
         </div>
 
         {/* Content region */}
-        <div className="flex flex-1 gap-4 overflow-hidden p-4">
+        <div className="with-steering-clearance flex min-h-0 flex-1 gap-4 overflow-hidden p-4">
           {!selectedPage ? (
             /* Empty state */
             <div className="flex flex-1 items-center justify-center">
@@ -204,7 +247,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
             </div>
           ) : isEditing ? (
             /* Editor */
-            <div className="flex-1 overflow-hidden">
+            <div className="min-w-0 flex-1 overflow-hidden">
               <PageEditor
                 page={selectedPage}
                 onSave={handleSave}
@@ -214,7 +257,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
           ) : (
             /* Viewer + TOC */
             <>
-              <div className="flex-1 overflow-hidden">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 <PageViewer
                   page={selectedPage}
                   onEdit={() => setIsEditing(true)}
@@ -230,7 +273,7 @@ export default function WikiTab({ project, addPage, updatePage, deletePage }) {
             </>
           )}
         </div>
-      </div>
+      </GlassCard>
 
       {/* Modals */}
       <TemplateSelector

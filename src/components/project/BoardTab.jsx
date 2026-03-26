@@ -274,7 +274,7 @@ export default function BoardTab({
       </div>
 
       {/* Main content area */}
-      <div className="surface-workstation flex-1 min-h-[650px] flex">
+      <div className="surface-workstation with-steering-clearance flex min-h-[650px] flex-1">
         {/* Epic sidebar */}
         <EpicSidebar
           issues={allIssues}

@@ -29,11 +29,15 @@ export default function TimelineView({
   milestones = [],
   onEditPhase,
   onDeletePhase,
+  onOpenHotWash,
   onEditMilestone,
   onDeleteMilestone,
   onToggleMilestone,
+  onGenerateHotWash,
+  onFinalizeHotWash,
+  projectId,
 }) {
-  // Build a combined timeline of phases + milestones, sorted by date
+  // Build a combined timeline of phases + milestones, sorting by date
   const items = useMemo(() => {
     const list = []
 
@@ -86,6 +90,10 @@ export default function TimelineView({
                 phase={item.data}
                 onEdit={onEditPhase}
                 onDelete={onDeletePhase}
+                onOpenHotWash={onOpenHotWash}
+                onGenerateHotWash={onGenerateHotWash}
+                onFinalizeHotWash={onFinalizeHotWash}
+                projectId={projectId}
                 isLast={index === items.length - 1}
               />
             ) : (

@@ -91,8 +91,8 @@ function TreeNode({
           paddingLeft: `${depth * 16 + 8}px`,
           ...(isSelected
             ? {
-                backgroundColor: 'rgba(var(--accent-default-rgb), 0.15)',
-                borderLeftColor: 'var(--accent-default)',
+                backgroundColor: 'var(--color-bg-glass-active)',
+                borderLeftColor: 'var(--color-border-emphasis)',
               }
             : {}),
         }}
@@ -224,7 +224,7 @@ export default function PageTree({
   const tree = useMemo(() => buildTree(sortedPages), [sortedPages])
 
   return (
-    <div className="glass-sidebar flex h-full w-64 shrink-0 flex-col">
+    <div className="flex h-full w-full shrink-0 flex-col">
       {/* Header */}
       <div className="shrink-0 border-b border-[var(--color-border-default)] px-3 py-3">
         <div className="mb-3 flex items-center justify-between">

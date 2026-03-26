@@ -9,6 +9,11 @@ import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { initEvents } from './events.js'
 import { initSteering } from './intelligence.js'
+import {
+  CORE_WIKI_PAGES,
+  WIKI_STALE_THRESHOLD_DAYS,
+  normalizeWikiTitle,
+} from '../shared/wikiCorePages.js'
 
 const DATA_DIR = join(process.cwd(), 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
@@ -113,6 +118,7 @@ export async function initDb() {
     'workflow_connections_data',
     'arch_components_data',
     'arch_connections_data',
+    'hot_washes_data',
   ]
   for (const col of snapshotEntityColumns) {
     try {
@@ -146,6 +152,8 @@ export async function initDb() {
     ['milestones', 'color', 'TEXT'],
     // S-1: Sessions agent identity
     ['agent_sessions', 'agent_id', 'TEXT'],
+    // Decision sequence identity — immutable ADR number
+    ['decisions', 'sequence_number', 'INTEGER'],
   ]
   for (const [table, col, type] of wireNowColumns) {
     try {
@@ -153,6 +161,33 @@ export async function initDb() {
     } catch (_) {
       // Column already exists — safe to ignore
     }
+  }
+
+  // Backfill decision sequence numbers for existing decisions without one
+  try {
+    const unsequenced = db.exec(
+      'SELECT id, project_id FROM decisions WHERE sequence_number IS NULL ORDER BY created_at ASC'
+    )
+    if (unsequenced.length > 0 && unsequenced[0].values.length > 0) {
+      const byProject = {}
+      for (const [id, pid] of unsequenced[0].values) {
+        if (!byProject[pid]) byProject[pid] = []
+        byProject[pid].push(id)
+      }
+      for (const [pid, ids] of Object.entries(byProject)) {
+        const maxRow = db.exec(
+          'SELECT COALESCE(MAX(sequence_number), 0) FROM decisions WHERE project_id = ?',
+          [pid]
+        )
+        let seq = maxRow.length > 0 ? maxRow[0].values[0][0] : 0
+        for (const id of ids) {
+          seq++
+          db.run('UPDATE decisions SET sequence_number = ? WHERE id = ?', [seq, id])
+        }
+      }
+    }
+  } catch (_) {
+    /* table may not exist yet on first run */
   }
 
   // Sprints (must come before issues due to FK dependency)
@@ -279,6 +314,34 @@ export async function initDb() {
     )
   `)
   db.run('CREATE INDEX IF NOT EXISTS idx_milestones_project ON milestones(project_id)')
+
+  // Hot washes (phase retrospective reports)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS hot_washes (
+      id TEXT PRIMARY KEY,
+      project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      phase_id TEXT NOT NULL REFERENCES phases(id) ON DELETE CASCADE,
+      status TEXT NOT NULL DEFAULT 'draft',
+      generated_at TEXT NOT NULL,
+      generated_by TEXT NOT NULL DEFAULT 'ai',
+      finalized_at TEXT,
+      finalized_by TEXT,
+      summary TEXT,
+      planned TEXT,
+      shipped TEXT,
+      slipped TEXT,
+      blockers TEXT,
+      decisions_data TEXT,
+      lessons_learned TEXT,
+      follow_up_actions TEXT,
+      wiki_page_id TEXT REFERENCES pages(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      UNIQUE(phase_id)
+    )
+  `)
+  db.run('CREATE INDEX IF NOT EXISTS idx_hot_washes_project ON hot_washes(project_id)')
+  db.run('CREATE INDEX IF NOT EXISTS idx_hot_washes_phase ON hot_washes(phase_id)')
 
   // Workflow nodes
   db.run(`
@@ -748,6 +811,7 @@ function mapPageRow(row) {
 function mapDecisionRow(row) {
   return {
     id: row.id,
+    sequenceNumber: row.sequence_number || null,
     title: row.title,
     description: row.description || '',
     rationale: row.rationale || '',
@@ -807,6 +871,8 @@ function mapWorkflowConnectionRow(row) {
     id: row.id,
     from: row.from_node_id,
     to: row.to_node_id,
+    fromNodeId: row.from_node_id,
+    toNodeId: row.to_node_id,
     type: row.type || null,
   }
 }
@@ -828,6 +894,8 @@ function mapArchConnectionRow(row) {
     id: row.id,
     from: row.from_component_id,
     to: row.to_component_id,
+    fromComponentId: row.from_component_id,
+    toComponentId: row.to_component_id,
     type: row.type || null,
   }
 }
@@ -1556,6 +1624,77 @@ export function listPages(projectId) {
   }))
 }
 
+export function getWikiAudit(projectId, options = {}) {
+  if (!_projectExists(projectId)) return null
+
+  const thresholdDays = options.thresholdDays || WIKI_STALE_THRESHOLD_DAYS
+  const thresholdMs = thresholdDays * 24 * 60 * 60 * 1000
+  const now = Date.now()
+  const pages = _sqlQuery(
+    'SELECT id, title, icon, status, updated_at, created_at FROM pages WHERE project_id = ? ORDER BY updated_at DESC',
+    [projectId]
+  )
+
+  const pagesByTitle = new Map()
+  for (const page of pages) {
+    pagesByTitle.set(normalizeWikiTitle(page.title), page)
+  }
+
+  const requiredCorePages = CORE_WIKI_PAGES.map((def) => {
+    const existing = pagesByTitle.get(normalizeWikiTitle(def.title)) || null
+    const updatedAt = existing?.updated_at || null
+    const daysStale =
+      updatedAt !== null
+        ? Math.max(0, Math.floor((now - Date.parse(updatedAt)) / (24 * 60 * 60 * 1000)))
+        : null
+    const isStale = daysStale !== null && daysStale >= thresholdDays
+
+    return {
+      slug: def.slug,
+      title: def.title,
+      icon: def.icon,
+      template: def.template,
+      purpose: def.purpose,
+      exists: Boolean(existing),
+      pageId: existing?.id || null,
+      updatedAt,
+      daysStale,
+      isStale,
+    }
+  })
+
+  const missingCorePages = requiredCorePages.filter((page) => !page.exists)
+  const staleCorePages = requiredCorePages.filter((page) => page.exists && page.isStale)
+
+  const stalePages = pages
+    .map((page) => {
+      const updatedAt = page.updated_at || page.created_at || null
+      const daysStale =
+        updatedAt !== null
+          ? Math.max(0, Math.floor((now - Date.parse(updatedAt)) / (24 * 60 * 60 * 1000)))
+          : null
+      return {
+        id: page.id,
+        title: page.title,
+        status: page.status || null,
+        updatedAt,
+        daysStale,
+        isCore: requiredCorePages.some((core) => core.pageId === page.id),
+      }
+    })
+    .filter((page) => page.daysStale !== null && page.daysStale >= thresholdDays)
+    .sort((a, b) => b.daysStale - a.daysStale)
+
+  return {
+    findings: missingCorePages.length + staleCorePages.length,
+    staleThresholdDays: thresholdDays,
+    requiredCorePages,
+    missingCorePages,
+    staleCorePages,
+    stalePages,
+  }
+}
+
 export function getPage(projectId, pageId) {
   const row = _sqlQueryOne('SELECT * FROM pages WHERE id = ? AND project_id = ?', [
     pageId,
@@ -1744,17 +1883,26 @@ export function addDecision(projectId, decision) {
   if (!_projectExists(projectId)) return null
 
   const now = new Date().toISOString()
+
+  // Auto-assign immutable sequence number
+  const maxSeqRow = _sqlQueryOne(
+    'SELECT COALESCE(MAX(sequence_number), 0) as max_seq FROM decisions WHERE project_id = ?',
+    [projectId]
+  )
+  const nextSeq = (maxSeqRow?.max_seq || 0) + 1
+
   const newDecision = {
     ...decision,
     id: decision.id || crypto.randomUUID(),
+    sequenceNumber: nextSeq,
     createdAt: now,
     updatedAt: now,
   }
 
   db.run(
     `INSERT OR REPLACE INTO decisions
-      (id, project_id, title, description, rationale, status, author, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, title, description, rationale, status, author, sequence_number, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newDecision.id,
       projectId,
@@ -1763,6 +1911,7 @@ export function addDecision(projectId, decision) {
       newDecision.rationale || null,
       newDecision.status || 'proposed',
       newDecision.author || null,
+      newDecision.sequenceNumber,
       newDecision.createdAt,
       newDecision.updatedAt,
     ]
@@ -1893,6 +2042,15 @@ export function updatePhase(projectId, phaseId, updates) {
     ]
   )
   db.run('UPDATE projects SET updated_at = ? WHERE id = ?', [now, projectId])
+
+  // Auto-generate draft hot wash when phase is marked completed
+  if (updates.status === 'completed' && phase.status !== 'completed') {
+    const existingHw = getHotWash(projectId, phaseId)
+    if (!existingHw) {
+      generateHotWash(projectId, phaseId, { generatedBy: 'system' })
+    }
+  }
+
   scheduleSave()
   return merged
 }
@@ -2399,14 +2557,16 @@ export function createSnapshot(projectId, { action, entity, actor }) {
   const workflowConnections = _listWorkflowConnectionsRaw(projectId)
   const archComponents = _listArchComponentsRaw(projectId)
   const archConnections = _listArchConnectionsRaw(projectId)
+  const hotWashRows = _sqlQuery('SELECT * FROM hot_washes WHERE project_id = ?', [projectId])
+  const hotWashes = hotWashRows.map(mapHotWashRow)
 
   db.run(
     `INSERT INTO snapshots
       (id, project_id, trigger_action, trigger_entity, trigger_actor, data, created_at,
        project_data, issues_data, sprints_data, pages_data, decisions_data,
        phases_data, milestones_data, workflow_nodes_data, workflow_connections_data,
-       arch_components_data, arch_connections_data)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       arch_components_data, arch_connections_data, hot_washes_data)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       projectId,
@@ -2426,6 +2586,7 @@ export function createSnapshot(projectId, { action, entity, actor }) {
       JSON.stringify(workflowConnections),
       JSON.stringify(archComponents),
       JSON.stringify(archConnections),
+      JSON.stringify(hotWashes),
     ]
   )
 
@@ -2504,6 +2665,7 @@ export function restoreSnapshot(projectId, snapshotId) {
       db.run('DELETE FROM architecture_components WHERE project_id = ?', [projectId])
       db.run('DELETE FROM pages WHERE project_id = ?', [projectId])
       db.run('DELETE FROM decisions WHERE project_id = ?', [projectId])
+      db.run('DELETE FROM hot_washes WHERE project_id = ?', [projectId])
       db.run('DELETE FROM phases WHERE project_id = ?', [projectId])
       db.run('DELETE FROM milestones WHERE project_id = ?', [projectId])
 
@@ -2707,6 +2869,40 @@ export function restoreSnapshot(projectId, snapshotId) {
           `INSERT OR REPLACE INTO architecture_connections (id, project_id, from_component_id, to_component_id, type)
            VALUES (?, ?, ?, ?, ?)`,
           [c.id, projectId, c.from, c.to, c.type || null]
+        )
+      }
+
+      // Restore hot washes
+      const hotWashes = JSON.parse(row.hot_washes_data || '[]')
+      for (const hw of hotWashes) {
+        db.run(
+          `INSERT OR REPLACE INTO hot_washes
+            (id, project_id, phase_id, status, generated_at, generated_by,
+             finalized_at, finalized_by, summary, planned, shipped, slipped,
+             blockers, decisions_data, lessons_learned, follow_up_actions,
+             wiki_page_id, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            hw.id,
+            projectId,
+            hw.phaseId,
+            hw.status || 'draft',
+            hw.generatedAt || now,
+            hw.generatedBy || 'system',
+            hw.finalizedAt || null,
+            hw.finalizedBy || null,
+            hw.summary || '',
+            JSON.stringify(hw.planned || []),
+            JSON.stringify(hw.shipped || []),
+            JSON.stringify(hw.slipped || []),
+            JSON.stringify(hw.blockers || []),
+            JSON.stringify(hw.decisions || []),
+            JSON.stringify(hw.lessonsLearned || []),
+            JSON.stringify(hw.followUpActions || []),
+            hw.wikiPageId || null,
+            hw.createdAt || now,
+            hw.updatedAt || now,
+          ]
         )
       }
     } finally {
@@ -3040,6 +3236,15 @@ export function getOperationalSummary(projectId, options = { includeHygiene: fal
 
   if (options.includeHygiene) {
     summary.hygiene = _getHygieneSummary(projectId)
+
+    // Completed phases without hot wash reports
+    const phasesNoHw = _sqlQuery(
+      `SELECT p.id, p.name FROM phases p
+       WHERE p.project_id = ? AND p.status = 'completed'
+         AND NOT EXISTS (SELECT 1 FROM hot_washes hw WHERE hw.phase_id = p.id)`,
+      [projectId]
+    )
+    summary.phasesWithoutHotWash = phasesNoHw.map((r) => ({ id: r.id, name: r.name }))
   }
 
   return summary
@@ -3121,6 +3326,121 @@ function _getHygieneSummary(projectId) {
 // ---------------------------------------------------------------------------
 export function projectExists(projectId) {
   return _projectExists(projectId)
+}
+
+// SQL-based title similarity check (replaces full-project-load dedup)
+export function findSimilarIssues(projectId, title, limit = 5) {
+  if (!title) return []
+  const like = `%${title}%`
+  const rows = _sqlQuery(
+    `SELECT id, key, title FROM issues
+     WHERE project_id = ? AND LOWER(title) LIKE LOWER(?)
+     LIMIT ?`,
+    [projectId, like, limit]
+  )
+  return rows.map((r) => ({
+    id: r.id,
+    key: r.key,
+    title: r.title,
+    score: r.title.toLowerCase() === title.toLowerCase() ? 100 : 75,
+  }))
+}
+
+// Public hygiene summary (wraps internal _getHygieneSummary)
+export function getHygieneSummary(projectId) {
+  return _getHygieneSummary(projectId)
+}
+
+// Server-side analytics — replaces client-side array iteration
+export function getProjectAnalytics(projectId) {
+  if (!_projectExists(projectId)) return null
+
+  // Completion percentage (points-based)
+  const pointsRow = _sqlQueryOne(
+    `SELECT COALESCE(SUM(story_points), 0) as total,
+            COALESCE(SUM(CASE WHEN status = 'Done' THEN story_points ELSE 0 END), 0) as done
+     FROM issues WHERE project_id = ? AND story_points IS NOT NULL`,
+    [projectId]
+  )
+  const totalPoints = pointsRow?.total || 0
+  const donePoints = pointsRow?.done || 0
+  const completionPercent = totalPoints > 0 ? Math.round((donePoints / totalPoints) * 100) : 0
+
+  // Issue-based completion
+  const countRow = _sqlQueryOne(
+    `SELECT COUNT(*) as total,
+            SUM(CASE WHEN status = 'Done' THEN 1 ELSE 0 END) as done
+     FROM issues WHERE project_id = ?`,
+    [projectId]
+  )
+  const totalIssues = countRow?.total || 0
+  const doneIssues = countRow?.done || 0
+
+  // Velocity: points completed in active sprint
+  const activeSprint = _sqlQueryOne(
+    "SELECT id, name FROM sprints WHERE project_id = ? AND status = 'active' LIMIT 1",
+    [projectId]
+  )
+  let sprintVelocity = null
+  if (activeSprint) {
+    const sprintPointsRow = _sqlQueryOne(
+      `SELECT COALESCE(SUM(CASE WHEN status = 'Done' THEN story_points ELSE 0 END), 0) as done,
+              COALESCE(SUM(story_points), 0) as total
+       FROM issues WHERE project_id = ? AND sprint_id = ? AND story_points IS NOT NULL`,
+      [projectId, activeSprint.id]
+    )
+    sprintVelocity = {
+      sprintName: activeSprint.name,
+      completedPoints: sprintPointsRow?.done || 0,
+      totalPoints: sprintPointsRow?.total || 0,
+    }
+  }
+
+  // Cycle time: average days from In Progress to Done (for recently completed issues)
+  const cycleRows = _sqlQuery(
+    `SELECT in_progress_at, done_at FROM issues
+     WHERE project_id = ? AND in_progress_at IS NOT NULL AND done_at IS NOT NULL
+     ORDER BY done_at DESC LIMIT 50`,
+    [projectId]
+  )
+  let avgCycleTimeDays = null
+  if (cycleRows.length > 0) {
+    const cycleTimes = cycleRows
+      .map((r) => {
+        const start = new Date(r.in_progress_at).getTime()
+        const end = new Date(r.done_at).getTime()
+        return (end - start) / (1000 * 60 * 60 * 24) // days
+      })
+      .filter((d) => d >= 0 && d < 365) // sanity filter
+    if (cycleTimes.length > 0) {
+      avgCycleTimeDays =
+        Math.round((cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length) * 10) / 10
+    }
+  }
+
+  // Status distribution
+  const statusRows = _sqlQuery(
+    'SELECT status, COUNT(*) as cnt FROM issues WHERE project_id = ? GROUP BY status',
+    [projectId]
+  )
+  const byStatus = { 'To Do': 0, 'In Progress': 0, Blocked: 0, Done: 0 }
+  for (const r of statusRows) byStatus[r.status] = r.cnt
+
+  return {
+    completion: {
+      percent: completionPercent,
+      donePoints,
+      totalPoints,
+      doneIssues,
+      totalIssues,
+    },
+    velocity: sprintVelocity,
+    cycleTime:
+      avgCycleTimeDays !== null
+        ? { averageDays: avgCycleTimeDays, sampleSize: cycleRows.length }
+        : null,
+    byStatus,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -3492,4 +3812,641 @@ export function resolveEntity(projectId, type, ref) {
       error: `Unknown type "${type}". Valid: ${Object.keys(resolvers).join(', ')}`,
     }
   return resolver()
+}
+
+// ---------------------------------------------------------------------------
+// Hot Wash — phase retrospective reports
+// ---------------------------------------------------------------------------
+
+function mapHotWashRow(row) {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    phaseId: row.phase_id,
+    status: row.status,
+    generatedAt: row.generated_at,
+    generatedBy: row.generated_by,
+    finalizedAt: row.finalized_at || null,
+    finalizedBy: row.finalized_by || null,
+    summary: row.summary || '',
+    planned: row.planned ? JSON.parse(row.planned) : [],
+    shipped: row.shipped ? JSON.parse(row.shipped) : [],
+    slipped: row.slipped ? JSON.parse(row.slipped) : [],
+    blockers: row.blockers ? JSON.parse(row.blockers) : [],
+    decisions: row.decisions_data ? JSON.parse(row.decisions_data) : [],
+    lessonsLearned: row.lessons_learned ? JSON.parse(row.lessons_learned) : [],
+    followUpActions: row.follow_up_actions ? JSON.parse(row.follow_up_actions) : [],
+    wikiPageId: row.wiki_page_id || null,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function _findPageByTitle(projectId, title) {
+  const row = _sqlQueryOne(
+    'SELECT * FROM pages WHERE project_id = ? AND LOWER(title) = LOWER(?) ORDER BY updated_at DESC LIMIT 1',
+    [projectId, title]
+  )
+  return row ? mapPageRow(row) : null
+}
+
+function _normalizeFollowUpAction(action) {
+  if (typeof action === 'string') {
+    const keyMatch = action.match(/^Carry forward:\s*([A-Z]+-\d+)\s+—\s+(.+)$/)
+    if (keyMatch) {
+      return { title: keyMatch[2], key: keyMatch[1] }
+    }
+    return { title: action, key: null }
+  }
+
+  if (action && typeof action === 'object') {
+    return {
+      title: action.title || '',
+      key: action.key || null,
+    }
+  }
+
+  return { title: '', key: null }
+}
+
+function _buildLessonsLearnedPageContent(summary, reports) {
+  const lines = [
+    '# Lessons Learned',
+    '',
+    `**Reports:** ${summary.reportsCount} | **Finalized:** ${summary.finalCount} | **Drafts:** ${summary.draftCount} | **Lessons:** ${summary.lessonsCount} | **Follow-Up Actions:** ${summary.followUpActionsCount}`,
+    '',
+    '## Executive Snapshot',
+    '',
+    `- Reports captured: ${summary.reportsCount}`,
+    `- Lessons captured: ${summary.lessonsCount}`,
+    `- Follow-up actions captured: ${summary.followUpActionsCount}`,
+    summary.lastUpdatedAt ? `- Last updated: ${summary.lastUpdatedAt}` : '- Last updated: _n/a_',
+    '',
+  ]
+
+  if (!reports.length) {
+    lines.push('## Current State', '', '_No phase hot washes have been captured yet._', '')
+    return lines.join('\n')
+  }
+
+  lines.push('## By Phase', '')
+  for (const report of reports) {
+    lines.push(`### ${report.phaseName} ${report.status === 'final' ? '[FINAL]' : '[DRAFT]'}`)
+    lines.push('')
+    lines.push(report.summary || '_No summary_')
+    lines.push('')
+
+    if (report.lessonsLearned.length) {
+      lines.push(`#### Lessons Learned (${report.lessonsLearned.length})`)
+      for (const lesson of report.lessonsLearned) lines.push(`- ${lesson}`)
+      lines.push('')
+    }
+
+    if (report.followUpActions.length) {
+      lines.push(`#### Follow-Up Actions (${report.followUpActions.length})`)
+      for (const action of report.followUpActions) {
+        lines.push(`- [ ] ${action.key ? `${action.key} — ` : ''}${action.title}`)
+      }
+      lines.push('')
+    }
+  }
+
+  return lines.join('\n')
+}
+
+export function getHotWash(projectId, phaseId) {
+  const row = _sqlQueryOne('SELECT * FROM hot_washes WHERE project_id = ? AND phase_id = ?', [
+    projectId,
+    phaseId,
+  ])
+  return row ? mapHotWashRow(row) : null
+}
+
+export function listHotWashes(projectId) {
+  const rows = _sqlQuery(
+    `SELECT hw.id, hw.phase_id, hw.status, hw.generated_at, hw.finalized_at, hw.summary, p.name as phase_name
+     FROM hot_washes hw
+     JOIN phases p ON hw.phase_id = p.id
+     WHERE hw.project_id = ?
+     ORDER BY hw.generated_at DESC`,
+    [projectId]
+  )
+  return rows.map((r) => ({
+    id: r.id,
+    phaseId: r.phase_id,
+    phaseName: r.phase_name,
+    status: r.status,
+    generatedAt: r.generated_at,
+    finalizedAt: r.finalized_at || null,
+    summary: r.summary || '',
+  }))
+}
+
+export function getLessonsLearnedSummary(projectId, options = {}) {
+  if (!_projectExists(projectId)) return null
+
+  const rows = _sqlQuery(
+    `SELECT hw.*, p.name AS phase_name
+     FROM hot_washes hw
+     JOIN phases p ON hw.phase_id = p.id
+     WHERE hw.project_id = ?
+     ORDER BY COALESCE(hw.finalized_at, hw.generated_at, hw.updated_at) DESC`,
+    [projectId]
+  )
+
+  const reports = rows.map((row) => {
+    const report = mapHotWashRow(row)
+    const followUpActions = (report.followUpActions || [])
+      .map(_normalizeFollowUpAction)
+      .filter((action) => action.title)
+    return {
+      id: report.id,
+      phaseId: report.phaseId,
+      phaseName: row.phase_name,
+      status: report.status,
+      summary: report.summary,
+      generatedAt: report.generatedAt,
+      finalizedAt: report.finalizedAt,
+      wikiPageId: report.wikiPageId,
+      lessonsLearned: Array.isArray(report.lessonsLearned)
+        ? report.lessonsLearned.filter(Boolean)
+        : [],
+      followUpActions,
+    }
+  })
+
+  const summary = {
+    reportsCount: reports.length,
+    draftCount: reports.filter((report) => report.status !== 'final').length,
+    finalCount: reports.filter((report) => report.status === 'final').length,
+    lessonsCount: reports.reduce((sum, report) => sum + report.lessonsLearned.length, 0),
+    followUpActionsCount: reports.reduce((sum, report) => sum + report.followUpActions.length, 0),
+    lastUpdatedAt: reports[0]?.finalizedAt || reports[0]?.generatedAt || null,
+  }
+
+  let page = _findPageByTitle(projectId, 'Lessons Learned')
+  if (options.syncPage && reports.length) {
+    const content = _buildLessonsLearnedPageContent(summary, reports)
+    if (page) {
+      page = updatePage(projectId, page.id, {
+        content,
+        icon: page.icon || '📘',
+        status: 'published',
+      })
+    } else {
+      page = addPage(projectId, {
+        title: 'Lessons Learned',
+        content,
+        icon: '📘',
+        status: 'published',
+        createdBy: 'system',
+      })
+    }
+  }
+
+  return {
+    summary: {
+      ...summary,
+      pageId: page?.id || null,
+      pageTitle: page?.title || 'Lessons Learned',
+    },
+    reports,
+  }
+}
+
+export function gatherPhaseEvidence(projectId, phaseId) {
+  const phase = _sqlQueryOne('SELECT * FROM phases WHERE id = ? AND project_id = ?', [
+    phaseId,
+    projectId,
+  ])
+  if (!phase) return null
+
+  const mapped = mapPhaseRow(phase)
+  const windowStart = mapped.startDate || mapped.createdAt
+  const windowEnd = mapped.endDate || new Date().toISOString()
+
+  // Issues in phase window
+  const allIssues = _sqlQuery(
+    `SELECT id, key, title, type, status, story_points, blocked_at, done_at, created_at
+     FROM issues WHERE project_id = ? AND created_at >= ? AND created_at <= ?
+     ORDER BY created_at ASC`,
+    [projectId, windowStart, windowEnd]
+  )
+
+  const planned = allIssues.map((i) => ({
+    key: i.key,
+    title: i.title,
+    type: i.type,
+    status: i.status,
+  }))
+  const shipped = allIssues
+    .filter((i) => i.status === 'Done')
+    .map((i) => ({ key: i.key, title: i.title, type: i.type }))
+  const slipped = allIssues
+    .filter((i) => i.status !== 'Done' && i.type !== 'epic')
+    .map((i) => ({ key: i.key, title: i.title, type: i.type, status: i.status }))
+
+  // Blockers (issues that were blocked during phase window)
+  const blockerRows = _sqlQuery(
+    `SELECT id, key, title, blocked_at, done_at, status FROM issues
+     WHERE project_id = ? AND blocked_at IS NOT NULL AND blocked_at >= ? AND blocked_at <= ?`,
+    [projectId, windowStart, windowEnd]
+  )
+  const blockers = blockerRows.map((i) => ({
+    key: i.key,
+    title: i.title,
+    resolvedAt: i.status === 'Done' ? i.done_at : null,
+  }))
+
+  // Milestones linked to phase
+  const milestoneRows = _sqlQuery(
+    'SELECT id, name, due_date, completed FROM milestones WHERE project_id = ? AND phase_id = ?',
+    [projectId, phaseId]
+  )
+  const milestones = milestoneRows.map((m) => ({
+    name: m.name,
+    dueDate: m.due_date || null,
+    completed: m.completed === 1,
+  }))
+
+  // Decisions in phase window
+  const decisionRows = _sqlQuery(
+    `SELECT id, title, status, rationale, author FROM decisions
+     WHERE project_id = ? AND created_at >= ? AND created_at <= ?
+     ORDER BY created_at ASC`,
+    [projectId, windowStart, windowEnd]
+  )
+  const decisions = decisionRows.map((d) => ({
+    title: d.title,
+    status: d.status,
+    rationale: d.rationale || '',
+  }))
+
+  // Session learnings in phase window
+  const sessionRows = _sqlQuery(
+    `SELECT learnings, key_decisions, work_done FROM agent_sessions
+     WHERE project_id = ? AND started_at >= ? AND started_at <= ?
+     ORDER BY started_at ASC`,
+    [projectId, windowStart, windowEnd]
+  )
+  const lessonsLearned = sessionRows
+    .filter((s) => s.learnings && s.learnings.trim())
+    .map((s) => s.learnings.trim())
+
+  // Follow-up actions from slipped items
+  const followUpActions = slipped.map((s) => `Carry forward: ${s.key} — ${s.title}`)
+
+  // Summary
+  const summary = [
+    `${shipped.length}/${planned.length} items shipped.`,
+    blockers.length ? `${blockers.length} blocker(s) encountered.` : null,
+    decisions.length ? `${decisions.length} decision(s) recorded.` : null,
+    lessonsLearned.length ? `${lessonsLearned.length} lesson(s) captured.` : null,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  return {
+    phase: mapped,
+    windowStart,
+    windowEnd,
+    summary,
+    planned,
+    shipped,
+    slipped,
+    blockers,
+    milestones,
+    decisions,
+    lessonsLearned,
+    followUpActions,
+  }
+}
+
+export function generateHotWash(projectId, phaseId, { generatedBy = 'ai', overrides = {} } = {}) {
+  // Check for existing finalized report
+  const existing = getHotWash(projectId, phaseId)
+  if (existing && existing.status === 'final') {
+    return { error: 'Cannot regenerate a finalized hot wash' }
+  }
+
+  const evidence = gatherPhaseEvidence(projectId, phaseId)
+  if (!evidence) return null
+
+  const now = new Date().toISOString()
+  const id = existing?.id || crypto.randomUUID()
+
+  const report = {
+    summary: overrides.summary || evidence.summary,
+    planned: evidence.planned,
+    shipped: evidence.shipped,
+    slipped: evidence.slipped,
+    blockers: evidence.blockers,
+    decisions: evidence.decisions,
+    lessonsLearned: [...evidence.lessonsLearned, ...(overrides.lessonsLearned || [])],
+    followUpActions: [...evidence.followUpActions, ...(overrides.followUpActions || [])],
+  }
+
+  // Create or update wiki page
+  const pageTitle = `Phase Hot Wash: ${evidence.phase.name}`
+  const pageContent = _renderHotWashWikiPage(evidence.phase, report, now, generatedBy)
+  let wikiPageId = existing?.wikiPageId || null
+
+  if (wikiPageId) {
+    updatePage(projectId, wikiPageId, { content: pageContent })
+  } else {
+    const page = addPage(projectId, {
+      title: pageTitle,
+      content: pageContent,
+      icon: '📊',
+      createdBy: 'system',
+    })
+    wikiPageId = page.id
+  }
+
+  // Upsert hot wash row
+  db.run(
+    `INSERT OR REPLACE INTO hot_washes
+      (id, project_id, phase_id, status, generated_at, generated_by,
+       finalized_at, finalized_by, summary, planned, shipped, slipped,
+       blockers, decisions_data, lessons_learned, follow_up_actions,
+       wiki_page_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      id,
+      projectId,
+      phaseId,
+      'draft',
+      now,
+      generatedBy,
+      existing?.finalizedAt || null,
+      existing?.finalizedBy || null,
+      report.summary,
+      JSON.stringify(report.planned),
+      JSON.stringify(report.shipped),
+      JSON.stringify(report.slipped),
+      JSON.stringify(report.blockers),
+      JSON.stringify(report.decisions),
+      JSON.stringify(report.lessonsLearned),
+      JSON.stringify(report.followUpActions),
+      wikiPageId,
+      existing?.createdAt || now,
+      now,
+    ]
+  )
+  scheduleSave()
+  getLessonsLearnedSummary(projectId, { syncPage: true })
+  return getHotWash(projectId, phaseId)
+}
+
+export function updateHotWash(projectId, phaseId, updates) {
+  const existing = getHotWash(projectId, phaseId)
+  if (!existing) return null
+  if (existing.status === 'final') return { error: 'Cannot edit a finalized hot wash' }
+
+  const now = new Date().toISOString()
+  const merged = { ...existing, ...updates, updatedAt: now }
+
+  db.run(
+    `UPDATE hot_washes SET
+       summary = ?, planned = ?, shipped = ?, slipped = ?,
+       blockers = ?, decisions_data = ?, lessons_learned = ?,
+       follow_up_actions = ?, updated_at = ?
+     WHERE project_id = ? AND phase_id = ?`,
+    [
+      merged.summary,
+      JSON.stringify(merged.planned),
+      JSON.stringify(merged.shipped),
+      JSON.stringify(merged.slipped),
+      JSON.stringify(merged.blockers),
+      JSON.stringify(merged.decisions),
+      JSON.stringify(merged.lessonsLearned),
+      JSON.stringify(merged.followUpActions),
+      now,
+      projectId,
+      phaseId,
+    ]
+  )
+
+  // Sync wiki page
+  if (existing.wikiPageId) {
+    const phase = _sqlQueryOne('SELECT * FROM phases WHERE id = ?', [phaseId])
+    if (phase) {
+      const content = _renderHotWashWikiPage(
+        mapPhaseRow(phase),
+        merged,
+        merged.generatedAt,
+        merged.generatedBy
+      )
+      updatePage(projectId, existing.wikiPageId, { content })
+    }
+  }
+
+  scheduleSave()
+  getLessonsLearnedSummary(projectId, { syncPage: true })
+  return getHotWash(projectId, phaseId)
+}
+
+export function finalizeHotWash(projectId, phaseId, { finalizedBy = 'human' } = {}) {
+  const existing = getHotWash(projectId, phaseId)
+  if (!existing) return null
+  if (existing.status === 'final') return { error: 'Already finalized' }
+
+  const now = new Date().toISOString()
+  db.run(
+    `UPDATE hot_washes SET status = 'final', finalized_at = ?, finalized_by = ?, updated_at = ?
+     WHERE project_id = ? AND phase_id = ?`,
+    [now, finalizedBy, now, projectId, phaseId]
+  )
+
+  // Update wiki page with FINAL header
+  if (existing.wikiPageId) {
+    const page = getPage(projectId, existing.wikiPageId)
+    if (page) {
+      const finalContent = `**[FINAL — ${now}]**\n\n${page.content}`
+      updatePage(projectId, existing.wikiPageId, { content: finalContent })
+    }
+  }
+
+  scheduleSave()
+  getLessonsLearnedSummary(projectId, { syncPage: true })
+  return getHotWash(projectId, phaseId)
+}
+
+function _renderHotWashWikiPage(phase, report, generatedAt, generatedBy) {
+  const lines = [
+    `# Phase Hot Wash: ${phase.name}`,
+    '',
+    `**Status:** ${report.status || 'draft'} | **Generated:** ${generatedAt} | **By:** ${generatedBy}`,
+    '',
+    '## Summary',
+    report.summary || '_No summary_',
+    '',
+  ]
+
+  if (report.shipped?.length) {
+    lines.push(`## What Shipped (${report.shipped.length})`)
+    for (const s of report.shipped) lines.push(`- **${s.key}** ${s.title}`)
+    lines.push('')
+  }
+
+  if (report.slipped?.length) {
+    lines.push(`## What Slipped (${report.slipped.length})`)
+    for (const s of report.slipped) lines.push(`- **${s.key}** ${s.title} — ${s.status}`)
+    lines.push('')
+  }
+
+  if (report.blockers?.length) {
+    lines.push(`## Blockers Encountered (${report.blockers.length})`)
+    for (const b of report.blockers)
+      lines.push(`- **${b.key}** ${b.title}${b.resolvedAt ? ' (resolved)' : ''}`)
+    lines.push('')
+  }
+
+  if (report.decisions?.length) {
+    lines.push(`## Decisions (${report.decisions.length})`)
+    for (const d of report.decisions) lines.push(`- **${d.title}** [${d.status}] — ${d.rationale}`)
+    lines.push('')
+  }
+
+  if (report.lessonsLearned?.length) {
+    lines.push(`## Lessons Learned (${report.lessonsLearned.length})`)
+    for (const l of report.lessonsLearned) lines.push(`- ${l}`)
+    lines.push('')
+  }
+
+  if (report.followUpActions?.length) {
+    lines.push(`## Follow-Up Actions (${report.followUpActions.length})`)
+    for (const a of report.followUpActions) lines.push(`- [ ] ${a}`)
+    lines.push('')
+  }
+
+  return lines.join('\n')
+}
+
+// ---------------------------------------------------------------------------
+// Workflow Connections — first-class edge CRUD
+// ---------------------------------------------------------------------------
+
+export function listWorkflowConnections(projectId) {
+  return _listWorkflowConnectionsRaw(projectId)
+}
+
+export function addWorkflowConnection(projectId, { fromNodeId, toNodeId, type }) {
+  if (!_projectExists(projectId)) return null
+  if (fromNodeId === toNodeId) return { error: 'Self-loops are not allowed' }
+
+  // Validate both nodes exist
+  const fromNode = _sqlQueryOne('SELECT id FROM workflow_nodes WHERE id = ? AND project_id = ?', [
+    fromNodeId,
+    projectId,
+  ])
+  const toNode = _sqlQueryOne('SELECT id FROM workflow_nodes WHERE id = ? AND project_id = ?', [
+    toNodeId,
+    projectId,
+  ])
+  if (!fromNode) return { error: `Node not found: ${fromNodeId}` }
+  if (!toNode) return { error: `Node not found: ${toNodeId}` }
+
+  // Check for duplicate
+  const existing = _sqlQueryOne(
+    'SELECT id FROM workflow_connections WHERE project_id = ? AND from_node_id = ? AND to_node_id = ?',
+    [projectId, fromNodeId, toNodeId]
+  )
+  if (existing) return { error: 'Connection already exists', existingId: existing.id }
+
+  const id = crypto.randomUUID()
+  db.run(
+    'INSERT INTO workflow_connections (id, project_id, from_node_id, to_node_id, type) VALUES (?, ?, ?, ?, ?)',
+    [id, projectId, fromNodeId, toNodeId, type || null]
+  )
+  scheduleSave()
+  return mapWorkflowConnectionRow({
+    id,
+    from_node_id: fromNodeId,
+    to_node_id: toNodeId,
+    type: type || null,
+  })
+}
+
+export function deleteWorkflowConnection(projectId, connId) {
+  const row = _sqlQueryOne('SELECT id FROM workflow_connections WHERE id = ? AND project_id = ?', [
+    connId,
+    projectId,
+  ])
+  if (!row) return false
+  db.run('DELETE FROM workflow_connections WHERE id = ?', [connId])
+  scheduleSave()
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Architecture Connections — first-class edge CRUD
+// ---------------------------------------------------------------------------
+
+export function listArchConnections(projectId) {
+  return _listArchConnectionsRaw(projectId)
+}
+
+export function addArchConnection(projectId, { fromComponentId, toComponentId, type }) {
+  if (!_projectExists(projectId)) return null
+  if (fromComponentId === toComponentId) return { error: 'Self-loops are not allowed' }
+
+  const fromComp = _sqlQueryOne(
+    'SELECT id FROM architecture_components WHERE id = ? AND project_id = ?',
+    [fromComponentId, projectId]
+  )
+  const toComp = _sqlQueryOne(
+    'SELECT id FROM architecture_components WHERE id = ? AND project_id = ?',
+    [toComponentId, projectId]
+  )
+  if (!fromComp) return { error: `Component not found: ${fromComponentId}` }
+  if (!toComp) return { error: `Component not found: ${toComponentId}` }
+
+  const existing = _sqlQueryOne(
+    'SELECT id FROM architecture_connections WHERE project_id = ? AND from_component_id = ? AND to_component_id = ?',
+    [projectId, fromComponentId, toComponentId]
+  )
+  if (existing) return { error: 'Connection already exists', existingId: existing.id }
+
+  const id = crypto.randomUUID()
+  db.run(
+    'INSERT INTO architecture_connections (id, project_id, from_component_id, to_component_id, type) VALUES (?, ?, ?, ?, ?)',
+    [id, projectId, fromComponentId, toComponentId, type || null]
+  )
+  scheduleSave()
+  return mapArchConnectionRow({
+    id,
+    from_component_id: fromComponentId,
+    to_component_id: toComponentId,
+    type: type || null,
+  })
+}
+
+export function deleteArchConnection(projectId, connId) {
+  const row = _sqlQueryOne(
+    'SELECT id FROM architecture_connections WHERE id = ? AND project_id = ?',
+    [connId, projectId]
+  )
+  if (!row) return false
+  db.run('DELETE FROM architecture_connections WHERE id = ?', [connId])
+  scheduleSave()
+  return true
+}
+
+// Create architecture connections from a dependencies array (for --deps CLI flag)
+export function syncArchDependencies(projectId, componentId, dependencyIds) {
+  // Remove existing outbound connections from this component
+  db.run('DELETE FROM architecture_connections WHERE project_id = ? AND from_component_id = ?', [
+    projectId,
+    componentId,
+  ])
+  const results = []
+  for (const depId of dependencyIds) {
+    const result = addArchConnection(projectId, {
+      fromComponentId: componentId,
+      toComponentId: depId,
+    })
+    if (result && !result.error) results.push(result)
+  }
+  return results
 }

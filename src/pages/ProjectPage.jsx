@@ -9,7 +9,16 @@ import {
   useNavigate,
 } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Loader2, Box, Workflow, FileEdit, Scale } from 'lucide-react'
+import {
+  ArrowLeft,
+  Loader2,
+  Box,
+  Workflow,
+  FileEdit,
+  Scale,
+  Lightbulb,
+  Calendar,
+} from 'lucide-react'
 import { useProject } from '../hooks/useProject'
 import { useKeyboardShortcuts, SHORTCUTS } from '../hooks/useKeyboardShortcuts'
 const SEED_PROJECT_ID = 'storyflow'
@@ -30,6 +39,15 @@ const SUB_NAV = {
     { key: 'docs', label: 'Wiki', icon: FileEdit, path: 'docs' },
     { key: 'docs/decisions', label: 'Decisions', icon: Scale, path: 'docs/decisions' },
   ],
+  insights: [
+    { key: 'insights', label: 'Phase Overview', icon: Calendar, path: 'insights' },
+    {
+      key: 'insights/lessons',
+      label: 'Lessons Learned',
+      icon: Lightbulb,
+      path: 'insights/lessons',
+    },
+  ],
 }
 
 // Map active tab keys → sub-nav group
@@ -38,6 +56,8 @@ const TAB_TO_GROUP = {
   workflow: 'plan',
   wiki: 'docs',
   decisions: 'docs',
+  timeline: 'insights',
+  lessons: 'insights',
 }
 
 // Map active tab keys → sub-nav tab key (for active indicator)
@@ -46,6 +66,8 @@ const TAB_TO_SUBNAV_KEY = {
   workflow: 'plan/workflow',
   wiki: 'docs',
   decisions: 'docs/decisions',
+  timeline: 'insights',
+  lessons: 'insights/lessons',
 }
 
 const OverviewTab = lazy(() => import('../components/project/OverviewTab'))
@@ -55,6 +77,7 @@ const BoardTab = lazy(() => import('../components/project/BoardTab'))
 const WikiTab = lazy(() => import('../components/project/WikiTab'))
 const TimelineTab = lazy(() => import('../components/project/TimelineTab'))
 const DecisionsTab = lazy(() => import('../components/project/DecisionsTab'))
+const LessonsLearnedTab = lazy(() => import('../components/project/LessonsLearnedTab'))
 
 function TabFallback() {
   return (
@@ -74,6 +97,7 @@ function getActiveTabFromPath(pathname, projectId) {
   // Check for nested routes first (more specific)
   if (subPath.startsWith('plan/workflow')) return 'workflow'
   if (subPath.startsWith('docs/decisions')) return 'decisions'
+  if (subPath.startsWith('insights/lessons')) return 'lessons'
   if (subPath.startsWith('work/issue/')) return 'board'
   if (subPath.startsWith('docs/page/')) return 'wiki'
 
@@ -91,6 +115,7 @@ export default function ProjectPage() {
   const { id } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+  const bareProjectPath = `/project/${id}`
 
   // Redirect legacy seed project URL to new slug-based URL
   useEffect(() => {
@@ -99,6 +124,15 @@ export default function ProjectPage() {
       navigate(`/project/${SEED_PROJECT_ID}${rest}`, { replace: true })
     }
   }, [id, location.pathname, navigate])
+
+  // Normalize bare project URLs to the Overview route.
+  // This avoids falling through the nested splat redirect path on `/project/:id`.
+  useEffect(() => {
+    if (!id) return
+    if (location.pathname === bareProjectPath || location.pathname === `${bareProjectPath}/`) {
+      navigate(`${bareProjectPath}/overview`, { replace: true })
+    }
+  }, [id, location.pathname, navigate, bareProjectPath])
 
   const hooks = useProject(id)
   const { project, updateProject } = hooks
@@ -152,6 +186,7 @@ export default function ProjectPage() {
             wiki: 'docs',
             timeline: 'insights',
             decisions: 'docs/decisions',
+            lessons: 'insights/lessons',
           }
           navigate(`/project/${id}/${pathMap[tab] || 'overview'}`)
         }}
@@ -179,7 +214,7 @@ export default function ProjectPage() {
           </div>
         )}
 
-        <div className="flex-1 overflow-auto px-4 pb-32 md:px-8 md:pb-32">
+        <div className="with-steering-clearance flex-1 overflow-auto px-4 md:px-8">
           <motion.div
             key={activeTab}
             initial={{ opacity: 0 }}
@@ -286,6 +321,7 @@ export default function ProjectPage() {
                     />
                   }
                 />
+                <Route path="insights/lessons" element={<LessonsLearnedTab project={project} />} />
 
                 {/* Default redirect */}
                 <Route path="*" element={<Navigate to="overview" replace />} />

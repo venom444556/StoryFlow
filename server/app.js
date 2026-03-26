@@ -225,7 +225,8 @@ app.delete('/api/*', requireToken)
 
 // ---------------------------------------------------------------------------
 // Gate enforcement middleware — Phase 1
-// Blocks AI mutations on entities with pending gates. Humans bypass.
+// Hybrid gate enforcement — blocks AI mutations on gated entities,
+// requires higher confidence for high-risk actions. Humans bypass.
 // ---------------------------------------------------------------------------
 const ENTITY_PARAM_MAP = {
   issueId: 'issue',
@@ -237,7 +238,11 @@ const ENTITY_PARAM_MAP = {
   milestoneId: 'milestone',
   nodeId: 'workflow_node',
   compId: 'architecture_component',
+  connId: 'connection',
 }
+
+const HIGH_RISK_PATHS = ['/restore', '/batch-update']
+const HIGH_RISK_CONFIDENCE = 0.7
 
 function enforceGates(req, res, next) {
   // Humans bypass gates
@@ -246,7 +251,7 @@ function enforceGates(req, res, next) {
   const projectId = req.params.id
   if (!projectId) return next()
 
-  // Find entity type/id from route params
+  // 1. Entity-specific gate check — block if pending gate exists
   for (const [param, entityType] of Object.entries(ENTITY_PARAM_MAP)) {
     const entityId = req.params[param]
     if (entityId) {
@@ -263,6 +268,20 @@ function enforceGates(req, res, next) {
       break
     }
   }
+
+  // 2. High-risk pre-flight — DELETE and dangerous paths require confidence >= 0.7
+  const isHighRisk = req.method === 'DELETE' || HIGH_RISK_PATHS.some((p) => req.path.endsWith(p))
+  if (isHighRisk) {
+    const confidence = parseFloat(req.headers['x-storyflow-confidence'] || '0')
+    if (confidence < HIGH_RISK_CONFIDENCE) {
+      return res.status(403).json({
+        error: `High-risk mutation requires confidence >= ${HIGH_RISK_CONFIDENCE}`,
+        required_confidence: HIGH_RISK_CONFIDENCE,
+        provided_confidence: confidence,
+      })
+    }
+  }
+
   next()
 }
 
@@ -365,6 +384,12 @@ app.delete('/api/projects/:id', (req, res) => {
 })
 
 // --- Board summary ---
+app.get('/api/projects/:id/analytics', (req, res) => {
+  const analytics = db.getProjectAnalytics(req.params.id)
+  if (!analytics) return res.status(404).json({ error: 'Project not found' })
+  res.json(analytics)
+})
+
 app.get('/api/projects/:id/board-summary', (req, res) => {
   const summary = db.getBoardSummary(req.params.id)
   if (!summary) return res.status(404).json({ error: 'Project not found' })
@@ -393,6 +418,8 @@ app.get('/api/projects/:id/context', (req, res) => {
   const directives = getSteeringDirectives(req.params.id)
   summary.directivesCount = directives.length
   summary.directives = directives
+  summary.wiki = db.getWikiAudit(req.params.id)
+  summary.lessons = db.getLessonsLearnedSummary(req.params.id)
 
   res.json(summary)
 })
@@ -468,19 +495,13 @@ app.post('/api/projects/:id/issues', (req, res) => {
   if (err) return res.status(400).json({ error: err })
   const provenance = extractProvenance(req)
 
-  // Server-side dedup check — warn on near-matches but don't block
-  const project = db.getProject(req.params.id)
-  if (project) {
-    const existingIssues = project.board?.issues || []
-    const dedup = checkTitleDuplication(req.body.title, existingIssues)
-    if (dedup.isDuplicate) {
-      const topMatch = dedup.matches[0]
-      // Include a dedup_warning in the response (non-blocking)
-      req._dedupWarning = {
-        similar_to: topMatch.issue.key || topMatch.issue.id,
-        similar_title: topMatch.issue.title,
-        score: Math.round(topMatch.score * 100),
-      }
+  // Server-side dedup check — SQL-based, no full-project load
+  const similar = db.findSimilarIssues(req.params.id, req.body.title)
+  if (similar.length > 0) {
+    req._dedupWarning = {
+      similar_to: similar[0].key || similar[0].id,
+      similar_title: similar[0].title,
+      score: similar[0].score,
     }
   }
 
@@ -791,6 +812,12 @@ app.get('/api/projects/:id/pages/:pageId', (req, res) => {
   res.json(page)
 })
 
+app.get('/api/projects/:id/wiki-audit', (req, res) => {
+  const audit = db.getWikiAudit(req.params.id)
+  if (!audit) return res.status(404).json({ error: 'Project not found' })
+  res.json(audit)
+})
+
 app.post('/api/projects/:id/pages', (req, res) => {
   const err = validatePageBody(req.body)
   if (err) return res.status(400).json({ error: err })
@@ -1097,6 +1124,75 @@ app.delete('/api/projects/:id/milestones/:milestoneId', (req, res) => {
   res.json({ success: true })
 })
 
+// --- Phase Hot Wash ---
+app.post('/api/projects/:id/phases/:phaseId/hot-wash/generate', (req, res) => {
+  const provenance = extractProvenance(req)
+  const result = db.generateHotWash(req.params.id, req.params.phaseId, {
+    generatedBy: provenance.actor || 'ai',
+    overrides: req.body || {},
+  })
+  if (!result) return res.status(404).json({ error: 'Phase or project not found' })
+  if (result.error) return res.status(409).json({ error: result.error })
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'timeline',
+    action: 'create',
+    entityType: 'hot_wash',
+    entityId: result.id,
+    entityTitle: `Hot wash for phase ${req.params.phaseId}`,
+  })
+  broadcastEvent(event)
+  notifyClients()
+  res.status(201).json(result)
+})
+
+app.get('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
+  const hw = db.getHotWash(req.params.id, req.params.phaseId)
+  if (!hw) return res.status(404).json({ error: 'No hot wash for this phase' })
+  res.json(hw)
+})
+
+app.put('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
+  const result = db.updateHotWash(req.params.id, req.params.phaseId, req.body)
+  if (!result) return res.status(404).json({ error: 'No hot wash for this phase' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  notifyClients()
+  res.json(result)
+})
+
+app.post('/api/projects/:id/phases/:phaseId/hot-wash/finalize', (req, res) => {
+  const provenance = extractProvenance(req)
+  const result = db.finalizeHotWash(req.params.id, req.params.phaseId, {
+    finalizedBy: provenance.actor || 'human',
+  })
+  if (!result) return res.status(404).json({ error: 'No hot wash for this phase' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'timeline',
+    action: 'update',
+    entityType: 'hot_wash',
+    entityId: result.id,
+    entityTitle: `Finalized hot wash`,
+  })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(result)
+})
+
+app.get('/api/projects/:id/hot-washes', (req, res) => {
+  const list = db.listHotWashes(req.params.id)
+  res.json(list)
+})
+
+app.get('/api/projects/:id/lessons-learned', (req, res) => {
+  const summary = db.getLessonsLearnedSummary(req.params.id, { syncPage: true })
+  if (!summary) return res.status(404).json({ error: 'Project not found' })
+  res.json(summary)
+})
+
 // --- Agent Sessions ---
 app.post('/api/projects/:id/sessions', (req, res) => {
   const session = db.saveSessionSummary(req.params.id, req.body)
@@ -1184,9 +1280,31 @@ app.post('/api/projects/:id/events/:eventId/respond', (req, res) => {
 
 // --- Approval Gates ---
 app.get('/api/projects/:id/gates', (req, res) => {
-  const pending = checkApprovalGates(req.params.id)
-  const rejected = getRejectedEvents(req.params.id, req.query.since)
-  res.json({ pending, rejected })
+  const rawPending = checkApprovalGates(req.params.id)
+  const rawRejected = getRejectedEvents(req.params.id, req.query.since)
+
+  // Normalize for UI consumption — stable shape across page refreshes
+  const mapGate = (g) => ({
+    id: g.id,
+    entityType: g.entity_type,
+    entityId: g.entity_id,
+    entityTitle: g.entity_title,
+    category: g.category,
+    action: g.action,
+    reasoning: g.reasoning || null,
+    confidence: g.confidence || null,
+    actor: g.actor,
+    status: g.status,
+    createdAt: g.timestamp,
+    data: g.data || {},
+  })
+
+  res.json({
+    pending: rawPending.map(mapGate),
+    rejected: rawRejected.map(mapGate),
+    pendingCount: rawPending.length,
+    rejectedCount: rawRejected.length,
+  })
 })
 
 // --- Snapshots — Phase 3 ---
@@ -1286,20 +1404,24 @@ app.post('/api/projects/:id/steering-queue/:directiveId/acknowledge', (req, res)
 
 // --- Board Hygiene ---
 app.get('/api/projects/:id/hygiene', (req, res) => {
-  const project = db.getProject(req.params.id)
-  if (!project) return res.status(404).json({ error: 'Project not found' })
-  const events = emitHygieneEvents(req.params.id, project)
-  res.json({ findings: events.length, events })
+  if (!db.projectExists(req.params.id)) return res.status(404).json({ error: 'Project not found' })
+  // SQL-based hygiene — no full-project load
+  const summary = db.getHygieneSummary(req.params.id)
+  res.json({ findings: summary.findings, ...summary })
 })
 
 // --- Title dedup check ---
 app.post('/api/projects/:id/check-duplicate', (req, res) => {
   if (!req.body.title) return res.status(400).json({ error: '"title" is required' })
-  const project = db.getProject(req.params.id)
-  if (!project) return res.status(404).json({ error: 'Project not found' })
-  const issues = project.board?.issues || []
-  const result = checkTitleDuplication(req.body.title, issues, req.body.threshold)
-  res.json(result)
+  if (!db.projectExists(req.params.id)) return res.status(404).json({ error: 'Project not found' })
+  const similar = db.findSimilarIssues(req.params.id, req.body.title)
+  res.json({
+    isDuplicate: similar.length > 0,
+    matches: similar.map((s) => ({
+      issue: { key: s.key, id: s.id, title: s.title },
+      score: s.score / 100,
+    })),
+  })
 })
 
 // --- Workflow nodes ---
@@ -1466,6 +1588,349 @@ app.delete('/api/projects/:id/architecture/components/:compId', (req, res) => {
   broadcastEvent(event)
   notifyClients()
   res.json({ ok: true })
+})
+
+// --- Workflow connections (edges) ---
+
+app.get('/api/projects/:id/workflow/connections', (req, res) => {
+  const conns = db.listWorkflowConnections(req.params.id)
+  res.json(conns)
+})
+
+app.post('/api/projects/:id/workflow/connections', (req, res) => {
+  const { fromNodeId, toNodeId, type } = req.body
+  if (!fromNodeId || !toNodeId)
+    return res.status(400).json({ error: '"fromNodeId" and "toNodeId" are required' })
+  const result = db.addWorkflowConnection(req.params.id, { fromNodeId, toNodeId, type })
+  if (!result) return res.status(404).json({ error: 'Project not found' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  notifyClients()
+  res.status(201).json(result)
+})
+
+app.delete('/api/projects/:id/workflow/connections/:connId', (req, res) => {
+  const ok = db.deleteWorkflowConnection(req.params.id, req.params.connId)
+  if (!ok) return res.status(404).json({ error: 'Connection not found' })
+  notifyClients()
+  res.json({ success: true })
+})
+
+// --- Architecture connections (edges) ---
+
+app.get('/api/projects/:id/architecture/connections', (req, res) => {
+  const conns = db.listArchConnections(req.params.id)
+  res.json(conns)
+})
+
+app.post('/api/projects/:id/architecture/connections', (req, res) => {
+  const { fromComponentId, toComponentId, type } = req.body
+  if (!fromComponentId || !toComponentId)
+    return res.status(400).json({ error: '"fromComponentId" and "toComponentId" are required' })
+  const result = db.addArchConnection(req.params.id, { fromComponentId, toComponentId, type })
+  if (!result) return res.status(404).json({ error: 'Project not found' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  notifyClients()
+  res.status(201).json(result)
+})
+
+app.delete('/api/projects/:id/architecture/connections/:connId', (req, res) => {
+  const ok = db.deleteArchConnection(req.params.id, req.params.connId)
+  if (!ok) return res.status(404).json({ error: 'Connection not found' })
+  notifyClients()
+  res.json({ success: true })
+})
+
+// --- Agent Package (workspace-scoped, not per-project) ---
+import {
+  existsSync as fsExists,
+  readFileSync as fsRead,
+  readdirSync as fsReaddir,
+  statSync as fsStat,
+  mkdirSync as fsMkdir,
+  writeFileSync as fsWrite,
+  chmodSync as fsChmod,
+} from 'node:fs'
+import { execFileSync as fsExecFile } from 'node:child_process'
+
+const AGENT_DIR = join(process.cwd(), 'agent')
+const AGENT_MEMORY_DB = join(AGENT_DIR, 'memory.db')
+const AGENT_CONFIG = join(AGENT_DIR, 'config.json')
+const AGENT_CLAUDE_SETTINGS = join(process.cwd(), '.claude', 'settings.local.json')
+
+function readClaudeHookSettings() {
+  if (!fsExists(AGENT_CLAUDE_SETTINGS)) return null
+  try {
+    return JSON.parse(fsRead(AGENT_CLAUDE_SETTINGS, 'utf-8'))
+  } catch {
+    return null
+  }
+}
+
+function hasInstalledAgentHooks(settings) {
+  return !!settings?.hooks && Object.keys(settings.hooks).length > 0
+}
+
+app.get('/api/agent/status', (req, res) => {
+  const packagePresent = fsExists(AGENT_DIR) && fsExists(join(AGENT_DIR, 'CLAUDE.md'))
+  const memoryDbPresent = fsExists(AGENT_MEMORY_DB)
+  const configPresent = fsExists(AGENT_CONFIG)
+
+  let config = null
+  if (configPresent) {
+    try {
+      config = JSON.parse(fsRead(AGENT_CONFIG, 'utf-8'))
+    } catch {
+      /* corrupt */
+    }
+  }
+
+  let hookCount = 0
+  const hooksDir = join(AGENT_DIR, 'hooks')
+  if (fsExists(hooksDir)) {
+    hookCount = fsReaddir(hooksDir).filter((f) => f.endsWith('.sh')).length
+  }
+  const claudeSettings = readClaudeHookSettings()
+  const hooksInstalled = hasInstalledAgentHooks(claudeSettings)
+
+  let kbCount = 0
+  const kbDir = join(AGENT_DIR, 'kb')
+  if (fsExists(kbDir)) {
+    const count = (dir) => {
+      let n = 0
+      for (const e of fsReaddir(dir)) {
+        const full = join(dir, e)
+        try {
+          n += fsStat(full).isDirectory() ? count(full) : 1
+        } catch {
+          /* skip */
+        }
+      }
+      return n
+    }
+    kbCount = count(kbDir)
+  }
+
+  // Overall health state for UI rendering
+  let health = 'missing'
+  if (packagePresent && memoryDbPresent && hookCount > 0 && hooksInstalled) health = 'healthy'
+  else if (packagePresent) health = 'warning'
+
+  res.json({
+    health,
+    packagePresent,
+    memoryDbPresent,
+    configPresent,
+    config,
+    hookCount,
+    hooksInstalled,
+    kbCount,
+  })
+})
+
+app.get('/api/agent/doctor', (req, res) => {
+  const checks = []
+
+  // 1. Package presence (workspace-level)
+  const pkgPresent = fsExists(AGENT_DIR) && fsExists(join(AGENT_DIR, 'CLAUDE.md'))
+  checks.push({
+    name: 'Agent package present',
+    pass: pkgPresent,
+    level: 'workspace',
+    detail: pkgPresent ? `Found at ${AGENT_DIR}` : 'agent/ directory missing',
+    fix: pkgPresent ? null : 'Run: storyflow agent init',
+  })
+
+  // 2. Memory DB (workspace-level)
+  checks.push({
+    name: 'Memory DB',
+    pass: fsExists(AGENT_MEMORY_DB),
+    level: 'workspace',
+    fix: fsExists(AGENT_MEMORY_DB) ? null : 'Run: storyflow agent init',
+  })
+
+  // 3. Config (workspace-level)
+  const configOk = fsExists(AGENT_CONFIG)
+  let configData = null
+  if (configOk) {
+    try {
+      configData = JSON.parse(fsRead(AGENT_CONFIG, 'utf-8'))
+    } catch {
+      /* corrupt */
+    }
+  }
+  checks.push({
+    name: 'Config file',
+    pass: configOk && !!configData,
+    level: 'workspace',
+    detail: configData ? `v${configData.version}` : null,
+    fix: configOk ? null : 'Run: storyflow agent init',
+  })
+
+  // 4. Hooks (workspace-level)
+  const hooksDir = join(AGENT_DIR, 'hooks')
+  let hookCount = 0
+  if (fsExists(hooksDir)) {
+    hookCount = fsReaddir(hooksDir).filter((f) => f.endsWith('.sh')).length
+  }
+  checks.push({
+    name: 'Hook files',
+    pass: hookCount > 0,
+    level: 'workspace',
+    detail: hookCount > 0 ? `${hookCount} hook(s)` : 'No hooks',
+    fix: hookCount > 0 ? null : 'Run: storyflow agent install-hooks',
+  })
+
+  const claudeSettings = readClaudeHookSettings()
+  const hooksInstalled = hasInstalledAgentHooks(claudeSettings)
+  checks.push({
+    name: 'Hooks installed',
+    pass: hooksInstalled,
+    level: 'workspace',
+    detail: hooksInstalled ? 'Registered in .claude/settings.local.json' : 'Not installed',
+    fix: hooksInstalled ? null : 'Run: storyflow agent install-hooks',
+  })
+
+  // 5. Server connectivity (workspace-level — always true if this endpoint is reachable)
+  checks.push({ name: 'StoryFlow server', pass: true, level: 'workspace', detail: 'Responding' })
+
+  // 6. Project-aware checks (optional, if projectId provided)
+  const projectId = req.query.projectId
+  if (projectId) {
+    // Context boot check
+    try {
+      const summary = db.getOperationalSummary(projectId, { includeHygiene: true })
+      checks.push({
+        name: 'Context boot',
+        pass: !!summary,
+        level: 'project',
+        detail: summary ? `Project: ${summary.project.name}` : 'Failed',
+      })
+    } catch (e) {
+      checks.push({ name: 'Context boot', pass: false, level: 'project', detail: e.message })
+    }
+
+    // Default project resolution
+    checks.push({
+      name: 'Project resolution',
+      pass: true,
+      level: 'project',
+      detail: `Resolved: ${projectId}`,
+    })
+  }
+
+  const failCount = checks.filter((c) => !c.pass).length
+  res.json({ checks, failCount, timestamp: new Date().toISOString() })
+})
+
+app.post('/api/agent/init', (req, res) => {
+  const force = req.body?.force === true
+  const exists = fsExists(AGENT_DIR) && fsExists(join(AGENT_DIR, 'CLAUDE.md'))
+  if (exists && !force) {
+    return res.json({ alreadyExists: true, created: [] })
+  }
+
+  // Delegate to CLI — safest way to reuse the scaffold logic
+  try {
+    const args = ['agent', 'init', '--json']
+    if (force) args.push('--force')
+    const cliPath = join(process.cwd(), 'cli', 'bin', 'storyflow.js')
+    const result = fsExecFile('node', [cliPath, ...args], {
+      cwd: process.cwd(),
+      stdio: 'pipe',
+      timeout: 10000,
+    })
+    const parsed = JSON.parse(result.toString())
+    res.status(201).json(parsed)
+  } catch (e) {
+    res.status(500).json({ error: 'Init failed', detail: e.message })
+  }
+})
+
+app.post('/api/agent/install-hooks', (req, res) => {
+  const hooksDir = join(AGENT_DIR, 'hooks')
+  if (!fsExists(hooksDir)) {
+    return res.status(400).json({ error: 'agent/hooks/ not found. Run init first.' })
+  }
+
+  const installed = []
+  const files = fsReaddir(hooksDir).filter((f) => f.endsWith('.sh'))
+  for (const file of files) {
+    fsChmod(join(hooksDir, file), 0o755)
+    installed.push(file)
+  }
+
+  // Write .claude/settings.local.json with hook entries
+  const claudeDir = join(process.cwd(), '.claude')
+  if (!fsExists(claudeDir)) fsMkdir(claudeDir, { recursive: true })
+  const settingsPath = join(claudeDir, 'settings.local.json')
+  let settings = {}
+  if (fsExists(settingsPath)) {
+    try {
+      settings = JSON.parse(fsRead(settingsPath, 'utf-8'))
+    } catch {
+      settings = {}
+    }
+  }
+  const absHooksDir = join(process.cwd(), 'agent', 'hooks')
+  const hookConfig = {}
+  if (files.includes('session-start.sh'))
+    hookConfig.SessionStart = [
+      {
+        matcher: '*',
+        hooks: [
+          {
+            type: 'command',
+            command: `bash ${join(absHooksDir, 'session-start.sh')}`,
+            timeout: 15,
+          },
+        ],
+      },
+    ]
+  if (files.includes('pre-mutation.sh'))
+    hookConfig.PreToolUse = [
+      {
+        matcher: 'Bash',
+        hooks: [
+          { type: 'command', command: `bash ${join(absHooksDir, 'pre-mutation.sh')}`, timeout: 10 },
+        ],
+      },
+    ]
+  if (files.includes('post-mutation.sh'))
+    hookConfig.PostToolUse = [
+      {
+        matcher: 'Bash',
+        hooks: [
+          {
+            type: 'command',
+            command: `bash ${join(absHooksDir, 'post-mutation.sh')}`,
+            timeout: 10,
+          },
+        ],
+      },
+    ]
+  if (files.includes('session-stop.sh'))
+    hookConfig.Stop = [
+      {
+        matcher: '*',
+        hooks: [
+          { type: 'command', command: `bash ${join(absHooksDir, 'session-stop.sh')}`, timeout: 5 },
+        ],
+      },
+    ]
+  settings.hooks = hookConfig
+  fsWrite(settingsPath, JSON.stringify(settings, null, 2))
+  installed.push('.claude/settings.local.json')
+
+  // Write manifest
+  const manifest = {
+    description: 'StoryFlow Agent hooks — installed',
+    installedAt: new Date().toISOString(),
+    settingsPath,
+  }
+  fsWrite(join(hooksDir, 'manifest.json'), JSON.stringify(manifest, null, 2))
+  installed.push('manifest.json')
+
+  res.json({ installed, settingsPath })
 })
 
 // --- Catch-all for production SPA serving ---

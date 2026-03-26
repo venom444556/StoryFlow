@@ -20,9 +20,10 @@ All interaction happens through the `storyflow` CLI via Bash. Every command supp
 | **Issues** | `storyflow issues list/show/create/update/done/block/comment/delete/nudge/batch-update/batch-done` |
 | **Board** | `storyflow board [project]`, `storyflow hygiene [project]` |
 | **Sprints** | `storyflow sprints list/create/update/delete` |
-| **Wiki** | `storyflow pages list/show/create/update/delete/templates` (create supports `--icon`) |
+| **Wiki** | `storyflow pages list/show/create/update/delete/templates/audit/ensure-core` (create supports `--icon`) |
 | **Decisions** | `storyflow decisions list/show/create/update/delete` |
 | **Phases** | `storyflow phases list/create/update/delete` |
+| **Hot Wash** | `storyflow phases hot-wash generate/show/update/finalize/list/lessons` — phase retrospective reports and project lessons rollup |
 | **Milestones** | `storyflow milestones list/create/update/toggle/delete` |
 | **Workflow** | `storyflow workflow list/show/create/update/delete/link/unlink` |
 | **Architecture** | `storyflow architecture list/show/create/update/delete` |
@@ -33,13 +34,17 @@ All interaction happens through the `storyflow` CLI via Bash. Every command supp
 
 ## Agent Operating Path
 
-**Session start:** Use `storyflow context boot --json` — returns project state, AI status, gates, directives, board summary, last session, agent wiki pages, and hygiene in one atomic call.
+**Session start:** Use `storyflow context boot --json` — returns project state, AI status, gates, directives, board summary, last session, agent wiki pages, wiki audit, project lessons rollup, and hygiene in one atomic call.
+
+**Wiki accountability:** Use `storyflow pages audit --json` to detect missing or stale core documentation. If core pages are missing, run `storyflow pages ensure-core` before the session ends. Wiki freshness is an operating responsibility, not optional cleanup.
 
 **Finding things:** Use `storyflow search "query" --json` to search across all entity types, or `storyflow resolve <type> <ref> --json` to resolve a fuzzy reference to a canonical ID.
 
 **Batch operations:** Use `storyflow issues batch-done SC-1 SC-2 SC-3` to mark multiple issues Done, or `storyflow issues batch-update --updates '[...]'` for arbitrary batch updates.
 
 **Session end:** Use `storyflow sessions save -s "..." --next-steps "..." --key-decisions "..." --work-done "..." --learnings "..."` — include all fields, not just the summary.
+
+**Phase close:** When a phase is completed, a hot wash is auto-generated. Review with `storyflow phases hot-wash show <phase-ref> --json`, edit if needed, then finalize with `storyflow phases hot-wash finalize <phase-ref>`. Use `storyflow phases hot-wash lessons --json` to review the project-level lessons rollup and the durable Lessons Learned page backing it. Hot washes are evidence-backed — every section is derived from real StoryFlow data (issues, sessions, decisions, events).
 
 ## Data Model
 

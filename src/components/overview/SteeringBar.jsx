@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Terminal, Loader2, Check, ChevronUp, ChevronDown } from 'lucide-react'
 
@@ -33,6 +33,7 @@ export default function SteeringBar({ projectId }) {
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [directives, setDirectives] = useState([])
+  const containerRef = useRef(null)
   const inputRef = useRef(null)
   const scrollRef = useRef(null)
 
@@ -42,6 +43,39 @@ export default function SteeringBar({ projectId }) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
   }, [directives, expanded])
+
+  useLayoutEffect(() => {
+    const node = containerRef.current
+    if (!node || typeof window === 'undefined') return undefined
+
+    const setClearance = (height) => {
+      document.documentElement.style.setProperty(
+        '--steering-bar-clearance',
+        `${Math.ceil(height + 12)}px`
+      )
+    }
+
+    setClearance(node.getBoundingClientRect().height)
+
+    if (typeof ResizeObserver === 'undefined') {
+      return () => {
+        document.documentElement.style.setProperty('--steering-bar-clearance', '0px')
+      }
+    }
+
+    const observer = new ResizeObserver(() => {
+      if (containerRef.current) {
+        setClearance(containerRef.current.getBoundingClientRect().height)
+      }
+    })
+
+    observer.observe(node)
+
+    return () => {
+      observer.disconnect()
+      document.documentElement.style.setProperty('--steering-bar-clearance', '0px')
+    }
+  }, [expanded, directives.length])
 
   const handleSubmit = async () => {
     const trimmed = text.trim()
@@ -86,12 +120,20 @@ export default function SteeringBar({ projectId }) {
     inputRef.current?.focus()
   }
 
+  const dockIsWide = expanded || text.trim().length > 0
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none flex justify-center pb-6 px-6">
+    <div
+      ref={containerRef}
+      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none flex justify-center pb-3 px-4 md:px-6 md:pb-4"
+    >
       {/* The Steering Console */}
       <motion.div
         layout
-        className="pointer-events-auto surface-critical w-full max-w-3xl flex flex-col overflow-hidden"
+        className={[
+          'pointer-events-auto surface-critical flex w-full flex-col overflow-hidden',
+          dockIsWide ? 'max-w-3xl' : 'max-w-xl md:max-w-2xl',
+        ].join(' ')}
         style={{
           boxShadow: '0 12px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
         }}

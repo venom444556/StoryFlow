@@ -234,6 +234,7 @@ export const sprints = {
 export const pages = {
   list: (pid) => request(`/api/projects/${enc(pid)}/pages`),
   get: (pid, pageId) => request(`/api/projects/${enc(pid)}/pages/${enc(pageId)}`),
+  audit: (pid) => request(`/api/projects/${enc(pid)}/wiki-audit`),
   create: (pid, data) =>
     request(`/api/projects/${enc(pid)}/pages`, { method: 'POST', body: JSON.stringify(data) }),
   update: (pid, pageId, data) =>
@@ -294,6 +295,28 @@ export const milestones = {
     request(`/api/projects/${enc(pid)}/milestones/${enc(mid)}`, { method: 'DELETE' }),
 }
 
+// --- Hot Washes ---
+
+export const hotWashes = {
+  generate: (pid, phaseId, data = {}) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash/generate`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  get: (pid, phaseId) => request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash`),
+  update: (pid, phaseId, data) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  finalize: (pid, phaseId) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash/finalize`, {
+      method: 'POST',
+    }),
+  list: (pid) => request(`/api/projects/${enc(pid)}/hot-washes`),
+  lessons: (pid) => request(`/api/projects/${enc(pid)}/lessons-learned`),
+}
+
 // --- Workflow ---
 
 export const workflow = {
@@ -321,6 +344,18 @@ export const workflow = {
       method: 'POST',
       body: JSON.stringify({ issueKey }),
     }),
+  connections: {
+    list: (pid) => request(`/api/projects/${enc(pid)}/workflow/connections`),
+    create: (pid, data) =>
+      request(`/api/projects/${enc(pid)}/workflow/connections`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (pid, connId) =>
+      request(`/api/projects/${enc(pid)}/workflow/connections/${enc(connId)}`, {
+        method: 'DELETE',
+      }),
+  },
 }
 
 // --- Architecture ---
@@ -340,6 +375,18 @@ export const architecture = {
     }),
   delete: (pid, cid) =>
     request(`/api/projects/${enc(pid)}/architecture/components/${enc(cid)}`, { method: 'DELETE' }),
+  connections: {
+    list: (pid) => request(`/api/projects/${enc(pid)}/architecture/connections`),
+    create: (pid, data) =>
+      request(`/api/projects/${enc(pid)}/architecture/connections`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    delete: (pid, connId) =>
+      request(`/api/projects/${enc(pid)}/architecture/connections/${enc(connId)}`, {
+        method: 'DELETE',
+      }),
+  },
 }
 
 // --- Events ---

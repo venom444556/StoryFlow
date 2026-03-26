@@ -142,6 +142,10 @@ You interact with StoryFlow exclusively via the `storyflow` CLI using the Bash t
 | Create phase | `storyflow phases create --name "Phase 1" --start 2026-03-01 --end 2026-03-14 --json` |
 | Update phase | `storyflow phases update <id> --progress 50 --json` |
 | Delete phase | `storyflow phases delete <id>` |
+| Generate hot wash | `storyflow phases hot-wash generate <phase-ref> --json` |
+| Show hot wash | `storyflow phases hot-wash show <phase-ref> --json` |
+| Finalize hot wash | `storyflow phases hot-wash finalize <phase-ref> --json` |
+| Lessons rollup | `storyflow phases hot-wash lessons --json` |
 
 #### Timeline — Milestones
 | Operation | Command |
@@ -321,6 +325,8 @@ No project (pitched): "No project found for <repo>. Offered to create — <accep
 ## Session End Protocol
 
 1. Save session: `storyflow sessions save --summary "..." --next-steps "..." --key-decisions "..."`
-2. Update "Agent:*" wiki pages with new knowledge via `storyflow pages update`
-3. Set AI status to idle: `storyflow ai-status set idle`
-4. Report final board state
+2. Audit wiki state: `storyflow pages audit --json`
+3. If required core pages are missing, run `storyflow pages ensure-core`
+4. Update stale or impacted wiki pages, including relevant `Agent:*` pages, in the same session as the change
+5. Set AI status to idle: `storyflow ai-status set idle`
+6. Report final board state

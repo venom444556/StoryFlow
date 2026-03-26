@@ -71,8 +71,7 @@ export default function BoardColumn({
       onDrop={handleDrop}
       className={[
         'flex min-w-[280px] flex-1 flex-col self-stretch rounded-xl border transition-all duration-200',
-        'bg-[var(--color-bg-glass)]',
-        status === 'Done' && 'opacity-80',
+        'bg-[var(--color-bg-glass)] backdrop-blur-md',
         isDragOver
           ? `border-2 ${accent.dropGlow} ring-2 bg-[var(--color-bg-glass-hover)]`
           : 'border-[var(--color-border-default)]',

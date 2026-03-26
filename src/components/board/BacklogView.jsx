@@ -139,6 +139,35 @@ export function BacklogRow({ issue, onIssueClick, onDeleteIssue, compact = false
         )}
 
         {issue.assignee && <Avatar name={issue.assignee} size="sm" />}
+
+        {/* Compact mode: inline actions menu */}
+        {compact && (
+          <div
+            className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DropdownMenu
+              trigger={
+                <button className="rounded-md p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]">
+                  <MoreHorizontal size={14} />
+                </button>
+              }
+              items={[
+                {
+                  icon: Pencil,
+                  label: 'Edit',
+                  onClick: () => onIssueClick?.(issue),
+                },
+                {
+                  icon: Trash2,
+                  label: 'Delete',
+                  danger: true,
+                  onClick: () => onDeleteIssue?.(issue.id),
+                },
+              ]}
+            />
+          </div>
+        )}
       </div>
 
       {/* Row 2: Priority + Points + Status + Labels + Actions (full mode only) */}

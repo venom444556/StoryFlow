@@ -29,10 +29,7 @@ function CollapsibleSection({ icon: Icon, title, children, defaultOpen = true })
 
 export default function WorkflowSidebar({ onAddNode, nodes = [], isExecuting }) {
   return (
-    <div
-      className="workstation-sidebar flex h-full w-56 flex-col"
-      style={{ backgroundColor: 'var(--th-panel-light)' }}
-    >
+    <div className="workstation-sidebar flex h-full w-56 flex-col border-r border-[var(--color-border-default)] bg-[var(--color-bg-glass)]">
       <CollapsibleSection icon={Palette} title="Node Palette">
         <NodePalette
           onSelect={onAddNode}

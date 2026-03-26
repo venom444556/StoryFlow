@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @import './styles/tokens.css';
 
+:root {
+  --steering-bar-clearance: 0px;
+}
+
 /* =====================================================
    TAILWIND THEME EXTENSIONS
    Map design tokens to Tailwind for use in classes
@@ -194,6 +198,15 @@
 /* Canonical Page Sidebar (usually inside a surface-workstation) */
 .workstation-sidebar {
   @apply shrink-0 overflow-y-auto border-r border-[var(--color-border-default)] bg-[var(--color-bg-glass-subtle)];
+}
+
+.with-steering-clearance {
+  padding-bottom: calc(var(--steering-bar-clearance, 0px) + var(--space-8));
+}
+
+.steering-aware-scroll {
+  padding-bottom: calc(var(--steering-bar-clearance, 0px) + var(--space-8));
+  scroll-padding-bottom: calc(var(--steering-bar-clearance, 0px) + var(--space-8));
 }
 
 /* =====================================================

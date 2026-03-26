@@ -12,22 +12,22 @@ export default function TableOfContents({ markdown, onHeadingClick }) {
   const minLevel = Math.min(...headings.map((h) => h.level))
 
   return (
-    <div className="glass-card hidden w-48 shrink-0 self-start p-3 md:block">
-      <div className="mb-2 flex items-center gap-1.5">
-        <List size={13} className="text-[var(--color-fg-muted)]" />
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-fg-muted)]">
+    <div className="glass-card steering-aware-scroll hidden w-72 shrink-0 self-start overflow-y-auto max-h-full p-4 md:block">
+      <div className="mb-3 flex items-center gap-1.5">
+        <List size={14} className="text-[var(--color-fg-muted)]" />
+        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-fg-muted)]">
           On this page
         </h4>
       </div>
 
-      <nav className="space-y-0.5">
+      <nav className="space-y-1">
         {headings.map((heading, idx) => {
           const indent = (heading.level - minLevel) * 12
           return (
             <button
               key={`${heading.id}-${idx}`}
               onClick={() => onHeadingClick?.(heading.id)}
-              className="block w-full truncate rounded px-2 py-1 text-left text-xs text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+              className="block w-full rounded px-2 py-1.5 text-left text-[13px] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)] leading-snug break-words"
               style={{ paddingLeft: `${indent + 8}px` }}
               title={heading.text}
             >

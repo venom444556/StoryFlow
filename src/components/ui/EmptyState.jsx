@@ -9,6 +9,9 @@ export default function EmptyState({ icon: Icon, title, description, action, cla
       ]
         .filter(Boolean)
         .join(' ')}
+      style={{
+        paddingBottom: 'calc(var(--steering-bar-clearance, 0px) + var(--space-16))',
+      }}
     >
       {Icon && (
         <Icon

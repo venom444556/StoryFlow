@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart3, Clock, Layers } from 'lucide-react'
 import SectionHeader from '../ui/SectionHeader'
@@ -33,14 +32,15 @@ function HorizontalBar({ label, value, max, color }) {
   )
 }
 
-function StatusDistribution({ issues }) {
-  const total = issues.length
-  if (total === 0) return null
-
-  const counts = { 'To Do': 0, 'In Progress': 0, Blocked: 0, Done: 0 }
-  for (const issue of issues) {
-    if (counts[issue.status] !== undefined) counts[issue.status]++
+function StatusDistribution({ byStatus = {} }) {
+  const counts = {
+    'To Do': byStatus['To Do'] || 0,
+    'In Progress': byStatus['In Progress'] || 0,
+    Blocked: byStatus.Blocked || 0,
+    Done: byStatus.Done || 0,
   }
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0)
+  if (total === 0) return null
 
   return (
     <div>
@@ -86,133 +86,91 @@ function StatusDistribution({ issues }) {
   )
 }
 
-export default function SprintMetricsPanel({ project }) {
-  const metrics = useMemo(() => {
-    const issues = project?.board?.issues || []
-    const sprints = project?.board?.sprints || []
+export default function SprintMetricsPanel({ analytics, embedded = false }) {
+  if (!analytics) {
+    return (
+      <div
+        className={[
+          embedded
+            ? 'flex flex-col opacity-60 pointer-events-none grayscale-[0.5]'
+            : 'glass-card flex flex-col overflow-hidden opacity-60 pointer-events-none grayscale-[0.5]',
+        ].join(' ')}
+      >
+        <div
+          className={
+            embedded ? 'px-5 py-4' : 'border-b border-[var(--color-border-default)] px-5 py-4'
+          }
+        >
+          <SectionHeader icon={BarChart3} color="var(--color-info, #3b82f6)" className="mb-0">
+            Sprint Metrics
+          </SectionHeader>
+        </div>
+        <div className="flex h-40 flex-col items-center justify-center p-6 text-center">
+          <Layers size={24} className="mb-2 text-[var(--color-fg-subtle)]" />
+          <p className="text-sm font-medium text-[var(--color-fg-muted)]">Awaiting Analytics</p>
+          <p className="mt-1 text-xs text-[var(--color-fg-subtle)]">
+            Sprint cycle metrics are currently building.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
-    // Velocity per sprint: sum of done story points per sprint
-    const sprintVelocity = sprints
-      .map((sprint) => {
-        const sprintIssues = issues.filter((i) => i.sprintId === sprint.id && i.status === 'Done')
-        const points = sprintIssues.reduce((sum, i) => sum + (i.storyPoints ?? 0), 0)
-        return { name: sprint.name, points }
-      })
-      .filter((s) => s.points > 0)
+  const { byStatus = {}, velocity = null, cycleTime = null } = analytics
 
-    const maxVelocity = Math.max(...sprintVelocity.map((s) => s.points), 1)
+  const hasDistribution = Object.values(byStatus).some((count) => count > 0)
+  const hasVelocity = Boolean(velocity)
+  const hasCycleTime = Boolean(cycleTime)
 
-    // Cycle time: avg days from inProgressAt → doneAt for Done issues
-    const doneTimes = issues
-      .filter((i) => i.status === 'Done' && i.inProgressAt && i.doneAt)
-      .map((i) => new Date(i.doneAt).getTime() - new Date(i.inProgressAt).getTime())
-      .filter((t) => t > 0)
-
-    const avgCycleTimeMs =
-      doneTimes.length > 0 ? doneTimes.reduce((s, t) => s + t, 0) / doneTimes.length : 0
-    const avgCycleTimeDays = avgCycleTimeMs / (1000 * 60 * 60 * 24)
-
-    // Blocked time: avg time issues spent in Blocked
-    const blockedTimes = issues
-      .filter((i) => i.blockedAt && (i.inProgressAt || i.doneAt || i.updatedAt))
-      .map((i) => {
-        // Use the next status transition after blockedAt as the end time
-        const blockedStart = new Date(i.blockedAt).getTime()
-        // If the issue is no longer blocked, use updatedAt as proxy
-        const end = i.status !== 'Blocked' ? new Date(i.updatedAt).getTime() : Date.now()
-        return end - blockedStart
-      })
-      .filter((t) => t > 0)
-
-    const avgBlockedTimeMs =
-      blockedTimes.length > 0 ? blockedTimes.reduce((s, t) => s + t, 0) / blockedTimes.length : 0
-    const avgBlockedTimeHours = avgBlockedTimeMs / (1000 * 60 * 60)
-
-    return {
-      issues,
-      sprintVelocity,
-      maxVelocity,
-      avgCycleTimeDays,
-      avgBlockedTimeHours,
-      cycleTimeSamples: doneTimes.length,
-      blockedSamples: blockedTimes.length,
-    }
-  }, [project])
-
-  const {
-    issues,
-    sprintVelocity,
-    maxVelocity,
-    avgCycleTimeDays,
-    avgBlockedTimeHours,
-    cycleTimeSamples,
-    blockedSamples,
-  } = metrics
-
-  if (issues.length === 0) return null
+  if (!hasDistribution && !hasVelocity && !hasCycleTime) return null
 
   return (
-    <div className="glass-card flex flex-col overflow-hidden">
-      <div className="border-b border-[var(--color-border-default)] px-5 py-4">
+    <div className={embedded ? 'flex flex-col' : 'glass-card flex flex-col overflow-hidden'}>
+      <div
+        className={
+          embedded ? 'px-5 py-4' : 'border-b border-[var(--color-border-default)] px-5 py-4'
+        }
+      >
         <SectionHeader icon={BarChart3} color="var(--color-info, #3b82f6)" className="mb-0">
           Sprint Metrics
         </SectionHeader>
       </div>
 
-      <div className="space-y-4 px-5 py-4">
+      <div className={embedded ? 'space-y-4 px-5 pb-5' : 'space-y-4 px-5 py-4'}>
         {/* Inline stats — compact, no cards */}
-        {(cycleTimeSamples > 0 || blockedSamples > 0) && (
+        {hasCycleTime && (
           <div className="flex items-center gap-4">
-            {cycleTimeSamples > 0 && (
-              <div className="flex items-center gap-2">
-                <Clock size={13} className="text-[var(--color-info)]" />
-                <div>
-                  <span className="text-sm font-bold text-[var(--color-fg-default)]">
-                    {avgCycleTimeDays < 1
-                      ? `${Math.round(avgCycleTimeDays * 24)} hour${Math.round(avgCycleTimeDays * 24) === 1 ? '' : 's'}`
-                      : `${avgCycleTimeDays.toFixed(1)} day${avgCycleTimeDays.toFixed(1) === '1.0' ? '' : 's'}`}
-                  </span>
-                  <span className="ml-1.5 text-[11px] text-[var(--color-fg-muted)]">
-                    cycle time
-                  </span>
-                </div>
+            <div className="flex items-center gap-2">
+              <Clock size={13} className="text-[var(--color-info)]" />
+              <div>
+                <span className="text-sm font-bold text-[var(--color-fg-default)]">
+                  {cycleTime.averageDays < 1
+                    ? `${Math.round(cycleTime.averageDays * 24)} hour${Math.round(cycleTime.averageDays * 24) === 1 ? '' : 's'}`
+                    : `${cycleTime.averageDays.toFixed(1)} day${cycleTime.averageDays.toFixed(1) === '1.0' ? '' : 's'}`}
+                </span>
+                <span className="ml-1.5 text-[11px] text-[var(--color-fg-muted)]">cycle time</span>
+                <span className="ml-1 text-[10px] text-[var(--color-fg-subtle)]">
+                  ({cycleTime.sampleSize} issues)
+                </span>
               </div>
-            )}
-            {blockedSamples > 0 && (
-              <div className="flex items-center gap-2">
-                <Layers size={13} className="text-[var(--color-warning)]" />
-                <div>
-                  <span className="text-sm font-bold text-[var(--color-fg-default)]">
-                    {avgBlockedTimeHours < 24
-                      ? `${Math.round(avgBlockedTimeHours)} hour${Math.round(avgBlockedTimeHours) === 1 ? '' : 's'}`
-                      : `${(avgBlockedTimeHours / 24).toFixed(1)} day${(avgBlockedTimeHours / 24).toFixed(1) === '1.0' ? '' : 's'}`}
-                  </span>
-                  <span className="ml-1.5 text-[11px] text-[var(--color-fg-muted)]">
-                    blocked avg
-                  </span>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
         {/* Status distribution */}
-        <StatusDistribution issues={issues} />
+        {hasDistribution && <StatusDistribution byStatus={byStatus} />}
 
         {/* Sprint velocity bars */}
-        {sprintVelocity.length > 0 && (
+        {hasVelocity && (
           <div>
             <p className="mb-2 text-xs font-bold text-[var(--color-fg-default)]">Sprint Velocity</p>
             <div className="space-y-1.5">
-              {sprintVelocity.map((sprint) => (
-                <HorizontalBar
-                  key={sprint.name}
-                  label={sprint.name}
-                  value={sprint.points}
-                  max={maxVelocity}
-                  color="var(--accent-default)"
-                />
-              ))}
+              <HorizontalBar
+                label={velocity.sprintName || 'Active Sprint'}
+                value={velocity.completedPoints || 0}
+                max={Math.max(velocity.totalPoints || 0, 1)}
+                color="var(--accent-default)"
+              />
             </div>
           </div>
         )}

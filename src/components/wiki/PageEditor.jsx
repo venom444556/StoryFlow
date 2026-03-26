@@ -213,13 +213,13 @@ export default function PageEditor({ page, onSave, onCancel }) {
             value={content}
             onChange={handleContentChange}
             placeholder="Start writing in markdown..."
-            className="flex-1 resize-none bg-transparent px-5 py-4 font-mono text-sm leading-relaxed text-[var(--color-fg-default)] placeholder-[var(--color-fg-subtle)] outline-none"
+            className="steering-aware-scroll flex-1 resize-none bg-transparent px-5 py-4 font-mono text-sm leading-relaxed text-[var(--color-fg-default)] placeholder-[var(--color-fg-subtle)] outline-none"
             spellCheck={false}
           />
         </div>
 
         {/* Preview pane */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="steering-aware-scroll flex-1 overflow-y-auto px-6 py-4">
           <MarkdownRenderer content={content} />
         </div>
       </div>

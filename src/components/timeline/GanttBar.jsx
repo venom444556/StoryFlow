@@ -17,10 +17,13 @@ export default function GanttBar({
   const barHeight = rowHeight - BAR_V_PADDING * 2
   const barY = rowY + BAR_V_PADDING
 
-  if (!phase.startDate || !phase.endDate) return null
+  if (!phase.startDate && !phase.endDate) return null
 
-  const x1 = dateToX(phase.startDate)
-  const x2 = dateToX(phase.endDate)
+  const sDate = phase.startDate || phase.endDate
+  const eDate = phase.endDate || phase.startDate
+
+  const x1 = dateToX(sDate)
+  const x2 = dateToX(eDate)
   const barWidth = Math.max(x2 - x1, 8)
   const progress = phase.progress || 0
   const fillWidth = barWidth * (progress / 100)
@@ -31,9 +34,9 @@ export default function GanttBar({
   const phaseColor = phase.color || FALLBACK_COLOR
 
   // Date range label
-  const startLabel = format(parseISO(phase.startDate), 'MMM d')
-  const endLabel = format(parseISO(phase.endDate), 'MMM d')
-  const dateRange = `${startLabel} – ${endLabel}`
+  const startLabel = format(parseISO(sDate), 'MMM d')
+  const endLabel = format(parseISO(eDate), 'MMM d')
+  const dateRange = startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`
 
   const statusLabel = isComplete ? 'Complete' : isInProgress ? `${progress}%` : 'Upcoming'
 

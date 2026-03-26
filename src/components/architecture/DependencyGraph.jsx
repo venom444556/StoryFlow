@@ -425,13 +425,7 @@ export default function DependencyGraph({
               initial={{ scale: 0.85, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-              className={[
-                'absolute select-none rounded-2xl',
-                isSelected &&
-                  'ring-2 ring-[var(--accent-cyan)]/50 ring-offset-2 ring-offset-transparent',
-              ]
-                .filter(Boolean)
-                .join(' ')}
+              className={['absolute select-none rounded-2xl'].filter(Boolean).join(' ')}
               style={{
                 left: comp.x,
                 top: comp.y,
@@ -439,12 +433,9 @@ export default function DependencyGraph({
                 zIndex: isSelected ? 20 : 2,
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
                 opacity: highlightIds && !highlightIds.has(comp.id) ? 0.15 : 1,
-                background: 'var(--color-bg-node, var(--color-bg-obsidian))',
-                border: isSelected
-                  ? `1.5px solid var(--accent-cyan, #06b6d4)`
-                  : '1.5px solid var(--color-border-default)',
-                boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
-                transition: 'border-color 0.25s, box-shadow 0.25s, opacity 0.2s',
+                background: 'var(--color-bg-glass)',
+                border: `${isSelected ? '2px' : '1px'} solid ${isSelected ? hexColor : 'var(--color-border-default)'}`,
+                transition: 'border-color 0.25s, opacity 0.2s',
               }}
               onMouseDown={(e) => handleNodeMouseDown(comp.id, e)}
             >
@@ -499,7 +490,7 @@ export default function DependencyGraph({
                 {comp.description && (
                   <div className="mt-2.5">
                     <p
-                      className="line-clamp-1 text-[10px] leading-relaxed text-[var(--color-fg-subtle)]"
+                      className="text-[10px] leading-relaxed text-[var(--color-fg-subtle)] line-clamp-3 break-words"
                       title={comp.description}
                     >
                       {comp.description}

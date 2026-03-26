@@ -41,12 +41,12 @@ export default function VerticalTimeline({
     const stops = items.map((item, i) => {
       const pct = (i / (items.length - 1)) * 100
       if (item.type === 'milestone') {
-        return `${item.data.completed ? '#10b981' : '#6b7280'} ${pct}%`
+        return `${item.data.completed ? '#10b981' : '#374151'} ${pct}%`
       }
       const progress = item.data.progress || 0
       if (progress >= 100) return `#10b981 ${pct}%`
-      if (progress > 0) return `#8b5cf6 ${pct}%`
-      return `#6b7280 ${pct}%`
+      if (progress > 0) return `#374151 ${pct}%`
+      return `#1f2937 ${pct}%`
     })
     return {
       background: `linear-gradient(to bottom, ${stops.join(', ')})`,

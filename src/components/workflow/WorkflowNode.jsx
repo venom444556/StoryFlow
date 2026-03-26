@@ -40,33 +40,24 @@ const ICON_MAP = {
 function getStatusStyles(status) {
   switch (status) {
     case 'running':
-      return {
-        borderColor: 'rgba(250, 204, 21, 0.6)',
-        boxShadow: '0 0 24px rgba(250, 204, 21, 0.15), inset 0 1px 0 rgba(250, 204, 21, 0.1)',
-      }
+      return { borderColor: 'var(--color-warning)' }
     case 'success':
-      return {
-        borderColor: 'rgba(52, 211, 153, 0.6)',
-        boxShadow: '0 0 24px rgba(52, 211, 153, 0.15), inset 0 1px 0 rgba(52, 211, 153, 0.1)',
-      }
+      return { borderColor: 'var(--color-success)' }
     case 'error':
-      return {
-        borderColor: 'rgba(248, 113, 113, 0.6)',
-        boxShadow: '0 0 24px rgba(248, 113, 113, 0.15), inset 0 1px 0 rgba(248, 113, 113, 0.1)',
-      }
+      return { borderColor: 'var(--color-danger)' }
     default:
-      return {}
+      return { borderColor: 'var(--color-border-default)' }
   }
 }
 
 function StatusIcon({ status }) {
   switch (status) {
     case 'running':
-      return <Clock size={14} className="animate-spin text-yellow-300" />
+      return <Clock size={14} className="animate-spin text-[var(--color-warning)]" />
     case 'success':
-      return <CheckCircle size={14} className="text-emerald-400" />
+      return <CheckCircle size={14} className="text-[var(--color-success)]" />
     case 'error':
-      return <XCircle size={14} className="text-red-400" />
+      return <XCircle size={14} className="text-[var(--color-danger)]" />
     default:
       return null
   }
@@ -229,12 +220,9 @@ export default function WorkflowNode({
         width: 220,
         zIndex: isSelected ? 20 : 2,
         cursor: 'grab',
-        background: 'var(--color-bg-node, var(--color-bg-obsidian))',
-        border: `1.5px solid ${statusStyles.borderColor || 'var(--color-border-default)'}`,
-        boxShadow:
-          statusStyles.boxShadow ||
-          '0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04)',
-        transition: 'border-color 0.25s, box-shadow 0.25s',
+        background: 'var(--color-bg-glass)',
+        border: `${node.status && node.status !== 'idle' ? '2px' : '1px'} solid ${statusStyles.borderColor || 'var(--color-border-default)'}`,
+        transition: 'border-color 0.25s',
       }}
       onMouseDown={onMouseDown}
       onDoubleClick={(e) => {
@@ -296,7 +284,7 @@ export default function WorkflowNode({
         {/* Config preview */}
         {configPreview && (
           <div
-            className="mt-2.5 rounded-lg px-2.5 py-2"
+            className="mt-2.5 rounded-lg px-2.5 py-2 overflow-hidden"
             style={{
               backgroundColor: 'var(--color-bg-glass)',
               border: '1px solid var(--color-border-muted)',
@@ -311,11 +299,11 @@ export default function WorkflowNode({
           </div>
         )}
 
-        {/* Description preview (only if no config preview) */}
+        {/* Description preview */}
         {node.description && !configPreview && (
           <div className="mt-2.5">
             <p
-              className="line-clamp-1 text-[10px] leading-relaxed text-[var(--color-fg-subtle)]"
+              className="text-[10px] leading-relaxed text-[var(--color-fg-subtle)] line-clamp-3 break-words"
               title={node.description}
             >
               {node.description}

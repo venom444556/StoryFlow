@@ -1,57 +1,42 @@
 # StoryFlow
 
-**Project management built for AI agents, not just humans.**
+StoryFlow is a local-first project operating system for AI-assisted software delivery. It ships three things together:
 
-StoryFlow gives autonomous coding agents persistent memory, transparent decision-making, and human-on-the-loop steering — through the same board, wiki, and timeline that you see. No hidden state. If the agent knows it, you can read it. If you correct it, the agent sees it immediately.
+- a React + Express app for boards, docs, workflow, architecture, timeline, decisions, and oversight
+- a terminal CLI for every major StoryFlow workflow
+- a packaged StoryFlow Agent care package that can be dropped into a workspace and operated by an LLM
 
-It's also a full project management tool: Kanban board with sprints, wiki with markdown preview, workflow canvas, architecture diagrams, decision logs, and timeline tracking. Local-first. No accounts, no cloud, no telemetry.
+StoryFlow is not “an app plus some prompts.” The app is the tool substrate and system of record. The agent package is the operating shell that uses it.
 
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-06B6D4?logo=tailwindcss&logoColor=white)
-![License](https://img.shields.io/badge/License-Apache_2.0-blue)
-![npm](https://img.shields.io/npm/v/storyflow-cli?label=storyflow-cli&color=CB3837&logo=npm)
+## What Ships Today
 
----
+### Core product surfaces
 
-## What's New in v2
+- Dashboard with operational project summaries
+- Overview with project operations, gates, activity feed, session history, analytics, and agent health
+- Board with epics, backlog, kanban lanes, sprints, blockers, and hygiene checks
+- Wiki with templates, core-page auditing, and required-page enforcement
+- Workflow graph with first-class connections
+- Architecture map with first-class dependency edges
+- Timeline with phases, milestones, hot wash reports, and lessons learned rollup
+- Decisions log with immutable ADR sequence numbers
 
-### Neptune Design System
-Complete visual identity overhaul. Cool charcoal palette with frosted glass surfaces, General Sans typography, and semantic design tokens powering two themes — **Obsidian** (dark glassmorphic) and **Warm Linen** (light, warm bone/eggshell). Every pixel earns its space.
+### Agent operating surfaces
 
-### Agent CLI
-The `storyflow-cli` npm package provides direct shell commands for every StoryFlow operation. 49 commands covering the full project lifecycle. Smart project resolution (type a name prefix, not a UUID), `--json` for piping, and full API coverage.
+- `storyflow context boot --json` for single-call project boot
+- cross-entity `search` and `resolve`
+- session save with richer reporting fields
+- phase hot wash generation, finalization, and project-level lessons rollup
+- wiki audit and required core-page creation
+- workspace-scoped packaged agent install, doctor, hook install, and status
 
-```bash
-npm i -g storyflow-cli
-storyflow-cli board                      # Visual board summary
-storyflow-cli issues done PRJ-42         # Mark issue as Done
-storyflow-cli steer "Focus on auth"      # Send steering directive
-```
+### Safety and truth
 
-### 5 Mechanical Safety Rails
-Invisible on the happy path, block only when needed:
-
-- **Gate enforcement** — AI mutations on gated entities return 403 until you approve
-- **Confidence auto-gating** — uncertain AI actions (confidence < 0.5) auto-create pending gates
-- **Snapshots & undo** — auto-snapshot before every destructive mutation; 20-cap LRU per project
-- **Agent pause** — escalations block all AI writes until you respond
-- **Causal event chains** — full audit trail with `parent_event_id` linking gate approvals to downstream mutations
-
-### Live AI Dashboard
-Real-time overview with WebSocket-powered status card, event feed with provenance badges (who did what, why, and how confident), sprint metrics with velocity/burndown, and session history. Steering bar for mid-task course correction without restarting the agent.
-
-![Overview Dashboard](docs/screenshots/overview-dashboard.png)
-
----
-
-## The Problem
-
-Autonomous coding agents hit three walls:
-
-1. **Black box** — you can't see what the agent knows or why it decided something. StoryFlow records every action with actor, reasoning, and confidence score.
-2. **Context loss** — agents forget everything between sessions. StoryFlow chains sessions through persistent wiki pages and summaries the agent reads on startup.
-3. **No steering** — you can't redirect an agent mid-task without restarting it. StoryFlow's steering queue and gate approvals let you course-correct in real time.
+- hybrid gate enforcement for AI mutations
+- low-confidence auto-gating
+- snapshots and restore
+- event provenance and session history
+- server-backed analytics, gates, and operational summaries
 
 ## Quick Start
 
@@ -59,182 +44,168 @@ Autonomous coding agents hit three walls:
 git clone https://github.com/venom444556/StoryFlow.git
 cd StoryFlow
 npm install
-npm run dev          # Express + Vite on a single port
+npm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser.
+Open [http://127.0.0.1:3001](http://127.0.0.1:3001).
 
-## Agent CLI
+`npm run dev` starts the StoryFlow server, API, and Vite-backed UI on port `3001`.
 
-The `storyflow-cli` package gives agents (and humans) direct terminal access to StoryFlow — 49 commands covering the full project lifecycle.
+## CLI
+
+The CLI lives in [`cli/`](./cli) and now exposes both `storyflow` and `storyflow-cli` as binaries. The examples below use `storyflow`.
+
+### Local install from this repo
 
 ```bash
-npm i -g storyflow-cli
-storyflow-cli config set-url http://your-server:3001
-storyflow-cli config set-default my-project
+npm install -g ./cli
+storyflow status
 ```
+
+### Example workflow
 
 ```bash
-storyflow-cli board                      # Visual board summary
-storyflow-cli issues list -s "Blocked"   # Filter issues
-storyflow-cli issues done PRJ-42         # Mark issue as Done
-storyflow-cli steer "Focus on auth"      # Send steering directive
-storyflow-cli hygiene                    # Board health check
-storyflow-cli workflow list              # Workflow canvas nodes
-storyflow-cli architecture list          # Architecture components
-storyflow-cli decisions list             # Architecture decision records
+storyflow config set-url http://127.0.0.1:3001
+storyflow config set-default saucier
+
+storyflow context boot --json
+storyflow search "stale preview" --json
+storyflow resolve issue S-305 --json
+storyflow issues batch-done S-301 S-302
+storyflow pages audit --json
+storyflow phases hot-wash lessons --json
 ```
 
-Smart project resolution — type a name prefix instead of UUIDs. Every command supports `--json` for piping.
+### Major command groups
 
-See the full command reference at [npmjs.com/package/storyflow-cli](https://www.npmjs.com/package/storyflow-cli).
+- `projects`, `issues`, `sprints`, `board`, `hygiene`
+- `pages`, `decisions`
+- `phases`, `milestones`
+- `workflow`, `architecture`
+- `events`, `sessions`, `ai-status`, `gates`, `snapshots`, `steer`
+- `context`, `search`, `resolve`
+- `agent`
 
-## Features
+## StoryFlow Agent Care Package
 
-### Board
-Kanban board with epics, stories, tasks, and bugs. Sprint management, backlog grooming, story point estimation, burndown charts, velocity tracking. Supports Blocked status with lifecycle timestamps.
+StoryFlow now includes a packaged agent scaffold in [`agent/`](./agent). This is the downloadable “care package” layer: the app stays the system of record, and the agent package carries the operating behavior.
 
-![Board](docs/screenshots/board-view.png)
-
-### AI Transparency & Safety
-Five mechanical safety rails — invisible on the happy path, block only when needed:
-
-- **Gate enforcement** — AI mutations on gated entities are blocked (403) until you approve
-- **Confidence auto-gating** — low-confidence AI actions automatically create pending gates
-- **Snapshots & undo** — auto-snapshot before every destructive mutation; restore any snapshot
-- **Agent pause** — escalations block all mutating operations until you respond
-- **Causal event chains** — full audit trail from gate approval through subsequent mutations
-
-Plus: event feed with provenance badges, session history, sprint metrics, and a steering bar for real-time directives.
-
-### Wiki
-Nested documentation pages with markdown editor, live preview, page templates, and version history. The agent uses wiki pages as persistent memory across sessions.
-
-![Wiki](docs/screenshots/wiki-view.png)
-
-### Workflow Canvas
-Visual node graph for project phases, dependencies, and execution flow. Supports sub-workflows, pan/zoom, and auto-sync with issue status.
-
-![Workflow Canvas](docs/screenshots/workflow-canvas.png)
-
-### Architecture View
-Component tree with dependency mapping, cycle detection, and type-based filtering.
-
-![Architecture](docs/screenshots/architecture-view.png)
-
-### Timeline & Decisions
-Gantt chart with phase bars, milestone diamonds, and responsive rendering. Architectural decision records with alternatives analysis and consequences tracking.
-
-![Timeline](docs/screenshots/timeline-view.png)
-
-## Architecture
-
-```
-cli/                 Agent CLI (npm: storyflow-cli)
-  src/commands/      49 commands: issues, board, sprints, pages, workflow,
-                     architecture, decisions, phases, milestones, events, etc.
-server/              Express backend
-  app.js             API routes + middleware
-  db.js              SQLite data layer (sql.js, normalized tables per entity)
-  events.js          Transparency event stream, causal chains
-  intelligence.js    AI steering, confidence scoring, gate enforcement
-  ws.js              WebSocket server for real-time updates
-src/
-  components/
-    ui/              Shared components (Button, Modal, Badge, GlassCard, etc.)
-    layout/          App shell (Sidebar, Header, Settings)
-    project/         Tab components (Board, Wiki, Workflow, Architecture, etc.)
-    overview/        AI dashboard (GatePanel, MetricsSummary, EventFeed, SteeringBar)
-    board/           Kanban board (SprintBoard, BacklogView, IssueCard)
-    wiki/            Documentation (PageTree, PageEditor, MarkdownRenderer)
-    workflow/        Visual canvas (WorkflowCanvas, WorkflowNode)
-    architecture/    Component tree (ComponentDetail, DependencyGraph)
-    timeline/        Gantt chart (GanttChart, GanttBar, GanttMilestone, GanttTimeAxis)
-    decisions/       Decision records (DecisionCard, DecisionForm)
-  stores/            Zustand stores (entity-specific: issues, sprints, pages, etc.)
-  styles/            Design tokens (tokens.css)
-  utils/             Markdown parser, sanitizer, export/import
-plugin/              Claude Code plugin (hooks, agent prompt, skills)
-```
-
-### Data Model
-
-Fully normalized SQL schema — 12 tables with foreign keys, indexes, and CASCADE deletes:
-
-| Table | Description |
-|-------|-------------|
-| `projects` | Project metadata, status, next issue number |
-| `issues` | Board items with status timestamps, epic/sprint FKs |
-| `comments` | Issue comments (extracted from issue nesting) |
-| `sprints` | Sprint planning with goals and date ranges |
-| `pages` | Wiki pages with parent hierarchy |
-| `decisions` | Architecture Decision Records |
-| `phases` | Timeline phases with progress tracking |
-| `milestones` | Timeline milestones with due dates |
-| `workflow_nodes` | Workflow canvas nodes with nested children |
-| `workflow_connections` | Node-to-node edges |
-| `architecture_components` | System components with tech stack |
-| `architecture_connections` | Component dependencies |
-
-Issue lifecycle timestamps (`todoAt`, `inProgressAt`, `blockedAt`, `doneAt`) enable cycle time and blocked time analytics. Snapshots store per-entity state for granular undo.
-
-### Design Tokens
-
-Two themes via semantic CSS variables:
-
-- **Obsidian** — dark glassmorphic with frosted glass panels, cool charcoal palette
-- **Warm Linen** — light theme with warm bone/eggshell palette
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, Vite 6, Tailwind CSS 4.0, Zustand, Framer Motion |
-| Backend | Express 4, sql.js (SQLite), WebSocket |
-| CLI | Commander.js, chalk |
-| Virtualization | @tanstack/react-virtual |
-| Persistence | SQLite (server, normalized tables — server is source of truth) |
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Express + Vite dev server (single process, port 3001) |
-| `npm run dev:vite` | Standalone Vite dev server (port 3000, no API) |
-| `npm run build` | Production build |
-| `npm run test` | Run tests (vitest) |
-| `npm run lint` | Lint with ESLint |
-| `npm run ci` | Full CI pipeline (format + lint + typecheck + test + build) |
-
-## Security
-
-StoryFlow is for **local single-user use**. The primary threat model is unauthorized tool access.
-
-**Protected:**
-- API token auth (`STORYFLOW_TOKEN`) with constant-time comparison
-- Loopback binding (`127.0.0.1` by default)
-- CORS restricted to known UI origins
-- Gate enforcement blocks AI mutations on gated entities
-- Confidence auto-gating on uncertain decisions
-- Agent pause on escalation
-- Auto-snapshots before destructive mutations (20 per project, LRU eviction)
-- Causal event chains for full audit trails
-
-**Not in scope:** network-level security (bind to `0.0.0.0` at your own risk), encryption at rest, multi-user access control.
-
-**Recommendations:** Set a strong token (`openssl rand -hex 32`), don't expose the port to untrusted networks, never commit tokens to version control.
-
-See [SECURITY.md](SECURITY.md) for full security policy and vulnerability reporting.
-
-## Deployment
+### Bootstrap the agent package
 
 ```bash
-npm run build                          # Produces dist/
-NODE_ENV=production node server/index.js  # Express serves dist/ + API on port 3001
+storyflow agent init
+storyflow agent doctor --json
+storyflow agent install-hooks
+storyflow agent status --json
 ```
 
-Set `STORYFLOW_PORT` to change the port. Set `STORYFLOW_HOST` to change the bind address (default: `127.0.0.1`).
+### Generated scaffold
+
+```text
+agent/
+├── CLAUDE.md
+├── SKILL.md
+├── config.json
+├── hooks/
+│   ├── session-start.sh
+│   ├── session-stop.sh
+│   ├── pre-mutation.sh
+│   └── post-mutation.sh
+├── kb/
+├── memory.db
+└── state/
+```
+
+### What the care package does
+
+- defines the agent’s operating rules and command path
+- boots from `storyflow context boot --json`
+- installs Claude-compatible hooks into `.claude/settings.local.json`
+- persists local runtime memory in `agent/memory.db`
+- runs readiness diagnostics with `storyflow agent doctor`
+
+## Hot Wash And Lessons Learned
+
+StoryFlow now treats retrospectives as first-class project artifacts.
+
+- per-phase hot wash reports can be generated, edited, finalized, and listed
+- project-level lessons learned roll up from hot wash evidence
+- a dedicated `Lessons Learned` page is available in the Insights area
+- the CLI exposes `storyflow phases hot-wash lessons --json`
+- lessons rollup is part of the agent operating loop, not a manual afterthought
+
+## Wiki Accountability
+
+Wiki discipline is now enforced with product primitives instead of prompt reminders.
+
+- `storyflow pages audit --json` detects stale or missing core documentation
+- `storyflow pages ensure-core` creates missing required backbone pages
+- required core pages are shared via [`shared/wikiCorePages.js`](./shared/wikiCorePages.js)
+- context boot surfaces wiki freshness and missing core pages to the agent
+
+## Architecture Overview
+
+### App and API
+
+- frontend: React 18, Vite 6, Tailwind CSS 4, Zustand, Framer Motion
+- backend: Express, SQLite via `sql.js`, WebSocket updates
+- server is the system of record for project truth
+
+### Agent and plugin
+
+- packaged local agent scaffold in [`agent/`](./agent)
+- Claude integration assets in [`plugin/`](./plugin)
+- workspace-scoped agent API:
+  - `GET /api/agent/status`
+  - `GET /api/agent/doctor`
+  - `POST /api/agent/init`
+  - `POST /api/agent/install-hooks`
+
+### Project truth endpoints
+
+- `GET /api/projects/:id/context`
+- `GET /api/projects/:id/operational`
+- `GET /api/projects/:id/analytics`
+- `GET /api/projects/:id/gates`
+- `GET /api/projects/:id/wiki-audit`
+- `GET /api/projects/:id/lessons-learned`
+- `POST/GET/PUT/finalize /api/projects/:id/phases/:phaseId/hot-wash`
+
+## Repository Map
+
+```text
+agent/      Packaged StoryFlow Agent scaffold
+cli/        StoryFlow CLI package
+plugin/     Claude plugin assets, skills, and hooks
+server/     Express API and SQLite data layer
+shared/     Shared product contracts
+src/        React app
+docs/       Product docs and screenshots
+```
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run test
+npm run test:run
+npm run lint
+npm run ci
+```
+
+## Local-First Security Model
+
+StoryFlow is designed for local or controlled-network operation.
+
+- loopback-first server defaults
+- optional API token support
+- gate enforcement for AI mutations
+- snapshots before destructive changes
+- inspectable event and session history
+
+See [SECURITY.md](./SECURITY.md) for the security policy.
 
 ## License
 
-Copyright (c) 2026 Sheldon Spence. See [LICENSE](LICENSE) for details.
+Copyright (c) 2026 Sheldon Spence. See [LICENSE](./LICENSE).

@@ -9,7 +9,10 @@ import {
   X,
   Zap,
   HelpCircle,
+  Terminal,
 } from 'lucide-react'
+import { useState } from 'react'
+import AgentDrawer from './AgentDrawer'
 import { useProjects } from '../../hooks/useProjects'
 import Tooltip from '../ui/Tooltip'
 
@@ -23,6 +26,7 @@ const STATUS_DOT_COLORS = {
 export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileMenuClose }) {
   const { projects, addProject } = useProjects()
   const navigate = useNavigate()
+  const [isAgentDrawerOpen, setAgentDrawerOpen] = useState(false)
 
   const handleNewProject = () => {
     const active = projects.filter((p) => !p.deletedAt)
@@ -36,7 +40,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
     }
 
     const project = addProject(name)
-    navigate(`/project/${project.id}`)
+    navigate(`/project/${project.id}/overview`)
     onMobileMenuClose?.()
   }
 
@@ -163,7 +167,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
                 <Tooltip key={project.id} content={project.name} position="right">
                   <button
                     type="button"
-                    onClick={() => handleNavClick(`/project/${project.id}`)}
+                    onClick={() => handleNavClick(`/project/${project.id}/overview`)}
                     className={[
                       'flex w-full items-center justify-center rounded-[var(--radius-lg)]',
                       'px-[var(--space-3)] py-[var(--space-2)]',
@@ -183,7 +187,7 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
               <button
                 type="button"
                 key={project.id}
-                onClick={() => handleNavClick(`/project/${project.id}`)}
+                onClick={() => handleNavClick(`/project/${project.id}/overview`)}
                 className={[
                   'flex w-full items-center gap-[var(--space-3)] rounded-[var(--radius-lg)]',
                   'px-[var(--space-3)] py-[var(--space-2)] text-[var(--text-sm)]',
@@ -209,6 +213,31 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
 
       {/* Bottom section */}
       <div className="border-t border-[var(--color-border-default)] p-[var(--space-3)]">
+        {/* Agent Care Package Affordance */}
+        {collapsed && !mobileMenuOpen ? (
+          <Tooltip content="Agent Command" position="right">
+            <button
+              type="button"
+              onClick={() => setAgentDrawerOpen(true)}
+              className="mb-2 flex w-full items-center justify-center rounded-[var(--radius-lg)] p-[var(--space-2)] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-accent)]"
+            >
+              <Terminal size={16} />
+            </button>
+          </Tooltip>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAgentDrawerOpen(true)}
+            className="mb-2 w-full flex items-center justify-between rounded-lg px-3 py-1.5 text-xs text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+          >
+            <div className="flex items-center gap-2">
+              <Terminal size={14} />
+              <span>Agent Command</span>
+            </div>
+            <div className="h-1.5 w-1.5 opacity-50 rounded-full bg-[var(--color-fg-muted)] mix-blend-screen" />
+          </button>
+        )}
+
         {/* Help button */}
         {collapsed && !mobileMenuOpen ? (
           <Tooltip content="Help" position="right">
@@ -301,6 +330,8 @@ export default function Sidebar({ collapsed, onToggle, mobileMenuOpen, onMobileM
       >
         {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
+
+      <AgentDrawer isOpen={isAgentDrawerOpen} onClose={() => setAgentDrawerOpen(false)} />
     </motion.aside>
   )
 }
