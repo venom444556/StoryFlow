@@ -110,6 +110,18 @@ export async function initDb() {
       trigger_entity TEXT,
       trigger_actor TEXT,
       data TEXT NOT NULL,
+      project_data TEXT,
+      issues_data TEXT,
+      sprints_data TEXT,
+      pages_data TEXT,
+      decisions_data TEXT,
+      phases_data TEXT,
+      milestones_data TEXT,
+      workflow_nodes_data TEXT,
+      workflow_connections_data TEXT,
+      arch_components_data TEXT,
+      arch_connections_data TEXT,
+      hot_washes_data TEXT,
       created_at TEXT NOT NULL
     )
   `)
@@ -242,6 +254,8 @@ export async function initDb() {
       in_progress_at TEXT,
       blocked_at TEXT,
       done_at TEXT,
+      last_nudge_message TEXT,
+      last_nudge_author TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       UNIQUE(project_id, key)
@@ -273,6 +287,7 @@ export async function initDb() {
       title TEXT NOT NULL,
       content TEXT,
       parent_id TEXT REFERENCES pages(id) ON DELETE SET NULL,
+      icon TEXT,
       status TEXT,
       created_by TEXT,
       created_at TEXT NOT NULL,
@@ -306,6 +321,10 @@ export async function initDb() {
       description TEXT,
       status TEXT DEFAULT 'pending',
       progress REAL DEFAULT 0,
+      start_date TEXT,
+      end_date TEXT,
+      deliverables TEXT,
+      color TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
@@ -321,6 +340,8 @@ export async function initDb() {
       description TEXT,
       due_date TEXT,
       completed INTEGER DEFAULT 0,
+      phase_id TEXT,
+      color TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
