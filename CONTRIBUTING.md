@@ -6,10 +6,10 @@
 git clone https://github.com/venom444556/StoryFlow.git
 cd StoryFlow
 npm install
-npm run dev:full
+npm run dev
 ```
 
-This starts the Express API server on port 3001 and the Vite dev server on port 3000. Open http://localhost:3000 in your browser.
+This starts the Express API server with Vite middleware on port 3001. Open http://localhost:3001 in your browser.
 
 ## Quality Gate
 

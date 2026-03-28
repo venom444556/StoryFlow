@@ -101,7 +101,7 @@ The storyflow-agent communicates with StoryFlow exclusively via the `storyflow` 
 
 | Problem | Solution |
 |---------|----------|
-| "Cannot reach StoryFlow" | Make sure StoryFlow is running: `npm run dev:full` |
+| "Cannot reach StoryFlow" | Make sure StoryFlow is running: `npm run dev` |
 | CLI not found | Run `npm i -g storyflow-cli` or use `npx storyflow-cli` |
 | Permission denied | Check that Node.js 18+ is installed and accessible |
 | Agent not syncing | Check `storyflow status` — server must be reachable |
