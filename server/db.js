@@ -94,6 +94,7 @@ export async function initDb() {
       learnings TEXT,
       wiki_pages_updated TEXT,
       next_steps TEXT,
+      agent_id TEXT,
       created_at TEXT NOT NULL
     )
   `)
@@ -306,6 +307,7 @@ export async function initDb() {
       rationale TEXT,
       status TEXT DEFAULT 'proposed',
       author TEXT,
+      sequence_number INTEGER,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
