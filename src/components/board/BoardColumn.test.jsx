@@ -115,8 +115,8 @@ describe('BoardColumn', () => {
       const { container } = render(
         <BoardColumn title="To Do" status="To Do" issues={[]} onDrop={mockOnDrop} />
       )
-      // Check for status dot — uses CSS variable token now
-      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]')
+      // Check for status dot — To Do uses danger color
+      const dot = container.querySelector('.bg-\\[var\\(--color-danger\\)\\]')
       expect(dot).toBeInTheDocument()
     })
 
@@ -304,8 +304,8 @@ describe('BoardColumn', () => {
       const { container } = render(
         <BoardColumn title="Unknown" status="Unknown" issues={[]} onDrop={mockOnDrop} />
       )
-      // Should fall back to To Do styling — uses CSS variable token
-      const dot = container.querySelector('.bg-\\[var\\(--color-fg-faint\\)\\]')
+      // Should fall back to To Do styling — uses danger color
+      const dot = container.querySelector('.bg-\\[var\\(--color-danger\\)\\]')
       expect(dot).toBeInTheDocument()
     })
   })

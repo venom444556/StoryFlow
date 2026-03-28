@@ -81,8 +81,8 @@ describe('DependencyEdge', () => {
       const pathD = visiblePath?.getAttribute('d')
 
       // Path should start near the fromNode output point
-      // Output point is at x + NODE_WIDTH + 4 = 100 + 180 + 4 = 284
-      expect(pathD).toMatch(/M\s*28[0-9]/)
+      // Output point is at x + NODE_WIDTH + 4 = 100 + 220 + 4 = 324
+      expect(pathD).toMatch(/M\s*32[0-9]/)
     })
   })
 
@@ -94,8 +94,8 @@ describe('DependencyEdge', () => {
       fireEvent.mouseEnter(edge)
 
       const hoveredStroke = visiblePath?.getAttribute('stroke')
-      // Hovered state should use blue color
-      expect(hoveredStroke).toBe('#3b82f6')
+      // Hovered state should use cyan color
+      expect(hoveredStroke).toBe('#22d3ee')
     })
 
     it('should revert style on mouse leave', () => {
@@ -180,8 +180,8 @@ describe('DependencyEdge', () => {
       const visiblePath = edge.querySelectorAll('path')[1]
 
       const stroke = visiblePath?.getAttribute('stroke')
-      // Hook color is cyan #06b6d4
-      expect(stroke).toBe('#06b6d4')
+      // Hook color is cyan #22d3ee
+      expect(stroke).toBe('#22d3ee')
     })
 
     it('should fall back to gray for unknown type', () => {

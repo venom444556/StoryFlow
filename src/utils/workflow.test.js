@@ -289,47 +289,47 @@ describe('workflow utilities', () => {
 
   describe('getConnectionColor', () => {
     it('returns gray for null fromNode', () => {
-      expect(getConnectionColor(null, { status: 'idle' })).toBe('#4b5563')
+      expect(getConnectionColor(null, { status: 'idle' })).toBe('#475569')
     })
 
     it('returns gray for null toNode', () => {
-      expect(getConnectionColor({ status: 'idle' }, null)).toBe('#4b5563')
+      expect(getConnectionColor({ status: 'idle' }, null)).toBe('#475569')
     })
 
     it('returns gray for both null', () => {
-      expect(getConnectionColor(null, null)).toBe('#4b5563')
+      expect(getConnectionColor(null, null)).toBe('#475569')
     })
 
     it('returns red when fromNode has error', () => {
-      expect(getConnectionColor({ status: 'error' }, { status: 'idle' })).toBe('#ef4444')
+      expect(getConnectionColor({ status: 'error' }, { status: 'idle' })).toBe('#f87171')
     })
 
     it('returns red when toNode has error', () => {
-      expect(getConnectionColor({ status: 'success' }, { status: 'error' })).toBe('#ef4444')
+      expect(getConnectionColor({ status: 'success' }, { status: 'error' })).toBe('#f87171')
     })
 
     it('returns yellow when fromNode success and toNode running', () => {
-      expect(getConnectionColor({ status: 'success' }, { status: 'running' })).toBe('#eab308')
+      expect(getConnectionColor({ status: 'success' }, { status: 'running' })).toBe('#fbbf24')
     })
 
     it('returns green when both success', () => {
-      expect(getConnectionColor({ status: 'success' }, { status: 'success' })).toBe('#22c55e')
+      expect(getConnectionColor({ status: 'success' }, { status: 'success' })).toBe('#34d399')
     })
 
     it('returns yellow when fromNode running', () => {
-      expect(getConnectionColor({ status: 'running' }, { status: 'idle' })).toBe('#eab308')
+      expect(getConnectionColor({ status: 'running' }, { status: 'idle' })).toBe('#fbbf24')
     })
 
     it('returns yellow when toNode running', () => {
-      expect(getConnectionColor({ status: 'idle' }, { status: 'running' })).toBe('#eab308')
+      expect(getConnectionColor({ status: 'idle' }, { status: 'running' })).toBe('#fbbf24')
     })
 
     it('returns gray for idle states', () => {
-      expect(getConnectionColor({ status: 'idle' }, { status: 'idle' })).toBe('#4b5563')
+      expect(getConnectionColor({ status: 'idle' }, { status: 'idle' })).toBe('#475569')
     })
 
     it('returns gray for unknown status', () => {
-      expect(getConnectionColor({ status: 'unknown' }, { status: 'unknown' })).toBe('#4b5563')
+      expect(getConnectionColor({ status: 'unknown' }, { status: 'unknown' })).toBe('#475569')
     })
   })
 

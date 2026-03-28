@@ -39,12 +39,12 @@ describe('NodePalette', () => {
   describe('basic rendering', () => {
     it('renders nothing when isOpen is false', () => {
       render(<NodePalette {...defaultProps} isOpen={false} />)
-      expect(screen.queryByText('Choose a Node Type')).not.toBeInTheDocument()
+      expect(screen.queryByText('Choose a node type')).not.toBeInTheDocument()
     })
 
     it('renders the palette when isOpen is true', () => {
       render(<NodePalette {...defaultProps} />)
-      expect(screen.getByText('Choose a Node Type')).toBeInTheDocument()
+      expect(screen.getByText('Choose a node type')).toBeInTheDocument()
     })
 
     it('renders all node types', () => {
@@ -105,7 +105,7 @@ describe('NodePalette', () => {
           type: 'start',
           label: 'Start',
           icon: 'Play',
-          color: '#22c55e',
+          color: '#34d399',
         })
       )
     })
@@ -120,7 +120,7 @@ describe('NodePalette', () => {
           type: 'end',
           label: 'End',
           icon: 'Square',
-          color: '#ef4444',
+          color: '#f87171',
         })
       )
     })
@@ -135,7 +135,7 @@ describe('NodePalette', () => {
           type: 'phase',
           label: 'Phase',
           icon: 'Layers',
-          color: '#6366f1',
+          color: '#818cf8',
         })
       )
     })
@@ -150,7 +150,7 @@ describe('NodePalette', () => {
           type: 'task',
           label: 'Task',
           icon: 'CheckSquare',
-          color: '#3b82f6',
+          color: '#60a5fa',
         })
       )
     })
@@ -165,7 +165,7 @@ describe('NodePalette', () => {
           type: 'milestone',
           label: 'Milestone',
           icon: 'Flag',
-          color: '#f59e0b',
+          color: '#fbbf24',
         })
       )
     })
@@ -180,7 +180,7 @@ describe('NodePalette', () => {
           type: 'decision',
           label: 'Decision',
           icon: 'GitBranch',
-          color: '#f59e0b',
+          color: '#fb923c',
         })
       )
     })
@@ -195,7 +195,7 @@ describe('NodePalette', () => {
           type: 'api',
           label: 'API Call',
           icon: 'Globe',
-          color: '#0ea5e9',
+          color: '#22d3ee',
         })
       )
     })
@@ -210,7 +210,7 @@ describe('NodePalette', () => {
           type: 'database',
           label: 'Database',
           icon: 'Database',
-          color: '#14b8a6',
+          color: '#2dd4bf',
         })
       )
     })
@@ -225,7 +225,7 @@ describe('NodePalette', () => {
           type: 'code',
           label: 'Code Logic',
           icon: 'Code',
-          color: '#a855f7',
+          color: '#c084fc',
         })
       )
     })
@@ -260,7 +260,7 @@ describe('NodePalette', () => {
       // Wait for the deferred event listener
       await new Promise((resolve) => setTimeout(resolve, 10))
 
-      const palette = screen.getByText('Choose a Node Type').closest('div[class*="absolute"]')
+      const palette = screen.getByText('Choose a node type').closest('div[class*="absolute"]')
       fireEvent.mouseDown(palette)
 
       // onClose should not have been called from outside click handler
@@ -304,7 +304,7 @@ describe('NodePalette', () => {
       render(<NodePalette isOpen={true} onClose={undefined} onSelect={vi.fn()} />)
 
       // Component should still render
-      expect(screen.getByText('Choose a Node Type')).toBeInTheDocument()
+      expect(screen.getByText('Choose a node type')).toBeInTheDocument()
     })
 
     it('handles rapid clicks', () => {

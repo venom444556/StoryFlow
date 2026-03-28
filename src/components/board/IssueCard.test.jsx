@@ -55,9 +55,9 @@ describe('IssueCard', () => {
       expect(screen.getByText('Test Issue Title')).toBeInTheDocument()
     })
 
-    it('renders type icon', () => {
+    it('renders type badge', () => {
       render(<IssueCard issue={mockIssue} />)
-      expect(screen.getByTitle('Task')).toBeInTheDocument()
+      expect(screen.getByText('[task]')).toBeInTheDocument()
     })
   })
 
@@ -203,24 +203,24 @@ describe('IssueCard', () => {
   })
 
   describe('Issue Types', () => {
-    it('renders epic type icon', () => {
+    it('renders epic type badge', () => {
       render(<IssueCard issue={{ ...mockIssue, type: 'epic' }} />)
-      expect(screen.getByTitle('Epic')).toBeInTheDocument()
+      expect(screen.getByText('[epic]')).toBeInTheDocument()
     })
 
-    it('renders story type icon', () => {
+    it('renders story type badge', () => {
       render(<IssueCard issue={{ ...mockIssue, type: 'story' }} />)
-      expect(screen.getByTitle('Story')).toBeInTheDocument()
+      expect(screen.getByText('[story]')).toBeInTheDocument()
     })
 
-    it('renders bug type icon', () => {
+    it('renders bug type badge', () => {
       render(<IssueCard issue={{ ...mockIssue, type: 'bug' }} />)
-      expect(screen.getByTitle('Bug')).toBeInTheDocument()
+      expect(screen.getByText('[bug]')).toBeInTheDocument()
     })
 
-    it('renders subtask type icon', () => {
+    it('renders subtask type badge', () => {
       render(<IssueCard issue={{ ...mockIssue, type: 'subtask' }} />)
-      expect(screen.getByTitle('Subtask')).toBeInTheDocument()
+      expect(screen.getByText('[subtask]')).toBeInTheDocument()
     })
   })
 

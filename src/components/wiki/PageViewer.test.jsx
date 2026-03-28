@@ -84,11 +84,6 @@ describe('PageViewer', () => {
       expect(screen.getByTestId('markdown-renderer')).toHaveTextContent('# Hello World')
     })
 
-    it('renders status badge', () => {
-      render(<PageViewer page={mockPage} />)
-      expect(screen.getByTestId('badge-published')).toBeInTheDocument()
-    })
-
     it('renders labels as badges', () => {
       render(<PageViewer page={mockPage} />)
       expect(screen.getByTestId('badge-documentation')).toBeInTheDocument()
@@ -199,27 +194,6 @@ describe('PageViewer', () => {
     it('does not show History button when onShowVersions is not provided', () => {
       render(<PageViewer page={mockPage} />)
       expect(screen.queryByText(/History/)).not.toBeInTheDocument()
-    })
-  })
-
-  describe('status variants', () => {
-    it('uses green variant for published status', () => {
-      render(<PageViewer page={mockPage} />)
-      const badge = screen.getByTestId('badge-published')
-      expect(badge).toHaveAttribute('data-variant', 'green')
-    })
-
-    it('uses yellow variant for draft status', () => {
-      const draftPage = { ...mockPage, status: 'draft' }
-      render(<PageViewer page={draftPage} />)
-      const badge = screen.getByTestId('badge-draft')
-      expect(badge).toHaveAttribute('data-variant', 'yellow')
-    })
-
-    it('defaults to draft when no status', () => {
-      const noStatusPage = { ...mockPage, status: undefined }
-      render(<PageViewer page={noStatusPage} />)
-      expect(screen.getByTestId('badge-draft')).toBeInTheDocument()
     })
   })
 

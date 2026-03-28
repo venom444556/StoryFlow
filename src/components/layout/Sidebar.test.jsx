@@ -2,8 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Sidebar from './Sidebar'
-import { ProjectsProvider } from '../../contexts/ProjectsContext'
-import { useProjectsStore } from '../../stores/projectsStore'
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
@@ -11,6 +9,7 @@ vi.mock('framer-motion', () => ({
     aside: ({ children, animate: _animate, ...props }) => <aside {...props}>{children}</aside>,
     span: ({ children, ...props }) => <span {...props}>{children}</span>,
   },
+  AnimatePresence: ({ children }) => <>{children}</>,
 }))
 
 // Mock the navigate function
@@ -23,13 +22,27 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Wrapper component with providers
-function renderWithProviders(ui, options = {}) {
+// Mock AgentDrawer to avoid side effects
+vi.mock('./AgentDrawer', () => ({
+  default: () => null,
+}))
+
+// Mock the useProjects hook
+const mockAddProject = vi.fn()
+let mockProjects = []
+
+vi.mock('../../hooks/useProjects', () => ({
+  useProjects: () => ({
+    projects: mockProjects,
+    addProject: mockAddProject,
+  }),
+}))
+
+function renderSidebar(props = {}) {
   return render(
     <MemoryRouter>
-      <ProjectsProvider>{ui}</ProjectsProvider>
-    </MemoryRouter>,
-    options
+      <Sidebar {...props} />
+    </MemoryRouter>
   )
 }
 
@@ -43,45 +56,29 @@ describe('Sidebar', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset Zustand store with a single test project to avoid state leaking
-    // between tests (e.g., "New Project" name collisions)
-    useProjectsStore.setState({
-      projects: [
-        {
-          id: 'test-project',
-          name: 'Test Project',
-          status: 'planning',
-          isSeed: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          overview: {},
-          board: {
-            issues: [],
-            sprints: [],
-            statusColumns: ['To Do', 'In Progress', 'Done'],
-            nextIssueNumber: 1,
-          },
-          pages: [],
-          decisions: [],
-          timeline: { phases: [], milestones: [] },
-          workflow: { nodes: [], connections: [] },
-          architecture: { components: [] },
-          settings: {},
-        },
-      ],
-    })
+    mockProjects = [
+      {
+        id: 'test-project',
+        name: 'Test Project',
+        status: 'planning',
+        isSeed: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ]
+    mockAddProject.mockReturnValue({ id: 'new-project-id' })
   })
 
   describe('Basic rendering', () => {
     it('renders without crashing', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // "Story" and "Flow" are in separate elements for accent styling
       expect(screen.getByText(/Story/)).toBeInTheDocument()
       expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('renders as an aside element', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const aside = document.querySelector('aside')
       expect(aside).toBeInTheDocument()
     })
@@ -89,25 +86,25 @@ describe('Sidebar', () => {
 
   describe('Brand section', () => {
     it('shows StoryFlow logo when expanded', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={false} />)
+      renderSidebar({ ...defaultProps, collapsed: false })
       expect(screen.getByText(/Story/)).toBeInTheDocument()
       expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('hides StoryFlow text when collapsed (desktop)', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} mobileMenuOpen={false} />)
+      renderSidebar({ ...defaultProps, collapsed: true, mobileMenuOpen: false })
       // Text should not be visible when collapsed
       expect(screen.queryByText('StoryFlow')).not.toBeInTheDocument()
     })
 
     it('shows StoryFlow text when mobile menu is open even if collapsed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} mobileMenuOpen={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true, mobileMenuOpen: true })
       expect(screen.getByText(/Story/)).toBeInTheDocument()
       expect(screen.getByText(/Flow/)).toBeInTheDocument()
     })
 
     it('renders Zap icon in brand', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // The icon is in a gradient div
       const brandIcon = document.querySelector('aside > div > div')
       expect(brandIcon).toBeInTheDocument()
@@ -116,21 +113,19 @@ describe('Sidebar', () => {
 
   describe('Dashboard link', () => {
     it('renders Dashboard link', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       expect(screen.getByText('Dashboard')).toBeInTheDocument()
     })
 
     it('Dashboard link navigates to /', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const dashboardLink = screen.getByText('Dashboard').closest('a')
       expect(dashboardLink).toHaveAttribute('href', '/')
     })
 
     it('calls onMobileMenuClose when Dashboard is clicked', () => {
       const onMobileMenuClose = vi.fn()
-      renderWithProviders(
-        <Sidebar {...defaultProps} mobileMenuOpen={true} onMobileMenuClose={onMobileMenuClose} />
-      )
+      renderSidebar({ ...defaultProps, mobileMenuOpen: true, onMobileMenuClose })
 
       const dashboardLink = screen.getByText('Dashboard').closest('a')
       fireEvent.click(dashboardLink)
@@ -141,18 +136,18 @@ describe('Sidebar', () => {
 
   describe('Projects section', () => {
     it('shows Projects label when expanded', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={false} />)
+      renderSidebar({ ...defaultProps, collapsed: false })
       expect(screen.getByText('Projects')).toBeInTheDocument()
     })
 
     it('hides Projects label when collapsed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true })
       expect(screen.queryByText('Projects')).not.toBeInTheDocument()
     })
 
     it('shows project count badge', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
-      // There should be at least one project (seed project)
+      renderSidebar(defaultProps)
+      // There should be at least one project
       const badges = document.querySelectorAll('.rounded-full')
       const countBadge = Array.from(badges).find(
         (b) => b.textContent && /^\d+$/.test(b.textContent)
@@ -161,15 +156,13 @@ describe('Sidebar', () => {
     })
 
     it('renders project list items', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
-      // ProjectsProvider seeds with a project
+      renderSidebar(defaultProps)
       const buttons = screen.getAllByRole('button')
-      // Should have project buttons
       expect(buttons.length).toBeGreaterThan(0)
     })
 
     it('navigates to project on click', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
 
       // Find a project button (not the New Project button)
       const buttons = screen.getAllByRole('button')
@@ -184,7 +177,7 @@ describe('Sidebar', () => {
     })
 
     it('shows status dot for each project', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // Status dots are small rounded-full elements with specific color classes
       const statusDots = document.querySelectorAll('.h-2.w-2.rounded-full')
       expect(statusDots.length).toBeGreaterThan(0)
@@ -193,26 +186,27 @@ describe('Sidebar', () => {
 
   describe('New Project button', () => {
     it('renders New Project button when expanded', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={false} />)
+      renderSidebar({ ...defaultProps, collapsed: false })
       expect(screen.getByText('New Project')).toBeInTheDocument()
     })
 
     it('shows only Plus icon when collapsed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
-      // In collapsed mode, "New Project" text appears in tooltip content
-      // but should NOT appear as a visible button label <span>
-      // The bottom section contains the new project button inside a Tooltip wrapper
+      renderSidebar({ ...defaultProps, collapsed: true })
+      // In collapsed mode, the bottom section has the new project button
       const bottomSection = document.querySelector('aside > div.border-t')
       expect(bottomSection).toBeInTheDocument()
-      const newProjectButton = bottomSection.querySelector('button')
+      // Find the last button group (new project area)
+      const newProjectArea = document.querySelector('aside > div.px-\\[var\\(--space-3\\)\\]')
+      expect(newProjectArea).toBeInTheDocument()
+      const newProjectButton = newProjectArea?.querySelector('button')
       expect(newProjectButton).toBeInTheDocument()
       // The button itself should NOT contain a <span>New Project</span> child
-      const buttonSpan = newProjectButton.querySelector('span')
+      const buttonSpan = newProjectButton?.querySelector('span')
       expect(buttonSpan).toBeNull()
     })
 
     it('creates new project and navigates on click', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
 
       const newProjectButton = screen.getByText('New Project')
       fireEvent.click(newProjectButton)
@@ -223,9 +217,7 @@ describe('Sidebar', () => {
 
     it('calls onMobileMenuClose after creating project', () => {
       const onMobileMenuClose = vi.fn()
-      renderWithProviders(
-        <Sidebar {...defaultProps} mobileMenuOpen={true} onMobileMenuClose={onMobileMenuClose} />
-      )
+      renderSidebar({ ...defaultProps, mobileMenuOpen: true, onMobileMenuClose })
 
       // Use getAllByText to handle possible duplicates from tooltip or project list
       const matches = screen.getAllByText('New Project')
@@ -236,7 +228,7 @@ describe('Sidebar', () => {
     })
 
     it('has accent background', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // Use getAllByText to handle possible duplicates from tooltip or project list
       const matches = screen.getAllByText('New Project')
       const newProjectButton = matches[matches.length - 1].closest('button')
@@ -246,7 +238,7 @@ describe('Sidebar', () => {
 
   describe('Collapse toggle button', () => {
     it('renders collapse toggle button', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // Toggle button is the last button with -right-3 class
       const toggleButton = document.querySelector('.-right-3')
       expect(toggleButton).toBeInTheDocument()
@@ -254,7 +246,7 @@ describe('Sidebar', () => {
 
     it('calls onToggle when clicked', () => {
       const onToggle = vi.fn()
-      renderWithProviders(<Sidebar {...defaultProps} onToggle={onToggle} />)
+      renderSidebar({ ...defaultProps, onToggle })
 
       const toggleButton = document.querySelector('.-right-3')
       if (toggleButton) {
@@ -264,21 +256,21 @@ describe('Sidebar', () => {
     })
 
     it('shows ChevronLeft when expanded', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={false} />)
+      renderSidebar({ ...defaultProps, collapsed: false })
       // When expanded, should show left chevron
       const toggleButton = document.querySelector('.-right-3')
       expect(toggleButton).toBeInTheDocument()
     })
 
     it('shows ChevronRight when collapsed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true })
       // When collapsed, should show right chevron
       const toggleButton = document.querySelector('.-right-3')
       expect(toggleButton).toBeInTheDocument()
     })
 
     it('is hidden on mobile (md:flex)', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const toggleButton = document.querySelector('.-right-3')
       expect(toggleButton).toHaveClass('hidden')
       expect(toggleButton).toHaveClass('md:flex')
@@ -287,7 +279,7 @@ describe('Sidebar', () => {
 
   describe('Mobile menu', () => {
     it('shows close button when mobile menu is open', () => {
-      renderWithProviders(<Sidebar {...defaultProps} mobileMenuOpen={true} />)
+      renderSidebar({ ...defaultProps, mobileMenuOpen: true })
       // X button for mobile close
       const buttons = document.querySelectorAll('button')
       const closeButton = Array.from(buttons).find(
@@ -298,9 +290,7 @@ describe('Sidebar', () => {
 
     it('calls onMobileMenuClose when close button clicked', () => {
       const onMobileMenuClose = vi.fn()
-      renderWithProviders(
-        <Sidebar {...defaultProps} mobileMenuOpen={true} onMobileMenuClose={onMobileMenuClose} />
-      )
+      renderSidebar({ ...defaultProps, mobileMenuOpen: true, onMobileMenuClose })
 
       const buttons = document.querySelectorAll('button')
       const closeButton = Array.from(buttons).find(
@@ -314,13 +304,13 @@ describe('Sidebar', () => {
     })
 
     it('is fixed positioned when mobile menu is open', () => {
-      renderWithProviders(<Sidebar {...defaultProps} mobileMenuOpen={true} />)
+      renderSidebar({ ...defaultProps, mobileMenuOpen: true })
       const aside = document.querySelector('aside')
       expect(aside).toHaveClass('fixed')
     })
 
     it('is hidden on mobile when closed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} mobileMenuOpen={false} />)
+      renderSidebar({ ...defaultProps, mobileMenuOpen: false })
       const aside = document.querySelector('aside')
       expect(aside).toHaveClass('hidden')
     })
@@ -328,21 +318,21 @@ describe('Sidebar', () => {
 
   describe('Collapsed state', () => {
     it('renders in collapsed mode', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true })
       // Should not show text labels
       expect(screen.queryByText('StoryFlow')).not.toBeInTheDocument()
       expect(screen.queryByText('Projects')).not.toBeInTheDocument()
     })
 
     it('uses tooltips for navigation in collapsed mode', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true })
       // Dashboard should show tooltip version
       const dashboardLink = document.querySelector('nav a')
       expect(dashboardLink).toBeInTheDocument()
     })
 
     it('shows icon-only project buttons when collapsed', () => {
-      renderWithProviders(<Sidebar {...defaultProps} collapsed={true} />)
+      renderSidebar({ ...defaultProps, collapsed: true })
       // Project buttons should be centered (icon only)
       const projectButtons = document.querySelectorAll('nav .space-y-0\\.5 button')
       projectButtons.forEach((btn) => {
@@ -353,7 +343,7 @@ describe('Sidebar', () => {
 
   describe('Project status colors', () => {
     it('applies correct color for planning status', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       // Status dots exist
       const statusDots = document.querySelectorAll('.h-2.w-2.rounded-full')
       expect(statusDots.length).toBeGreaterThan(0)
@@ -362,26 +352,26 @@ describe('Sidebar', () => {
 
   describe('Styling and structure', () => {
     it('has glass-sidebar class', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const aside = document.querySelector('aside')
       expect(aside).toHaveClass('glass-sidebar')
     })
 
     it('has flex-col layout', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const aside = document.querySelector('aside')
       expect(aside).toHaveClass('flex')
       expect(aside).toHaveClass('flex-col')
     })
 
     it('has border-b on brand section', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const brandSection = document.querySelector('aside > div:first-child')
       expect(brandSection).toHaveClass('border-b')
     })
 
     it('has scrollable nav section', () => {
-      renderWithProviders(<Sidebar {...defaultProps} />)
+      renderSidebar(defaultProps)
       const nav = document.querySelector('nav')
       expect(nav).toHaveClass('overflow-y-auto')
     })
@@ -389,30 +379,24 @@ describe('Sidebar', () => {
 
   describe('Edge cases', () => {
     it('handles missing onMobileMenuClose gracefully', () => {
-      renderWithProviders(<Sidebar collapsed={false} onToggle={vi.fn()} mobileMenuOpen={false} />)
+      renderSidebar({ collapsed: false, onToggle: vi.fn(), mobileMenuOpen: false })
       // Should not throw
       expect(screen.getByText('Dashboard')).toBeInTheDocument()
     })
 
     it('handles rapid collapse/expand', () => {
       const onToggle = vi.fn()
-      const { rerender } = renderWithProviders(
-        <Sidebar {...defaultProps} collapsed={false} onToggle={onToggle} />
-      )
+      const { rerender } = renderSidebar({ ...defaultProps, collapsed: false, onToggle })
 
       rerender(
         <MemoryRouter>
-          <ProjectsProvider>
-            <Sidebar {...defaultProps} collapsed={true} onToggle={onToggle} />
-          </ProjectsProvider>
+          <Sidebar {...defaultProps} collapsed={true} onToggle={onToggle} />
         </MemoryRouter>
       )
 
       rerender(
         <MemoryRouter>
-          <ProjectsProvider>
-            <Sidebar {...defaultProps} collapsed={false} onToggle={onToggle} />
-          </ProjectsProvider>
+          <Sidebar {...defaultProps} collapsed={false} onToggle={onToggle} />
         </MemoryRouter>
       )
 

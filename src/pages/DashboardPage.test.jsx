@@ -109,13 +109,13 @@ describe('DashboardPage', () => {
         createMockProject({ id: '3', name: 'Project 3' }),
       ]
       renderDashboard()
-      expect(screen.getByText('3 projects')).toBeInTheDocument()
+      expect(screen.getByText(/3 Projects/i)).toBeInTheDocument()
     })
 
     it('displays singular "project" when only one exists', () => {
       mockProjects = [createMockProject({ id: '1', name: 'Single Project' })]
       renderDashboard()
-      expect(screen.getByText('1 project')).toBeInTheDocument()
+      expect(screen.getByText(/1 Project/i)).toBeInTheDocument()
     })
 
     it('shows trash count alongside project count', () => {
@@ -160,7 +160,7 @@ describe('DashboardPage', () => {
       expect(screen.getByText('Another Project')).toBeInTheDocument()
     })
 
-    it('displays project status badges', () => {
+    it('displays project names for different statuses', () => {
       mockProjects = [
         createMockProject({ id: '1', name: 'Planning Project', status: 'planning' }),
         createMockProject({ id: '2', name: 'Active Project', status: 'in-progress' }),
@@ -168,9 +168,10 @@ describe('DashboardPage', () => {
       ]
       renderDashboard()
 
-      expect(screen.getByText('planning')).toBeInTheDocument()
-      expect(screen.getByText('in-progress')).toBeInTheDocument()
-      expect(screen.getByText('completed')).toBeInTheDocument()
+      // The redesigned card no longer shows status badges; verify project names render
+      expect(screen.getByText('Planning Project')).toBeInTheDocument()
+      expect(screen.getByText('Active Project')).toBeInTheDocument()
+      expect(screen.getByText('Done Project')).toBeInTheDocument()
     })
 
     it('displays tech stack badges (max 3 visible)', () => {
@@ -189,7 +190,7 @@ describe('DashboardPage', () => {
       expect(screen.getByText('+2')).toBeInTheDocument()
     })
 
-    it('displays issue count and open count', () => {
+    it('displays issue progress on card', () => {
       mockProjects = [
         createMockProject({
           id: '1',
@@ -208,9 +209,9 @@ describe('DashboardPage', () => {
       ]
       renderDashboard()
 
-      // Issues text uses nested spans with dot separator
-      expect(screen.getByText(/3 issues/)).toBeInTheDocument()
-      expect(screen.getByText(/2 open/)).toBeInTheDocument()
+      // Redesigned card shows "done/total issues done" and progress percentage
+      expect(screen.getByText(/1\/3 issues done/)).toBeInTheDocument()
+      expect(screen.getByText('33%')).toBeInTheDocument()
     })
 
     it('navigates to project when card is clicked', async () => {
@@ -220,7 +221,7 @@ describe('DashboardPage', () => {
       const projectCard = screen.getByText('Clickable Project').closest('[class*="glass"]')
       fireEvent.click(projectCard)
 
-      expect(mockNavigate).toHaveBeenCalledWith('/project/test-123')
+      expect(mockNavigate).toHaveBeenCalledWith('/project/test-123/overview')
     })
   })
 
@@ -292,8 +293,11 @@ describe('DashboardPage', () => {
       const createBtn = screen.getByRole('button', { name: /create project/i })
       await userEvent.click(createBtn)
 
-      expect(mockAddProject).toHaveBeenCalledWith('My New Project')
-      expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id')
+      expect(mockAddProject).toHaveBeenCalledWith(
+        'My New Project',
+        expect.objectContaining({ techStack: [] })
+      )
+      expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id/overview')
     })
 
     it('shows error and prevents creation when project name is empty', async () => {
@@ -314,7 +318,7 @@ describe('DashboardPage', () => {
       await userEvent.type(input, 'Enter Project{Enter}')
 
       expect(mockAddProject).toHaveBeenCalled()
-      expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id')
+      expect(mockNavigate).toHaveBeenCalledWith('/project/new-project-id/overview')
     })
 
     it('closes modal without creating project when Cancel is clicked', async () => {
@@ -561,7 +565,7 @@ describe('DashboardPage', () => {
       mockProjects = [createMockProject({ id: '1', name: 'No Board', board: undefined })]
       renderDashboard()
       expect(screen.getByText('No Board')).toBeInTheDocument()
-      expect(screen.getByText('0 issues')).toBeInTheDocument()
+      expect(screen.getByText('No issues tracked')).toBeInTheDocument()
     })
 
     it('handles project with empty techStack', () => {
