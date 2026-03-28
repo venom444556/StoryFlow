@@ -536,31 +536,36 @@ app.post('/api/projects/:id/issues', (req, res) => {
 app.put('/api/projects/:id/issues/:issueId', (req, res) => {
   const err = validateIssueBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
-  if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
-  if (issue.error) return res.status(400).json({ error: issue.error })
-  const provenance = extractProvenance(req)
-  const action = req.body.status ? 'status_change' : 'update'
-  const event = emitMutationEvent({
-    projectId: req.params.id,
-    provenance,
-    category: 'board',
-    action,
-    entityType: 'issue',
-    entityId: issue.id,
-    entityTitle: issue.title,
-    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    data: { key: issue.key, type: issue.type, status: issue.status },
-  })
-  broadcastEvent(event)
+  try {
+    const issue = db.updateIssue(req.params.id, req.params.issueId, req.body)
+    if (!issue) return res.status(404).json({ error: 'Issue or project not found' })
+    if (issue.error) return res.status(400).json({ error: issue.error })
+    const provenance = extractProvenance(req)
+    const action = req.body.status ? 'status_change' : 'update'
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action,
+      entityType: 'issue',
+      entityId: issue.id,
+      entityTitle: issue.title,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+      data: { key: issue.key, type: issue.type, status: issue.status },
+    })
+    broadcastEvent(event)
 
-  // #39 — Auto-update linked workflow nodes when issue moves to Done
-  if (req.body.status === 'Done' && issue.key) {
-    autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    // #39 — Auto-update linked workflow nodes when issue moves to Done
+    if (req.body.status === 'Done' && issue.key) {
+      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    }
+
+    notifyClients()
+    res.json(issue)
+  } catch (e) {
+    console.error('[API] Issue update failed:', e.message)
+    res.status(500).json({ error: 'Issue update failed', detail: e.message })
   }
-
-  notifyClients()
-  res.json(issue)
 })
 
 app.delete('/api/projects/:id/issues/:issueId', (req, res) => {
@@ -659,31 +664,36 @@ app.get('/api/projects/:id/issues/by-key/:key', (req, res) => {
 app.put('/api/projects/:id/issues/by-key/:key', (req, res) => {
   const err = validateIssueBody(req.body, true)
   if (err) return res.status(400).json({ error: err })
-  const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
-  if (!issue) return res.status(404).json({ error: 'Issue not found' })
-  if (issue.error) return res.status(400).json({ error: issue.error })
-  const provenance = extractProvenance(req)
-  const action = req.body.status ? 'status_change' : 'update'
-  const event = emitMutationEvent({
-    projectId: req.params.id,
-    provenance,
-    category: 'board',
-    action,
-    entityType: 'issue',
-    entityId: issue.id,
-    entityTitle: issue.title,
-    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-    data: { key: issue.key, type: issue.type, status: issue.status },
-  })
-  broadcastEvent(event)
+  try {
+    const issue = db.updateIssueByKey(req.params.id, req.params.key, req.body)
+    if (!issue) return res.status(404).json({ error: 'Issue not found' })
+    if (issue.error) return res.status(400).json({ error: issue.error })
+    const provenance = extractProvenance(req)
+    const action = req.body.status ? 'status_change' : 'update'
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'board',
+      action,
+      entityType: 'issue',
+      entityId: issue.id,
+      entityTitle: issue.title,
+      changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
+      data: { key: issue.key, type: issue.type, status: issue.status },
+    })
+    broadcastEvent(event)
 
-  // #39 — Auto-update linked workflow nodes when issue moves to Done
-  if (req.body.status === 'Done' && issue.key) {
-    autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    // #39 — Auto-update linked workflow nodes when issue moves to Done
+    if (req.body.status === 'Done' && issue.key) {
+      autoSyncLinkedWorkflowNodes(req.params.id, issue.key)
+    }
+
+    notifyClients()
+    res.json(issue)
+  } catch (e) {
+    console.error('[API] Issue update by key failed:', e.message)
+    res.status(500).json({ error: 'Issue update failed', detail: e.message })
   }
-
-  notifyClients()
-  res.json(issue)
 })
 
 app.delete('/api/projects/:id/issues/by-key/:key', (req, res) => {
