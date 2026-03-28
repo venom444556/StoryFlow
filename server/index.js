@@ -71,10 +71,15 @@ async function main() {
     }
   })
 
-  // Graceful shutdown — flush SQLite to disk
-  const shutdown = () => {
+  // Graceful shutdown — flush SQLite to disk before exiting
+  const shutdown = async () => {
     console.log('\n[StoryFlow Server] Shutting down...')
-    flushToDisk()
+    try {
+      await flushToDisk()
+      console.log('[StoryFlow Server] Database saved to disk')
+    } catch (err) {
+      console.error('[StoryFlow Server] FAILED to save database:', err.message)
+    }
     server.close(() => {
       console.log('[StoryFlow Server] Closed')
       process.exit(0)

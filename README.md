@@ -149,6 +149,7 @@ Wiki discipline is now enforced with product primitives instead of prompt remind
 
 - frontend: React 18, Vite 6, Tailwind CSS 4, Zustand, Framer Motion
 - backend: Express, SQLite via `sql.js`, WebSocket updates
+- database durability: debounced save on every mutation, periodic auto-save every 30s, awaited flush on shutdown
 - server is the system of record for project truth
 
 ### Agent and plugin

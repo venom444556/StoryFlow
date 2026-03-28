@@ -6,7 +6,8 @@
 import initSqlJs from 'sql.js'
 import { readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { initEvents } from './events.js'
 import { initSteering } from './intelligence.js'
 import {
@@ -15,11 +16,15 @@ import {
   normalizeWikiTitle,
 } from '../shared/wikiCorePages.js'
 
-const DATA_DIR = join(process.cwd(), 'data')
+// Anchor to repo root (parent of server/), not process.cwd()
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const PROJECT_ROOT = join(__dirname, '..')
+const DATA_DIR = join(PROJECT_ROOT, 'data')
 const DB_PATH = join(DATA_DIR, 'storyflow.db')
 
 let db = null
 let _saveTimer = null
+let _periodicSaveInterval = null
 
 // ---------------------------------------------------------------------------
 // Initialization
@@ -38,8 +43,15 @@ export async function initDb() {
     console.log('[DB] Loaded existing database from', DB_PATH)
   } else {
     db = new SQL.Database()
-    console.log('[DB] Created new database')
+    console.log('[DB] Created new database at', DB_PATH)
   }
+
+  // Periodic auto-save every 30 seconds as a safety net
+  _periodicSaveInterval = setInterval(() => {
+    saveToDisk().catch((err) => {
+      console.error('[DB] Periodic save failed:', err.message)
+    })
+  }, 30_000)
 
   // Create schema (IF NOT EXISTS — safe to run always)
   db.run(`
@@ -708,19 +720,29 @@ function _dropLegacyColumns() {
 /** Persist database to disk asynchronously (non-blocking) */
 async function saveToDisk() {
   if (!db) return
-  const data = db.export()
-  await writeFile(DB_PATH, Buffer.from(data))
+  try {
+    const data = db.export()
+    await writeFile(DB_PATH, Buffer.from(data))
+  } catch (err) {
+    console.error('[DB] FAILED to save database to disk:', err.message)
+    throw err
+  }
 }
 
 /** Schedule a save (debounced 100ms to batch rapid writes) */
 export function scheduleSave() {
   clearTimeout(_saveTimer)
-  _saveTimer = setTimeout(saveToDisk, 100)
+  _saveTimer = setTimeout(() => {
+    saveToDisk().catch((err) => {
+      console.error('[DB] Scheduled save failed:', err.message)
+    })
+  }, 100)
 }
 
 /** Force immediate save (for shutdown) */
 export async function flushToDisk() {
   clearTimeout(_saveTimer)
+  clearInterval(_periodicSaveInterval)
   await saveToDisk()
 }
 
