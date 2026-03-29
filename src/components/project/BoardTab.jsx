@@ -206,7 +206,7 @@ export default function BoardTab({
   if (!project) return null
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* Toolbar: view-mode switcher + epic toggle + charts toggle */}
       <div className="mb-4 flex items-center gap-3">
         {/* Segmented view-mode control */}
@@ -274,7 +274,7 @@ export default function BoardTab({
       </div>
 
       {/* Main content area */}
-      <div className="surface-workstation with-steering-clearance flex min-h-[650px] flex-1">
+      <div className="surface-workstation flex min-h-0 flex-1 overflow-hidden">
         {/* Epic sidebar */}
         <EpicSidebar
           issues={allIssues}

@@ -214,13 +214,15 @@ export default function ProjectPage() {
           </div>
         )}
 
-        <div className="with-steering-clearance flex-1 overflow-auto px-4 md:px-8">
+        <div
+          className={`flex-1 px-4 md:px-8 ${activeTab === 'board' ? 'flex min-h-0 flex-col overflow-hidden' : 'with-steering-clearance overflow-auto'}`}
+        >
           <motion.div
             key={activeTab}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.12, ease: 'easeOut' }}
-            className="h-full pt-2"
+            className={activeTab === 'board' ? 'flex min-h-0 flex-1 flex-col pt-2' : 'h-full pt-2'}
           >
             <Suspense fallback={<TabFallback />}>
               <Routes>
