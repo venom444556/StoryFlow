@@ -394,7 +394,7 @@ export default function DependencyGraph({
       <div className="absolute inset-0" style={transformStyle}>
         <svg
           className="absolute h-full w-full"
-          style={{ left: 0, top: 0, width: '200%', height: '200%' }}
+          style={{ left: 0, top: 0, width: '200%', height: '200%', zIndex: 0 }}
           onClick={handleCanvasClick}
         >
           {/* Dependency edges */}
