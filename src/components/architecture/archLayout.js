@@ -7,8 +7,8 @@
 // ---------------------------------------------------------------------------
 
 import { NODE_WIDTH } from '../../utils/canvasConstants'
-const NODE_HEIGHT = 80
-const HORIZONTAL_GAP = 100
+const NODE_HEIGHT = 140
+const HORIZONTAL_GAP = 160
 const VERTICAL_GAP = 40
 const GRID_SIZE = 20
 

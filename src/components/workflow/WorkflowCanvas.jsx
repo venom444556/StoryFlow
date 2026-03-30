@@ -281,8 +281,7 @@ export default function WorkflowCanvas({
         : 'default'
 
   const transformStyle = {
-    zoom: viewport.scale,
-    transform: `translate(${viewport.offsetX / viewport.scale}px, ${viewport.offsetY / viewport.scale}px)`,
+    transform: `scale(${viewport.scale}) translate(${viewport.offsetX / viewport.scale}px, ${viewport.offsetY / viewport.scale}px)`,
     transformOrigin: '0 0',
   }
 
@@ -305,13 +304,12 @@ export default function WorkflowCanvas({
       onMouseDown={handlePanStart}
       onClick={handleCanvasClick}
     >
-      {/* Transform wrapper */}
+      {/* Single transform wrapper — SVG first (behind), nodes second (on top) via DOM order */}
       <div className="absolute inset-0" style={transformStyle}>
         <svg
           className="absolute h-full w-full"
-          style={{ left: 0, top: 0, width: '200%', height: '200%', zIndex: 0 }}
+          style={{ left: 0, top: 0, width: '200%', height: '200%' }}
         >
-          {/* Connections */}
           {connections.map((conn) => {
             const fromNode = safeNodes.find((n) => n.id === conn.from)
             const toNode = safeNodes.find((n) => n.id === conn.to)
@@ -327,12 +325,9 @@ export default function WorkflowCanvas({
               />
             )
           })}
-
-          {/* Temp connection being drawn */}
           {renderTempConnection()}
         </svg>
 
-        {/* Nodes rendered as HTML positioned over the SVG */}
         {safeNodes.map((node) => (
           <WorkflowNode
             key={node.id}

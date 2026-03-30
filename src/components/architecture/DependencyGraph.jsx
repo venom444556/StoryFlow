@@ -367,8 +367,7 @@ export default function DependencyGraph({
   const canvasCursor = isPanning ? 'grabbing' : draggingId ? 'grabbing' : 'default'
 
   const transformStyle = {
-    zoom: viewport.scale,
-    transform: `translate(${viewport.offsetX / viewport.scale}px, ${viewport.offsetY / viewport.scale}px)`,
+    transform: `scale(${viewport.scale}) translate(${viewport.offsetX / viewport.scale}px, ${viewport.offsetY / viewport.scale}px)`,
     transformOrigin: '0 0',
   }
 
@@ -391,13 +390,13 @@ export default function DependencyGraph({
       }}
       onMouseDown={handlePanStart}
     >
+      {/* Transform wrapper — SVG edges first in DOM, nodes after (painter's algorithm) */}
       <div className="absolute inset-0" style={transformStyle}>
         <svg
           className="absolute h-full w-full"
-          style={{ left: 0, top: 0, width: '200%', height: '200%', zIndex: 0 }}
+          style={{ left: 0, top: 0, width: '200%', height: '200%' }}
           onClick={handleCanvasClick}
         >
-          {/* Dependency edges */}
           {edges.map((edge) => (
             <DependencyEdge
               key={edge.id}
@@ -415,8 +414,6 @@ export default function DependencyGraph({
             />
           ))}
         </svg>
-
-        {/* Component nodes (HTML over SVG) */}
         {positionedComponents.map((comp) => {
           const hexColor = sanitizeColor(TYPE_HEX_COLORS[comp.type], '#6b7280')
           const TypeIcon = TYPE_ICONS[comp.type] || null
