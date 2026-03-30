@@ -179,6 +179,9 @@ export async function initDb() {
     ['agent_sessions', 'agent_id', 'TEXT'],
     // Decision sequence identity — immutable ADR number
     ['decisions', 'sequence_number', 'INTEGER'],
+    // Workflow node canvas positions
+    ['workflow_nodes', 'x', 'REAL DEFAULT 0'],
+    ['workflow_nodes', 'y', 'REAL DEFAULT 0'],
   ]
   for (const [table, col, type] of wireNowColumns) {
     try {
@@ -389,6 +392,8 @@ export async function initDb() {
       type TEXT,
       status TEXT DEFAULT 'pending',
       linked_issue_keys TEXT,
+      x REAL DEFAULT 0,
+      y REAL DEFAULT 0,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
@@ -906,6 +911,8 @@ function mapWorkflowNodeRow(row) {
     type: row.type || null,
     status: row.status || 'pending',
     linkedIssueKeys: row.linked_issue_keys ? JSON.parse(row.linked_issue_keys) : [],
+    x: row.x ?? 0,
+    y: row.y ?? 0,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -2238,8 +2245,8 @@ function _writeWorkflowNode(projectId, node, parentNodeId) {
   db.run(
     `INSERT OR REPLACE INTO workflow_nodes
       (id, project_id, parent_node_id, title, description, type, status,
-       linked_issue_keys, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       linked_issue_keys, x, y, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       node.id,
       projectId,
@@ -2249,6 +2256,8 @@ function _writeWorkflowNode(projectId, node, parentNodeId) {
       node.type || null,
       node.status || 'pending',
       node.linkedIssueKeys ? JSON.stringify(node.linkedIssueKeys) : null,
+      node.x ?? 0,
+      node.y ?? 0,
       node.createdAt || now,
       node.updatedAt || now,
     ]
@@ -2360,13 +2369,15 @@ export function updateWorkflowNode(projectId, nodeId, updates) {
 
     db.run(
       `UPDATE workflow_nodes SET title = ?, description = ?, type = ?, status = ?,
-       linked_issue_keys = ?, updated_at = ? WHERE id = ? AND project_id = ?`,
+       linked_issue_keys = ?, x = ?, y = ?, updated_at = ? WHERE id = ? AND project_id = ?`,
       [
         merged.title || '',
         merged.description || null,
         merged.type || null,
         merged.status || 'pending',
         merged.linkedIssueKeys ? JSON.stringify(merged.linkedIssueKeys) : null,
+        merged.x ?? 0,
+        merged.y ?? 0,
         now,
         nodeId,
         projectId,

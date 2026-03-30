@@ -91,6 +91,8 @@ export function register(program) {
     .option('-t, --type <type>', 'Node type')
     .option('-s, --status <status>', 'Status')
     .option('-d, --description <desc>', 'Description')
+    .option('--x <n>', 'X position on canvas')
+    .option('--y <n>', 'Y position on canvas')
     .option('--json', 'Output raw JSON')
     .action(async (nodeId, opts) => {
       const project = await resolveProject(opts.project)
@@ -99,6 +101,8 @@ export function register(program) {
       if (opts.type) data.type = opts.type
       if (opts.status) data.status = opts.status
       if (opts.description) data.description = opts.description
+      if (opts.x) data.x = parseFloat(opts.x)
+      if (opts.y) data.y = parseFloat(opts.y)
       const result = await workflow.update(project, nodeId, data)
       if (opts.json) return out.json(result)
       out.success(`Updated node: ${result.title}`)

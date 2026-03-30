@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import { PanelRightClose, PanelRightOpen, Rocket } from 'lucide-react'
 import { generateId } from '../../utils/ids'
 import { executeWorkflow } from '../../utils/workflow'
@@ -44,11 +44,31 @@ export default function WorkflowTab({ project, onUpdate }) {
     : null
 
   // ------ Helpers to persist changes ------
+  // Debounce position persistence — drag fires on every mousemove
+  const positionTimerRef = useRef(null)
+
   const saveNodes = useCallback(
     (updatedNodes) => {
       onUpdate?.({ ...workflow, nodes: updatedNodes })
+
+      // Debounced: persist position changes to server after drag settles
+      if (project?.id) {
+        clearTimeout(positionTimerRef.current)
+        positionTimerRef.current = setTimeout(() => {
+          for (const node of updatedNodes) {
+            const prev = nodes.find((n) => n.id === node.id)
+            if (prev && (prev.x !== node.x || prev.y !== node.y)) {
+              fetch(`/api/projects/${project.id}/workflow/nodes/${node.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: node.x, y: node.y }),
+              }).catch(() => {})
+            }
+          }
+        }, 300)
+      }
     },
-    [onUpdate, workflow]
+    [onUpdate, workflow, nodes, project?.id]
   )
 
   const saveConnections = useCallback(
