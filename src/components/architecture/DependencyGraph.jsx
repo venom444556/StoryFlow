@@ -55,12 +55,14 @@ export default function DependencyGraph({
 
   // ------ Auto-layout on first render when nodes lack positions ------
   const positionedComponents = useMemo(() => {
-    const needsLayout = components.some((c) => c.x === undefined || c.y === undefined)
+    const needsLayout =
+      components.some((c) => c.x === undefined || c.y === undefined) ||
+      (components.length > 1 && components.every((c) => (c.x ?? 0) === 0 && (c.y ?? 0) === 0))
     const laid = needsLayout
       ? (() => {
           const positions = autoLayout(components)
           return components.map((c) => {
-            if (c.x !== undefined && c.y !== undefined) return c
+            if (c.x !== undefined && c.y !== undefined && (c.x !== 0 || c.y !== 0)) return c
             const pos = positions.get(c.id)
             return pos ? { ...c, x: pos.x, y: pos.y } : { ...c, x: 60, y: 60 }
           })
@@ -79,7 +81,9 @@ export default function DependencyGraph({
   const layoutApplied = useRef(false)
   useEffect(() => {
     if (!layoutApplied.current) {
-      const needsLayout = components.some((c) => c.x === undefined || c.y === undefined)
+      const needsLayout =
+        components.some((c) => c.x === undefined || c.y === undefined) ||
+        (components.length > 1 && components.every((c) => (c.x ?? 0) === 0 && (c.y ?? 0) === 0))
       if (needsLayout && positionedComponents.length > 0) {
         onUpdateComponents(positionedComponents)
       }

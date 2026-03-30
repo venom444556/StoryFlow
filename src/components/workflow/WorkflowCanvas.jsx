@@ -37,16 +37,24 @@ export default function WorkflowCanvas({
   const canvasRef = useRef(null)
   const [contextMenu, setContextMenu] = useState(null)
 
-  // Guard against NaN/undefined coordinates (M4 audit fix)
-  const safeNodes = useMemo(
-    () =>
-      (nodes || []).map((n) => ({
+  // Guard against NaN/undefined coordinates + auto-spread if all at origin
+  const safeNodes = useMemo(() => {
+    const raw = (nodes || []).map((n) => ({
+      ...n,
+      x: Number.isFinite(n.x) ? n.x : 0,
+      y: Number.isFinite(n.y) ? n.y : 0,
+    }))
+    // If multiple nodes are all stacked at (0,0), spread them into a grid
+    if (raw.length > 1 && raw.every((n) => n.x === 0 && n.y === 0)) {
+      const cols = Math.ceil(Math.sqrt(raw.length))
+      return raw.map((n, i) => ({
         ...n,
-        x: Number.isFinite(n.x) ? n.x : 0,
-        y: Number.isFinite(n.y) ? n.y : 0,
-      })),
-    [nodes]
-  )
+        x: (i % cols) * 280 + 60,
+        y: Math.floor(i / cols) * 160 + 60,
+      }))
+    }
+    return raw
+  }, [nodes])
 
   // ------ Viewport (zoom + pan offset) ------
   const {
