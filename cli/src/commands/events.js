@@ -51,6 +51,12 @@ export function register(program) {
     .option('--entity-title <title>', 'Entity title')
     .option('--actor <actor>', 'Actor (ai, human, system)', 'human')
     .option('--detail <detail>', 'Additional detail')
+    .option('--reasoning <text>', 'Reasoning for the event')
+    .option('--confidence <n>', 'Confidence score (0-1)')
+    .option('--parent-event-id <id>', 'Parent event ID for causal chain')
+    .option('--entity-id <id>', 'Entity ID')
+    .option('--session-id <id>', 'Session ID')
+    .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const event = { action: opts.action, actor: opts.actor }
@@ -58,7 +64,13 @@ export function register(program) {
       if (opts.entityType) event.entity_type = opts.entityType
       if (opts.entityTitle) event.entity_title = opts.entityTitle
       if (opts.detail) event.detail = opts.detail
-      await events.record(project, event)
+      if (opts.reasoning) event.reasoning = opts.reasoning
+      if (opts.confidence) event.confidence = parseFloat(opts.confidence)
+      if (opts.parentEventId) event.parent_event_id = opts.parentEventId
+      if (opts.entityId) event.entity_id = opts.entityId
+      if (opts.sessionId) event.session_id = opts.sessionId
+      const result = await events.record(project, event)
+      if (opts.json) return out.json(result)
       out.success(`Event recorded: ${opts.action}`)
     })
 
@@ -68,11 +80,13 @@ export function register(program) {
     .requiredOption('--action <action>', 'Response: approve, reject, redirect')
     .option('--project <project>', 'Override default project')
     .option('--reason <reason>', 'Reason for decision')
+    .option('--json', 'Output raw JSON')
     .action(async (eventId, opts) => {
       const project = await resolveProject(opts.project)
       const data = { action: opts.action }
       if (opts.reason) data.comment = opts.reason
-      await events.respond(project, eventId, data)
+      const result = await events.respond(project, eventId, data)
+      if (opts.json) return out.json(result)
       out.success(`Gate ${eventId}: ${opts.action}`)
     })
 
@@ -91,9 +105,11 @@ export function register(program) {
     .description('Send a steering directive to the AI agent')
     .option('--project <project>', 'Override default project')
     .option('-p, --priority <priority>', 'Priority (normal, high, critical)', 'normal')
+    .option('--json', 'Output raw JSON')
     .action(async (message, opts) => {
       const project = await resolveProject(opts.project)
-      await ai.steer(project, message, opts.priority)
+      const result = await ai.steer(project, message, opts.priority)
+      if (opts.json) return out.json(result)
       out.success(`Directive sent (${opts.priority}): ${message}`)
     })
 
@@ -212,9 +228,11 @@ export function register(program) {
     .command('restore <snapshotId>')
     .description('Restore project from a snapshot')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (snapshotId, opts) => {
       const project = await resolveProject(opts.project)
-      await safety.restore(project, snapshotId)
+      const result = await safety.restore(project, snapshotId)
+      if (opts.json) return out.json(result)
       out.success(`Restored from snapshot ${snapshotId}`)
     })
 

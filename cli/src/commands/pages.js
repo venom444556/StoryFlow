@@ -57,6 +57,8 @@ export function register(program) {
       'Template: blank, meeting-notes, technical-spec, requirements-doc, api-documentation, retrospective, adr'
     )
     .option('--icon <emoji>', 'Page icon (emoji)')
+    .option('--parent <pageId>', 'Parent page ID')
+    .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       let content = opts.content || ''
@@ -72,7 +74,9 @@ export function register(program) {
       }
       const data = { title: opts.title, content }
       if (icon) data.icon = icon
+      if (opts.parent) data.parent_id = opts.parent
       const result = await pages.create(project, data)
+      if (opts.json) return out.json(result)
       out.success(`Created page: ${result.title} (${result.id})`)
     })
 
@@ -83,6 +87,7 @@ export function register(program) {
     .option('--title <title>', 'New title')
     .option('-c, --content <content>', 'New content')
     .option('--icon <emoji>', 'Update icon')
+    .option('--json', 'Output raw JSON')
     .action(async (pageId, opts) => {
       const project = await resolveProject(opts.project)
       const data = {}
@@ -90,6 +95,7 @@ export function register(program) {
       if (opts.content) data.content = opts.content
       if (opts.icon !== undefined) data.icon = opts.icon
       const result = await pages.update(project, pageId, data)
+      if (opts.json) return out.json(result)
       out.success(`Updated page: ${result.title}`)
     })
 

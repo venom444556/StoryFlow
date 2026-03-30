@@ -75,12 +75,14 @@ export function register(program) {
     .command('toggle <milestoneId>')
     .description('Toggle milestone completion')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (milestoneId, opts) => {
       const project = await resolveProject(opts.project)
       const list = await milestones.list(project)
       const m = list.find((x) => x.id === milestoneId || x.id?.startsWith(milestoneId))
       if (!m) throw new Error(`Milestone "${milestoneId}" not found`)
       const result = await milestones.update(project, m.id, { completed: !m.completed })
+      if (opts.json) return out.json(result)
       out.success(`${result.name}: ${result.completed ? 'completed' : 'not completed'}`)
     })
 

@@ -295,7 +295,7 @@ async function runDoctor() {
   if (projectResolved) {
     try {
       const pid = await resolveProject()
-      const ctx = await operational.boot(pid)
+      const ctx = await operational.context(pid)
       checks.push({
         name: 'Context boot health',
         pass: !!ctx?.project,

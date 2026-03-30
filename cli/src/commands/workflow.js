@@ -71,6 +71,7 @@ export function register(program) {
     .option('-d, --description <desc>', 'Node description')
     .option('--x <n>', 'X position on canvas')
     .option('--y <n>', 'Y position on canvas')
+    .option('--parent <nodeId>', 'Parent node ID')
     .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
@@ -78,6 +79,7 @@ export function register(program) {
       if (opts.description) data.description = opts.description
       if (opts.x) data.x = parseInt(opts.x, 10)
       if (opts.y) data.y = parseInt(opts.y, 10)
+      if (opts.parent) data.parent_node_id = opts.parent
       const result = await workflow.create(project, data)
       if (opts.json) return out.json(result)
       out.success(`Created node: ${result.title} (${result.id})`)
@@ -123,9 +125,11 @@ export function register(program) {
     .command('link <nodeId> <issueKey>')
     .description('Link an issue to a workflow node')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (nodeId, issueKey, opts) => {
       const project = await resolveProject(opts.project)
-      await workflow.link(project, nodeId, issueKey)
+      const result = await workflow.link(project, nodeId, issueKey)
+      if (opts.json) return out.json(result)
       out.success(`Linked ${issueKey} to node ${nodeId}`)
     })
 
@@ -133,9 +137,11 @@ export function register(program) {
     .command('unlink <nodeId> <issueKey>')
     .description('Unlink an issue from a workflow node')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (nodeId, issueKey, opts) => {
       const project = await resolveProject(opts.project)
-      await workflow.unlink(project, nodeId, issueKey)
+      const result = await workflow.unlink(project, nodeId, issueKey)
+      if (opts.json) return out.json(result)
       out.success(`Unlinked ${issueKey} from node ${nodeId}`)
     })
 

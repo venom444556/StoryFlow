@@ -45,6 +45,7 @@ const commands = await Promise.all([
   import('../src/commands/agent.js'),
   import('../src/commands/context.js'),
   import('../src/commands/search.js'),
+  import('../src/commands/reconcile.js'),
 ])
 
 for (const mod of commands) {

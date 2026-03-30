@@ -37,6 +37,7 @@ export function register(program) {
     .option('--start <date>', 'Start date (YYYY-MM-DD)')
     .option('--end <date>', 'End date (YYYY-MM-DD)')
     .option('-s, --status <status>', 'Status (planning, active, completed)', 'planning')
+    .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const data = { name: opts.name, status: opts.status }
@@ -44,6 +45,7 @@ export function register(program) {
       if (opts.start) data.startDate = opts.start
       if (opts.end) data.endDate = opts.end
       const result = await sprints.create(project, data)
+      if (opts.json) return out.json(result)
       out.success(`Created sprint: ${result.name}`)
     })
 
@@ -56,6 +58,7 @@ export function register(program) {
     .option('-s, --status <status>', 'Status')
     .option('--start <date>', 'Start date')
     .option('--end <date>', 'End date')
+    .option('--json', 'Output raw JSON')
     .action(async (sprintId, opts) => {
       const project = await resolveProject(opts.project)
       const data = {}
@@ -65,6 +68,7 @@ export function register(program) {
       if (opts.start) data.startDate = opts.start
       if (opts.end) data.endDate = opts.end
       const result = await sprints.update(project, sprintId, data)
+      if (opts.json) return out.json(result)
       out.success(`Updated sprint: ${result.name}`)
     })
 
@@ -73,9 +77,11 @@ export function register(program) {
     .alias('rm')
     .description('Delete a sprint')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (sprintId, opts) => {
       const project = await resolveProject(opts.project)
-      await sprints.delete(project, sprintId)
+      const result = await sprints.delete(project, sprintId)
+      if (opts.json) return out.json(result)
       out.success(`Deleted sprint ${sprintId}`)
     })
 }

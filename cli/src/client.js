@@ -313,6 +313,10 @@ export const hotWashes = {
     request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash/finalize`, {
       method: 'POST',
     }),
+  delete: (pid, phaseId) =>
+    request(`/api/projects/${enc(pid)}/phases/${enc(phaseId)}/hot-wash`, {
+      method: 'DELETE',
+    }),
   list: (pid) => request(`/api/projects/${enc(pid)}/hot-washes`),
   lessons: (pid) => request(`/api/projects/${enc(pid)}/lessons-learned`),
 }

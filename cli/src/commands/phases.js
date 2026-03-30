@@ -183,6 +183,18 @@ export function register(program) {
       out.success('Hot wash finalized')
     })
 
+  hw.command('delete <phaseRef>')
+    .alias('rm')
+    .description('Delete a draft hot wash report')
+    .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
+    .action(async (phaseRef, opts) => {
+      const project = await resolveProject(opts.project)
+      const result = await hotWashes.delete(project, phaseRef)
+      if (opts.json) return out.json(result)
+      out.success(`Deleted hot wash for phase ${phaseRef}`)
+    })
+
   hw.command('list [project]')
     .alias('ls')
     .description('List all hot wash reports for a project')

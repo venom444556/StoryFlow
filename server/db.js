@@ -3988,6 +3988,39 @@ function _buildLessonsLearnedPageContent(summary, reports) {
   return lines.join('\n')
 }
 
+/**
+ * Resolve a phase reference to a UUID.
+ * Accepts: UUID, name (case-insensitive exact), or name prefix/contains.
+ * Returns the phase ID string, or null if not found.
+ */
+export function resolvePhaseRef(projectId, ref) {
+  if (!ref) return null
+  // UUID format — use directly
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-/.test(ref)) {
+    const row = _sqlQueryOne('SELECT id FROM phases WHERE id = ? AND project_id = ?', [
+      ref,
+      projectId,
+    ])
+    return row ? row.id : null
+  }
+
+  // Exact name match (case-insensitive)
+  const exact = _sqlQueryOne(
+    'SELECT id FROM phases WHERE project_id = ? AND LOWER(name) = LOWER(?)',
+    [projectId, ref]
+  )
+  if (exact) return exact.id
+
+  // Name LIKE match (case-insensitive contains)
+  const likeRows = _sqlQuery(
+    'SELECT id, name FROM phases WHERE project_id = ? AND LOWER(name) LIKE LOWER(?)',
+    [projectId, `%${ref}%`]
+  )
+  if (likeRows.length === 1) return likeRows[0].id
+  // Ambiguous or no match
+  return null
+}
+
 export function getHotWash(projectId, phaseId) {
   const row = _sqlQueryOne('SELECT * FROM hot_washes WHERE project_id = ? AND phase_id = ?', [
     projectId,
@@ -4344,6 +4377,26 @@ export function finalizeHotWash(projectId, phaseId, { finalizedBy = 'human' } = 
   scheduleSave()
   getLessonsLearnedSummary(projectId, { syncPage: true })
   return getHotWash(projectId, phaseId)
+}
+
+export function deleteHotWash(projectId, phaseId) {
+  const existing = getHotWash(projectId, phaseId)
+  if (!existing) return null
+  if (existing.status === 'final') return { error: 'Cannot delete a finalized hot wash' }
+
+  // Delete the associated wiki page if it exists
+  if (existing.wikiPageId) {
+    const page = getPage(projectId, existing.wikiPageId)
+    if (page) {
+      deletePage(projectId, existing.wikiPageId)
+    }
+  }
+
+  db.run('DELETE FROM hot_washes WHERE project_id = ? AND phase_id = ?', [projectId, phaseId])
+  db.run('UPDATE projects SET updated_at = ? WHERE id = ?', [new Date().toISOString(), projectId])
+  scheduleSave()
+  getLessonsLearnedSummary(projectId, { syncPage: true })
+  return { success: true, deletedId: existing.id }
 }
 
 function _renderHotWashWikiPage(phase, report, generatedAt, generatedBy) {

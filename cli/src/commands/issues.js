@@ -130,6 +130,7 @@ export function register(program) {
     .option('--sprint <sprintId>', 'Sprint ID')
     .option('-d, --description <desc>', 'Description')
     .option('--assignee <name>', 'Assignee')
+    .option('--labels <labels>', 'Comma-separated labels')
     .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
@@ -144,6 +145,7 @@ export function register(program) {
       if (opts.sprint) data.sprintId = opts.sprint
       if (opts.description) data.description = opts.description
       if (opts.assignee) data.assignee = opts.assignee
+      if (opts.labels) data.labels = opts.labels.split(',').map((s) => s.trim())
 
       const result = await issues.create(project, data)
       if (opts.json) return out.json(result)
@@ -161,6 +163,8 @@ export function register(program) {
     .option('--assignee <name>', 'Assignee')
     .option('--sprint <sprintId>', 'Sprint ID')
     .option('--epic <epic>', 'Epic (key like SC-179 or UUID)')
+    .option('-d, --description <text>', 'Description')
+    .option('--labels <labels>', 'Comma-separated labels')
     .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
@@ -172,6 +176,8 @@ export function register(program) {
       if (opts.assignee) data.assignee = opts.assignee
       if (opts.sprint) data.sprintId = opts.sprint
       if (opts.epic) data.epicId = await resolveEpicId(project, opts.epic)
+      if (opts.description) data.description = opts.description
+      if (opts.labels) data.labels = opts.labels.split(',').map((s) => s.trim())
 
       const result = await issues.updateByKey(project, key, data)
       if (opts.json) return out.json(result)
@@ -218,15 +224,17 @@ export function register(program) {
     .description('Quick-mark an issue as Blocked')
     .option('--project <project>', 'Override default project')
     .option('-r, --reason <reason>', 'Reason for blocking')
+    .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
-      await issues.updateByKey(project, key, { status: 'Blocked' })
+      const result = await issues.updateByKey(project, key, { status: 'Blocked' })
       if (opts.reason) {
         await issues.addCommentByKey(project, key, {
           body: `Blocked: ${opts.reason}`,
           author: 'cli',
         })
       }
+      if (opts.json) return out.json(result)
       out.success(`${key} marked as Blocked`)
     })
 
@@ -235,10 +243,12 @@ export function register(program) {
     .alias('rm')
     .description('Delete an issue by key')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
       const issue = await issues.getByKey(project, key)
-      await issues.delete(project, issue.id)
+      const result = await issues.delete(project, issue.id)
+      if (opts.json) return out.json(result)
       out.success(`Deleted ${key}: ${issue.title}`)
     })
 
@@ -246,9 +256,19 @@ export function register(program) {
     .command('nudge <key>')
     .description('Reset staleness timer on an issue')
     .option('--project <project>', 'Override default project')
+    .option('-m, --message <text>', 'Nudge message')
+    .option('--author <name>', 'Author name')
+    .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
-      await issues.nudge(project, key)
+      const result = await issues.nudge(project, key)
+      if (opts.message) {
+        await issues.addCommentByKey(project, key, {
+          body: opts.message,
+          author: opts.author || 'cli',
+        })
+      }
+      if (opts.json) return out.json(result)
       out.success(`Nudged ${key}`)
     })
 

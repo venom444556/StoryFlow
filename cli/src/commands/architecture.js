@@ -84,12 +84,18 @@ export function register(program) {
     .option('-d, --description <desc>', 'Description')
     .option('--parent <parentId>', 'Parent component ID')
     .option('--deps <ids>', 'Comma-separated dependency component IDs')
+    .option('--x <n>', 'X position on canvas')
+    .option('--y <n>', 'Y position on canvas')
+    .option('--tech <tech>', 'Technology stack')
     .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const data = { name: opts.name, type: opts.type }
       if (opts.description) data.description = opts.description
       if (opts.parent) data.parentId = opts.parent
+      if (opts.x) data.x = parseFloat(opts.x)
+      if (opts.y) data.y = parseFloat(opts.y)
+      if (opts.tech) data.tech = opts.tech
       const deps = opts.deps ? opts.deps.split(',').map((s) => s.trim()) : []
       const result = await architecture.create(project, data)
       if (opts.json && !deps.length) return out.json(result)
@@ -116,6 +122,9 @@ export function register(program) {
     .option('-d, --description <desc>', 'Description')
     .option('--parent <parentId>', 'Parent component ID')
     .option('--deps <ids>', 'Comma-separated dependency IDs')
+    .option('--x <n>', 'X position on canvas')
+    .option('--y <n>', 'Y position on canvas')
+    .option('--tech <tech>', 'Technology stack')
     .option('--json', 'Output raw JSON')
     .action(async (componentId, opts) => {
       const project = await resolveProject(opts.project)
@@ -124,6 +133,9 @@ export function register(program) {
       if (opts.type) data.type = opts.type
       if (opts.description) data.description = opts.description
       if (opts.parent) data.parentId = opts.parent
+      if (opts.x) data.x = parseFloat(opts.x)
+      if (opts.y) data.y = parseFloat(opts.y)
+      if (opts.tech) data.tech = opts.tech
       const deps = opts.deps ? opts.deps.split(',').map((s) => s.trim()) : null
       const result = await architecture.update(project, componentId, data)
       // Wire --deps to real architecture connections (replace existing)

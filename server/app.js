@@ -1135,9 +1135,24 @@ app.delete('/api/projects/:id/milestones/:milestoneId', (req, res) => {
 })
 
 // --- Phase Hot Wash ---
+
+// Helper: resolve phaseId param by UUID or name
+function resolvePhaseParam(req, res) {
+  const projectId = req.params.id
+  const raw = decodeURIComponent(req.params.phaseId)
+  const resolved = db.resolvePhaseRef(projectId, raw)
+  if (!resolved) {
+    res.status(404).json({ error: `Phase "${raw}" not found` })
+    return null
+  }
+  return resolved
+}
+
 app.post('/api/projects/:id/phases/:phaseId/hot-wash/generate', (req, res) => {
+  const phaseId = resolvePhaseParam(req, res)
+  if (!phaseId) return
   const provenance = extractProvenance(req)
-  const result = db.generateHotWash(req.params.id, req.params.phaseId, {
+  const result = db.generateHotWash(req.params.id, phaseId, {
     generatedBy: provenance.actor || 'ai',
     overrides: req.body || {},
   })
@@ -1150,7 +1165,7 @@ app.post('/api/projects/:id/phases/:phaseId/hot-wash/generate', (req, res) => {
     action: 'create',
     entityType: 'hot_wash',
     entityId: result.id,
-    entityTitle: `Hot wash for phase ${req.params.phaseId}`,
+    entityTitle: `Hot wash for phase ${phaseId}`,
   })
   broadcastEvent(event)
   notifyClients()
@@ -1158,13 +1173,17 @@ app.post('/api/projects/:id/phases/:phaseId/hot-wash/generate', (req, res) => {
 })
 
 app.get('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
-  const hw = db.getHotWash(req.params.id, req.params.phaseId)
+  const phaseId = resolvePhaseParam(req, res)
+  if (!phaseId) return
+  const hw = db.getHotWash(req.params.id, phaseId)
   if (!hw) return res.status(404).json({ error: 'No hot wash for this phase' })
   res.json(hw)
 })
 
 app.put('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
-  const result = db.updateHotWash(req.params.id, req.params.phaseId, req.body)
+  const phaseId = resolvePhaseParam(req, res)
+  if (!phaseId) return
+  const result = db.updateHotWash(req.params.id, phaseId, req.body)
   if (!result) return res.status(404).json({ error: 'No hot wash for this phase' })
   if (result.error) return res.status(400).json({ error: result.error })
   notifyClients()
@@ -1172,8 +1191,10 @@ app.put('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
 })
 
 app.post('/api/projects/:id/phases/:phaseId/hot-wash/finalize', (req, res) => {
+  const phaseId = resolvePhaseParam(req, res)
+  if (!phaseId) return
   const provenance = extractProvenance(req)
-  const result = db.finalizeHotWash(req.params.id, req.params.phaseId, {
+  const result = db.finalizeHotWash(req.params.id, phaseId, {
     finalizedBy: provenance.actor || 'human',
   })
   if (!result) return res.status(404).json({ error: 'No hot wash for this phase' })
@@ -1186,6 +1207,27 @@ app.post('/api/projects/:id/phases/:phaseId/hot-wash/finalize', (req, res) => {
     entityType: 'hot_wash',
     entityId: result.id,
     entityTitle: `Finalized hot wash`,
+  })
+  broadcastEvent(event)
+  notifyClients()
+  res.json(result)
+})
+
+app.delete('/api/projects/:id/phases/:phaseId/hot-wash', (req, res) => {
+  const phaseId = resolvePhaseParam(req, res)
+  if (!phaseId) return
+  const result = db.deleteHotWash(req.params.id, phaseId)
+  if (!result) return res.status(404).json({ error: 'No hot wash for this phase' })
+  if (result.error) return res.status(400).json({ error: result.error })
+  const provenance = extractProvenance(req)
+  const event = emitMutationEvent({
+    projectId: req.params.id,
+    provenance,
+    category: 'timeline',
+    action: 'delete',
+    entityType: 'hot_wash',
+    entityId: result.deletedId,
+    entityTitle: `Deleted hot wash for phase ${phaseId}`,
   })
   broadcastEvent(event)
   notifyClients()
