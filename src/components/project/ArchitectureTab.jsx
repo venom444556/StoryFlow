@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useRef } from 'react'
 import { Plus, Network, List, Boxes } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { generateId } from '../../utils/ids'
@@ -77,13 +77,32 @@ export default function ArchitectureTab({ project, onUpdate }) {
     [components, selectedId]
   )
 
+  const positionTimerRef = useRef(null)
+
   const updateComponents = useCallback(
     (newComponents) => {
       onUpdate({
         architecture: { ...project.architecture, components: newComponents },
       })
+
+      // Debounced: persist position changes to server after drag settles
+      if (project?.id) {
+        clearTimeout(positionTimerRef.current)
+        positionTimerRef.current = setTimeout(() => {
+          for (const comp of newComponents) {
+            const prev = components.find((c) => c.id === comp.id)
+            if (prev && (prev.x !== comp.x || prev.y !== comp.y)) {
+              fetch(`/api/projects/${project.id}/architecture/components/${comp.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: comp.x, y: comp.y }),
+              }).catch(() => {})
+            }
+          }
+        }, 300)
+      }
     },
-    [project?.architecture, onUpdate]
+    [project?.architecture, project?.id, components, onUpdate]
   )
 
   // --- CRUD handlers ---

@@ -182,6 +182,9 @@ export async function initDb() {
     // Workflow node canvas positions
     ['workflow_nodes', 'x', 'REAL DEFAULT 0'],
     ['workflow_nodes', 'y', 'REAL DEFAULT 0'],
+    // Architecture component canvas positions
+    ['architecture_components', 'x', 'REAL DEFAULT 0'],
+    ['architecture_components', 'y', 'REAL DEFAULT 0'],
   ]
   for (const [table, col, type] of wireNowColumns) {
     try {
@@ -424,6 +427,8 @@ export async function initDb() {
       description TEXT,
       type TEXT,
       tech TEXT,
+      x REAL DEFAULT 0,
+      y REAL DEFAULT 0,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
@@ -936,6 +941,8 @@ function mapArchComponentRow(row) {
     description: row.description || '',
     type: row.type || null,
     tech: row.tech || null,
+    x: row.x ?? 0,
+    y: row.y ?? 0,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -1149,10 +1156,17 @@ export function getProject(id) {
     connections: _listWorkflowConnectionsRaw(id),
   }
 
-  // Architecture
+  // Architecture — enrich components with their dependency IDs from connections
+  const archComponents = _listArchComponentsRaw(id)
+  const archConnections = _listArchConnectionsRaw(id)
+  for (const comp of archComponents) {
+    comp.dependencies = archConnections
+      .filter((c) => c.fromComponentId === comp.id)
+      .map((c) => c.toComponentId)
+  }
   project.architecture = {
-    components: _listArchComponentsRaw(id),
-    connections: _listArchConnectionsRaw(id),
+    components: archComponents,
+    connections: archConnections,
   }
 
   return project
@@ -2500,8 +2514,8 @@ export function addArchitectureComponent(projectId, component) {
 
   db.run(
     `INSERT OR REPLACE INTO architecture_components
-      (id, project_id, name, description, type, tech, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, type, tech, x, y, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newComp.id,
       projectId,
@@ -2509,6 +2523,8 @@ export function addArchitectureComponent(projectId, component) {
       newComp.description || null,
       newComp.type || null,
       newComp.tech || null,
+      newComp.x ?? 0,
+      newComp.y ?? 0,
       newComp.createdAt,
       newComp.updatedAt,
     ]
@@ -2531,8 +2547,8 @@ export function updateArchitectureComponent(projectId, componentId, updates) {
 
   db.run(
     `INSERT OR REPLACE INTO architecture_components
-      (id, project_id, name, description, type, tech, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, project_id, name, description, type, tech, x, y, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       merged.id,
       projectId,
@@ -2540,6 +2556,8 @@ export function updateArchitectureComponent(projectId, componentId, updates) {
       merged.description || null,
       merged.type || null,
       merged.tech || null,
+      merged.x ?? 0,
+      merged.y ?? 0,
       merged.createdAt || now,
       merged.updatedAt,
     ]
