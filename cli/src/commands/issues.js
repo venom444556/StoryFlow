@@ -182,14 +182,22 @@ export function register(program) {
     .command('comment <key>')
     .description('Add a comment to an issue')
     .option('--project <project>', 'Override default project')
-    .requiredOption('-m, --message <text>', 'Comment text')
+    .option('-m, --message <text>', 'Comment text')
+    .option('-b, --body <text>', 'Comment text (alias for --message)')
     .option('--author <name>', 'Author name', 'cli')
+    .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
+      const commentText = opts.body || opts.message
+      if (!commentText) {
+        out.error('Provide comment text with --message (-m) or --body (-b)')
+        return
+      }
       const project = await resolveProject(opts.project)
-      await issues.addCommentByKey(project, key, {
-        body: opts.message,
+      const result = await issues.addCommentByKey(project, key, {
+        body: commentText,
         author: opts.author,
       })
+      if (opts.json) return out.json(result)
       out.success(`Comment added to ${key}`)
     })
 
@@ -197,9 +205,11 @@ export function register(program) {
     .command('done <key>')
     .description('Quick-mark an issue as Done')
     .option('--project <project>', 'Override default project')
+    .option('--json', 'Output raw JSON')
     .action(async (key, opts) => {
       const project = await resolveProject(opts.project)
-      await issues.updateByKey(project, key, { status: 'Done' })
+      const result = await issues.updateByKey(project, key, { status: 'Done' })
+      if (opts.json) return out.json(result)
       out.success(`${key} marked as Done`)
     })
 
@@ -285,7 +295,7 @@ export function register(program) {
       }
       const project = await resolveProject(opts.project)
       const updates = keys.map((k) => ({ issue_key: k, status: 'Done' }))
-      const result = await issues.batchUpdate(project, { updates })
+      const result = await issues.batchUpdate(project, updates)
       if (opts.json) return out.json(result)
       out.success(`Marked ${result.updated?.length || 0} issues as Done`)
       if (result.errors?.length) {

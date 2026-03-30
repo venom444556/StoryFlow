@@ -104,9 +104,11 @@ export function register(program) {
     .command('show [project]')
     .alias('get')
     .description('Check AI agent status')
-    .action(async (project) => {
+    .option('--json', 'Output raw JSON')
+    .action(async (project, opts) => {
       project = await resolveProject(project)
       const status = await ai.getStatus(project)
+      if (opts?.json) return out.json(status)
       out.heading('AI Agent Status')
       out.kv('Status', out.status(status.status || 'idle'))
       out.kv('Detail', status.detail || chalk.gray('none'))
@@ -273,6 +275,7 @@ export function register(program) {
     .option('--issues-updated <n>', 'Count of issues updated', parseInt)
     .option('--events-recorded <n>', 'Count of events recorded', parseInt)
     .option('--agent-id <id>', 'Agent ID')
+    .option('--json', 'Output raw JSON')
     .action(async (project, opts) => {
       project = await resolveProject(project)
       const data = { summary: opts.summary }
@@ -285,7 +288,8 @@ export function register(program) {
       if (opts.issuesUpdated !== undefined) data.issues_updated = opts.issuesUpdated
       if (opts.eventsRecorded !== undefined) data.events_recorded = opts.eventsRecorded
       if (opts.agentId) data.agent_id = opts.agentId
-      await sessions.save(project, data)
+      const result = await sessions.save(project, data)
+      if (opts.json) return out.json(result)
       out.success('Session saved')
     })
 }
