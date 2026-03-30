@@ -254,7 +254,7 @@ export default function WorkflowTab({ project, onUpdate }) {
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) || null
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* Toolbar */}
       <WorkflowToolbar
         onAddNode={handleAddNode}
@@ -266,7 +266,7 @@ export default function WorkflowTab({ project, onUpdate }) {
       />
 
       {/* 3-panel layout: sidebar | canvas | properties */}
-      <div className="surface-workstation with-steering-clearance flex min-h-[700px] flex-1">
+      <div className="surface-workstation flex min-h-0 flex-1 overflow-hidden">
         {/* Left sidebar: palette + layers + templates */}
         <WorkflowSidebar onAddNode={handleAddNode} nodes={nodes} isExecuting={isExecuting} />
 

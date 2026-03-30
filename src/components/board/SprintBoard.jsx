@@ -313,24 +313,19 @@ export default function SprintBoard({
         />
       )}
 
-      {/* No sprints state */}
+      {/* No sprints — compact inline prompt */}
       {sprints.length === 0 && (
-        <div className="mb-3 flex items-center justify-between rounded-xl border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-glass)] p-4">
-          <div>
-            <p className="text-sm font-medium text-[var(--color-fg-default)]">No sprints yet</p>
-            <p className="text-xs text-[var(--color-fg-muted)]">
-              Create a sprint to organize your work into time-boxed iterations.
-            </p>
-          </div>
+        <div className="mb-2 flex items-center gap-3 px-1">
+          <span className="text-xs text-[var(--color-fg-muted)]">No sprints</span>
           <button
             type="button"
             onClick={() => {
               setEditingSprint(null)
               setSprintModalOpen(true)
             }}
-            className="flex items-center gap-1.5 rounded-lg bg-[var(--color-accent-emphasis)] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+            className="flex items-center gap-1 rounded-lg border border-dashed border-[var(--color-border-default)] px-2.5 py-1 text-[11px] font-medium text-[var(--color-fg-muted)] transition-colors hover:border-[var(--color-accent-emphasis)] hover:text-[var(--color-accent-emphasis)]"
           >
-            <Plus size={12} /> Create Sprint
+            <Plus size={11} /> Create Sprint
           </button>
         </div>
       )}

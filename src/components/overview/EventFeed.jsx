@@ -64,6 +64,9 @@ function FeedItem({ event }) {
   const Icon = ACTION_ICONS[event.action] || FileText
   const categoryColor = CATEGORY_COLORS[event.category] || 'var(--color-fg-muted)'
   const isPendingGate = event.status === 'pending'
+  const isHighlight =
+    isPendingGate ||
+    ['status_change', 'approve', 'reject', 'steer', 'create'].includes(event.action)
 
   const timeAgo = useMemo(() => {
     try {
@@ -101,27 +104,33 @@ function FeedItem({ event }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15 }}
       className={[
-        'rounded-xl px-3 py-3 transition-colors hover:bg-[var(--color-bg-glass)]',
-        isPendingGate ? 'bg-amber-400/5' : '',
+        'rounded-xl px-3 transition-colors hover:bg-[var(--color-bg-glass)]',
+        isPendingGate ? 'border border-amber-400/20 bg-amber-400/5 py-3' : 'py-2.5',
+        isHighlight ? 'py-3' : '',
       ]
         .filter(Boolean)
         .join(' ')}
     >
       <div className="flex items-start gap-3">
-        {/* Dot indicator with color coding — matches SessionHistory */}
-        <div className="mt-2 flex flex-col items-center gap-1">
+        {/* Dot indicator with color coding */}
+        <div className="mt-1.5 flex flex-col items-center gap-1">
           <span
-            className="h-2.5 w-2.5 shrink-0 rounded-full"
+            className={`shrink-0 rounded-full ${isHighlight ? 'h-3 w-3' : 'h-2 w-2'}`}
             style={{ backgroundColor: categoryColor }}
           />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-medium leading-snug text-[var(--color-fg-default)]">
-            {description}
-          </p>
+          <div className="flex items-baseline justify-between gap-2">
+            <p
+              className={`font-medium leading-snug text-[var(--color-fg-default)] ${isHighlight ? 'text-sm' : 'text-[13px]'}`}
+            >
+              {description}
+            </p>
+            <span className="shrink-0 text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
+          </div>
 
-          {/* Reasoning — always visible, gives each item substance */}
-          {event.reasoning && (
+          {/* Reasoning — only for highlighted events to reduce noise */}
+          {event.reasoning && isHighlight && (
             <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[var(--color-fg-muted)]">
               {event.reasoning}
             </p>
@@ -135,13 +144,12 @@ function FeedItem({ event }) {
             </div>
           )}
 
-          {/* Stat chips — matches SessionHistory */}
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          {/* Stat chips — compact for non-highlighted */}
+          <div className="mt-1 flex flex-wrap items-center gap-2">
             <AIBadge source={event.actor === 'ai' ? 'ai' : 'human'} />
             <span className="flex items-center gap-1 rounded-full bg-[var(--color-info)]/10 px-2 py-0.5 text-[10px] font-medium text-[var(--color-info)]">
               <Icon size={9} /> {CATEGORY_LABELS[event.category] || event.category}
             </span>
-            <span className="text-[10px] text-[var(--color-fg-faint)]">{timeAgo}</span>
           </div>
         </div>
       </div>

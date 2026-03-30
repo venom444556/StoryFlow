@@ -14,7 +14,7 @@ function CommandMetric({ label, value, accentClass = 'text-[var(--color-fg-defau
       <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-fg-faint)]">
         {label}
       </span>
-      <span className={`text-sm leading-relaxed ${accentClass}`} title={title}>
+      <span className={`text-lg font-semibold leading-relaxed ${accentClass}`} title={title}>
         {value}
       </span>
     </div>
@@ -149,29 +149,25 @@ export default function OverviewTab({ project }) {
 
       {/* 3. OVERVIEW WORKSPACE */}
       <div
-        className="grid grid-cols-1 items-stretch gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.95fr)]"
+        className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(340px,0.95fr)]"
         style={{
           marginBottom: 'calc(var(--steering-bar-clearance, 0px) + var(--space-2))',
         }}
       >
-        <div className="min-w-0 relative h-full">
-          <div className="absolute inset-0">
-            <EventFeed projectId={project.id} />
-          </div>
+        <div
+          className="min-w-0 overflow-hidden rounded-xl"
+          style={{ height: 'min(calc(100vh - 22rem), 800px)' }}
+        >
+          <EventFeed projectId={project.id} />
         </div>
 
-        <div className="min-w-0 space-y-6">
-          <div className="xl:h-[400px]">
-            <SessionHistory projectId={project.id} />
-          </div>
-
-          <div className="xl:h-[17rem]">
-            <SprintMetricsPanel analytics={analyticsData} />
-          </div>
-
-          <div className="xl:h-[15rem]" style={{ marginTop: '2.5rem' }}>
-            <MetricsSummary analytics={analyticsData} />
-          </div>
+        <div
+          className="min-w-0 space-y-6 overflow-y-auto"
+          style={{ maxHeight: 'min(calc(100vh - 22rem), 800px)' }}
+        >
+          <SessionHistory projectId={project.id} />
+          <SprintMetricsPanel analytics={analyticsData} />
+          <MetricsSummary analytics={analyticsData} />
         </div>
       </div>
     </div>

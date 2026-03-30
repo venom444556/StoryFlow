@@ -168,7 +168,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
   }, [selectedId, components])
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       {/* Header row */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Tabs tabs={VIEW_TABS} activeTab={view} onTabChange={setView} />
@@ -187,7 +187,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
       {/* View content */}
       {view === 'graph' ? (
         components.length === 0 ? (
-          <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 items-center justify-center">
+          <div className="surface-workstation flex min-h-0 flex-1 items-center justify-center">
             <EmptyState
               icon={Boxes}
               title="No components yet"
@@ -199,7 +199,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
             />
           </div>
         ) : (
-          <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 gap-4 p-1">
+          <div className="surface-workstation flex min-h-0 flex-1 gap-4 p-1">
             <DependencyGraph
               components={components}
               selectedId={selectedId}
@@ -224,7 +224,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
           </div>
         )
       ) : (
-        <div className="surface-workstation with-steering-clearance flex min-h-[600px] flex-1 flex-col gap-4 overflow-hidden p-1 md:flex-row">
+        <div className="surface-workstation flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-1 md:flex-row">
           <div
             className={[
               'flex shrink-0 flex-col max-h-64 transition-all duration-300 md:max-h-none',

@@ -6,10 +6,10 @@ import ProvenanceBadge from '../ui/ProvenanceBadge'
 import { formatRelative } from '../../utils/dates'
 
 const STATUS_CONFIG = {
-  proposed: { label: 'Proposed', variant: 'yellow' },
-  accepted: { label: 'Accepted', variant: 'green' },
-  superseded: { label: 'Superseded', variant: 'gray' },
-  deprecated: { label: 'Deprecated', variant: 'red' },
+  proposed: { label: 'Proposed', variant: 'yellow', borderColor: 'var(--color-warning)' },
+  accepted: { label: 'Accepted', variant: 'green', borderColor: 'var(--color-success)' },
+  superseded: { label: 'Superseded', variant: 'gray', borderColor: 'var(--color-fg-faint)' },
+  deprecated: { label: 'Deprecated', variant: 'red', borderColor: 'var(--color-danger)' },
 }
 
 export default function DecisionCard({ decision, onEdit, onClick, isActive = false }) {
@@ -29,6 +29,7 @@ export default function DecisionCard({ decision, onEdit, onClick, isActive = fal
         isActive ? 'bg-[var(--color-bg-glass-hover)]' : 'hover:bg-[var(--color-bg-glass-hover)]',
         'border-b border-[var(--color-border-subtle)] last:border-b-0',
       ].join(' ')}
+      style={{ borderLeft: `3px solid ${statusCfg.borderColor}` }}
     >
       {/* Active Indicator Line */}
       {isActive && (
@@ -42,7 +43,9 @@ export default function DecisionCard({ decision, onEdit, onClick, isActive = fal
         {/* Left Column: ID & Status */}
         <div className="w-[72px] shrink-0 pt-0.5 flex flex-col gap-1.5 items-start">
           <span className="text-[11px] font-mono font-medium text-[var(--color-fg-muted)] group-hover:text-[var(--accent-default)] transition-colors">
-            {decision.sequenceId ? `ADR-${String(decision.sequenceId).padStart(3, '0')}` : 'ADR'}
+            {decision.sequenceNumber
+              ? `ADR-${String(decision.sequenceNumber).padStart(3, '0')}`
+              : 'ADR'}
           </span>
           <Badge variant={statusCfg.variant} size="xs" outline className="w-full justify-center">
             {statusCfg.label}
