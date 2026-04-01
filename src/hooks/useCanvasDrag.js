@@ -74,7 +74,7 @@ export function useCanvasDrag({
         const newY = snapToGrid(rawY)
 
         const updatedNodes = nodes.map((n) =>
-          n.id === draggingId ? { ...n, x: Math.max(0, newX), y: Math.max(0, newY) } : n
+          n.id === draggingId ? { ...n, x: newX, y: newY } : n
         )
         onSaveNodes(updatedNodes)
         return true

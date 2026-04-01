@@ -302,7 +302,7 @@ export default function DependencyGraph({
         const newY = snapToGrid(rawY)
 
         const updated = positionedComponents.map((c) =>
-          c.id === draggingId ? { ...c, x: Math.max(0, newX), y: Math.max(0, newY) } : c
+          c.id === draggingId ? { ...c, x: newX, y: newY } : c
         )
         onUpdateComponents(updated)
       }
