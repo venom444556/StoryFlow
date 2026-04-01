@@ -1512,19 +1512,24 @@ app.put('/api/projects/:id/workflow/nodes/:nodeId', (req, res) => {
   const result = db.updateWorkflowNode(req.params.id, req.params.nodeId, req.body)
   if (!result) return res.status(404).json({ error: 'Node not found' })
   if (result.error) return res.status(400).json({ error: result.error })
-  const provenance = extractProvenance(req)
-  const event = emitMutationEvent({
-    projectId: req.params.id,
-    provenance,
-    category: 'workflow',
-    action: 'update',
-    entityType: 'workflow_node',
-    entityId: req.params.nodeId,
-    entityTitle: result.title || req.params.nodeId,
-    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-  })
-  broadcastEvent(event)
-  notifyClients()
+  // Position-only updates (drag) skip event/sync to prevent reload race
+  const fields = Object.keys(req.body)
+  const isPositionOnly = fields.every((k) => k === 'x' || k === 'y')
+  if (!isPositionOnly) {
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'workflow',
+      action: 'update',
+      entityType: 'workflow_node',
+      entityId: req.params.nodeId,
+      entityTitle: result.title || req.params.nodeId,
+      changes: fields.map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
+    notifyClients()
+  }
   res.json(result)
 })
 
@@ -1609,19 +1614,24 @@ app.post('/api/projects/:id/architecture/components', (req, res) => {
 app.put('/api/projects/:id/architecture/components/:compId', (req, res) => {
   const comp = db.updateArchitectureComponent(req.params.id, req.params.compId, req.body)
   if (!comp) return res.status(404).json({ error: 'Component not found' })
-  const provenance = extractProvenance(req)
-  const event = emitMutationEvent({
-    projectId: req.params.id,
-    provenance,
-    category: 'project',
-    action: 'update',
-    entityType: 'architecture_component',
-    entityId: req.params.compId,
-    entityTitle: comp.name || req.params.compId,
-    changes: Object.keys(req.body).map((k) => ({ field: k, to: req.body[k] })),
-  })
-  broadcastEvent(event)
-  notifyClients()
+  // Position-only updates (drag) skip event/sync to prevent reload race
+  const fields = Object.keys(req.body)
+  const isPositionOnly = fields.every((k) => k === 'x' || k === 'y')
+  if (!isPositionOnly) {
+    const provenance = extractProvenance(req)
+    const event = emitMutationEvent({
+      projectId: req.params.id,
+      provenance,
+      category: 'project',
+      action: 'update',
+      entityType: 'architecture_component',
+      entityId: req.params.compId,
+      entityTitle: comp.name || req.params.compId,
+      changes: fields.map((k) => ({ field: k, to: req.body[k] })),
+    })
+    broadcastEvent(event)
+    notifyClients()
+  }
   res.json(comp)
 })
 
