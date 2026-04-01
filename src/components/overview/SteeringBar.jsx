@@ -1,12 +1,11 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send,
   Terminal,
   Loader2,
   Check,
-  ChevronUp,
-  ChevronDown,
+  X,
   Zap,
   Search,
   Pencil,
@@ -24,70 +23,63 @@ const QUICK_ACTIONS = [
 
 function DirectiveMessage({ text, status }) {
   return (
-    <div className="flex items-center gap-3 py-1.5 px-2 hover:bg-[var(--color-bg-subtle)] rounded transition-colors group">
-      {status === 'sent' && <Check size={14} className="text-[var(--color-success)] shrink-0" />}
-      {status === 'sending' && (
-        <Loader2 size={14} className="animate-spin text-[var(--color-fg-muted)] shrink-0" />
-      )}
-      {status === 'error' && (
-        <div className="h-2 w-2 rounded-full bg-[var(--color-danger)] shrink-0" />
-      )}
-
-      <p className="text-[13px] font-mono text-[var(--color-fg-muted)] group-hover:text-[var(--color-fg-default)] truncate">
-        {text}
-      </p>
+    <div className="flex items-start gap-2.5 py-2">
+      <div className="mt-0.5 shrink-0">
+        {status === 'sent' && <Check size={12} className="text-[var(--color-success)]" />}
+        {status === 'sending' && (
+          <Loader2 size={12} className="animate-spin text-[var(--color-fg-muted)]" />
+        )}
+        {status === 'error' && (
+          <div className="mt-0.5 h-2 w-2 rounded-full bg-[var(--color-danger)]" />
+        )}
+      </div>
+      <p className="text-[13px] leading-relaxed text-[var(--color-fg-default)]">{text}</p>
     </div>
   )
 }
 
 export default function SteeringBar({ projectId }) {
-  const [expanded, setExpanded] = useState(false)
+  const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [directives, setDirectives] = useState([])
-  const containerRef = useRef(null)
   const inputRef = useRef(null)
   const scrollRef = useRef(null)
+  const panelRef = useRef(null)
 
-  // Scroll to bottom when new directive added
+  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [directives, expanded])
+  }, [directives])
 
-  useLayoutEffect(() => {
-    const node = containerRef.current
-    if (!node || typeof window === 'undefined') return undefined
+  // Focus input when panel opens
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 100)
+  }, [open])
 
-    const setClearance = (height) => {
-      document.documentElement.style.setProperty(
-        '--steering-bar-clearance',
-        `${Math.ceil(height + 12)}px`
-      )
-    }
-
-    setClearance(node.getBoundingClientRect().height)
-
-    if (typeof ResizeObserver === 'undefined') {
-      return () => {
-        document.documentElement.style.setProperty('--steering-bar-clearance', '0px')
+  // Close on click outside
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (panelRef.current && !panelRef.current.contains(e.target)) {
+        setOpen(false)
       }
     }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
 
-    const observer = new ResizeObserver(() => {
-      if (containerRef.current) {
-        setClearance(containerRef.current.getBoundingClientRect().height)
-      }
-    })
-
-    observer.observe(node)
-
-    return () => {
-      observer.disconnect()
-      document.documentElement.style.setProperty('--steering-bar-clearance', '0px')
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => {
+      if (e.key === 'Escape') setOpen(false)
     }
-  }, [expanded, directives.length])
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [open])
 
   const handleSubmit = async () => {
     const trimmed = text.trim()
@@ -97,7 +89,6 @@ export default function SteeringBar({ projectId }) {
     setDirectives((prev) => [...prev, { id, text: trimmed, status: 'sending' }])
     setText('')
     setSending(true)
-    setExpanded(true)
 
     try {
       const res = await fetch(`/api/projects/${encodeURIComponent(projectId)}/steer`, {
@@ -121,112 +112,128 @@ export default function SteeringBar({ projectId }) {
       e.preventDefault()
       handleSubmit()
     }
-    if (e.key === 'Escape') {
-      inputRef.current?.blur()
-      setExpanded(false)
-    }
   }
-
-  const handleQuickAction = (action) => {
-    setText(action)
-    inputRef.current?.focus()
-  }
-
-  const dockIsWide = expanded || text.trim().length > 0
 
   return (
-    <div
-      ref={containerRef}
-      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none flex justify-center pb-3 px-4 md:px-6 md:pb-4"
-    >
-      {/* The Steering Console */}
-      <motion.div
-        layout
-        className={[
-          'pointer-events-auto surface-critical flex w-full flex-col overflow-hidden',
-          dockIsWide ? 'max-w-3xl' : 'max-w-xl md:max-w-2xl',
-        ].join(' ')}
-        style={{
-          boxShadow: '0 12px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05)',
-        }}
-      >
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="border-b border-[var(--color-border-muted)] bg-[var(--color-bg-card)]"
-            >
-              <div className="p-4 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs uppercase font-bold tracking-wider text-[var(--color-fg-faint)]">
-                    Active Directives
-                  </span>
-                  <div className="flex gap-2">
-                    {QUICK_ACTIONS.map((a) => (
-                      <button
-                        key={a.label}
-                        onClick={() => handleQuickAction(a.label)}
-                        className="text-[10px] px-2 py-1 rounded bg-[var(--color-bg-subtle)] text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-default)] hover:bg-[var(--color-border-muted)] transition-colors border border-[var(--color-border-subtle)]"
-                      >
-                        {a.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+    <>
+      {/* Floating trigger button */}
+      <AnimatePresence>
+        {!open && (
+          <motion.button
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={() => setOpen(true)}
+            className="fixed bottom-5 right-5 z-50 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-accent-emphasis)] text-white shadow-lg shadow-black/30 transition-transform hover:scale-105 active:scale-95"
+            title="Steer Agent"
+          >
+            <Terminal size={20} />
+            {directives.length > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-danger)] text-[9px] font-bold text-white">
+                {directives.length}
+              </span>
+            )}
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-                <div
-                  ref={scrollRef}
-                  className="max-h-[160px] overflow-y-auto pr-2 flex flex-col gap-1"
-                >
-                  {directives.length === 0 ? (
-                    <p className="text-xs italic text-[var(--color-fg-faint)] py-2">
-                      No directives issued bridging this runtime.
-                    </p>
-                  ) : (
-                    directives.map((d) => <DirectiveMessage key={d.id} {...d} />)
-                  )}
-                </div>
+      {/* Chat panel */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            ref={panelRef}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-5 right-5 z-50 flex w-[400px] flex-col overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)] shadow-2xl shadow-black/40"
+            style={{ maxHeight: 'min(500px, calc(100vh - 120px))' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[var(--color-border-muted)] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Terminal size={15} className="text-[var(--color-accent-emphasis)]" />
+                <span className="text-sm font-semibold text-[var(--color-fg-default)]">
+                  Agent Steering
+                </span>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-lg p-1 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+              >
+                <X size={16} />
+              </button>
+            </div>
 
-        {/* Input Bar */}
-        <div className="flex items-center bg-[var(--color-bg-glass)] px-4 py-3 gap-3">
-          <Terminal size={16} className="text-[var(--color-fg-muted)] shrink-0" />
-          <input
-            ref={inputRef}
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => {
-              if (directives.length > 0) setExpanded(true)
-            }}
-            placeholder="Issue operational directive to the Agent..."
-            disabled={sending}
-            className="flex-1 bg-transparent border-none text-[14px] text-[var(--color-fg-default)] placeholder-[var(--color-fg-faint)] focus:outline-none focus:ring-0 font-mono"
-          />
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="p-1.5 rounded text-[var(--color-fg-subtle)] hover:bg-[var(--color-bg-subtle)] hover:text-[var(--color-fg-default)] transition-colors"
-              title="Toggle Log"
+            {/* Messages area */}
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto px-4 py-2"
+              style={{ minHeight: 120 }}
             >
-              {expanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!text.trim() || sending}
-              className="flex items-center justify-center p-1.5 rounded bg-[var(--color-fg-subtle)] text-[var(--color-bg-default)] disabled:opacity-30 disabled:pointer-events-none hover:bg-[var(--color-fg-default)] transition-colors"
-            >
-              {sending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+              {directives.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <Terminal size={24} className="mb-2 text-[var(--color-fg-faint)]" />
+                  <p className="text-xs text-[var(--color-fg-muted)]">
+                    Issue directives to the StoryFlow agent.
+                  </p>
+                  <p className="mt-1 text-[10px] text-[var(--color-fg-faint)]">
+                    Commands are queued for the agent to consume.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col divide-y divide-[var(--color-border-subtle)]">
+                  {directives.map((d) => (
+                    <DirectiveMessage key={d.id} {...d} />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Quick actions */}
+            <div className="flex gap-1.5 overflow-x-auto border-t border-[var(--color-border-subtle)] px-4 py-2">
+              {QUICK_ACTIONS.map((a) => {
+                const Icon = a.icon
+                return (
+                  <button
+                    key={a.label}
+                    onClick={() => {
+                      setText(a.label)
+                      inputRef.current?.focus()
+                    }}
+                    className="flex shrink-0 items-center gap-1 rounded-lg border border-[var(--color-border-subtle)] px-2 py-1 text-[10px] text-[var(--color-fg-subtle)] transition-colors hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)]"
+                  >
+                    <Icon size={10} />
+                    {a.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Input */}
+            <div className="flex items-center gap-2 border-t border-[var(--color-border-default)] px-4 py-3">
+              <input
+                ref={inputRef}
+                type="text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Steer the agent..."
+                disabled={sending}
+                className="flex-1 border-none bg-transparent text-sm text-[var(--color-fg-default)] placeholder-[var(--color-fg-faint)] focus:outline-none"
+              />
+              <button
+                onClick={handleSubmit}
+                disabled={!text.trim() || sending}
+                className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-accent-emphasis)] text-white transition-all disabled:opacity-30 disabled:pointer-events-none hover:opacity-90 active:scale-95"
+              >
+                {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

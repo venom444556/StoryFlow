@@ -30,6 +30,9 @@ vi.mock('framer-motion', () => ({
     }) => {
       return <span {...rest}>{children}</span>
     },
+    button: ({ children, initial: _i3, animate: _a3, exit: _e3, transition: _t3, ...rest }) => {
+      return <button {...rest}>{children}</button>
+    },
   },
 }))
 
