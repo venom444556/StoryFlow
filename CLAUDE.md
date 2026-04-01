@@ -138,6 +138,8 @@ The session-boot hook handles this automatically. If `context boot` fails, fall 
 - Comments use `body` field (not `text`)
 - Board summary uses `issueCount` (not `total`)
 - Issues list returns `{ issues: [...] }` wrapper (not bare array)
+- **StoryFlow operations belong to the StoryFlow agent.** Wiki pages, board updates, session saves, sprint management, and all project management tasks must be dispatched to the storyflow-agent — not executed directly by the main Claude instance. Claude's job is engineering. The agent's job is PM. Don't do the agent's work.
+- **All StoryFlow data operations go through the CLI.** Never write JSON, manually construct API calls, or build workarounds for what the CLI already does. If the CLI can't do it, that's a capability gap to fix — not a reason to work around it.
 
 ## Safety
 
