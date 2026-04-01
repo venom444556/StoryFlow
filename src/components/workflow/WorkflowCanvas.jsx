@@ -308,7 +308,7 @@ export default function WorkflowCanvas({
       <div className="absolute inset-0" style={transformStyle}>
         <svg
           className="absolute h-full w-full"
-          style={{ left: 0, top: 0, width: '200%', height: '200%' }}
+          style={{ left: 0, top: 0, width: '500%', height: '500%', overflow: 'visible' }}
         >
           {connections.map((conn) => {
             const fromNode = safeNodes.find((n) => n.id === conn.from)

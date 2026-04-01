@@ -9,15 +9,15 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
 // Arrow goes FROM depender TO dependency (A→B means "A depends on B").
 // Connects from the nearest facing sides of each node pair.
 // ---------------------------------------------------------------------------
-const NODE_HEIGHT_CENTER = 80 // approximate center of a node (~160px tall)
+const NODE_HEIGHT_EST = 120 // estimated rendered node height
 
 // Pick connection ports based on relative node positions so lines connect
 // from the sides that face each other instead of always right→left.
 function getConnectionPoints(fromNode, toNode) {
   const fromCx = fromNode.x + NODE_WIDTH / 2
-  const fromCy = fromNode.y + NODE_HEIGHT_CENTER
+  const fromCy = fromNode.y + NODE_HEIGHT_EST / 2
   const toCx = toNode.x + NODE_WIDTH / 2
-  const toCy = toNode.y + NODE_HEIGHT_CENTER
+  const toCy = toNode.y + NODE_HEIGHT_EST / 2
 
   const dx = toCx - fromCx
   const dy = toCy - fromCy
@@ -25,22 +25,22 @@ function getConnectionPoints(fromNode, toNode) {
   let start, end
 
   if (Math.abs(dx) >= Math.abs(dy)) {
-    // Nodes are more horizontal — connect right→left or left→right
+    // Horizontal — connect from right/left sides at vertical center
     if (dx >= 0) {
-      start = { x: fromNode.x + NODE_WIDTH + 4, y: fromCy }
-      end = { x: toNode.x - 4, y: toCy }
+      start = { x: fromNode.x + NODE_WIDTH, y: fromCy }
+      end = { x: toNode.x, y: toCy }
     } else {
-      start = { x: fromNode.x - 4, y: fromCy }
-      end = { x: toNode.x + NODE_WIDTH + 4, y: toCy }
+      start = { x: fromNode.x, y: fromCy }
+      end = { x: toNode.x + NODE_WIDTH, y: toCy }
     }
   } else {
-    // Nodes are more vertical — connect bottom→top or top→bottom
+    // Vertical — connect from bottom/top at horizontal center
     if (dy >= 0) {
-      start = { x: fromCx, y: fromNode.y + NODE_HEIGHT_CENTER * 2 + 4 }
-      end = { x: toCx, y: toNode.y - 4 }
+      start = { x: fromCx, y: fromNode.y + NODE_HEIGHT_EST }
+      end = { x: toCx, y: toNode.y }
     } else {
-      start = { x: fromCx, y: fromNode.y - 4 }
-      end = { x: toCx, y: toNode.y + NODE_HEIGHT_CENTER * 2 + 4 }
+      start = { x: fromCx, y: fromNode.y }
+      end = { x: toCx, y: toNode.y + NODE_HEIGHT_EST }
     }
   }
 
@@ -48,12 +48,14 @@ function getConnectionPoints(fromNode, toNode) {
 }
 
 function buildSmartPath(sx, sy, ex, ey, isVertical) {
+  // Tighter control points — curve stays closer to the straight line
+  const tension = 0.4
   if (isVertical) {
-    const midY = (sy + ey) / 2
-    return `M ${sx} ${sy} C ${sx} ${midY}, ${ex} ${midY}, ${ex} ${ey}`
+    const dy = (ey - sy) * tension
+    return `M ${sx} ${sy} C ${sx} ${sy + dy}, ${ex} ${ey - dy}, ${ex} ${ey}`
   }
-  const midX = (sx + ex) / 2
-  return `M ${sx} ${sy} C ${midX} ${sy}, ${midX} ${ey}, ${ex} ${ey}`
+  const dx = (ex - sx) * tension
+  return `M ${sx} ${sy} C ${sx + dx} ${sy}, ${ex - dx} ${ey}, ${ex} ${ey}`
 }
 
 export default function DependencyEdge({ fromNode, toNode, sourceType, onDelete, edgeOpacity }) {

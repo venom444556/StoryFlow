@@ -46,29 +46,31 @@ export default function WorkflowTab({ project, onUpdate }) {
   // ------ Helpers to persist changes ------
   // Debounce position persistence — drag fires on every mousemove
   const positionTimerRef = useRef(null)
+  const pendingPositionsRef = useRef(null)
 
   const saveNodes = useCallback(
     (updatedNodes) => {
       onUpdate?.({ ...workflow, nodes: updatedNodes })
 
-      // Debounced: persist position changes to server after drag settles
+      // Stash latest positions for debounced persist
       if (project?.id) {
+        pendingPositionsRef.current = updatedNodes
         clearTimeout(positionTimerRef.current)
         positionTimerRef.current = setTimeout(() => {
-          for (const node of updatedNodes) {
-            const prev = nodes.find((n) => n.id === node.id)
-            if (prev && (prev.x !== node.x || prev.y !== node.y)) {
-              fetch(`/api/projects/${project.id}/workflow/nodes/${node.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ x: node.x, y: node.y }),
-              }).catch(() => {})
-            }
+          const toSave = pendingPositionsRef.current
+          if (!toSave) return
+          pendingPositionsRef.current = null
+          for (const node of toSave) {
+            fetch(`/api/projects/${project.id}/workflow/nodes/${node.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ x: node.x, y: node.y }),
+            }).catch(() => {})
           }
-        }, 300)
+        }, 500)
       }
     },
-    [onUpdate, workflow, nodes, project?.id]
+    [onUpdate, workflow, project?.id]
   )
 
   const saveConnections = useCallback(

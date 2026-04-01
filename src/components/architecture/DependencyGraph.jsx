@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
-import { motion } from 'framer-motion'
 import WorkflowZoomControls from '../workflow/WorkflowZoomControls'
 import DependencyEdge from './DependencyEdge'
 import ConfirmDialog from '../ui/ConfirmDialog'
@@ -393,8 +392,8 @@ export default function DependencyGraph({
       {/* Transform wrapper — SVG edges first in DOM, nodes after (painter's algorithm) */}
       <div className="absolute inset-0" style={transformStyle}>
         <svg
-          className="absolute h-full w-full"
-          style={{ left: 0, top: 0, width: '200%', height: '200%' }}
+          className="absolute"
+          style={{ left: 0, top: 0, width: '500%', height: '500%', overflow: 'visible' }}
           onClick={handleCanvasClick}
         >
           {edges.map((edge) => (
@@ -421,12 +420,9 @@ export default function DependencyGraph({
           const depCount = (comp.dependencies || []).length
 
           return (
-            <motion.div
+            <div
               key={comp.id}
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-              className={['absolute select-none rounded-2xl'].filter(Boolean).join(' ')}
+              className="absolute select-none rounded-2xl"
               style={{
                 left: comp.x,
                 top: comp.y,
@@ -499,7 +495,7 @@ export default function DependencyGraph({
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
           )
         })}
       </div>

@@ -78,6 +78,7 @@ export default function ArchitectureTab({ project, onUpdate }) {
   )
 
   const positionTimerRef = useRef(null)
+  const pendingPositionsRef = useRef(null)
 
   const updateComponents = useCallback(
     (newComponents) => {
@@ -85,24 +86,25 @@ export default function ArchitectureTab({ project, onUpdate }) {
         architecture: { ...project.architecture, components: newComponents },
       })
 
-      // Debounced: persist position changes to server after drag settles
+      // Stash latest positions for debounced persist
       if (project?.id) {
+        pendingPositionsRef.current = newComponents
         clearTimeout(positionTimerRef.current)
         positionTimerRef.current = setTimeout(() => {
-          for (const comp of newComponents) {
-            const prev = components.find((c) => c.id === comp.id)
-            if (prev && (prev.x !== comp.x || prev.y !== comp.y)) {
-              fetch(`/api/projects/${project.id}/architecture/components/${comp.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ x: comp.x, y: comp.y }),
-              }).catch(() => {})
-            }
+          const toSave = pendingPositionsRef.current
+          if (!toSave) return
+          pendingPositionsRef.current = null
+          for (const comp of toSave) {
+            fetch(`/api/projects/${project.id}/architecture/components/${comp.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ x: comp.x, y: comp.y }),
+            }).catch(() => {})
           }
-        }, 300)
+        }, 500)
       }
     },
-    [project?.architecture, project?.id, components, onUpdate]
+    [project?.architecture, project?.id, onUpdate]
   )
 
   // --- CRUD handlers ---
