@@ -506,6 +506,15 @@ export default function DependencyGraph({
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onReset={handleResetView}
+        onTidy={() => {
+          const positions = autoLayout(positionedComponents)
+          const tidied = positionedComponents.map((c) => {
+            const pos = positions.get(c.id)
+            return pos ? { ...c, x: pos.x, y: pos.y } : c
+          })
+          onUpdateComponents(tidied)
+          setTimeout(() => centerOnNodes(), 100)
+        }}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
       />

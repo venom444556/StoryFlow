@@ -1,4 +1,4 @@
-import { Plus, Minus, Maximize2 } from 'lucide-react'
+import { Plus, Minus, Maximize2, LayoutGrid } from 'lucide-react'
 import Tooltip from '../ui/Tooltip'
 
 export default function WorkflowZoomControls({
@@ -6,6 +6,7 @@ export default function WorkflowZoomControls({
   onZoomIn,
   onZoomOut,
   onReset,
+  onTidy,
   minZoom = 0.25,
   maxZoom = 2.0,
 }) {
@@ -47,6 +48,20 @@ export default function WorkflowZoomControls({
           <Maximize2 size={14} />
         </button>
       </Tooltip>
+
+      {onTidy && (
+        <>
+          <div className="mx-0.5 h-4 w-px bg-[var(--color-border-default)]" />
+          <Tooltip content="Tidy layout">
+            <button
+              onClick={onTidy}
+              className="rounded-md p-1.5 text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-bg-glass-hover)] hover:text-[var(--color-fg-default)]"
+            >
+              <LayoutGrid size={14} />
+            </button>
+          </Tooltip>
+        </>
+      )}
     </div>
   )
 }

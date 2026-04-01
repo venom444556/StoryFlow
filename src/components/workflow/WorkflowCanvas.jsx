@@ -396,6 +396,60 @@ export default function WorkflowCanvas({
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onReset={handleResetView}
+        onTidy={() => {
+          // Grid layout based on connection topology
+          const nodeMap = new Map(safeNodes.map((n) => [n.id, n]))
+          const inDegree = new Map()
+          safeNodes.forEach((n) => inDegree.set(n.id, 0))
+          connections.forEach((c) => {
+            if (inDegree.has(c.to)) inDegree.set(c.to, inDegree.get(c.to) + 1)
+          })
+
+          // BFS layering from roots (nodes with no incoming connections)
+          const layers = new Map()
+          const queue = []
+          safeNodes.forEach((n) => {
+            if (inDegree.get(n.id) === 0) {
+              queue.push(n.id)
+              layers.set(n.id, 0)
+            }
+          })
+          while (queue.length > 0) {
+            const id = queue.shift()
+            const layer = layers.get(id)
+            connections
+              .filter((c) => c.from === id)
+              .forEach((c) => {
+                const nextLayer = layer + 1
+                if (!layers.has(c.to) || layers.get(c.to) < nextLayer) {
+                  layers.set(c.to, nextLayer)
+                  queue.push(c.to)
+                }
+              })
+          }
+          // Assign unconnected nodes
+          safeNodes.forEach((n) => {
+            if (!layers.has(n.id)) layers.set(n.id, 0)
+          })
+
+          // Group by layer
+          const groups = new Map()
+          safeNodes.forEach((n) => {
+            const l = layers.get(n.id) || 0
+            if (!groups.has(l)) groups.set(l, [])
+            groups.get(l).push(n)
+          })
+
+          // Position: 280px horizontal spacing, 160px vertical
+          const tidied = []
+          for (const [layer, nodes] of [...groups.entries()].sort((a, b) => a[0] - b[0])) {
+            nodes.forEach((n, i) => {
+              tidied.push({ ...n, x: layer * 280 + 60, y: i * 160 + 60 })
+            })
+          }
+          onSaveNodes(tidied)
+          setTimeout(() => handleResetView(), 100)
+        }}
         minZoom={MIN_ZOOM}
         maxZoom={MAX_ZOOM}
       />
