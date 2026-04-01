@@ -41,9 +41,8 @@ cmd_increment() {
     nudged=true
     write_state
     cat <<'NUDGE'
-5+ file changes with no StoryFlow tracking. Create an issue NOW for the work you are doing:
-  storyflow issues create --title "..." --type story --priority medium
-  storyflow issues update <key> --status "In Progress"
+5+ file changes with no StoryFlow tracking. Use the storyflow-agent to create and track this work NOW. Do not create issues directly — dispatch to the storyflow-agent:
+  Agent tool → storyflow-agent → "Create a story for the current work and move it to In Progress"
 You will not be able to commit without an In Progress issue.
 NUDGE
   else

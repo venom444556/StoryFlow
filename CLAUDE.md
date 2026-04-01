@@ -51,6 +51,16 @@ Plus: events, steering_directives, agent_sessions, snapshots (all separate SQL t
 
 ## Agent Behavior
 
+### Delegation model — both ends covered
+
+StoryFlow PM work is handled from two directions so nothing is missed:
+
+**Claude's responsibility (push):** When you see work happening that needs tracking — feature work, bug fixes, refactors — dispatch the storyflow-agent to create stories and update the board. Don't do PM work yourself. Don't wait to be asked.
+
+**Hooks' responsibility (pull):** The plugin hooks automatically trigger on commits (auto-mark done), file edits (nudge if untracked), session start (boot context), and session end (force reconciliation via storyflow-agent). These catch anything Claude missed.
+
+The overlap is intentional. If Claude dispatches the agent proactively, the hooks have nothing to catch. If Claude forgets, the hooks enforce it. Neither side should assume the other handled it.
+
 ### CLI is the interface
 
 All agent interaction with StoryFlow goes through the `storyflow` CLI via Bash. One command = one operation. Never use MCP tools — they don't exist anymore.
@@ -67,7 +77,7 @@ storyflow issues done SC-42               # Mark done
 storyflow issues batch-done SC-42 SC-43   # Mark multiple done
 storyflow issues block SC-42 -r "reason"  # Mark blocked with reason
 storyflow pages show <id>                 # Read wiki page
-storyflow pages create --title "..." --icon "📝"  # Create with icon
+storyflow pages create --title "..." --icon "pencil"  # Create with icon
 storyflow pages audit --json             # Missing/stale core wiki pages
 storyflow pages ensure-core              # Create required core pages
 storyflow phases hot-wash generate <phase-ref>   # Generate phase hot wash
