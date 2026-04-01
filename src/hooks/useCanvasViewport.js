@@ -46,11 +46,17 @@ export function useCanvasViewport(canvasRef, nodes, canvasId) {
     const contentW = maxX - minX
     const contentH = maxY - minY
 
-    // Auto-fit: scale to fill viewport (up to 1.5x for small content)
+    // Guard: if all nodes are at the same position, don't try to fit
+    if (contentW < 10 && contentH < 10) {
+      setViewport({ scale: 1, offsetX: rect.width / 2 - minX, offsetY: rect.height / 2 - minY })
+      return true
+    }
+
+    // Auto-fit: scale to fill viewport (cap at 1.0 to never zoom in past 100%)
     const pad = 60
     const scaleX = (rect.width - pad * 2) / contentW
     const scaleY = (rect.height - pad * 2) / contentH
-    const FIT_MAX = 1.5
+    const FIT_MAX = 1.0
     const fitScale = clampZoom(Math.min(FIT_MAX, scaleX, scaleY))
 
     const contentCenterX = (minX + maxX) / 2
@@ -71,15 +77,28 @@ export function useCanvasViewport(canvasRef, nodes, canvasId) {
       prevCanvasId.current = canvasId
     }
 
-    if (!viewportInitialized.current && nodes.length > 0) {
-      // Delay to allow parent animations (e.g. overlay scale-in) to finish
-      // so container has its final dimensions for accurate centering
-      const timer = setTimeout(() => {
-        if (centerOnNodes()) {
-          viewportInitialized.current = true
-        }
-      }, 280)
-      return () => clearTimeout(timer)
+    if (nodes.length > 0) {
+      // Check if content bounding box is degenerate (all nodes stacked)
+      const xs = nodes.map((n) => n.x ?? 0)
+      const ys = nodes.map((n) => n.y ?? 0)
+      const contentW = Math.max(...xs) - Math.min(...xs)
+      const contentH = Math.max(...ys) - Math.min(...ys)
+      const isDegenerate = nodes.length > 1 && contentW < 10 && contentH < 10
+
+      // Only auto-center once, OR re-center if positions changed from degenerate to spread
+      if (
+        !viewportInitialized.current ||
+        (viewportInitialized.current &&
+          !isDegenerate &&
+          viewportInitialized.current === 'degenerate')
+      ) {
+        const timer = setTimeout(() => {
+          if (centerOnNodes()) {
+            viewportInitialized.current = isDegenerate ? 'degenerate' : true
+          }
+        }, 400)
+        return () => clearTimeout(timer)
+      }
     }
   }, [nodes, canvasId, centerOnNodes])
 

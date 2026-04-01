@@ -212,9 +212,9 @@ describe('useCanvasViewport', () => {
         result.current.handleResetView()
       })
 
-      // centerOnNodes auto-fits: scale = clampZoom(min(1.5, scaleX, scaleY))
-      // which yields 1.5 for this node layout and container size
-      expect(result.current.viewport.scale).toBe(1.5)
+      // centerOnNodes auto-fits: scale = clampZoom(min(1.0, scaleX, scaleY))
+      // FIT_MAX is 1.0 — never zoom past 100%
+      expect(result.current.viewport.scale).toBe(1.0)
       // Offsets should center the content
       expect(typeof result.current.viewport.offsetX).toBe('number')
       expect(typeof result.current.viewport.offsetY).toBe('number')

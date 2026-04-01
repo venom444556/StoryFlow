@@ -264,10 +264,11 @@ describe('workflow utilities', () => {
       expect(path).toMatch(/150 200$/)
     })
 
-    it('places control points at horizontal midpoint', () => {
+    it('places control points with proportional offset', () => {
       const path = buildBezierPath(0, 0, 100, 100)
-      // midX should be 50
-      expect(path).toContain('C 50 0, 50 100')
+      // offset = max(40, min(100*0.4, 200)) = 40
+      expect(path).toContain('C 40 0')
+      expect(path).toContain('60 100, 100 100')
     })
 
     it('handles negative coordinates', () => {
@@ -277,7 +278,8 @@ describe('workflow utilities', () => {
 
     it('handles same start and end points', () => {
       const path = buildBezierPath(50, 50, 50, 50)
-      expect(path).toBe('M 50 50 C 50 50, 50 50, 50 50')
+      // offset = max(40, min(0, 200)) = 40
+      expect(path).toBe('M 50 50 C 90 50, 10 50, 50 50')
     })
 
     it('handles decimal values', () => {

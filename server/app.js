@@ -140,6 +140,14 @@ setInterval(() => {
 }, 5 * 60_000)
 
 app.use('/api', (req, res, next) => {
+  // Skip rate limiting for position-only PUTs (canvas drag generates many rapid requests)
+  if (req.method === 'PUT' && req.body) {
+    const keys = Object.keys(req.body)
+    if (keys.length > 0 && keys.every((k) => k === 'x' || k === 'y')) {
+      return next()
+    }
+  }
+
   const ip = req.ip || req.socket.remoteAddress
   const now = Date.now()
   const timestamps = (rateLimitMap.get(ip) || []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS)

@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import {
   Clock,
   CheckCircle,
@@ -200,14 +199,11 @@ export default function WorkflowNode({
   const statusStyles = getStatusStyles(node.status)
 
   return (
-    <motion.div
+    <div
       data-workflow-node
       role="button"
       tabIndex={0}
       aria-label={`${node.title} (${typeDef?.label || node.type})${node.status !== 'idle' ? `, status: ${node.status}` : ''}`}
-      initial={{ scale: 0.85, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
       className={[
         'absolute select-none rounded-2xl',
         isSelected && 'ring-2 ring-[var(--accent-cyan)]/50 ring-offset-2 ring-offset-transparent',
@@ -414,6 +410,6 @@ export default function WorkflowNode({
           </span>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

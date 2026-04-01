@@ -90,16 +90,21 @@ export default function ArchitectureTab({ project, onUpdate }) {
       if (project?.id) {
         pendingPositionsRef.current = newComponents
         clearTimeout(positionTimerRef.current)
-        positionTimerRef.current = setTimeout(() => {
+        positionTimerRef.current = setTimeout(async () => {
           const toSave = pendingPositionsRef.current
           if (!toSave) return
           pendingPositionsRef.current = null
+          // Save sequentially to avoid rate limiting
           for (const comp of toSave) {
-            fetch(`/api/projects/${project.id}/architecture/components/${comp.id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ x: comp.x, y: comp.y }),
-            }).catch(() => {})
+            try {
+              await fetch(`/api/projects/${project.id}/architecture/components/${comp.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: comp.x, y: comp.y }),
+              })
+            } catch {
+              /* ignore */
+            }
           }
         }, 500)
       }

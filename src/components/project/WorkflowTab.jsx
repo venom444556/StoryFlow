@@ -56,16 +56,21 @@ export default function WorkflowTab({ project, onUpdate }) {
       if (project?.id) {
         pendingPositionsRef.current = updatedNodes
         clearTimeout(positionTimerRef.current)
-        positionTimerRef.current = setTimeout(() => {
+        positionTimerRef.current = setTimeout(async () => {
           const toSave = pendingPositionsRef.current
           if (!toSave) return
           pendingPositionsRef.current = null
+          // Save sequentially to avoid rate limiting
           for (const node of toSave) {
-            fetch(`/api/projects/${project.id}/workflow/nodes/${node.id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ x: node.x, y: node.y }),
-            }).catch(() => {})
+            try {
+              await fetch(`/api/projects/${project.id}/workflow/nodes/${node.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ x: node.x, y: node.y }),
+              })
+            } catch {
+              /* ignore */
+            }
           }
         }, 500)
       }

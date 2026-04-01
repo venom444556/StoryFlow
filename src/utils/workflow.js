@@ -137,8 +137,11 @@ export function getUpstreamNodes(nodeId, connections, nodes) {
  * @returns {string} SVG `d` attribute value
  */
 export function buildBezierPath(startX, startY, endX, endY) {
-  const midX = (startX + endX) / 2
-  return `M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}`
+  const dx = Math.abs(endX - startX)
+  const dy = Math.abs(endY - startY)
+  // Use proportional control offset — tighter for short distances, wider for long
+  const offset = Math.max(40, Math.min(dx * 0.4, 200))
+  return `M ${startX} ${startY} C ${startX + offset} ${startY}, ${endX - offset} ${endY}, ${endX} ${endY}`
 }
 
 /**

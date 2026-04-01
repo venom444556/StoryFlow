@@ -56,6 +56,18 @@ export default function WorkflowCanvas({
     return raw
   }, [nodes])
 
+  // Persist spread positions once on first render
+  const spreadPersisted = useRef(false)
+  useEffect(() => {
+    if (!spreadPersisted.current && safeNodes.length > 1) {
+      const allOrigin = (nodes || []).every((n) => (n.x ?? 0) === 0 && (n.y ?? 0) === 0)
+      if (allOrigin) {
+        onSaveNodes?.(safeNodes)
+        spreadPersisted.current = true
+      }
+    }
+  }, [safeNodes]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ------ Viewport (zoom + pan offset) ------
   const {
     viewport,
