@@ -3,6 +3,7 @@ import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import MarkdownRenderer from './MarkdownRenderer'
 import { formatRelative } from '../../utils/dates'
+import { PageIcon } from '../../utils/iconMap'
 
 export default function PageViewer({ page, onEdit, onDelete, onTogglePin, onShowVersions }) {
   if (!page) return null
@@ -15,7 +16,9 @@ export default function PageViewer({ page, onEdit, onDelete, onTogglePin, onShow
           {/* Title block */}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              {page.icon && <span className="text-3xl leading-none">{page.icon}</span>}
+              {page.icon && (
+                <PageIcon name={page.icon} size={28} className="text-[var(--color-fg-muted)]" />
+              )}
               <h1 className="text-2xl font-bold text-[var(--color-fg-default)]">
                 {page.title || 'Untitled'}
               </h1>

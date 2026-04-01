@@ -6,14 +6,14 @@ export const PAGE_TEMPLATES = [
   {
     id: 'blank',
     name: 'Blank Page',
-    icon: '📄',
+    icon: 'file-text',
     description: 'Start with a clean slate',
     content: '',
   },
   {
     id: 'meeting-notes',
     name: 'Meeting Notes',
-    icon: '📝',
+    icon: 'pencil',
     description: 'Capture meeting discussions and action items',
     content: `# Meeting Notes
 
@@ -53,7 +53,7 @@ export const PAGE_TEMPLATES = [
   {
     id: 'technical-spec',
     name: 'Technical Spec',
-    icon: '🔧',
+    icon: 'wrench',
     description: 'Document a technical design or feature specification',
     content: `# Technical Specification
 
@@ -116,7 +116,7 @@ Describe the high-level architecture and how components interact.
   {
     id: 'requirements-doc',
     name: 'Requirements Doc',
-    icon: '📋',
+    icon: 'clipboard-list',
     description: 'Define project or feature requirements',
     content: `# Requirements Document
 
@@ -169,7 +169,7 @@ Describe the context and motivation for this work.
   {
     id: 'api-documentation',
     name: 'API Documentation',
-    icon: '🌐',
+    icon: 'globe',
     description: 'Document API endpoints and usage',
     content: `# API Documentation
 
@@ -241,7 +241,7 @@ Create a new resource.
   {
     id: 'retrospective',
     name: 'Retrospective',
-    icon: '🔄',
+    icon: 'refresh-cw',
     description: 'Reflect on a sprint or project phase',
     content: `# Retrospective
 
@@ -286,7 +286,7 @@ Additional observations or discussion points.
   {
     id: 'adr',
     name: 'Architecture Decision Record',
-    icon: '🏗️',
+    icon: 'building',
     description: 'Record an architectural or design decision',
     content: `# ADR: [Decision Title]
 

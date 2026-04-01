@@ -31,27 +31,37 @@ vi.mock('../ui/Modal', () => ({
   },
 }))
 
+// Mock icon map
+vi.mock('../../utils/iconMap', () => ({
+  PageIcon: ({ name, size, className }) => (
+    <span data-testid={`page-icon-${name}`} className={className}>
+      {name}
+    </span>
+  ),
+  ICON_MAP: {},
+}))
+
 // Mock page templates
 vi.mock('../../data/pageTemplates', () => ({
   pageTemplates: [
     {
       id: 'blank',
       name: 'Blank Page',
-      icon: '📄',
+      icon: 'file-text',
       description: 'Start with a clean slate',
       content: '',
     },
     {
       id: 'meeting-notes',
       name: 'Meeting Notes',
-      icon: '📝',
+      icon: 'pencil',
       description: 'Capture meeting discussions',
       content: '# Meeting Notes\n\n**Date:**',
     },
     {
       id: 'technical-spec',
       name: 'Technical Spec',
-      icon: '🔧',
+      icon: 'wrench',
       description: 'Document a technical design',
       content: '# Technical Specification\n\n## Overview',
     },
@@ -105,9 +115,9 @@ describe('TemplateSelector', () => {
     it('displays template icons', () => {
       render(<TemplateSelector isOpen={true} onClose={mockOnClose} onSelect={mockOnSelect} />)
 
-      expect(screen.getByText('📄')).toBeInTheDocument()
-      expect(screen.getByText('📝')).toBeInTheDocument()
-      expect(screen.getByText('🔧')).toBeInTheDocument()
+      expect(screen.getByTestId('page-icon-file-text')).toBeInTheDocument()
+      expect(screen.getByTestId('page-icon-pencil')).toBeInTheDocument()
+      expect(screen.getByTestId('page-icon-wrench')).toBeInTheDocument()
     })
 
     it('displays template descriptions', () => {
@@ -128,7 +138,7 @@ describe('TemplateSelector', () => {
       expect(mockOnSelect).toHaveBeenCalledWith({
         id: 'blank',
         name: 'Blank Page',
-        icon: '📄',
+        icon: 'file-text',
         description: 'Start with a clean slate',
         content: '',
       })

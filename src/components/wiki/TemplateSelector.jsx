@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import Modal from '../ui/Modal'
 import { pageTemplates } from '../../data/pageTemplates'
+import { PageIcon } from '../../utils/iconMap'
 
 export default function TemplateSelector({ isOpen, onClose, onSelect }) {
   const handleSelect = (template) => {
@@ -20,7 +21,11 @@ export default function TemplateSelector({ isOpen, onClose, onSelect }) {
             onClick={() => handleSelect(template)}
             className="glass-card flex flex-col items-start rounded-xl p-4 text-left transition-colors duration-200"
           >
-            <span className="mb-2 text-2xl">{template.icon}</span>
+            <PageIcon
+              name={template.icon}
+              size={24}
+              className="mb-2 text-[var(--color-fg-muted)]"
+            />
             <span className="text-sm font-medium text-[var(--color-fg-default)]">
               {template.name}
             </span>

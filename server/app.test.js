@@ -1143,23 +1143,23 @@ describe('Wire-Now Field Persistence', () => {
   it('pages: icon round-trips through create and fetch', async () => {
     const { body: page } = await api(`/api/projects/${projectId}/pages`, {
       method: 'POST',
-      body: JSON.stringify({ title: 'Icon Page', icon: '📝' }),
+      body: JSON.stringify({ title: 'Icon Page', icon: 'pencil' }),
     })
-    expect(page.icon).toBe('📝')
+    expect(page.icon).toBe('pencil')
     const { body: fetched } = await api(`/api/projects/${projectId}/pages/${page.id}`)
-    expect(fetched.icon).toBe('📝')
+    expect(fetched.icon).toBe('pencil')
   })
 
   it('pages: icon can be updated', async () => {
     const { body: page } = await api(`/api/projects/${projectId}/pages`, {
       method: 'POST',
-      body: JSON.stringify({ title: 'Icon Update', icon: '📋' }),
+      body: JSON.stringify({ title: 'Icon Update', icon: 'clipboard-list' }),
     })
     const { body: updated } = await api(`/api/projects/${projectId}/pages/${page.id}`, {
       method: 'PUT',
-      body: JSON.stringify({ icon: '🔧' }),
+      body: JSON.stringify({ icon: 'wrench' }),
     })
-    expect(updated.icon).toBe('🔧')
+    expect(updated.icon).toBe('wrench')
   })
 
   // --- Phases: startDate, endDate, deliverables, color ---

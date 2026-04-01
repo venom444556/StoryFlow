@@ -12,6 +12,33 @@ vi.mock('../../utils/markdown', () => ({
   }),
 }))
 
+// Mock icon map
+vi.mock('../../utils/iconMap', () => ({
+  PageIcon: ({ name, size, className }) => (
+    <span data-testid={`page-icon-${name}`} className={className}>
+      {name}
+    </span>
+  ),
+  ICON_MAP: {
+    'file-text': 'FileText',
+    pencil: 'Pencil',
+    wrench: 'Wrench',
+    'clipboard-list': 'ClipboardList',
+    globe: 'Globe',
+    'refresh-cw': 'RefreshCw',
+    building: 'Building',
+    database: 'Database',
+    bot: 'Bot',
+    shield: 'Shield',
+    brain: 'Brain',
+    rocket: 'Rocket',
+    'book-open': 'BookOpen',
+    'bar-chart-3': 'BarChart3',
+    target: 'Target',
+    layers: 'Layers',
+  },
+}))
+
 // Mock child components
 vi.mock('./MarkdownRenderer', () => ({
   default: ({ content }) => <div data-testid="markdown-preview">{content}</div>,
@@ -57,7 +84,7 @@ describe('PageEditor', () => {
     title: 'Test Page',
     content: 'Test content',
     labels: ['label1', 'label2'],
-    icon: '📝',
+    icon: 'pencil',
   }
 
   const mockOnSave = vi.fn()
@@ -93,8 +120,8 @@ describe('PageEditor', () => {
 
     it('displays page icon', () => {
       render(<PageEditor page={mockPage} onSave={mockOnSave} onCancel={mockOnCancel} />)
-      const iconInput = screen.getByTitle('Page icon (emoji)')
-      expect(iconInput).toHaveValue('📝')
+      const iconSelect = screen.getByTitle('Page icon')
+      expect(iconSelect).toHaveValue('pencil')
     })
 
     it('shows markdown preview', () => {
@@ -143,11 +170,11 @@ describe('PageEditor', () => {
 
     it('updates icon on input', async () => {
       render(<PageEditor page={mockPage} onSave={mockOnSave} onCancel={mockOnCancel} />)
-      const iconInput = screen.getByTitle('Page icon (emoji)')
+      const iconSelect = screen.getByTitle('Page icon')
 
-      fireEvent.change(iconInput, { target: { value: '🚀' } })
+      fireEvent.change(iconSelect, { target: { value: 'rocket' } })
 
-      expect(iconInput).toHaveValue('🚀')
+      expect(iconSelect).toHaveValue('rocket')
     })
 
     it('calls onSave when save button is clicked', async () => {
@@ -160,7 +187,7 @@ describe('PageEditor', () => {
         title: 'Test Page',
         content: 'Test content',
         labels: ['label1', 'label2'],
-        icon: '📝',
+        icon: 'pencil',
       })
     })
 
@@ -340,7 +367,7 @@ describe('PageEditor', () => {
         title: 'Different Page',
         content: 'Different content',
         labels: ['new-label'],
-        icon: '🆕',
+        icon: 'rocket',
       }
 
       rerender(<PageEditor page={newPage} onSave={mockOnSave} onCancel={mockOnCancel} />)
@@ -374,10 +401,10 @@ describe('PageEditor', () => {
   })
 
   describe('edge cases', () => {
-    it('limits icon input to 2 characters', () => {
+    it('renders icon selector as a dropdown', () => {
       render(<PageEditor page={mockPage} onSave={mockOnSave} onCancel={mockOnCancel} />)
-      const iconInput = screen.getByTitle('Page icon (emoji)')
-      expect(iconInput).toHaveAttribute('maxLength', '2')
+      const iconSelect = screen.getByTitle('Page icon')
+      expect(iconSelect.tagName).toBe('SELECT')
     })
 
     it('handles very long content', () => {

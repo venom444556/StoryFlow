@@ -7,6 +7,16 @@ vi.mock('../../utils/dates', () => ({
   formatRelative: vi.fn((_date) => 'just now'),
 }))
 
+// Mock icon map
+vi.mock('../../utils/iconMap', () => ({
+  PageIcon: ({ name, size, className }) => (
+    <span data-testid={`page-icon-${name}`} className={className}>
+      {name}
+    </span>
+  ),
+  ICON_MAP: {},
+}))
+
 // Mock child components
 vi.mock('./MarkdownRenderer', () => ({
   default: ({ content }) => <div data-testid="markdown-renderer">{content}</div>,
@@ -40,7 +50,7 @@ describe('PageViewer', () => {
     id: 'page-1',
     title: 'Test Page',
     content: '# Hello World\n\nThis is content.',
-    icon: '📝',
+    icon: 'pencil',
     status: 'published',
     labels: ['documentation', 'api'],
     updatedAt: '2024-01-15T10:30:00Z',
@@ -76,7 +86,7 @@ describe('PageViewer', () => {
 
     it('renders page icon when provided', () => {
       render(<PageViewer page={mockPage} />)
-      expect(screen.getByText('📝')).toBeInTheDocument()
+      expect(screen.getByTestId('page-icon-pencil')).toBeInTheDocument()
     })
 
     it('renders page content via MarkdownRenderer', () => {
@@ -208,7 +218,7 @@ describe('PageViewer', () => {
       const noIconPage = { ...mockPage, icon: undefined }
       render(<PageViewer page={noIconPage} />)
       expect(screen.getByText('Test Page')).toBeInTheDocument()
-      expect(screen.queryByText('📝')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('page-icon-pencil')).not.toBeInTheDocument()
     })
 
     it('handles page without labels', () => {

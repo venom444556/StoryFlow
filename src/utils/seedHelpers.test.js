@@ -472,9 +472,9 @@ describe('seedHelpers utilities', () => {
       expect(page.status).toBe('published')
     })
 
-    it('defaults icon to document emoji', () => {
+    it('defaults icon to file-text', () => {
       const page = createPage({ title: 'Page' })
-      expect(page.icon).toBe('📄')
+      expect(page.icon).toBe('file-text')
     })
 
     it('accepts all optional properties', () => {
@@ -483,12 +483,12 @@ describe('seedHelpers utilities', () => {
         content: '# Hello\n\nWorld',
         parentId: 'parent-123',
         status: 'draft',
-        icon: '📚',
+        icon: 'book-open',
       })
       expect(page.content).toBe('# Hello\n\nWorld')
       expect(page.parentId).toBe('parent-123')
       expect(page.status).toBe('draft')
-      expect(page.icon).toBe('📚')
+      expect(page.icon).toBe('book-open')
     })
 
     it('generates different IDs for different pages', () => {

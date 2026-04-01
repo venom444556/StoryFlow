@@ -16,6 +16,9 @@ import Button from '../ui/Button'
 import TagInput from '../ui/TagInput'
 import MarkdownRenderer from './MarkdownRenderer'
 import { wordCount, readingTime } from '../../utils/markdown'
+import { PageIcon, ICON_MAP } from '../../utils/iconMap'
+
+const ICON_OPTIONS = Object.keys(ICON_MAP)
 
 // ---------------------------------------------------------------------------
 // Toolbar button config
@@ -162,16 +165,23 @@ export default function PageEditor({ page, onSave, onCancel }) {
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)]">
       {/* Top bar: title + icon */}
       <div className="flex shrink-0 items-center gap-3 border-b border-[var(--color-border-default)] px-4 py-2.5">
-        {/* Emoji icon input */}
-        <input
-          type="text"
-          value={icon}
-          onChange={(e) => setIcon(e.target.value)}
-          placeholder="icon"
-          maxLength={2}
-          className="w-10 rounded bg-[var(--color-bg-glass)] px-1.5 py-1 text-center text-lg text-[var(--color-fg-default)] outline-none transition-colors focus:bg-[var(--color-bg-glass-hover)]"
-          title="Page icon (emoji)"
-        />
+        {/* Icon selector */}
+        <div className="flex items-center gap-1.5">
+          <PageIcon name={icon} size={18} className="text-[var(--color-fg-muted)]" />
+          <select
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            className="rounded bg-[var(--color-bg-glass)] px-1.5 py-1 text-xs text-[var(--color-fg-default)] outline-none transition-colors focus:bg-[var(--color-bg-glass-hover)]"
+            title="Page icon"
+          >
+            <option value="">default</option>
+            {ICON_OPTIONS.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
         {/* Title */}
         <input
           type="text"

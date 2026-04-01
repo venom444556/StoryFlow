@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import SearchBar from '../ui/SearchBar'
 import Button from '../ui/Button'
+import { PageIcon } from '../../utils/iconMap'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -115,7 +116,7 @@ function TreeNode({
 
         {/* Icon: folder for parents, file for leaves */}
         {icon ? (
-          <span className="shrink-0 text-base leading-none">{icon}</span>
+          <PageIcon name={icon} size={14} className="shrink-0 text-[var(--color-fg-muted)]" />
         ) : hasChildren ? (
           isExpanded ? (
             <FolderOpen size={14} className="shrink-0" style={{ color: 'var(--accent-default)' }} />

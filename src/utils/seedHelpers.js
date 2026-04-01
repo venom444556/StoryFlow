@@ -187,7 +187,7 @@ export function createPage({
   content = '',
   parentId = null,
   status = 'published',
-  icon = '📄',
+  icon = 'file-text',
 }) {
   const now = new Date().toISOString()
   return {

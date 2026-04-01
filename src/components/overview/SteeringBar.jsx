@@ -1,13 +1,25 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Terminal, Loader2, Check, ChevronUp, ChevronDown } from 'lucide-react'
+import {
+  Send,
+  Terminal,
+  Loader2,
+  Check,
+  ChevronUp,
+  ChevronDown,
+  Zap,
+  Search,
+  Pencil,
+  ClipboardList,
+  CheckSquare,
+} from 'lucide-react'
 
 const QUICK_ACTIONS = [
-  { label: 'Optimize Code', icon: '⚡' },
-  { label: 'Find Bugs', icon: '🔍' },
-  { label: 'Gen Docs', icon: '📝' },
-  { label: 'Plan Sprint', icon: '📋' },
-  { label: 'Review Issues', icon: '✅' },
+  { label: 'Optimize Code', icon: Zap },
+  { label: 'Find Bugs', icon: Search },
+  { label: 'Gen Docs', icon: Pencil },
+  { label: 'Plan Sprint', icon: ClipboardList },
+  { label: 'Review Issues', icon: CheckSquare },
 ]
 
 function DirectiveMessage({ text, status }) {

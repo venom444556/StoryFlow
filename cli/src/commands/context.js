@@ -47,7 +47,7 @@ export function register(program) {
       // Gates
       if (ctx.pendingGatesCount > 0) {
         console.log()
-        console.log(chalk.yellow(`  ⚠ ${ctx.pendingGatesCount} pending gate(s):`))
+        console.log(chalk.yellow(`  WARNING: ${ctx.pendingGatesCount} pending gate(s):`))
         for (const g of ctx.pendingGates) {
           console.log(
             `    • ${g.entityTitle || g.entityType} — ${g.reasoning || 'no reason given'}`
@@ -58,7 +58,7 @@ export function register(program) {
       // Directives
       if (ctx.directivesCount > 0) {
         console.log()
-        console.log(chalk.cyan(`  📋 ${ctx.directivesCount} steering directive(s):`))
+        console.log(chalk.cyan(`  DIRECTIVES: ${ctx.directivesCount} steering directive(s):`))
         for (const d of ctx.directives) {
           const pri =
             d.priority === 'critical'
@@ -73,7 +73,7 @@ export function register(program) {
       // Blockers
       if (ctx.activeBlockers.length > 0) {
         console.log()
-        console.log(chalk.red(`  🚫 ${ctx.activeBlockers.length} blocked issue(s):`))
+        console.log(chalk.red(`  BLOCKED: ${ctx.activeBlockers.length} blocked issue(s):`))
         for (const b of ctx.activeBlockers) {
           console.log(`    • ${b.key} ${b.title}`)
         }
@@ -82,7 +82,7 @@ export function register(program) {
       // Stale issues
       if (ctx.staleIssues.length > 0) {
         console.log()
-        console.log(chalk.yellow(`  ⏰ ${ctx.staleIssues.length} stale issue(s):`))
+        console.log(chalk.yellow(`  STALE: ${ctx.staleIssues.length} stale issue(s):`))
         for (const s of ctx.staleIssues) {
           console.log(`    • ${s.key} ${s.title}`)
         }

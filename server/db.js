@@ -4097,14 +4097,14 @@ export function getLessonsLearnedSummary(projectId, options = {}) {
     if (page) {
       page = updatePage(projectId, page.id, {
         content,
-        icon: page.icon || '📘',
+        icon: page.icon || 'book-open',
         status: 'published',
       })
     } else {
       page = addPage(projectId, {
         title: 'Lessons Learned',
         content,
-        icon: '📘',
+        icon: 'book-open',
         status: 'published',
         createdBy: 'system',
       })
@@ -4264,7 +4264,7 @@ export function generateHotWash(projectId, phaseId, { generatedBy = 'ai', overri
     const page = addPage(projectId, {
       title: pageTitle,
       content: pageContent,
-      icon: '📊',
+      icon: 'bar-chart-3',
       createdBy: 'system',
     })
     wikiPageId = page.id

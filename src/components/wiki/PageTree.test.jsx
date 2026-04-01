@@ -10,6 +10,16 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
 }))
 
+// Mock icon map
+vi.mock('../../utils/iconMap', () => ({
+  PageIcon: ({ name, size, className }) => (
+    <span data-testid={`page-icon-${name}`} className={className}>
+      {name}
+    </span>
+  ),
+  ICON_MAP: {},
+}))
+
 // Mock child components
 vi.mock('../ui/SearchBar', () => ({
   default: ({ value, onChange, placeholder }) => (
@@ -36,7 +46,7 @@ describe('PageTree', () => {
     { id: 'page-2', title: 'Beta Page', parentId: null, pinned: true },
     { id: 'page-3', title: 'Child Page', parentId: 'page-1', pinned: false },
     { id: 'page-4', title: 'Grandchild Page', parentId: 'page-3', pinned: false },
-    { id: 'page-5', title: 'Gamma Page', parentId: null, pinned: false, icon: '🎯' },
+    { id: 'page-5', title: 'Gamma Page', parentId: null, pinned: false, icon: 'target' },
   ]
 
   const mockOnSelectPage = vi.fn()
@@ -74,7 +84,7 @@ describe('PageTree', () => {
 
     it('renders page icon when provided', () => {
       render(<PageTree pages={mockPages} />)
-      expect(screen.getByText('🎯')).toBeInTheDocument()
+      expect(screen.getByTestId('page-icon-target')).toBeInTheDocument()
     })
   })
 
