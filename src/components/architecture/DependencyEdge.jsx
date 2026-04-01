@@ -9,7 +9,7 @@ import { NODE_WIDTH } from '../../utils/canvasConstants'
 // Arrow goes FROM depender TO dependency (A→B means "A depends on B").
 // Connects from the nearest facing sides of each node pair.
 // ---------------------------------------------------------------------------
-const NODE_HEIGHT_CENTER = 48 // approximate center of a node
+const NODE_HEIGHT_CENTER = 80 // approximate center of a node (~160px tall)
 
 // Pick connection ports based on relative node positions so lines connect
 // from the sides that face each other instead of always right→left.

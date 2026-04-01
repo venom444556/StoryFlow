@@ -434,7 +434,7 @@ export default function DependencyGraph({
                 zIndex: isSelected ? 20 : 2,
                 cursor: draggingId === comp.id ? 'grabbing' : 'grab',
                 opacity: highlightIds && !highlightIds.has(comp.id) ? 0.15 : 1,
-                background: 'var(--color-bg-glass)',
+                background: 'var(--color-bg-node)',
                 border: `${isSelected ? '2px' : '1px'} solid ${isSelected ? hexColor : 'var(--color-border-default)'}`,
                 transition: 'border-color 0.25s, opacity 0.2s',
               }}

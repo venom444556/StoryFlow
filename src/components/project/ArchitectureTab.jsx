@@ -243,15 +243,9 @@ export default function ArchitectureTab({ project, onUpdate }) {
           </div>
         )
       ) : (
-        <div className="surface-workstation flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-1 md:flex-row">
-          <div
-            className={[
-              'flex shrink-0 flex-col max-h-64 transition-all duration-300 md:max-h-none',
-              selected
-                ? 'w-full md:w-[320px] lg:w-[400px] border-r border-[var(--color-border-default)] pr-4'
-                : 'w-full max-w-4xl mx-auto',
-            ].join(' ')}
-          >
+        <div className="flex min-h-0 flex-1 gap-4 overflow-hidden">
+          {/* Left column — locked component list */}
+          <div className="w-[300px] shrink-0 overflow-y-auto">
             <ComponentTree
               components={components}
               selectedId={selectedId}
@@ -261,17 +255,39 @@ export default function ArchitectureTab({ project, onUpdate }) {
             />
           </div>
 
-          <div className={selected ? 'flex-1 overflow-y-auto' : 'hidden'}>
+          {/* Right column — detail slides in */}
+          <div className="min-w-0 flex-1 overflow-y-auto">
             <AnimatePresence mode="wait">
-              {selected && (
-                <ComponentDetail
+              {selected ? (
+                <motion.div
                   key={selected.id}
-                  component={selected}
-                  allComponents={components}
-                  onUpdate={handleUpdateSelected}
-                  onDelete={handleDeleteSelected}
-                  parentOptions={parentOptions}
-                />
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 24 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <ComponentDetail
+                    component={selected}
+                    allComponents={components}
+                    onUpdate={handleUpdateSelected}
+                    onDelete={handleDeleteSelected}
+                    parentOptions={parentOptions}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex h-full items-center justify-center"
+                >
+                  <div className="text-center">
+                    <Network size={32} className="mx-auto mb-3 text-[var(--color-fg-faint)]" />
+                    <p className="text-sm text-[var(--color-fg-muted)]">
+                      Select a component to view details
+                    </p>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>

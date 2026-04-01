@@ -220,7 +220,7 @@ export default function WorkflowNode({
         width: 220,
         zIndex: isSelected ? 20 : 2,
         cursor: 'grab',
-        background: 'var(--color-bg-glass)',
+        background: 'var(--color-bg-node)',
         border: `${node.status && node.status !== 'idle' ? '2px' : '1px'} solid ${statusStyles.borderColor || 'var(--color-border-default)'}`,
         transition: 'border-color 0.25s',
       }}

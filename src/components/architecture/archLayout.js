@@ -7,9 +7,9 @@
 // ---------------------------------------------------------------------------
 
 import { NODE_WIDTH } from '../../utils/canvasConstants'
-const NODE_HEIGHT = 140
-const HORIZONTAL_GAP = 160
-const VERTICAL_GAP = 40
+const NODE_HEIGHT = 160
+const HORIZONTAL_GAP = 140
+const VERTICAL_GAP = 30
 const GRID_SIZE = 20
 
 function snapToGrid(value) {

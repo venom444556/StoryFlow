@@ -42,14 +42,14 @@ function TreeNode({ node, selectedId, onSelect, depth = 0, highlightIds }) {
         aria-expanded={hasChildren ? expanded : undefined}
         aria-label={`${node.name} (${node.type || 'component'})`}
         className={[
-          'group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-all duration-200',
+          'group flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm transition-all duration-150',
           isSelected
             ? 'bg-[var(--color-bg-glass-hover)] text-[var(--color-fg-default)]'
-            : 'text-[var(--color-fg-default)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
+            : 'text-[var(--color-fg-muted)] hover:bg-[var(--color-bg-glass)] hover:text-[var(--color-fg-default)]',
         ].join(' ')}
         style={{
           paddingLeft: `${depth * 16 + 8}px`,
-          ...(isDimmed ? { opacity: 0.3, pointerEvents: 'none' } : {}),
+          ...(isDimmed ? { opacity: 0.2, pointerEvents: 'none' } : {}),
         }}
       >
         {hasChildren ? (
@@ -66,20 +66,12 @@ function TreeNode({ node, selectedId, onSelect, depth = 0, highlightIds }) {
           <span className="h-4 w-4 shrink-0" />
         )}
 
-        {/* Color-coded type icon */}
-        {hasChildren ? (
-          expanded ? (
-            <FolderOpen size={14} style={{ color: hexColor }} className="shrink-0" />
-          ) : (
-            <Folder size={14} style={{ color: hexColor }} className="shrink-0" />
-          )
-        ) : TypeIcon ? (
-          <TypeIcon size={14} style={{ color: hexColor }} className="shrink-0" />
-        ) : null}
+        {TypeIcon && <TypeIcon size={14} style={{ color: hexColor }} className="shrink-0" />}
 
-        <span className="truncate" title={node.name}>
+        <span className="min-w-0 flex-1 truncate" title={node.name}>
           {node.name}
         </span>
+
         <Badge variant={TYPE_COLORS[node.type] || 'default'} size="xs">
           {node.type || 'component'}
         </Badge>
