@@ -22,11 +22,6 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Mock AgentDrawer to avoid side effects
-vi.mock('./AgentDrawer', () => ({
-  default: () => null,
-}))
-
 // Mock the useProjects hook
 const mockAddProject = vi.fn()
 let mockProjects = []

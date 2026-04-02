@@ -142,7 +142,6 @@
   box-shadow: var(--shadow-elevated);
   position: relative;
   border-radius: var(--radius-lg);
-  overflow: hidden;
   transition: all var(--duration-normal) var(--ease-default);
 }
 
@@ -189,7 +188,7 @@
 
 /* Canonical Page Shell */
 .surface-workstation {
-  @apply relative overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] shadow-sm;
+  @apply relative rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-glass)] shadow-sm;
 }
 
 /* Canonical Page Sidebar (usually inside a surface-workstation) */
