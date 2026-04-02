@@ -1,25 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Send,
-  Terminal,
-  Loader2,
-  Check,
-  X,
-  Zap,
-  Search,
-  Pencil,
-  ClipboardList,
-  CheckSquare,
-} from 'lucide-react'
-
-const QUICK_ACTIONS = [
-  { label: 'Optimize Code', icon: Zap },
-  { label: 'Find Bugs', icon: Search },
-  { label: 'Gen Docs', icon: Pencil },
-  { label: 'Plan Sprint', icon: ClipboardList },
-  { label: 'Review Issues', icon: CheckSquare },
-]
+import { Send, Terminal, Loader2, Check, X } from 'lucide-react'
 
 function DirectiveMessage({ text, status }) {
   return (
@@ -189,26 +170,6 @@ export default function SteeringBar({ projectId }) {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Quick actions */}
-            <div className="flex gap-1.5 overflow-x-auto border-t border-[var(--color-border-subtle)] px-4 py-2">
-              {QUICK_ACTIONS.map((a) => {
-                const Icon = a.icon
-                return (
-                  <button
-                    key={a.label}
-                    onClick={() => {
-                      setText(a.label)
-                      inputRef.current?.focus()
-                    }}
-                    className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--color-border-subtle)] px-2 py-1 text-[10px] text-[var(--color-fg-subtle)] transition-colors hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)]"
-                  >
-                    <Icon size={10} />
-                    {a.label}
-                  </button>
-                )
-              })}
             </div>
 
             {/* Input */}
