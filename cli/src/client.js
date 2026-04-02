@@ -114,7 +114,7 @@ async function request(path, options = {}) {
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
-        'X-StoryFlow-Actor': 'human',
+        'X-StoryFlow-Actor': 'ai',
         ...authHeaders,
         ...options.headers,
       },

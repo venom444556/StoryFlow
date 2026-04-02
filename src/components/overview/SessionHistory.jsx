@@ -141,7 +141,7 @@ function SessionCard({ session }) {
   )
 }
 
-export default function SessionHistory({ projectId }) {
+export default function SessionHistory({ projectId, className = '' }) {
   const [sessions, setSessions] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -169,7 +169,7 @@ export default function SessionHistory({ projectId }) {
 
   if (loading) {
     return (
-      <div className="glass-card flex flex-col overflow-hidden">
+      <div className={`glass-card flex flex-col overflow-hidden ${className}`}>
         <div className="border-b border-[var(--color-border-default)] px-5 py-4">
           <SectionHeader icon={History} color="var(--color-ai-accent)" className="mb-0">
             Session History
@@ -192,7 +192,7 @@ export default function SessionHistory({ projectId }) {
 
   if (sessions.length === 0) {
     return (
-      <div className="glass-card overflow-hidden h-[400px] flex flex-col">
+      <div className={`glass-card overflow-hidden flex flex-col ${className}`}>
         <div className="border-b border-[var(--color-border-default)] px-5 py-4">
           <SectionHeader icon={History} color="var(--color-ai-accent)" className="mb-0">
             Session History
@@ -210,7 +210,7 @@ export default function SessionHistory({ projectId }) {
   }
 
   return (
-    <div className="glass-card flex flex-col overflow-hidden h-[400px]">
+    <div className={`glass-card flex flex-col overflow-hidden ${className}`}>
       <div className="border-b border-[var(--color-border-default)] px-5 py-4 shrink-0">
         <SectionHeader
           icon={History}

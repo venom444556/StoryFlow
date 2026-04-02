@@ -156,10 +156,10 @@ export default function OverviewTab({ project }) {
         </div>
 
         <div
-          className="min-w-0 space-y-6 overflow-y-auto"
-          style={{ maxHeight: 'min(calc(100vh - 22rem), 800px)' }}
+          className="flex min-w-0 flex-col gap-6"
+          style={{ height: 'min(calc(100vh - 22rem), 800px)' }}
         >
-          <SessionHistory projectId={project.id} />
+          <SessionHistory projectId={project.id} className="min-h-0 flex-1" />
           <SprintMetricsPanel analytics={analyticsData} />
           <MetricsSummary analytics={analyticsData} />
         </div>
