@@ -1,4 +1,3 @@
-import AgentCommandCenter from '../overview/AgentCommandCenter'
 import GatePanel from '../overview/GatePanel'
 import EventFeed from '../overview/EventFeed'
 import MetricsSummary from '../overview/MetricsSummary'
@@ -138,12 +137,7 @@ export default function OverviewTab({ project }) {
         </div>
       </div>
 
-      {/* 2. WORKSPACE-SCOPED AGENT RUNTIME HEALTH */}
       <div className="animate-entrance stagger-2">
-        <AgentCommandCenter projectId={project.id} />
-      </div>
-
-      <div className="animate-entrance stagger-3">
         <GatePanel projectId={project.id} />
       </div>
 
