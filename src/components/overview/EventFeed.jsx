@@ -195,7 +195,7 @@ export default function EventFeed({ className = '', projectId = null }) {
   }, [events, activeFilter])
 
   return (
-    <div className={`glass-card flex flex-col overflow-hidden h-full ${className}`}>
+    <div className={`glass-card flex flex-col h-full ${className}`}>
       {/* Header with filters */}
       <div className="border-b border-[var(--color-border-default)] px-5 py-4 shrink-0">
         <SectionHeader
