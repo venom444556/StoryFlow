@@ -112,28 +112,36 @@ StoryFlow includes a packaged agent scaffold in [`agent/`](./agent). The app sta
 
 ### Bootstrap the agent package
 
+The agent scaffold ships in the repo. After cloning, install hooks and verify:
+
 ```bash
-storyflow agent init
-storyflow agent doctor --json
-storyflow agent install-hooks
-storyflow agent status --json
+storyflow agent install-hooks    # wire hooks into Claude Code
+storyflow agent doctor --json    # verify all 8 checks pass
+storyflow agent status --json    # package health snapshot
 ```
 
-### Generated scaffold
+To regenerate the scaffold from scratch (e.g. in a separate project):
+
+```bash
+storyflow agent init             # create agent/ directory
+storyflow agent install-hooks
+```
+
+### Scaffold layout
 
 ```text
 agent/
-  CLAUDE.md
-  SKILL.md
-  config.json
+  CLAUDE.md                      # agent identity, operating rules, boot/close sequences
+  SKILL.md                       # CLI quick reference
+  config.json                    # hook file mapping
   hooks/
-    session-start.sh
-    session-stop.sh
-    pre-mutation.sh
-    post-mutation.sh
-  kb/
-  memory.db
-  state/
+    session-start.sh             # boot: set working, context boot
+    session-stop.sh              # close: set idle
+    pre-mutation.sh              # gate: block commit if no In Progress issue
+    post-mutation.sh             # sync: mark issues Done on commit
+  kb/                            # knowledge base (core + runtime)
+  memory.db                      # agent persistent memory (gitignored)
+  state/                         # runtime state (gitignored)
 ```
 
 ### What the care package does

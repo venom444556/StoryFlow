@@ -4,20 +4,23 @@
 <dict>
 	<key>Label</key>
 	<string>com.storyflow.server</string>
+	<!-- Replace these paths with your local equivalents -->
 	<key>ProgramArguments</key>
 	<array>
-		<string>/Users/devserver/local/node-v22.14.0-darwin-arm64/bin/node</string>
-		<string>/Users/devserver/Documents/GitHub/StoryFlow/server/index.js</string>
+		<!-- Path to your node binary: run `which node` to find it -->
+		<string>/usr/local/bin/node</string>
+		<!-- Path to your StoryFlow checkout -->
+		<string>__STORYFLOW_ROOT__/server/index.js</string>
 	</array>
 	<key>WorkingDirectory</key>
-	<string>/Users/devserver/Documents/GitHub/StoryFlow</string>
+	<string>__STORYFLOW_ROOT__</string>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>KeepAlive</key>
 	<true/>
 	<key>StandardOutPath</key>
-	<string>/Users/devserver/Library/Logs/storyflow.log</string>
+	<string>__HOME__/Library/Logs/storyflow.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/devserver/Library/Logs/storyflow.log</string>
+	<string>__HOME__/Library/Logs/storyflow.log</string>
 </dict>
 </plist>

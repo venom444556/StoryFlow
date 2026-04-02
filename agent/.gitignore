@@ -1,3 +1,4 @@
 memory.db
 state/
 kb/runtime/
+hooks/manifest.json

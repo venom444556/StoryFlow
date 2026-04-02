@@ -297,6 +297,7 @@
 
   /* Card background — elevated above base */
   --color-bg-card: #161922;
+  --color-bg-card-translucent: rgba(22, 25, 34, 0.85);
 
   /* Overlay backgrounds */
   --color-bg-overlay: rgba(15, 17, 23, 0.88);
@@ -527,6 +528,7 @@
 
   /* Glass/card backgrounds — solid white (no translucency in light mode) */
   --color-bg-card: #ffffff;
+  --color-bg-card-translucent: rgba(255, 255, 255, 0.85);
   --color-bg-glass: #ffffff;
   --color-bg-glass-hover: #f8f9fb;
   --color-bg-glass-active: #f0f2f5;

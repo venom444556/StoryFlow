@@ -1,7 +1,7 @@
 {
   "metadata": {
     "skill_name": "design-forge-comparison",
-    "skill_path": "/Users/devserver/Documents/GitHub/StoryFlow/design-forge/skills/",
+    "skill_path": "./design-forge/skills/",
     "executor_model": "claude-opus-4-6",
     "timestamp": "2026-03-11T00:30:00.745384+00:00",
     "evals_run": [

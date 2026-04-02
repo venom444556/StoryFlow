@@ -8,10 +8,10 @@ Triggered when: the PM check-in hook fired and the user accepted the offer to or
    ```bash
    storyflow status
    ```
-   If unreachable:
+   If unreachable, start the server from the StoryFlow project root:
    ```bash
-   node /Users/devserver/Documents/GitHub/StoryFlow/server/index.js &
-   sleep 2
+   npm run dev &
+   sleep 3
    storyflow status
    ```
    If still unreachable after boot attempt, report the error and stop.

@@ -12,6 +12,7 @@ All interaction through `storyflow` CLI. Every command supports `--json`.
 | `storyflow issues batch-done <keys>` | Mark multiple issues Done |
 | `storyflow sessions save ...` | Save session with all fields |
 | `storyflow phases hot-wash generate` | Generate phase retrospective |
+| `storyflow phases hot-wash lessons` | Project-level lessons rollup |
 | `storyflow pages audit --json` | Check wiki completeness |
 | `storyflow agent doctor --json` | Self-diagnostics |
 

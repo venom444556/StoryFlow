@@ -147,7 +147,7 @@ export default function SteeringBar({ projectId }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-5 right-5 z-50 flex w-[400px] flex-col overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card)] shadow-2xl shadow-black/40"
+            className="fixed bottom-5 right-5 z-50 flex w-[400px] flex-col overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-card-translucent)] backdrop-blur-md shadow-2xl shadow-black/40"
             style={{ maxHeight: 'min(500px, calc(100vh - 120px))' }}
           >
             {/* Header */}
@@ -202,7 +202,7 @@ export default function SteeringBar({ projectId }) {
                       setText(a.label)
                       inputRef.current?.focus()
                     }}
-                    className="flex shrink-0 items-center gap-1 rounded-lg border border-[var(--color-border-subtle)] px-2 py-1 text-[10px] text-[var(--color-fg-subtle)] transition-colors hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)]"
+                    className="flex shrink-0 items-center gap-1 rounded-full border border-[var(--color-border-subtle)] px-2 py-1 text-[10px] text-[var(--color-fg-subtle)] transition-colors hover:border-[var(--color-border-emphasis)] hover:text-[var(--color-fg-default)]"
                   >
                     <Icon size={10} />
                     {a.label}
