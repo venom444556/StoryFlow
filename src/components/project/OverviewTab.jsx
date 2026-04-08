@@ -153,10 +153,7 @@ export default function OverviewTab({ project }) {
           marginBottom: 'calc(var(--steering-bar-clearance, 0px) + var(--space-2))',
         }}
       >
-        <div
-          className="min-w-0 overflow-hidden rounded-xl"
-          style={{ height: 'min(calc(100vh - 22rem), 800px)' }}
-        >
+        <div className="min-w-0" style={{ height: 'min(calc(100vh - 22rem), 800px)' }}>
           <EventFeed projectId={project.id} />
         </div>
 

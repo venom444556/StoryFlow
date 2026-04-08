@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Pencil, Trash2, ArrowRight, FileText, Zap, Clock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import { useEventStore, selectEventsByEntity } from '../../stores/eventStore'
+import { useShallow } from 'zustand/react/shallow'
+import { useEventStore } from '../../stores/eventStore'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
 
 const ACTION_ICONS = {
@@ -110,8 +111,11 @@ function ChainEvent({ event, isFirst, isLast }) {
 }
 
 export default function EventChainPanel({ entityType, entityId }) {
-  const selector = useMemo(() => selectEventsByEntity(entityType, entityId), [entityType, entityId])
-  const events = useEventStore(selector)
+  const events = useEventStore(
+    useShallow((state) =>
+      state.events.filter((e) => e.entity_type === entityType && e.entity_id === entityId)
+    )
+  )
 
   // Sort oldest-first for the timeline
   const sortedEvents = useMemo(() => [...events].reverse(), [events])

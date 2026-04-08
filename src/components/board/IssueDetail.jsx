@@ -159,7 +159,7 @@ export default function IssueDetail({
     if (!trimmed) return
     const comment = {
       id: generateId(),
-      text: trimmed,
+      body: trimmed,
       author: 'User',
       createdAt: new Date().toISOString(),
     }
@@ -476,7 +476,7 @@ export default function IssueDetail({
                         </span>
                       </div>
                       <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-fg-muted)]">
-                        {comment.text}
+                        {comment.body}
                       </p>
                     </div>
                   ))}
