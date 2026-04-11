@@ -5,6 +5,8 @@ import Badge from '../ui/Badge'
 import TypeBadge from '../ui/TypeBadge'
 import ProvenanceBadge from '../ui/ProvenanceBadge'
 import BlockedBanner from './BlockedBanner'
+import ImpactBadge from '../../features/code-intelligence/components/ImpactBadge'
+import { useIssueImpact } from '../../features/code-intelligence/hooks/useIssueImpact'
 import { getStaleInfo } from '../../utils/staleness'
 import { useSettings } from '../../contexts/SettingsContext'
 
@@ -20,6 +22,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
   const priorityVariant = PRIORITY_BADGE_VARIANT[issue.priority] || 'default'
   const { isStale, agoText } = getStaleInfo(issue, settings.staleThresholdMinutes * 60 * 1000)
   const isAiCreated = issue.createdBy === 'ai'
+  const { report: impactReport } = useIssueImpact(issue)
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData('text/plain', issue.id)
@@ -66,6 +69,7 @@ export default function IssueCard({ issue, onClick, onDragStart, onDragEnd, isDr
       {/* Top row: type badge + key + AI sparkle + provenance */}
       <div className="mb-2 flex items-center gap-2">
         <TypeBadge type={issue.type} />
+        <ImpactBadge report={impactReport} />
         <span className="text-xs font-medium text-[var(--color-fg-muted)]">{issue.key}</span>
         {isAiCreated && (
           <span

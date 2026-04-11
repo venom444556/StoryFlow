@@ -1,0 +1,22 @@
+{
+  "name": "@storyflow/code-intel-symbol-resolver",
+  "version": "0.1.0",
+  "description": "Maps StoryFlow tickets to candidate code symbols via a dependency-injected GitNexusClient.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "USAGE.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}

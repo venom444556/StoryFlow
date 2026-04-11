@@ -14,6 +14,8 @@ import {
 } from 'lucide-react'
 import IssueTypeIcon from './IssueTypeIcon'
 import EventChainPanel from './EventChainPanel'
+import CodeTab from '../../features/code-intelligence/components/CodeTab.jsx'
+import { useCodeIntelligence } from '../../features/code-intelligence/index.js'
 import Select from '../ui/Select'
 import TextArea from '../ui/TextArea'
 import TagInput from '../ui/TagInput'
@@ -89,6 +91,7 @@ export default function IssueDetail({
   const [newSubtask, setNewSubtask] = useState('')
   const [newComment, setNewComment] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const { enabled: codeIntelEnabled } = useCodeIntelligence()
 
   const epics = useMemo(
     () =>
@@ -515,6 +518,14 @@ export default function IssueDetail({
                 <SectionHeader icon={History}>Event History</SectionHeader>
                 <EventChainPanel entityType="issue" entityId={issue.id} />
               </div>
+
+              {/* Code Intelligence — hidden entirely when feature is off */}
+              {codeIntelEnabled && (
+                <div>
+                  <SectionHeader icon={History}>Code</SectionHeader>
+                  <CodeTab issue={issue} />
+                </div>
+              )}
 
               {/* Timestamps */}
               <div className="border-t border-[var(--color-border-default)] pt-4">

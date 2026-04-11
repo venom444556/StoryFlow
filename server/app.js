@@ -25,7 +25,14 @@ import {
   checkTitleDuplication,
   emitHygieneEvents,
 } from './intelligence.js'
+import { startCodeIntelligence } from './codeIntelligence.js'
+import { createCodeIntelligenceRouter } from './codeIntelligenceRoutes.js'
 const app = express()
+
+// Boot the Code Intelligence (GitNexus) lifecycle. Fail-open: startup errors
+// are logged and swallowed inside the module, so this never blocks the server.
+// Shutdown is wired via process signal handlers registered inside the module.
+startCodeIntelligence().catch((err) => console.error('[CodeIntelligence] startup error:', err))
 
 // --- Request body validation helpers ---
 const VALID_ISSUE_TYPES = ['epic', 'story', 'task', 'bug', 'subtask']
@@ -199,6 +206,8 @@ app.use((req, res, next) => {
   if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
 })
+
+app.use('/api/code-intelligence', createCodeIntelligenceRouter())
 
 // Token auth — if STORYFLOW_TOKEN is set, require it on mutating requests
 const AUTH_TOKEN = process.env.STORYFLOW_TOKEN || process.env.STORYFLOW_MCP_TOKEN || null

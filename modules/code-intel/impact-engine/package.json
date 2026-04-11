@@ -1,0 +1,27 @@
+{
+  "name": "@storyflow/code-intel-impact-engine",
+  "version": "0.1.0",
+  "description": "Pure-logic blast radius classification and pre-flight gate policy for StoryFlow Code Intelligence.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "USAGE.md"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vitest": "^1.6.0",
+    "fast-check": "^3.19.0",
+    "@vitest/coverage-v8": "^1.6.0"
+  },
+  "license": "MIT"
+}

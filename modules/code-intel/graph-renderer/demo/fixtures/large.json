@@ -1,0 +1,8178 @@
+{
+  "nodes": [
+    {
+      "id": "n0",
+      "label": "handleRequest",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleRequest",
+        "file": "src/auth/file_0.js",
+        "kind": "function",
+        "line": 325
+      }
+    },
+    {
+      "id": "n1",
+      "label": "loadToken",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.loadToken",
+        "file": "workers/file_1.js",
+        "kind": "function",
+        "line": 153
+      }
+    },
+    {
+      "id": "n2",
+      "label": "buildSession",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.buildSession",
+        "file": "agents/claude/file_2.js",
+        "kind": "function",
+        "line": 218
+      }
+    },
+    {
+      "id": "n3",
+      "label": "parseState",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseState",
+        "file": "agents/claude/file_3.js",
+        "kind": "function",
+        "line": 77
+      }
+    },
+    {
+      "id": "n4",
+      "label": "syncPayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.syncPayload",
+        "file": "server/db/file_4.js",
+        "kind": "function",
+        "line": 82
+      }
+    },
+    {
+      "id": "n5",
+      "label": "emitNode",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.emitNode",
+        "file": "plugin/hooks/file_5.js",
+        "kind": "function",
+        "line": 372
+      }
+    },
+    {
+      "id": "n6",
+      "label": "resolveEvent",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.resolveEvent",
+        "file": "workers/file_6.js",
+        "kind": "function",
+        "line": 80
+      }
+    },
+    {
+      "id": "n7",
+      "label": "applyConfig",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.applyConfig",
+        "file": "server/api/file_7.js",
+        "kind": "function",
+        "line": 117
+      }
+    },
+    {
+      "id": "n8",
+      "label": "fetchRequest",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.fetchRequest",
+        "file": "server/db/migrations/file_8.js",
+        "kind": "function",
+        "line": 291
+      }
+    },
+    {
+      "id": "n9",
+      "label": "handleToken",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleToken",
+        "file": "src/auth/file_9.js",
+        "kind": "function",
+        "line": 270
+      }
+    },
+    {
+      "id": "n10",
+      "label": "loadSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadSession",
+        "file": "src/auth/middleware/file_10.js",
+        "kind": "function",
+        "line": 81
+      }
+    },
+    {
+      "id": "n11",
+      "label": "buildState",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.buildState",
+        "file": "ingest/file_11.js",
+        "kind": "function",
+        "line": 226
+      }
+    },
+    {
+      "id": "n12",
+      "label": "parsePayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.parsePayload",
+        "file": "server/db/file_12.js",
+        "kind": "function",
+        "line": 110
+      }
+    },
+    {
+      "id": "n13",
+      "label": "syncNode",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.syncNode",
+        "file": "src/core/file_13.js",
+        "kind": "function",
+        "line": 102
+      }
+    },
+    {
+      "id": "n14",
+      "label": "emitEvent",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.emitEvent",
+        "file": "src/components/board/file_14.js",
+        "kind": "function",
+        "line": 118
+      }
+    },
+    {
+      "id": "n15",
+      "label": "resolveConfig",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.resolveConfig",
+        "file": "agents/claude/file_15.js",
+        "kind": "function",
+        "line": 189
+      }
+    },
+    {
+      "id": "n16",
+      "label": "applyRequest",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.applyRequest",
+        "file": "ingest/parsers/file_16.js",
+        "kind": "function",
+        "line": 275
+      }
+    },
+    {
+      "id": "n17",
+      "label": "fetchToken",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.fetchToken",
+        "file": "src/core/file_17.js",
+        "kind": "function",
+        "line": 104
+      }
+    },
+    {
+      "id": "n18",
+      "label": "handleSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleSession",
+        "file": "src/auth/file_18.js",
+        "kind": "function",
+        "line": 104
+      }
+    },
+    {
+      "id": "n19",
+      "label": "loadState",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadState",
+        "file": "src/components/file_19.js",
+        "kind": "function",
+        "line": 63
+      }
+    },
+    {
+      "id": "n20",
+      "label": "buildPayload",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.buildPayload",
+        "file": "src/auth/middleware/file_20.js",
+        "kind": "function",
+        "line": 216
+      }
+    },
+    {
+      "id": "n21",
+      "label": "parseNode",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseNode",
+        "file": "agents/claude/file_21.js",
+        "kind": "function",
+        "line": 229
+      }
+    },
+    {
+      "id": "n22",
+      "label": "syncEvent",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.syncEvent",
+        "file": "src/core/file_22.js",
+        "kind": "function",
+        "line": 107
+      }
+    },
+    {
+      "id": "n23",
+      "label": "emitConfig",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.emitConfig",
+        "file": "ingest/file_23.js",
+        "kind": "function",
+        "line": 113
+      }
+    },
+    {
+      "id": "n24",
+      "label": "resolveRequest",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.resolveRequest",
+        "file": "agents/claude/file_24.js",
+        "kind": "function",
+        "line": 240
+      }
+    },
+    {
+      "id": "n25",
+      "label": "applyToken",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.applyToken",
+        "file": "plugin/hooks/file_25.js",
+        "kind": "function",
+        "line": 57
+      }
+    },
+    {
+      "id": "n26",
+      "label": "fetchSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.fetchSession",
+        "file": "ingest/parsers/file_26.js",
+        "kind": "function",
+        "line": 126
+      }
+    },
+    {
+      "id": "n27",
+      "label": "handleState",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handleState",
+        "file": "src/components/wiki/file_27.js",
+        "kind": "function",
+        "line": 335
+      }
+    },
+    {
+      "id": "n28",
+      "label": "loadPayload",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.loadPayload",
+        "file": "bridge/mcp/file_28.js",
+        "kind": "function",
+        "line": 234
+      }
+    },
+    {
+      "id": "n29",
+      "label": "buildNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildNode",
+        "file": "server/db/file_29.js",
+        "kind": "function",
+        "line": 7
+      }
+    },
+    {
+      "id": "n30",
+      "label": "parseEvent",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.parseEvent",
+        "file": "src/components/board/file_30.js",
+        "kind": "function",
+        "line": 361
+      }
+    },
+    {
+      "id": "n31",
+      "label": "syncConfig",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.syncConfig",
+        "file": "src/components/board/file_31.js",
+        "kind": "function",
+        "line": 75
+      }
+    },
+    {
+      "id": "n32",
+      "label": "emitRequest",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.emitRequest",
+        "file": "src/auth/file_32.js",
+        "kind": "function",
+        "line": 328
+      }
+    },
+    {
+      "id": "n33",
+      "label": "resolveToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.resolveToken",
+        "file": "bridge/file_33.js",
+        "kind": "function",
+        "line": 13
+      }
+    },
+    {
+      "id": "n34",
+      "label": "applySession",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.applySession",
+        "file": "server/db/migrations/file_34.js",
+        "kind": "function",
+        "line": 219
+      }
+    },
+    {
+      "id": "n35",
+      "label": "fetchState",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.fetchState",
+        "file": "workers/file_35.js",
+        "kind": "function",
+        "line": 281
+      }
+    },
+    {
+      "id": "n36",
+      "label": "handlePayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handlePayload",
+        "file": "server/db/file_36.js",
+        "kind": "function",
+        "line": 271
+      }
+    },
+    {
+      "id": "n37",
+      "label": "loadNode",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadNode",
+        "file": "src/auth/middleware/file_37.js",
+        "kind": "function",
+        "line": 23
+      }
+    },
+    {
+      "id": "n38",
+      "label": "buildEvent",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.buildEvent",
+        "file": "src/auth/file_38.js",
+        "kind": "function",
+        "line": 276
+      }
+    },
+    {
+      "id": "n39",
+      "label": "parseConfig",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseConfig",
+        "file": "workers/queue/file_39.js",
+        "kind": "function",
+        "line": 66
+      }
+    },
+    {
+      "id": "n40",
+      "label": "syncRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.syncRequest",
+        "file": "workers/file_40.js",
+        "kind": "function",
+        "line": 310
+      }
+    },
+    {
+      "id": "n41",
+      "label": "emitToken",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.emitToken",
+        "file": "server/api/file_41.js",
+        "kind": "function",
+        "line": 170
+      }
+    },
+    {
+      "id": "n42",
+      "label": "resolveSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.resolveSession",
+        "file": "ingest/file_42.js",
+        "kind": "function",
+        "line": 87
+      }
+    },
+    {
+      "id": "n43",
+      "label": "applyState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.applyState",
+        "file": "server/db/migrations/file_43.js",
+        "kind": "function",
+        "line": 358
+      }
+    },
+    {
+      "id": "n44",
+      "label": "fetchPayload",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.fetchPayload",
+        "file": "src/components/wiki/file_44.js",
+        "kind": "function",
+        "line": 146
+      }
+    },
+    {
+      "id": "n45",
+      "label": "handleNode",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handleNode",
+        "file": "src/components/wiki/file_45.js",
+        "kind": "function",
+        "line": 323
+      }
+    },
+    {
+      "id": "n46",
+      "label": "loadEvent",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadEvent",
+        "file": "src/components/file_46.js",
+        "kind": "function",
+        "line": 205
+      }
+    },
+    {
+      "id": "n47",
+      "label": "buildConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.buildConfig",
+        "file": "src/auth/file_47.js",
+        "kind": "function",
+        "line": 279
+      }
+    },
+    {
+      "id": "n48",
+      "label": "parseRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseRequest",
+        "file": "workers/file_48.js",
+        "kind": "function",
+        "line": 36
+      }
+    },
+    {
+      "id": "n49",
+      "label": "syncToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.syncToken",
+        "file": "agents/file_49.js",
+        "kind": "function",
+        "line": 11
+      }
+    },
+    {
+      "id": "n50",
+      "label": "emitSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.emitSession",
+        "file": "ingest/file_50.js",
+        "kind": "function",
+        "line": 309
+      }
+    },
+    {
+      "id": "n51",
+      "label": "resolveState",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.resolveState",
+        "file": "server/api/routes/file_51.js",
+        "kind": "function",
+        "line": 42
+      }
+    },
+    {
+      "id": "n52",
+      "label": "applyPayload",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.applyPayload",
+        "file": "server/api/file_52.js",
+        "kind": "function",
+        "line": 256
+      }
+    },
+    {
+      "id": "n53",
+      "label": "fetchNode",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.fetchNode",
+        "file": "src/components/wiki/file_53.js",
+        "kind": "function",
+        "line": 115
+      }
+    },
+    {
+      "id": "n54",
+      "label": "handleEvent",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleEvent",
+        "file": "ingest/parsers/file_54.js",
+        "kind": "function",
+        "line": 95
+      }
+    },
+    {
+      "id": "n55",
+      "label": "loadConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadConfig",
+        "file": "src/auth/middleware/file_55.js",
+        "kind": "function",
+        "line": 318
+      }
+    },
+    {
+      "id": "n56",
+      "label": "buildRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.buildRequest",
+        "file": "workers/queue/file_56.js",
+        "kind": "function",
+        "line": 202
+      }
+    },
+    {
+      "id": "n57",
+      "label": "parseToken",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseToken",
+        "file": "workers/file_57.js",
+        "kind": "function",
+        "line": 348
+      }
+    },
+    {
+      "id": "n58",
+      "label": "syncSession",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.syncSession",
+        "file": "bridge/file_58.js",
+        "kind": "function",
+        "line": 124
+      }
+    },
+    {
+      "id": "n59",
+      "label": "emitState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.emitState",
+        "file": "src/core/util/file_59.js",
+        "kind": "function",
+        "line": 25
+      }
+    },
+    {
+      "id": "n60",
+      "label": "resolvePayload",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.resolvePayload",
+        "file": "workers/file_60.js",
+        "kind": "function",
+        "line": 396
+      }
+    },
+    {
+      "id": "n61",
+      "label": "applyNode",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.applyNode",
+        "file": "src/components/board/file_61.js",
+        "kind": "function",
+        "line": 10
+      }
+    },
+    {
+      "id": "n62",
+      "label": "fetchEvent",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.fetchEvent",
+        "file": "ingest/file_62.js",
+        "kind": "function",
+        "line": 180
+      }
+    },
+    {
+      "id": "n63",
+      "label": "handleConfig",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handleConfig",
+        "file": "src/components/wiki/file_63.js",
+        "kind": "function",
+        "line": 24
+      }
+    },
+    {
+      "id": "n64",
+      "label": "loadRequest",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.loadRequest",
+        "file": "server/api/file_64.js",
+        "kind": "function",
+        "line": 131
+      }
+    },
+    {
+      "id": "n65",
+      "label": "buildToken",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.buildToken",
+        "file": "workers/queue/file_65.js",
+        "kind": "function",
+        "line": 175
+      }
+    },
+    {
+      "id": "n66",
+      "label": "parseSession",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.parseSession",
+        "file": "server/api/file_66.js",
+        "kind": "function",
+        "line": 331
+      }
+    },
+    {
+      "id": "n67",
+      "label": "syncState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.syncState",
+        "file": "server/db/migrations/file_67.js",
+        "kind": "function",
+        "line": 90
+      }
+    },
+    {
+      "id": "n68",
+      "label": "emitPayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitPayload",
+        "file": "server/db/migrations/file_68.js",
+        "kind": "function",
+        "line": 113
+      }
+    },
+    {
+      "id": "n69",
+      "label": "resolveNode",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.resolveNode",
+        "file": "agents/claude/file_69.js",
+        "kind": "function",
+        "line": 336
+      }
+    },
+    {
+      "id": "n70",
+      "label": "applyEvent",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.applyEvent",
+        "file": "src/components/board/file_70.js",
+        "kind": "function",
+        "line": 317
+      }
+    },
+    {
+      "id": "n71",
+      "label": "fetchConfig",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.fetchConfig",
+        "file": "bridge/mcp/file_71.js",
+        "kind": "function",
+        "line": 303
+      }
+    },
+    {
+      "id": "n72",
+      "label": "handleRequest",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleRequest",
+        "file": "ingest/file_72.js",
+        "kind": "function",
+        "line": 134
+      }
+    },
+    {
+      "id": "n73",
+      "label": "loadToken",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.loadToken",
+        "file": "ingest/file_73.js",
+        "kind": "function",
+        "line": 139
+      }
+    },
+    {
+      "id": "n74",
+      "label": "buildSession",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.buildSession",
+        "file": "bridge/mcp/file_74.js",
+        "kind": "function",
+        "line": 282
+      }
+    },
+    {
+      "id": "n75",
+      "label": "parseState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.parseState",
+        "file": "src/core/util/file_75.js",
+        "kind": "function",
+        "line": 261
+      }
+    },
+    {
+      "id": "n76",
+      "label": "syncPayload",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.syncPayload",
+        "file": "ingest/file_76.js",
+        "kind": "function",
+        "line": 147
+      }
+    },
+    {
+      "id": "n77",
+      "label": "emitNode",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitNode",
+        "file": "bridge/file_77.js",
+        "kind": "function",
+        "line": 298
+      }
+    },
+    {
+      "id": "n78",
+      "label": "resolveEvent",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.resolveEvent",
+        "file": "workers/file_78.js",
+        "kind": "function",
+        "line": 197
+      }
+    },
+    {
+      "id": "n79",
+      "label": "applyConfig",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.applyConfig",
+        "file": "ingest/file_79.js",
+        "kind": "function",
+        "line": 48
+      }
+    },
+    {
+      "id": "n80",
+      "label": "fetchRequest",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.fetchRequest",
+        "file": "ingest/parsers/file_80.js",
+        "kind": "function",
+        "line": 243
+      }
+    },
+    {
+      "id": "n81",
+      "label": "handleToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.handleToken",
+        "file": "bridge/file_81.js",
+        "kind": "function",
+        "line": 391
+      }
+    },
+    {
+      "id": "n82",
+      "label": "loadSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadSession",
+        "file": "src/auth/file_82.js",
+        "kind": "function",
+        "line": 41
+      }
+    },
+    {
+      "id": "n83",
+      "label": "buildState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildState",
+        "file": "server/db/migrations/file_83.js",
+        "kind": "function",
+        "line": 172
+      }
+    },
+    {
+      "id": "n84",
+      "label": "parsePayload",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.parsePayload",
+        "file": "bridge/file_84.js",
+        "kind": "function",
+        "line": 314
+      }
+    },
+    {
+      "id": "n85",
+      "label": "syncNode",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.syncNode",
+        "file": "plugin/hooks/file_85.js",
+        "kind": "function",
+        "line": 145
+      }
+    },
+    {
+      "id": "n86",
+      "label": "emitEvent",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.emitEvent",
+        "file": "src/core/file_86.js",
+        "kind": "function",
+        "line": 8
+      }
+    },
+    {
+      "id": "n87",
+      "label": "resolveConfig",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.resolveConfig",
+        "file": "agents/claude/file_87.js",
+        "kind": "function",
+        "line": 173
+      }
+    },
+    {
+      "id": "n88",
+      "label": "applyRequest",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.applyRequest",
+        "file": "server/api/file_88.js",
+        "kind": "function",
+        "line": 107
+      }
+    },
+    {
+      "id": "n89",
+      "label": "fetchToken",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.fetchToken",
+        "file": "workers/file_89.js",
+        "kind": "function",
+        "line": 327
+      }
+    },
+    {
+      "id": "n90",
+      "label": "handleSession",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.handleSession",
+        "file": "workers/queue/file_90.js",
+        "kind": "function",
+        "line": 18
+      }
+    },
+    {
+      "id": "n91",
+      "label": "loadState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.loadState",
+        "file": "server/db/migrations/file_91.js",
+        "kind": "function",
+        "line": 360
+      }
+    },
+    {
+      "id": "n92",
+      "label": "buildPayload",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.buildPayload",
+        "file": "src/components/wiki/file_92.js",
+        "kind": "function",
+        "line": 179
+      }
+    },
+    {
+      "id": "n93",
+      "label": "parseNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.parseNode",
+        "file": "server/db/file_93.js",
+        "kind": "function",
+        "line": 202
+      }
+    },
+    {
+      "id": "n94",
+      "label": "syncEvent",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.syncEvent",
+        "file": "ingest/file_94.js",
+        "kind": "function",
+        "line": 98
+      }
+    },
+    {
+      "id": "n95",
+      "label": "emitConfig",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.emitConfig",
+        "file": "agents/claude/file_95.js",
+        "kind": "function",
+        "line": 331
+      }
+    },
+    {
+      "id": "n96",
+      "label": "resolveRequest",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.resolveRequest",
+        "file": "server/api/routes/file_96.js",
+        "kind": "function",
+        "line": 140
+      }
+    },
+    {
+      "id": "n97",
+      "label": "applyToken",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.applyToken",
+        "file": "src/auth/middleware/file_97.js",
+        "kind": "function",
+        "line": 322
+      }
+    },
+    {
+      "id": "n98",
+      "label": "fetchSession",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.fetchSession",
+        "file": "server/api/routes/file_98.js",
+        "kind": "function",
+        "line": 285
+      }
+    },
+    {
+      "id": "n99",
+      "label": "handleState",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleState",
+        "file": "src/auth/middleware/file_99.js",
+        "kind": "function",
+        "line": 315
+      }
+    },
+    {
+      "id": "n100",
+      "label": "loadPayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.loadPayload",
+        "file": "server/db/file_100.js",
+        "kind": "function",
+        "line": 24
+      }
+    },
+    {
+      "id": "n101",
+      "label": "buildNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildNode",
+        "file": "server/db/file_101.js",
+        "kind": "function",
+        "line": 321
+      }
+    },
+    {
+      "id": "n102",
+      "label": "parseEvent",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.parseEvent",
+        "file": "src/core/util/file_102.js",
+        "kind": "function",
+        "line": 20
+      }
+    },
+    {
+      "id": "n103",
+      "label": "syncConfig",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.syncConfig",
+        "file": "server/db/file_103.js",
+        "kind": "function",
+        "line": 143
+      }
+    },
+    {
+      "id": "n104",
+      "label": "emitRequest",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.emitRequest",
+        "file": "ingest/parsers/file_104.js",
+        "kind": "function",
+        "line": 308
+      }
+    },
+    {
+      "id": "n105",
+      "label": "resolveToken",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.resolveToken",
+        "file": "ingest/file_105.js",
+        "kind": "function",
+        "line": 149
+      }
+    },
+    {
+      "id": "n106",
+      "label": "applySession",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.applySession",
+        "file": "agents/file_106.js",
+        "kind": "function",
+        "line": 67
+      }
+    },
+    {
+      "id": "n107",
+      "label": "fetchState",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.fetchState",
+        "file": "ingest/file_107.js",
+        "kind": "function",
+        "line": 162
+      }
+    },
+    {
+      "id": "n108",
+      "label": "handlePayload",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handlePayload",
+        "file": "ingest/file_108.js",
+        "kind": "function",
+        "line": 137
+      }
+    },
+    {
+      "id": "n109",
+      "label": "loadNode",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.loadNode",
+        "file": "src/core/file_109.js",
+        "kind": "function",
+        "line": 9
+      }
+    },
+    {
+      "id": "n110",
+      "label": "buildEvent",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildEvent",
+        "file": "server/db/migrations/file_110.js",
+        "kind": "function",
+        "line": 159
+      }
+    },
+    {
+      "id": "n111",
+      "label": "parseConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.parseConfig",
+        "file": "src/auth/middleware/file_111.js",
+        "kind": "function",
+        "line": 290
+      }
+    },
+    {
+      "id": "n112",
+      "label": "syncRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.syncRequest",
+        "file": "workers/file_112.js",
+        "kind": "function",
+        "line": 105
+      }
+    },
+    {
+      "id": "n113",
+      "label": "emitToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitToken",
+        "file": "bridge/mcp/file_113.js",
+        "kind": "function",
+        "line": 24
+      }
+    },
+    {
+      "id": "n114",
+      "label": "resolveSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.resolveSession",
+        "file": "src/auth/file_114.js",
+        "kind": "function",
+        "line": 277
+      }
+    },
+    {
+      "id": "n115",
+      "label": "applyState",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.applyState",
+        "file": "plugin/hooks/file_115.js",
+        "kind": "function",
+        "line": 96
+      }
+    },
+    {
+      "id": "n116",
+      "label": "fetchPayload",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.fetchPayload",
+        "file": "plugin/hooks/file_116.js",
+        "kind": "function",
+        "line": 185
+      }
+    },
+    {
+      "id": "n117",
+      "label": "handleNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handleNode",
+        "file": "server/db/file_117.js",
+        "kind": "function",
+        "line": 68
+      }
+    },
+    {
+      "id": "n118",
+      "label": "loadEvent",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.loadEvent",
+        "file": "agents/worker/file_118.js",
+        "kind": "function",
+        "line": 56
+      }
+    },
+    {
+      "id": "n119",
+      "label": "buildConfig",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.buildConfig",
+        "file": "src/components/board/file_119.js",
+        "kind": "function",
+        "line": 12
+      }
+    },
+    {
+      "id": "n120",
+      "label": "parseRequest",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.parseRequest",
+        "file": "src/components/file_120.js",
+        "kind": "function",
+        "line": 95
+      }
+    },
+    {
+      "id": "n121",
+      "label": "syncToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.syncToken",
+        "file": "bridge/mcp/file_121.js",
+        "kind": "function",
+        "line": 127
+      }
+    },
+    {
+      "id": "n122",
+      "label": "emitSession",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitSession",
+        "file": "server/db/file_122.js",
+        "kind": "function",
+        "line": 96
+      }
+    },
+    {
+      "id": "n123",
+      "label": "resolveState",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.resolveState",
+        "file": "src/auth/file_123.js",
+        "kind": "function",
+        "line": 126
+      }
+    },
+    {
+      "id": "n124",
+      "label": "applyPayload",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.applyPayload",
+        "file": "plugin/hooks/file_124.js",
+        "kind": "function",
+        "line": 236
+      }
+    },
+    {
+      "id": "n125",
+      "label": "fetchNode",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.fetchNode",
+        "file": "src/components/board/file_125.js",
+        "kind": "function",
+        "line": 179
+      }
+    },
+    {
+      "id": "n126",
+      "label": "handleEvent",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleEvent",
+        "file": "ingest/file_126.js",
+        "kind": "function",
+        "line": 222
+      }
+    },
+    {
+      "id": "n127",
+      "label": "loadConfig",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.loadConfig",
+        "file": "workers/file_127.js",
+        "kind": "function",
+        "line": 364
+      }
+    },
+    {
+      "id": "n128",
+      "label": "buildRequest",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.buildRequest",
+        "file": "bridge/file_128.js",
+        "kind": "function",
+        "line": 37
+      }
+    },
+    {
+      "id": "n129",
+      "label": "parseToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseToken",
+        "file": "agents/file_129.js",
+        "kind": "function",
+        "line": 249
+      }
+    },
+    {
+      "id": "n130",
+      "label": "syncSession",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.syncSession",
+        "file": "plugin/hooks/file_130.js",
+        "kind": "function",
+        "line": 340
+      }
+    },
+    {
+      "id": "n131",
+      "label": "emitState",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.emitState",
+        "file": "src/components/file_131.js",
+        "kind": "function",
+        "line": 175
+      }
+    },
+    {
+      "id": "n132",
+      "label": "resolvePayload",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.resolvePayload",
+        "file": "src/core/types/file_132.js",
+        "kind": "function",
+        "line": 341
+      }
+    },
+    {
+      "id": "n133",
+      "label": "applyNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.applyNode",
+        "file": "ingest/file_133.js",
+        "kind": "function",
+        "line": 260
+      }
+    },
+    {
+      "id": "n134",
+      "label": "fetchEvent",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.fetchEvent",
+        "file": "bridge/file_134.js",
+        "kind": "function",
+        "line": 241
+      }
+    },
+    {
+      "id": "n135",
+      "label": "handleConfig",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handleConfig",
+        "file": "src/components/wiki/file_135.js",
+        "kind": "function",
+        "line": 320
+      }
+    },
+    {
+      "id": "n136",
+      "label": "loadRequest",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadRequest",
+        "file": "src/components/file_136.js",
+        "kind": "function",
+        "line": 306
+      }
+    },
+    {
+      "id": "n137",
+      "label": "buildToken",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.buildToken",
+        "file": "plugin/hooks/file_137.js",
+        "kind": "function",
+        "line": 384
+      }
+    },
+    {
+      "id": "n138",
+      "label": "parseSession",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseSession",
+        "file": "workers/queue/file_138.js",
+        "kind": "function",
+        "line": 17
+      }
+    },
+    {
+      "id": "n139",
+      "label": "syncState",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.syncState",
+        "file": "bridge/mcp/file_139.js",
+        "kind": "function",
+        "line": 6
+      }
+    },
+    {
+      "id": "n140",
+      "label": "emitPayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitPayload",
+        "file": "server/db/migrations/file_140.js",
+        "kind": "function",
+        "line": 347
+      }
+    },
+    {
+      "id": "n141",
+      "label": "resolveNode",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.resolveNode",
+        "file": "bridge/mcp/file_141.js",
+        "kind": "function",
+        "line": 297
+      }
+    },
+    {
+      "id": "n142",
+      "label": "applyEvent",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.applyEvent",
+        "file": "src/auth/middleware/file_142.js",
+        "kind": "function",
+        "line": 264
+      }
+    },
+    {
+      "id": "n143",
+      "label": "fetchConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchConfig",
+        "file": "src/auth/file_143.js",
+        "kind": "function",
+        "line": 282
+      }
+    },
+    {
+      "id": "n144",
+      "label": "handleRequest",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.handleRequest",
+        "file": "src/core/file_144.js",
+        "kind": "function",
+        "line": 18
+      }
+    },
+    {
+      "id": "n145",
+      "label": "loadToken",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.loadToken",
+        "file": "workers/file_145.js",
+        "kind": "function",
+        "line": 73
+      }
+    },
+    {
+      "id": "n146",
+      "label": "buildSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.buildSession",
+        "file": "ingest/file_146.js",
+        "kind": "function",
+        "line": 106
+      }
+    },
+    {
+      "id": "n147",
+      "label": "parseState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.parseState",
+        "file": "src/core/types/file_147.js",
+        "kind": "function",
+        "line": 40
+      }
+    },
+    {
+      "id": "n148",
+      "label": "syncPayload",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.syncPayload",
+        "file": "agents/file_148.js",
+        "kind": "function",
+        "line": 86
+      }
+    },
+    {
+      "id": "n149",
+      "label": "emitNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.emitNode",
+        "file": "ingest/parsers/file_149.js",
+        "kind": "function",
+        "line": 58
+      }
+    },
+    {
+      "id": "n150",
+      "label": "resolveEvent",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.resolveEvent",
+        "file": "ingest/file_150.js",
+        "kind": "function",
+        "line": 268
+      }
+    },
+    {
+      "id": "n151",
+      "label": "applyConfig",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.applyConfig",
+        "file": "src/components/board/file_151.js",
+        "kind": "function",
+        "line": 390
+      }
+    },
+    {
+      "id": "n152",
+      "label": "fetchRequest",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.fetchRequest",
+        "file": "bridge/mcp/file_152.js",
+        "kind": "function",
+        "line": 131
+      }
+    },
+    {
+      "id": "n153",
+      "label": "handleToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.handleToken",
+        "file": "bridge/mcp/file_153.js",
+        "kind": "function",
+        "line": 73
+      }
+    },
+    {
+      "id": "n154",
+      "label": "loadSession",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.loadSession",
+        "file": "workers/file_154.js",
+        "kind": "function",
+        "line": 389
+      }
+    },
+    {
+      "id": "n155",
+      "label": "buildState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildState",
+        "file": "server/db/file_155.js",
+        "kind": "function",
+        "line": 47
+      }
+    },
+    {
+      "id": "n156",
+      "label": "parsePayload",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parsePayload",
+        "file": "workers/file_156.js",
+        "kind": "function",
+        "line": 15
+      }
+    },
+    {
+      "id": "n157",
+      "label": "syncNode",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.syncNode",
+        "file": "src/core/util/file_157.js",
+        "kind": "function",
+        "line": 78
+      }
+    },
+    {
+      "id": "n158",
+      "label": "emitEvent",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitEvent",
+        "file": "bridge/file_158.js",
+        "kind": "function",
+        "line": 130
+      }
+    },
+    {
+      "id": "n159",
+      "label": "resolveConfig",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.resolveConfig",
+        "file": "ingest/parsers/file_159.js",
+        "kind": "function",
+        "line": 235
+      }
+    },
+    {
+      "id": "n160",
+      "label": "applyRequest",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.applyRequest",
+        "file": "bridge/mcp/file_160.js",
+        "kind": "function",
+        "line": 205
+      }
+    },
+    {
+      "id": "n161",
+      "label": "fetchToken",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchToken",
+        "file": "src/auth/middleware/file_161.js",
+        "kind": "function",
+        "line": 37
+      }
+    },
+    {
+      "id": "n162",
+      "label": "handleSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleSession",
+        "file": "src/auth/middleware/file_162.js",
+        "kind": "function",
+        "line": 103
+      }
+    },
+    {
+      "id": "n163",
+      "label": "loadState",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.loadState",
+        "file": "agents/file_163.js",
+        "kind": "function",
+        "line": 42
+      }
+    },
+    {
+      "id": "n164",
+      "label": "buildPayload",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.buildPayload",
+        "file": "workers/queue/file_164.js",
+        "kind": "function",
+        "line": 36
+      }
+    },
+    {
+      "id": "n165",
+      "label": "parseNode",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseNode",
+        "file": "agents/worker/file_165.js",
+        "kind": "function",
+        "line": 272
+      }
+    },
+    {
+      "id": "n166",
+      "label": "syncEvent",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.syncEvent",
+        "file": "src/core/util/file_166.js",
+        "kind": "function",
+        "line": 139
+      }
+    },
+    {
+      "id": "n167",
+      "label": "emitConfig",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitConfig",
+        "file": "server/db/migrations/file_167.js",
+        "kind": "function",
+        "line": 113
+      }
+    },
+    {
+      "id": "n168",
+      "label": "resolveRequest",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.resolveRequest",
+        "file": "src/auth/middleware/file_168.js",
+        "kind": "function",
+        "line": 348
+      }
+    },
+    {
+      "id": "n169",
+      "label": "applyToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.applyToken",
+        "file": "bridge/mcp/file_169.js",
+        "kind": "function",
+        "line": 32
+      }
+    },
+    {
+      "id": "n170",
+      "label": "fetchSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchSession",
+        "file": "src/auth/file_170.js",
+        "kind": "function",
+        "line": 190
+      }
+    },
+    {
+      "id": "n171",
+      "label": "handleState",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.handleState",
+        "file": "plugin/hooks/file_171.js",
+        "kind": "function",
+        "line": 166
+      }
+    },
+    {
+      "id": "n172",
+      "label": "loadPayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.loadPayload",
+        "file": "server/db/migrations/file_172.js",
+        "kind": "function",
+        "line": 160
+      }
+    },
+    {
+      "id": "n173",
+      "label": "buildNode",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.buildNode",
+        "file": "plugin/hooks/file_173.js",
+        "kind": "function",
+        "line": 23
+      }
+    },
+    {
+      "id": "n174",
+      "label": "parseEvent",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseEvent",
+        "file": "workers/file_174.js",
+        "kind": "function",
+        "line": 219
+      }
+    },
+    {
+      "id": "n175",
+      "label": "syncConfig",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.syncConfig",
+        "file": "workers/queue/file_175.js",
+        "kind": "function",
+        "line": 332
+      }
+    },
+    {
+      "id": "n176",
+      "label": "emitRequest",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitRequest",
+        "file": "server/db/file_176.js",
+        "kind": "function",
+        "line": 344
+      }
+    },
+    {
+      "id": "n177",
+      "label": "resolveToken",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.resolveToken",
+        "file": "src/auth/middleware/file_177.js",
+        "kind": "function",
+        "line": 90
+      }
+    },
+    {
+      "id": "n178",
+      "label": "applySession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.applySession",
+        "file": "src/auth/file_178.js",
+        "kind": "function",
+        "line": 232
+      }
+    },
+    {
+      "id": "n179",
+      "label": "fetchState",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchState",
+        "file": "src/auth/middleware/file_179.js",
+        "kind": "function",
+        "line": 193
+      }
+    },
+    {
+      "id": "n180",
+      "label": "handlePayload",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handlePayload",
+        "file": "ingest/file_180.js",
+        "kind": "function",
+        "line": 371
+      }
+    },
+    {
+      "id": "n181",
+      "label": "loadNode",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.loadNode",
+        "file": "src/core/util/file_181.js",
+        "kind": "function",
+        "line": 213
+      }
+    },
+    {
+      "id": "n182",
+      "label": "buildEvent",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.buildEvent",
+        "file": "bridge/mcp/file_182.js",
+        "kind": "function",
+        "line": 371
+      }
+    },
+    {
+      "id": "n183",
+      "label": "parseConfig",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.parseConfig",
+        "file": "server/api/file_183.js",
+        "kind": "function",
+        "line": 337
+      }
+    },
+    {
+      "id": "n184",
+      "label": "syncRequest",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.syncRequest",
+        "file": "server/api/routes/file_184.js",
+        "kind": "function",
+        "line": 37
+      }
+    },
+    {
+      "id": "n185",
+      "label": "emitToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitToken",
+        "file": "bridge/file_185.js",
+        "kind": "function",
+        "line": 343
+      }
+    },
+    {
+      "id": "n186",
+      "label": "resolveSession",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.resolveSession",
+        "file": "src/core/types/file_186.js",
+        "kind": "function",
+        "line": 123
+      }
+    },
+    {
+      "id": "n187",
+      "label": "applyState",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.applyState",
+        "file": "server/api/file_187.js",
+        "kind": "function",
+        "line": 350
+      }
+    },
+    {
+      "id": "n188",
+      "label": "fetchPayload",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.fetchPayload",
+        "file": "bridge/file_188.js",
+        "kind": "function",
+        "line": 49
+      }
+    },
+    {
+      "id": "n189",
+      "label": "handleNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handleNode",
+        "file": "server/db/migrations/file_189.js",
+        "kind": "function",
+        "line": 87
+      }
+    },
+    {
+      "id": "n190",
+      "label": "loadEvent",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.loadEvent",
+        "file": "server/api/file_190.js",
+        "kind": "function",
+        "line": 1
+      }
+    },
+    {
+      "id": "n191",
+      "label": "buildConfig",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.buildConfig",
+        "file": "workers/file_191.js",
+        "kind": "function",
+        "line": 2
+      }
+    },
+    {
+      "id": "n192",
+      "label": "parseRequest",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseRequest",
+        "file": "agents/file_192.js",
+        "kind": "function",
+        "line": 139
+      }
+    },
+    {
+      "id": "n193",
+      "label": "syncToken",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.syncToken",
+        "file": "server/db/file_193.js",
+        "kind": "function",
+        "line": 347
+      }
+    },
+    {
+      "id": "n194",
+      "label": "emitSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.emitSession",
+        "file": "ingest/file_194.js",
+        "kind": "function",
+        "line": 114
+      }
+    },
+    {
+      "id": "n195",
+      "label": "resolveState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.resolveState",
+        "file": "src/core/types/file_195.js",
+        "kind": "function",
+        "line": 201
+      }
+    },
+    {
+      "id": "n196",
+      "label": "applyPayload",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.applyPayload",
+        "file": "ingest/file_196.js",
+        "kind": "function",
+        "line": 219
+      }
+    },
+    {
+      "id": "n197",
+      "label": "fetchNode",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.fetchNode",
+        "file": "server/db/file_197.js",
+        "kind": "function",
+        "line": 265
+      }
+    },
+    {
+      "id": "n198",
+      "label": "handleEvent",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.handleEvent",
+        "file": "src/auth/middleware/file_198.js",
+        "kind": "function",
+        "line": 11
+      }
+    },
+    {
+      "id": "n199",
+      "label": "loadConfig",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.loadConfig",
+        "file": "server/api/routes/file_199.js",
+        "kind": "function",
+        "line": 331
+      }
+    },
+    {
+      "id": "n200",
+      "label": "buildRequest",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.buildRequest",
+        "file": "bridge/mcp/file_200.js",
+        "kind": "function",
+        "line": 39
+      }
+    },
+    {
+      "id": "n201",
+      "label": "parseToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseToken",
+        "file": "agents/worker/file_201.js",
+        "kind": "function",
+        "line": 34
+      }
+    },
+    {
+      "id": "n202",
+      "label": "syncSession",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.syncSession",
+        "file": "bridge/file_202.js",
+        "kind": "function",
+        "line": 235
+      }
+    },
+    {
+      "id": "n203",
+      "label": "emitState",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.emitState",
+        "file": "agents/worker/file_203.js",
+        "kind": "function",
+        "line": 384
+      }
+    },
+    {
+      "id": "n204",
+      "label": "resolvePayload",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.resolvePayload",
+        "file": "workers/file_204.js",
+        "kind": "function",
+        "line": 264
+      }
+    },
+    {
+      "id": "n205",
+      "label": "applyNode",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.applyNode",
+        "file": "src/core/file_205.js",
+        "kind": "function",
+        "line": 32
+      }
+    },
+    {
+      "id": "n206",
+      "label": "fetchEvent",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchEvent",
+        "file": "src/auth/file_206.js",
+        "kind": "function",
+        "line": 143
+      }
+    },
+    {
+      "id": "n207",
+      "label": "handleConfig",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handleConfig",
+        "file": "server/db/migrations/file_207.js",
+        "kind": "function",
+        "line": 78
+      }
+    },
+    {
+      "id": "n208",
+      "label": "loadRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.loadRequest",
+        "file": "workers/file_208.js",
+        "kind": "function",
+        "line": 274
+      }
+    },
+    {
+      "id": "n209",
+      "label": "buildToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.buildToken",
+        "file": "agents/worker/file_209.js",
+        "kind": "function",
+        "line": 79
+      }
+    },
+    {
+      "id": "n210",
+      "label": "parseSession",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.parseSession",
+        "file": "plugin/hooks/file_210.js",
+        "kind": "function",
+        "line": 2
+      }
+    },
+    {
+      "id": "n211",
+      "label": "syncState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.syncState",
+        "file": "src/core/file_211.js",
+        "kind": "function",
+        "line": 262
+      }
+    },
+    {
+      "id": "n212",
+      "label": "emitPayload",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.emitPayload",
+        "file": "src/core/file_212.js",
+        "kind": "function",
+        "line": 296
+      }
+    },
+    {
+      "id": "n213",
+      "label": "resolveNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.resolveNode",
+        "file": "ingest/file_213.js",
+        "kind": "function",
+        "line": 173
+      }
+    },
+    {
+      "id": "n214",
+      "label": "applyEvent",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.applyEvent",
+        "file": "workers/file_214.js",
+        "kind": "function",
+        "line": 372
+      }
+    },
+    {
+      "id": "n215",
+      "label": "fetchConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchConfig",
+        "file": "src/auth/file_215.js",
+        "kind": "function",
+        "line": 259
+      }
+    },
+    {
+      "id": "n216",
+      "label": "handleRequest",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handleRequest",
+        "file": "server/db/migrations/file_216.js",
+        "kind": "function",
+        "line": 375
+      }
+    },
+    {
+      "id": "n217",
+      "label": "loadToken",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadToken",
+        "file": "src/components/wiki/file_217.js",
+        "kind": "function",
+        "line": 242
+      }
+    },
+    {
+      "id": "n218",
+      "label": "buildSession",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.buildSession",
+        "file": "plugin/hooks/file_218.js",
+        "kind": "function",
+        "line": 63
+      }
+    },
+    {
+      "id": "n219",
+      "label": "parseState",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.parseState",
+        "file": "plugin/hooks/file_219.js",
+        "kind": "function",
+        "line": 347
+      }
+    },
+    {
+      "id": "n220",
+      "label": "syncPayload",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.syncPayload",
+        "file": "plugin/hooks/file_220.js",
+        "kind": "function",
+        "line": 252
+      }
+    },
+    {
+      "id": "n221",
+      "label": "emitNode",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.emitNode",
+        "file": "plugin/hooks/file_221.js",
+        "kind": "function",
+        "line": 343
+      }
+    },
+    {
+      "id": "n222",
+      "label": "resolveEvent",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.resolveEvent",
+        "file": "bridge/file_222.js",
+        "kind": "function",
+        "line": 203
+      }
+    },
+    {
+      "id": "n223",
+      "label": "applyConfig",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.applyConfig",
+        "file": "plugin/hooks/file_223.js",
+        "kind": "function",
+        "line": 347
+      }
+    },
+    {
+      "id": "n224",
+      "label": "fetchRequest",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.fetchRequest",
+        "file": "workers/file_224.js",
+        "kind": "function",
+        "line": 281
+      }
+    },
+    {
+      "id": "n225",
+      "label": "handleToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.handleToken",
+        "file": "bridge/mcp/file_225.js",
+        "kind": "function",
+        "line": 133
+      }
+    },
+    {
+      "id": "n226",
+      "label": "loadSession",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.loadSession",
+        "file": "server/db/migrations/file_226.js",
+        "kind": "function",
+        "line": 303
+      }
+    },
+    {
+      "id": "n227",
+      "label": "buildState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildState",
+        "file": "server/db/migrations/file_227.js",
+        "kind": "function",
+        "line": 342
+      }
+    },
+    {
+      "id": "n228",
+      "label": "parsePayload",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.parsePayload",
+        "file": "server/db/migrations/file_228.js",
+        "kind": "function",
+        "line": 6
+      }
+    },
+    {
+      "id": "n229",
+      "label": "syncNode",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.syncNode",
+        "file": "server/api/routes/file_229.js",
+        "kind": "function",
+        "line": 65
+      }
+    },
+    {
+      "id": "n230",
+      "label": "emitEvent",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitEvent",
+        "file": "server/db/file_230.js",
+        "kind": "function",
+        "line": 293
+      }
+    },
+    {
+      "id": "n231",
+      "label": "resolveConfig",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.resolveConfig",
+        "file": "plugin/hooks/file_231.js",
+        "kind": "function",
+        "line": 306
+      }
+    },
+    {
+      "id": "n232",
+      "label": "applyRequest",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.applyRequest",
+        "file": "src/auth/file_232.js",
+        "kind": "function",
+        "line": 97
+      }
+    },
+    {
+      "id": "n233",
+      "label": "fetchToken",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.fetchToken",
+        "file": "server/api/routes/file_233.js",
+        "kind": "function",
+        "line": 17
+      }
+    },
+    {
+      "id": "n234",
+      "label": "handleSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleSession",
+        "file": "ingest/file_234.js",
+        "kind": "function",
+        "line": 6
+      }
+    },
+    {
+      "id": "n235",
+      "label": "loadState",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadState",
+        "file": "src/components/wiki/file_235.js",
+        "kind": "function",
+        "line": 18
+      }
+    },
+    {
+      "id": "n236",
+      "label": "buildPayload",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.buildPayload",
+        "file": "agents/claude/file_236.js",
+        "kind": "function",
+        "line": 217
+      }
+    },
+    {
+      "id": "n237",
+      "label": "parseNode",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.parseNode",
+        "file": "src/auth/middleware/file_237.js",
+        "kind": "function",
+        "line": 381
+      }
+    },
+    {
+      "id": "n238",
+      "label": "syncEvent",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.syncEvent",
+        "file": "server/api/routes/file_238.js",
+        "kind": "function",
+        "line": 91
+      }
+    },
+    {
+      "id": "n239",
+      "label": "emitConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.emitConfig",
+        "file": "src/auth/middleware/file_239.js",
+        "kind": "function",
+        "line": 195
+      }
+    },
+    {
+      "id": "n240",
+      "label": "resolveRequest",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.resolveRequest",
+        "file": "server/api/routes/file_240.js",
+        "kind": "function",
+        "line": 83
+      }
+    },
+    {
+      "id": "n241",
+      "label": "applyToken",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.applyToken",
+        "file": "plugin/hooks/file_241.js",
+        "kind": "function",
+        "line": 187
+      }
+    },
+    {
+      "id": "n242",
+      "label": "fetchSession",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.fetchSession",
+        "file": "workers/queue/file_242.js",
+        "kind": "function",
+        "line": 328
+      }
+    },
+    {
+      "id": "n243",
+      "label": "handleState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.handleState",
+        "file": "server/db/migrations/file_243.js",
+        "kind": "function",
+        "line": 339
+      }
+    },
+    {
+      "id": "n244",
+      "label": "loadPayload",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.loadPayload",
+        "file": "server/api/file_244.js",
+        "kind": "function",
+        "line": 197
+      }
+    },
+    {
+      "id": "n245",
+      "label": "buildNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.buildNode",
+        "file": "ingest/parsers/file_245.js",
+        "kind": "function",
+        "line": 248
+      }
+    },
+    {
+      "id": "n246",
+      "label": "parseEvent",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseEvent",
+        "file": "agents/claude/file_246.js",
+        "kind": "function",
+        "line": 366
+      }
+    },
+    {
+      "id": "n247",
+      "label": "syncConfig",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.syncConfig",
+        "file": "src/auth/middleware/file_247.js",
+        "kind": "function",
+        "line": 50
+      }
+    },
+    {
+      "id": "n248",
+      "label": "emitRequest",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitRequest",
+        "file": "bridge/mcp/file_248.js",
+        "kind": "function",
+        "line": 388
+      }
+    },
+    {
+      "id": "n249",
+      "label": "resolveToken",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.resolveToken",
+        "file": "bridge/mcp/file_249.js",
+        "kind": "function",
+        "line": 67
+      }
+    },
+    {
+      "id": "n250",
+      "label": "applySession",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.applySession",
+        "file": "server/db/migrations/file_250.js",
+        "kind": "function",
+        "line": 117
+      }
+    },
+    {
+      "id": "n251",
+      "label": "fetchState",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.fetchState",
+        "file": "plugin/hooks/file_251.js",
+        "kind": "function",
+        "line": 112
+      }
+    },
+    {
+      "id": "n252",
+      "label": "handlePayload",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handlePayload",
+        "file": "src/components/file_252.js",
+        "kind": "function",
+        "line": 165
+      }
+    },
+    {
+      "id": "n253",
+      "label": "loadNode",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.loadNode",
+        "file": "agents/worker/file_253.js",
+        "kind": "function",
+        "line": 365
+      }
+    },
+    {
+      "id": "n254",
+      "label": "buildEvent",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.buildEvent",
+        "file": "workers/queue/file_254.js",
+        "kind": "function",
+        "line": 301
+      }
+    },
+    {
+      "id": "n255",
+      "label": "parseConfig",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.parseConfig",
+        "file": "server/db/file_255.js",
+        "kind": "function",
+        "line": 135
+      }
+    },
+    {
+      "id": "n256",
+      "label": "syncRequest",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.syncRequest",
+        "file": "server/db/file_256.js",
+        "kind": "function",
+        "line": 118
+      }
+    },
+    {
+      "id": "n257",
+      "label": "emitToken",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.emitToken",
+        "file": "plugin/hooks/file_257.js",
+        "kind": "function",
+        "line": 330
+      }
+    },
+    {
+      "id": "n258",
+      "label": "resolveSession",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.resolveSession",
+        "file": "src/core/types/file_258.js",
+        "kind": "function",
+        "line": 24
+      }
+    },
+    {
+      "id": "n259",
+      "label": "applyState",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.applyState",
+        "file": "src/core/util/file_259.js",
+        "kind": "function",
+        "line": 80
+      }
+    },
+    {
+      "id": "n260",
+      "label": "fetchPayload",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.fetchPayload",
+        "file": "src/auth/file_260.js",
+        "kind": "function",
+        "line": 95
+      }
+    },
+    {
+      "id": "n261",
+      "label": "handleNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleNode",
+        "file": "ingest/parsers/file_261.js",
+        "kind": "function",
+        "line": 157
+      }
+    },
+    {
+      "id": "n262",
+      "label": "loadEvent",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadEvent",
+        "file": "src/auth/middleware/file_262.js",
+        "kind": "function",
+        "line": 72
+      }
+    },
+    {
+      "id": "n263",
+      "label": "buildConfig",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.buildConfig",
+        "file": "agents/file_263.js",
+        "kind": "function",
+        "line": 184
+      }
+    },
+    {
+      "id": "n264",
+      "label": "parseRequest",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.parseRequest",
+        "file": "agents/worker/file_264.js",
+        "kind": "function",
+        "line": 17
+      }
+    },
+    {
+      "id": "n265",
+      "label": "syncToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.syncToken",
+        "file": "agents/claude/file_265.js",
+        "kind": "function",
+        "line": 65
+      }
+    },
+    {
+      "id": "n266",
+      "label": "emitSession",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.emitSession",
+        "file": "bridge/file_266.js",
+        "kind": "function",
+        "line": 369
+      }
+    },
+    {
+      "id": "n267",
+      "label": "resolveState",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.resolveState",
+        "file": "src/components/board/file_267.js",
+        "kind": "function",
+        "line": 218
+      }
+    },
+    {
+      "id": "n268",
+      "label": "applyPayload",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.applyPayload",
+        "file": "agents/file_268.js",
+        "kind": "function",
+        "line": 182
+      }
+    },
+    {
+      "id": "n269",
+      "label": "fetchNode",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.fetchNode",
+        "file": "bridge/mcp/file_269.js",
+        "kind": "function",
+        "line": 127
+      }
+    },
+    {
+      "id": "n270",
+      "label": "handleEvent",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.handleEvent",
+        "file": "src/components/board/file_270.js",
+        "kind": "function",
+        "line": 126
+      }
+    },
+    {
+      "id": "n271",
+      "label": "loadConfig",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.loadConfig",
+        "file": "bridge/mcp/file_271.js",
+        "kind": "function",
+        "line": 295
+      }
+    },
+    {
+      "id": "n272",
+      "label": "buildRequest",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.buildRequest",
+        "file": "server/db/file_272.js",
+        "kind": "function",
+        "line": 328
+      }
+    },
+    {
+      "id": "n273",
+      "label": "parseToken",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.parseToken",
+        "file": "server/db/migrations/file_273.js",
+        "kind": "function",
+        "line": 165
+      }
+    },
+    {
+      "id": "n274",
+      "label": "syncSession",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.syncSession",
+        "file": "ingest/file_274.js",
+        "kind": "function",
+        "line": 380
+      }
+    },
+    {
+      "id": "n275",
+      "label": "emitState",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.emitState",
+        "file": "server/db/file_275.js",
+        "kind": "function",
+        "line": 137
+      }
+    },
+    {
+      "id": "n276",
+      "label": "resolvePayload",
+      "clusterId": "hooks",
+      "symbol": {
+        "name": "hooks.resolvePayload",
+        "file": "plugin/hooks/file_276.js",
+        "kind": "function",
+        "line": 145
+      }
+    },
+    {
+      "id": "n277",
+      "label": "applyNode",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.applyNode",
+        "file": "ingest/parsers/file_277.js",
+        "kind": "function",
+        "line": 260
+      }
+    },
+    {
+      "id": "n278",
+      "label": "fetchEvent",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.fetchEvent",
+        "file": "server/api/routes/file_278.js",
+        "kind": "function",
+        "line": 246
+      }
+    },
+    {
+      "id": "n279",
+      "label": "handleConfig",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.handleConfig",
+        "file": "server/api/file_279.js",
+        "kind": "function",
+        "line": 5
+      }
+    },
+    {
+      "id": "n280",
+      "label": "loadRequest",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.loadRequest",
+        "file": "agents/file_280.js",
+        "kind": "function",
+        "line": 222
+      }
+    },
+    {
+      "id": "n281",
+      "label": "buildToken",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.buildToken",
+        "file": "agents/claude/file_281.js",
+        "kind": "function",
+        "line": 212
+      }
+    },
+    {
+      "id": "n282",
+      "label": "parseSession",
+      "clusterId": "workers",
+      "symbol": {
+        "name": "workers.parseSession",
+        "file": "workers/file_282.js",
+        "kind": "function",
+        "line": 257
+      }
+    },
+    {
+      "id": "n283",
+      "label": "syncState",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.syncState",
+        "file": "agents/claude/file_283.js",
+        "kind": "function",
+        "line": 234
+      }
+    },
+    {
+      "id": "n284",
+      "label": "emitPayload",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.emitPayload",
+        "file": "agents/claude/file_284.js",
+        "kind": "function",
+        "line": 170
+      }
+    },
+    {
+      "id": "n285",
+      "label": "resolveNode",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.resolveNode",
+        "file": "src/components/board/file_285.js",
+        "kind": "function",
+        "line": 377
+      }
+    },
+    {
+      "id": "n286",
+      "label": "applyEvent",
+      "clusterId": "db",
+      "symbol": {
+        "name": "db.applyEvent",
+        "file": "server/db/file_286.js",
+        "kind": "function",
+        "line": 55
+      }
+    },
+    {
+      "id": "n287",
+      "label": "fetchConfig",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.fetchConfig",
+        "file": "agents/worker/file_287.js",
+        "kind": "function",
+        "line": 122
+      }
+    },
+    {
+      "id": "n288",
+      "label": "handleRequest",
+      "clusterId": "ingest",
+      "symbol": {
+        "name": "ingest.handleRequest",
+        "file": "ingest/parsers/file_288.js",
+        "kind": "function",
+        "line": 329
+      }
+    },
+    {
+      "id": "n289",
+      "label": "loadToken",
+      "clusterId": "ui",
+      "symbol": {
+        "name": "ui.loadToken",
+        "file": "src/components/file_289.js",
+        "kind": "function",
+        "line": 124
+      }
+    },
+    {
+      "id": "n290",
+      "label": "buildSession",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.buildSession",
+        "file": "bridge/mcp/file_290.js",
+        "kind": "function",
+        "line": 99
+      }
+    },
+    {
+      "id": "n291",
+      "label": "parseState",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.parseState",
+        "file": "bridge/mcp/file_291.js",
+        "kind": "function",
+        "line": 193
+      }
+    },
+    {
+      "id": "n292",
+      "label": "syncPayload",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.syncPayload",
+        "file": "bridge/file_292.js",
+        "kind": "function",
+        "line": 304
+      }
+    },
+    {
+      "id": "n293",
+      "label": "emitNode",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.emitNode",
+        "file": "agents/worker/file_293.js",
+        "kind": "function",
+        "line": 128
+      }
+    },
+    {
+      "id": "n294",
+      "label": "resolveEvent",
+      "clusterId": "api",
+      "symbol": {
+        "name": "api.resolveEvent",
+        "file": "server/api/routes/file_294.js",
+        "kind": "function",
+        "line": 9
+      }
+    },
+    {
+      "id": "n295",
+      "label": "applyConfig",
+      "clusterId": "bridge",
+      "symbol": {
+        "name": "bridge.applyConfig",
+        "file": "bridge/file_295.js",
+        "kind": "function",
+        "line": 331
+      }
+    },
+    {
+      "id": "n296",
+      "label": "fetchRequest",
+      "clusterId": "agents",
+      "symbol": {
+        "name": "agents.fetchRequest",
+        "file": "agents/claude/file_296.js",
+        "kind": "function",
+        "line": 348
+      }
+    },
+    {
+      "id": "n297",
+      "label": "handleToken",
+      "clusterId": "core",
+      "symbol": {
+        "name": "core.handleToken",
+        "file": "src/core/util/file_297.js",
+        "kind": "function",
+        "line": 251
+      }
+    },
+    {
+      "id": "n298",
+      "label": "loadSession",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.loadSession",
+        "file": "src/auth/file_298.js",
+        "kind": "function",
+        "line": 293
+      }
+    },
+    {
+      "id": "n299",
+      "label": "buildState",
+      "clusterId": "auth",
+      "symbol": {
+        "name": "auth.buildState",
+        "file": "src/auth/file_299.js",
+        "kind": "function",
+        "line": 164
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "n99",
+      "target": "n10",
+      "weight": 3
+    },
+    {
+      "source": "n269",
+      "target": "n139",
+      "weight": 2
+    },
+    {
+      "source": "n238",
+      "target": "n87",
+      "weight": 2
+    },
+    {
+      "source": "n52",
+      "target": "n60",
+      "weight": 1
+    },
+    {
+      "source": "n242",
+      "target": "n1",
+      "weight": 1
+    },
+    {
+      "source": "n187",
+      "target": "n233",
+      "weight": 1
+    },
+    {
+      "source": "n231",
+      "target": "n219",
+      "weight": 3
+    },
+    {
+      "source": "n160",
+      "target": "n82",
+      "weight": 3
+    },
+    {
+      "source": "n277",
+      "target": "n72",
+      "weight": 3
+    },
+    {
+      "source": "n225",
+      "target": "n62",
+      "weight": 3
+    },
+    {
+      "source": "n80",
+      "target": "n277",
+      "weight": 3
+    },
+    {
+      "source": "n63",
+      "target": "n27",
+      "weight": 1
+    },
+    {
+      "source": "n99",
+      "target": "n198",
+      "weight": 1
+    },
+    {
+      "source": "n219",
+      "target": "n25",
+      "weight": 3
+    },
+    {
+      "source": "n75",
+      "target": "n13",
+      "weight": 1
+    },
+    {
+      "source": "n142",
+      "target": "n198",
+      "weight": 3
+    },
+    {
+      "source": "n20",
+      "target": "n32",
+      "weight": 1
+    },
+    {
+      "source": "n297",
+      "target": "n132",
+      "weight": 2
+    },
+    {
+      "source": "n99",
+      "target": "n82",
+      "weight": 1
+    },
+    {
+      "source": "n192",
+      "target": "n280",
+      "weight": 2
+    },
+    {
+      "source": "n267",
+      "target": "n19",
+      "weight": 2
+    },
+    {
+      "source": "n79",
+      "target": "n73",
+      "weight": 2
+    },
+    {
+      "source": "n152",
+      "target": "n266",
+      "weight": 2
+    },
+    {
+      "source": "n45",
+      "target": "n119",
+      "weight": 2
+    },
+    {
+      "source": "n41",
+      "target": "n64",
+      "weight": 3
+    },
+    {
+      "source": "n85",
+      "target": "n130",
+      "weight": 3
+    },
+    {
+      "source": "n290",
+      "target": "n222",
+      "weight": 1
+    },
+    {
+      "source": "n63",
+      "target": "n270",
+      "weight": 2
+    },
+    {
+      "source": "n56",
+      "target": "n44",
+      "weight": 1
+    },
+    {
+      "source": "n121",
+      "target": "n216",
+      "weight": 1
+    },
+    {
+      "source": "n251",
+      "target": "n171",
+      "weight": 1
+    },
+    {
+      "source": "n10",
+      "target": "n20",
+      "weight": 2
+    },
+    {
+      "source": "n249",
+      "target": "n74",
+      "weight": 2
+    },
+    {
+      "source": "n209",
+      "target": "n120",
+      "weight": 3
+    },
+    {
+      "source": "n149",
+      "target": "n191",
+      "weight": 1
+    },
+    {
+      "source": "n6",
+      "target": "n89",
+      "weight": 1
+    },
+    {
+      "source": "n56",
+      "target": "n282",
+      "weight": 3
+    },
+    {
+      "source": "n95",
+      "target": "n118",
+      "weight": 1
+    },
+    {
+      "source": "n154",
+      "target": "n40",
+      "weight": 2
+    },
+    {
+      "source": "n17",
+      "target": "n195",
+      "weight": 3
+    },
+    {
+      "source": "n62",
+      "target": "n64",
+      "weight": 2
+    },
+    {
+      "source": "n152",
+      "target": "n269",
+      "weight": 2
+    },
+    {
+      "source": "n205",
+      "target": "n22",
+      "weight": 3
+    },
+    {
+      "source": "n44",
+      "target": "n119",
+      "weight": 1
+    },
+    {
+      "source": "n97",
+      "target": "n178",
+      "weight": 2
+    },
+    {
+      "source": "n104",
+      "target": "n150",
+      "weight": 2
+    },
+    {
+      "source": "n246",
+      "target": "n118",
+      "weight": 2
+    },
+    {
+      "source": "n98",
+      "target": "n184",
+      "weight": 2
+    },
+    {
+      "source": "n141",
+      "target": "n200",
+      "weight": 2
+    },
+    {
+      "source": "n221",
+      "target": "n194",
+      "weight": 3
+    },
+    {
+      "source": "n168",
+      "target": "n299",
+      "weight": 2
+    },
+    {
+      "source": "n292",
+      "target": "n147",
+      "weight": 3
+    },
+    {
+      "source": "n217",
+      "target": "n267",
+      "weight": 1
+    },
+    {
+      "source": "n195",
+      "target": "n186",
+      "weight": 2
+    },
+    {
+      "source": "n7",
+      "target": "n41",
+      "weight": 1
+    },
+    {
+      "source": "n233",
+      "target": "n199",
+      "weight": 3
+    },
+    {
+      "source": "n98",
+      "target": "n244",
+      "weight": 1
+    },
+    {
+      "source": "n88",
+      "target": "n199",
+      "weight": 1
+    },
+    {
+      "source": "n299",
+      "target": "n10",
+      "weight": 2
+    },
+    {
+      "source": "n273",
+      "target": "n167",
+      "weight": 1
+    },
+    {
+      "source": "n296",
+      "target": "n136",
+      "weight": 1
+    },
+    {
+      "source": "n214",
+      "target": "n242",
+      "weight": 2
+    },
+    {
+      "source": "n282",
+      "target": "n174",
+      "weight": 2
+    },
+    {
+      "source": "n137",
+      "target": "n219",
+      "weight": 3
+    },
+    {
+      "source": "n8",
+      "target": "n66",
+      "weight": 1
+    },
+    {
+      "source": "n277",
+      "target": "n76",
+      "weight": 2
+    },
+    {
+      "source": "n297",
+      "target": "n212",
+      "weight": 2
+    },
+    {
+      "source": "n199",
+      "target": "n184",
+      "weight": 2
+    },
+    {
+      "source": "n83",
+      "target": "n255",
+      "weight": 1
+    },
+    {
+      "source": "n69",
+      "target": "n278",
+      "weight": 2
+    },
+    {
+      "source": "n283",
+      "target": "n281",
+      "weight": 2
+    },
+    {
+      "source": "n201",
+      "target": "n296",
+      "weight": 1
+    },
+    {
+      "source": "n33",
+      "target": "n75",
+      "weight": 2
+    },
+    {
+      "source": "n24",
+      "target": "n86",
+      "weight": 2
+    },
+    {
+      "source": "n279",
+      "target": "n190",
+      "weight": 2
+    },
+    {
+      "source": "n242",
+      "target": "n40",
+      "weight": 1
+    },
+    {
+      "source": "n22",
+      "target": "n259",
+      "weight": 3
+    },
+    {
+      "source": "n217",
+      "target": "n24",
+      "weight": 2
+    },
+    {
+      "source": "n144",
+      "target": "n211",
+      "weight": 3
+    },
+    {
+      "source": "n17",
+      "target": "n49",
+      "weight": 1
+    },
+    {
+      "source": "n144",
+      "target": "n157",
+      "weight": 1
+    },
+    {
+      "source": "n114",
+      "target": "n55",
+      "weight": 2
+    },
+    {
+      "source": "n195",
+      "target": "n157",
+      "weight": 3
+    },
+    {
+      "source": "n146",
+      "target": "n155",
+      "weight": 2
+    },
+    {
+      "source": "n174",
+      "target": "n60",
+      "weight": 1
+    },
+    {
+      "source": "n120",
+      "target": "n70",
+      "weight": 3
+    },
+    {
+      "source": "n289",
+      "target": "n46",
+      "weight": 2
+    },
+    {
+      "source": "n284",
+      "target": "n110",
+      "weight": 2
+    },
+    {
+      "source": "n290",
+      "target": "n39",
+      "weight": 1
+    },
+    {
+      "source": "n204",
+      "target": "n208",
+      "weight": 1
+    },
+    {
+      "source": "n165",
+      "target": "n201",
+      "weight": 3
+    },
+    {
+      "source": "n251",
+      "target": "n221",
+      "weight": 3
+    },
+    {
+      "source": "n2",
+      "target": "n15",
+      "weight": 1
+    },
+    {
+      "source": "n23",
+      "target": "n102",
+      "weight": 2
+    },
+    {
+      "source": "n134",
+      "target": "n295",
+      "weight": 1
+    },
+    {
+      "source": "n190",
+      "target": "n52",
+      "weight": 1
+    },
+    {
+      "source": "n114",
+      "target": "n20",
+      "weight": 1
+    },
+    {
+      "source": "n244",
+      "target": "n199",
+      "weight": 1
+    },
+    {
+      "source": "n262",
+      "target": "n114",
+      "weight": 3
+    },
+    {
+      "source": "n12",
+      "target": "n30",
+      "weight": 1
+    },
+    {
+      "source": "n144",
+      "target": "n59",
+      "weight": 2
+    },
+    {
+      "source": "n46",
+      "target": "n19",
+      "weight": 2
+    },
+    {
+      "source": "n56",
+      "target": "n89",
+      "weight": 1
+    },
+    {
+      "source": "n184",
+      "target": "n240",
+      "weight": 1
+    },
+    {
+      "source": "n243",
+      "target": "n133",
+      "weight": 1
+    },
+    {
+      "source": "n258",
+      "target": "n169",
+      "weight": 1
+    },
+    {
+      "source": "n112",
+      "target": "n40",
+      "weight": 1
+    },
+    {
+      "source": "n34",
+      "target": "n140",
+      "weight": 1
+    },
+    {
+      "source": "n79",
+      "target": "n63",
+      "weight": 3
+    },
+    {
+      "source": "n97",
+      "target": "n55",
+      "weight": 2
+    },
+    {
+      "source": "n85",
+      "target": "n173",
+      "weight": 2
+    },
+    {
+      "source": "n151",
+      "target": "n31",
+      "weight": 1
+    },
+    {
+      "source": "n208",
+      "target": "n84",
+      "weight": 2
+    },
+    {
+      "source": "n70",
+      "target": "n125",
+      "weight": 1
+    },
+    {
+      "source": "n66",
+      "target": "n233",
+      "weight": 1
+    },
+    {
+      "source": "n212",
+      "target": "n181",
+      "weight": 3
+    },
+    {
+      "source": "n41",
+      "target": "n238",
+      "weight": 1
+    },
+    {
+      "source": "n64",
+      "target": "n133",
+      "weight": 1
+    },
+    {
+      "source": "n2",
+      "target": "n287",
+      "weight": 3
+    },
+    {
+      "source": "n184",
+      "target": "n96",
+      "weight": 2
+    },
+    {
+      "source": "n41",
+      "target": "n88",
+      "weight": 3
+    },
+    {
+      "source": "n299",
+      "target": "n179",
+      "weight": 2
+    },
+    {
+      "source": "n26",
+      "target": "n123",
+      "weight": 2
+    },
+    {
+      "source": "n199",
+      "target": "n7",
+      "weight": 2
+    },
+    {
+      "source": "n243",
+      "target": "n230",
+      "weight": 1
+    },
+    {
+      "source": "n175",
+      "target": "n127",
+      "weight": 1
+    },
+    {
+      "source": "n141",
+      "target": "n77",
+      "weight": 1
+    },
+    {
+      "source": "n34",
+      "target": "n36",
+      "weight": 3
+    },
+    {
+      "source": "n205",
+      "target": "n297",
+      "weight": 1
+    },
+    {
+      "source": "n285",
+      "target": "n45",
+      "weight": 2
+    },
+    {
+      "source": "n25",
+      "target": "n210",
+      "weight": 2
+    },
+    {
+      "source": "n91",
+      "target": "n34",
+      "weight": 2
+    },
+    {
+      "source": "n221",
+      "target": "n241",
+      "weight": 2
+    },
+    {
+      "source": "n144",
+      "target": "n22",
+      "weight": 2
+    },
+    {
+      "source": "n210",
+      "target": "n53",
+      "weight": 1
+    },
+    {
+      "source": "n12",
+      "target": "n29",
+      "weight": 3
+    },
+    {
+      "source": "n103",
+      "target": "n176",
+      "weight": 3
+    },
+    {
+      "source": "n38",
+      "target": "n239",
+      "weight": 2
+    },
+    {
+      "source": "n116",
+      "target": "n218",
+      "weight": 3
+    },
+    {
+      "source": "n120",
+      "target": "n165",
+      "weight": 1
+    },
+    {
+      "source": "n281",
+      "target": "n293",
+      "weight": 2
+    },
+    {
+      "source": "n221",
+      "target": "n25",
+      "weight": 1
+    },
+    {
+      "source": "n57",
+      "target": "n30",
+      "weight": 3
+    },
+    {
+      "source": "n42",
+      "target": "n105",
+      "weight": 1
+    },
+    {
+      "source": "n30",
+      "target": "n19",
+      "weight": 3
+    },
+    {
+      "source": "n28",
+      "target": "n265",
+      "weight": 3
+    },
+    {
+      "source": "n76",
+      "target": "n90",
+      "weight": 1
+    },
+    {
+      "source": "n5",
+      "target": "n210",
+      "weight": 1
+    },
+    {
+      "source": "n196",
+      "target": "n248",
+      "weight": 3
+    },
+    {
+      "source": "n78",
+      "target": "n65",
+      "weight": 1
+    },
+    {
+      "source": "n244",
+      "target": "n183",
+      "weight": 1
+    },
+    {
+      "source": "n73",
+      "target": "n180",
+      "weight": 2
+    },
+    {
+      "source": "n212",
+      "target": "n59",
+      "weight": 3
+    },
+    {
+      "source": "n40",
+      "target": "n56",
+      "weight": 3
+    },
+    {
+      "source": "n276",
+      "target": "n171",
+      "weight": 2
+    },
+    {
+      "source": "n210",
+      "target": "n132",
+      "weight": 1
+    },
+    {
+      "source": "n291",
+      "target": "n109",
+      "weight": 3
+    },
+    {
+      "source": "n95",
+      "target": "n296",
+      "weight": 1
+    },
+    {
+      "source": "n104",
+      "target": "n228",
+      "weight": 3
+    },
+    {
+      "source": "n293",
+      "target": "n265",
+      "weight": 1
+    },
+    {
+      "source": "n52",
+      "target": "n30",
+      "weight": 2
+    },
+    {
+      "source": "n30",
+      "target": "n119",
+      "weight": 3
+    },
+    {
+      "source": "n294",
+      "target": "n98",
+      "weight": 1
+    },
+    {
+      "source": "n271",
+      "target": "n74",
+      "weight": 1
+    },
+    {
+      "source": "n269",
+      "target": "n169",
+      "weight": 1
+    },
+    {
+      "source": "n117",
+      "target": "n229",
+      "weight": 1
+    },
+    {
+      "source": "n222",
+      "target": "n129",
+      "weight": 3
+    },
+    {
+      "source": "n143",
+      "target": "n161",
+      "weight": 2
+    },
+    {
+      "source": "n60",
+      "target": "n156",
+      "weight": 2
+    },
+    {
+      "source": "n199",
+      "target": "n127",
+      "weight": 1
+    },
+    {
+      "source": "n292",
+      "target": "n151",
+      "weight": 1
+    },
+    {
+      "source": "n243",
+      "target": "n122",
+      "weight": 2
+    },
+    {
+      "source": "n89",
+      "target": "n175",
+      "weight": 1
+    },
+    {
+      "source": "n166",
+      "target": "n159",
+      "weight": 3
+    },
+    {
+      "source": "n85",
+      "target": "n251",
+      "weight": 1
+    },
+    {
+      "source": "n234",
+      "target": "n174",
+      "weight": 1
+    },
+    {
+      "source": "n14",
+      "target": "n31",
+      "weight": 2
+    },
+    {
+      "source": "n18",
+      "target": "n161",
+      "weight": 1
+    },
+    {
+      "source": "n93",
+      "target": "n256",
+      "weight": 2
+    },
+    {
+      "source": "n102",
+      "target": "n157",
+      "weight": 2
+    },
+    {
+      "source": "n190",
+      "target": "n86",
+      "weight": 1
+    },
+    {
+      "source": "n4",
+      "target": "n10",
+      "weight": 2
+    },
+    {
+      "source": "n117",
+      "target": "n216",
+      "weight": 3
+    },
+    {
+      "source": "n201",
+      "target": "n253",
+      "weight": 1
+    },
+    {
+      "source": "n98",
+      "target": "n51",
+      "weight": 3
+    },
+    {
+      "source": "n199",
+      "target": "n38",
+      "weight": 1
+    },
+    {
+      "source": "n241",
+      "target": "n143",
+      "weight": 2
+    },
+    {
+      "source": "n10",
+      "target": "n177",
+      "weight": 2
+    },
+    {
+      "source": "n101",
+      "target": "n110",
+      "weight": 1
+    },
+    {
+      "source": "n67",
+      "target": "n207",
+      "weight": 1
+    },
+    {
+      "source": "n208",
+      "target": "n134",
+      "weight": 2
+    },
+    {
+      "source": "n218",
+      "target": "n241",
+      "weight": 3
+    },
+    {
+      "source": "n67",
+      "target": "n8",
+      "weight": 1
+    },
+    {
+      "source": "n25",
+      "target": "n137",
+      "weight": 1
+    },
+    {
+      "source": "n15",
+      "target": "n44",
+      "weight": 3
+    },
+    {
+      "source": "n214",
+      "target": "n56",
+      "weight": 3
+    },
+    {
+      "source": "n92",
+      "target": "n162",
+      "weight": 1
+    },
+    {
+      "source": "n296",
+      "target": "n280",
+      "weight": 1
+    },
+    {
+      "source": "n205",
+      "target": "n13",
+      "weight": 1
+    },
+    {
+      "source": "n135",
+      "target": "n267",
+      "weight": 3
+    },
+    {
+      "source": "n121",
+      "target": "n219",
+      "weight": 1
+    },
+    {
+      "source": "n108",
+      "target": "n50",
+      "weight": 1
+    },
+    {
+      "source": "n218",
+      "target": "n130",
+      "weight": 3
+    },
+    {
+      "source": "n111",
+      "target": "n18",
+      "weight": 3
+    },
+    {
+      "source": "n27",
+      "target": "n151",
+      "weight": 3
+    },
+    {
+      "source": "n0",
+      "target": "n29",
+      "weight": 3
+    },
+    {
+      "source": "n28",
+      "target": "n222",
+      "weight": 1
+    },
+    {
+      "source": "n144",
+      "target": "n195",
+      "weight": 1
+    },
+    {
+      "source": "n260",
+      "target": "n149",
+      "weight": 2
+    },
+    {
+      "source": "n208",
+      "target": "n90",
+      "weight": 1
+    },
+    {
+      "source": "n189",
+      "target": "n287",
+      "weight": 1
+    },
+    {
+      "source": "n220",
+      "target": "n210",
+      "weight": 2
+    },
+    {
+      "source": "n50",
+      "target": "n194",
+      "weight": 3
+    },
+    {
+      "source": "n109",
+      "target": "n17",
+      "weight": 1
+    },
+    {
+      "source": "n35",
+      "target": "n154",
+      "weight": 1
+    },
+    {
+      "source": "n298",
+      "target": "n18",
+      "weight": 3
+    },
+    {
+      "source": "n267",
+      "target": "n252",
+      "weight": 2
+    },
+    {
+      "source": "n10",
+      "target": "n239",
+      "weight": 3
+    },
+    {
+      "source": "n176",
+      "target": "n140",
+      "weight": 1
+    },
+    {
+      "source": "n48",
+      "target": "n56",
+      "weight": 3
+    },
+    {
+      "source": "n124",
+      "target": "n83",
+      "weight": 3
+    },
+    {
+      "source": "n86",
+      "target": "n157",
+      "weight": 1
+    },
+    {
+      "source": "n280",
+      "target": "n129",
+      "weight": 1
+    },
+    {
+      "source": "n147",
+      "target": "n59",
+      "weight": 1
+    },
+    {
+      "source": "n232",
+      "target": "n20",
+      "weight": 1
+    },
+    {
+      "source": "n53",
+      "target": "n46",
+      "weight": 3
+    },
+    {
+      "source": "n262",
+      "target": "n178",
+      "weight": 1
+    },
+    {
+      "source": "n63",
+      "target": "n160",
+      "weight": 3
+    },
+    {
+      "source": "n159",
+      "target": "n213",
+      "weight": 3
+    },
+    {
+      "source": "n251",
+      "target": "n115",
+      "weight": 3
+    },
+    {
+      "source": "n70",
+      "target": "n289",
+      "weight": 2
+    },
+    {
+      "source": "n64",
+      "target": "n184",
+      "weight": 1
+    },
+    {
+      "source": "n257",
+      "target": "n115",
+      "weight": 2
+    },
+    {
+      "source": "n43",
+      "target": "n228",
+      "weight": 2
+    },
+    {
+      "source": "n74",
+      "target": "n248",
+      "weight": 3
+    },
+    {
+      "source": "n151",
+      "target": "n103",
+      "weight": 1
+    },
+    {
+      "source": "n17",
+      "target": "n127",
+      "weight": 1
+    },
+    {
+      "source": "n51",
+      "target": "n240",
+      "weight": 1
+    },
+    {
+      "source": "n45",
+      "target": "n30",
+      "weight": 2
+    },
+    {
+      "source": "n62",
+      "target": "n288",
+      "weight": 2
+    },
+    {
+      "source": "n185",
+      "target": "n153",
+      "weight": 1
+    },
+    {
+      "source": "n57",
+      "target": "n80",
+      "weight": 2
+    },
+    {
+      "source": "n173",
+      "target": "n210",
+      "weight": 1
+    },
+    {
+      "source": "n212",
+      "target": "n262",
+      "weight": 3
+    },
+    {
+      "source": "n18",
+      "target": "n170",
+      "weight": 3
+    },
+    {
+      "source": "n214",
+      "target": "n252",
+      "weight": 3
+    },
+    {
+      "source": "n267",
+      "target": "n136",
+      "weight": 1
+    },
+    {
+      "source": "n197",
+      "target": "n29",
+      "weight": 2
+    },
+    {
+      "source": "n244",
+      "target": "n5",
+      "weight": 3
+    },
+    {
+      "source": "n206",
+      "target": "n18",
+      "weight": 3
+    },
+    {
+      "source": "n98",
+      "target": "n88",
+      "weight": 1
+    },
+    {
+      "source": "n174",
+      "target": "n127",
+      "weight": 2
+    },
+    {
+      "source": "n174",
+      "target": "n278",
+      "weight": 1
+    },
+    {
+      "source": "n232",
+      "target": "n215",
+      "weight": 2
+    },
+    {
+      "source": "n260",
+      "target": "n179",
+      "weight": 3
+    },
+    {
+      "source": "n153",
+      "target": "n134",
+      "weight": 2
+    },
+    {
+      "source": "n136",
+      "target": "n92",
+      "weight": 2
+    },
+    {
+      "source": "n145",
+      "target": "n78",
+      "weight": 3
+    },
+    {
+      "source": "n216",
+      "target": "n161",
+      "weight": 1
+    },
+    {
+      "source": "n241",
+      "target": "n210",
+      "weight": 2
+    },
+    {
+      "source": "n133",
+      "target": "n149",
+      "weight": 2
+    },
+    {
+      "source": "n289",
+      "target": "n165",
+      "weight": 2
+    },
+    {
+      "source": "n274",
+      "target": "n196",
+      "weight": 2
+    },
+    {
+      "source": "n113",
+      "target": "n152",
+      "weight": 2
+    },
+    {
+      "source": "n58",
+      "target": "n217",
+      "weight": 2
+    },
+    {
+      "source": "n296",
+      "target": "n265",
+      "weight": 2
+    },
+    {
+      "source": "n43",
+      "target": "n275",
+      "weight": 1
+    },
+    {
+      "source": "n2",
+      "target": "n69",
+      "weight": 3
+    },
+    {
+      "source": "n211",
+      "target": "n132",
+      "weight": 2
+    },
+    {
+      "source": "n188",
+      "target": "n200",
+      "weight": 1
+    },
+    {
+      "source": "n294",
+      "target": "n184",
+      "weight": 1
+    },
+    {
+      "source": "n115",
+      "target": "n173",
+      "weight": 1
+    },
+    {
+      "source": "n242",
+      "target": "n228",
+      "weight": 3
+    },
+    {
+      "source": "n57",
+      "target": "n48",
+      "weight": 2
+    },
+    {
+      "source": "n48",
+      "target": "n224",
+      "weight": 2
+    },
+    {
+      "source": "n111",
+      "target": "n168",
+      "weight": 2
+    },
+    {
+      "source": "n77",
+      "target": "n291",
+      "weight": 3
+    },
+    {
+      "source": "n146",
+      "target": "n157",
+      "weight": 3
+    },
+    {
+      "source": "n32",
+      "target": "n0",
+      "weight": 3
+    },
+    {
+      "source": "n37",
+      "target": "n9",
+      "weight": 1
+    },
+    {
+      "source": "n165",
+      "target": "n276",
+      "weight": 1
+    },
+    {
+      "source": "n207",
+      "target": "n250",
+      "weight": 2
+    },
+    {
+      "source": "n159",
+      "target": "n16",
+      "weight": 1
+    },
+    {
+      "source": "n241",
+      "target": "n217",
+      "weight": 3
+    },
+    {
+      "source": "n75",
+      "target": "n17",
+      "weight": 3
+    },
+    {
+      "source": "n120",
+      "target": "n298",
+      "weight": 3
+    },
+    {
+      "source": "n238",
+      "target": "n183",
+      "weight": 3
+    },
+    {
+      "source": "n261",
+      "target": "n50",
+      "weight": 1
+    },
+    {
+      "source": "n210",
+      "target": "n219",
+      "weight": 1
+    },
+    {
+      "source": "n156",
+      "target": "n154",
+      "weight": 2
+    },
+    {
+      "source": "n195",
+      "target": "n298",
+      "weight": 1
+    },
+    {
+      "source": "n46",
+      "target": "n267",
+      "weight": 3
+    },
+    {
+      "source": "n136",
+      "target": "n70",
+      "weight": 2
+    },
+    {
+      "source": "n21",
+      "target": "n175",
+      "weight": 1
+    },
+    {
+      "source": "n102",
+      "target": "n17",
+      "weight": 3
+    },
+    {
+      "source": "n297",
+      "target": "n192",
+      "weight": 1
+    },
+    {
+      "source": "n49",
+      "target": "n3",
+      "weight": 3
+    },
+    {
+      "source": "n94",
+      "target": "n72",
+      "weight": 1
+    },
+    {
+      "source": "n69",
+      "target": "n296",
+      "weight": 2
+    },
+    {
+      "source": "n249",
+      "target": "n82",
+      "weight": 1
+    },
+    {
+      "source": "n111",
+      "target": "n130",
+      "weight": 3
+    },
+    {
+      "source": "n75",
+      "target": "n151",
+      "weight": 1
+    },
+    {
+      "source": "n37",
+      "target": "n206",
+      "weight": 2
+    },
+    {
+      "source": "n267",
+      "target": "n51",
+      "weight": 1
+    },
+    {
+      "source": "n266",
+      "target": "n155",
+      "weight": 3
+    },
+    {
+      "source": "n199",
+      "target": "n278",
+      "weight": 2
+    },
+    {
+      "source": "n268",
+      "target": "n265",
+      "weight": 3
+    },
+    {
+      "source": "n60",
+      "target": "n56",
+      "weight": 2
+    },
+    {
+      "source": "n214",
+      "target": "n57",
+      "weight": 2
+    },
+    {
+      "source": "n207",
+      "target": "n83",
+      "weight": 1
+    },
+    {
+      "source": "n22",
+      "target": "n166",
+      "weight": 1
+    },
+    {
+      "source": "n13",
+      "target": "n166",
+      "weight": 3
+    },
+    {
+      "source": "n143",
+      "target": "n38",
+      "weight": 2
+    },
+    {
+      "source": "n54",
+      "target": "n96",
+      "weight": 3
+    },
+    {
+      "source": "n14",
+      "target": "n125",
+      "weight": 1
+    },
+    {
+      "source": "n4",
+      "target": "n185",
+      "weight": 3
+    },
+    {
+      "source": "n12",
+      "target": "n83",
+      "weight": 2
+    },
+    {
+      "source": "n59",
+      "target": "n213",
+      "weight": 2
+    },
+    {
+      "source": "n173",
+      "target": "n169",
+      "weight": 2
+    },
+    {
+      "source": "n51",
+      "target": "n233",
+      "weight": 1
+    },
+    {
+      "source": "n220",
+      "target": "n30",
+      "weight": 3
+    },
+    {
+      "source": "n29",
+      "target": "n256",
+      "weight": 1
+    },
+    {
+      "source": "n182",
+      "target": "n71",
+      "weight": 1
+    },
+    {
+      "source": "n236",
+      "target": "n192",
+      "weight": 2
+    },
+    {
+      "source": "n151",
+      "target": "n66",
+      "weight": 2
+    },
+    {
+      "source": "n30",
+      "target": "n150",
+      "weight": 1
+    },
+    {
+      "source": "n59",
+      "target": "n186",
+      "weight": 1
+    },
+    {
+      "source": "n225",
+      "target": "n188",
+      "weight": 3
+    },
+    {
+      "source": "n145",
+      "target": "n56",
+      "weight": 3
+    },
+    {
+      "source": "n4",
+      "target": "n286",
+      "weight": 2
+    },
+    {
+      "source": "n131",
+      "target": "n125",
+      "weight": 1
+    },
+    {
+      "source": "n187",
+      "target": "n88",
+      "weight": 3
+    },
+    {
+      "source": "n174",
+      "target": "n122",
+      "weight": 1
+    },
+    {
+      "source": "n57",
+      "target": "n174",
+      "weight": 1
+    },
+    {
+      "source": "n294",
+      "target": "n199",
+      "weight": 2
+    },
+    {
+      "source": "n195",
+      "target": "n132",
+      "weight": 2
+    },
+    {
+      "source": "n102",
+      "target": "n259",
+      "weight": 1
+    },
+    {
+      "source": "n140",
+      "target": "n110",
+      "weight": 2
+    },
+    {
+      "source": "n75",
+      "target": "n127",
+      "weight": 1
+    },
+    {
+      "source": "n288",
+      "target": "n249",
+      "weight": 2
+    },
+    {
+      "source": "n233",
+      "target": "n228",
+      "weight": 2
+    },
+    {
+      "source": "n257",
+      "target": "n221",
+      "weight": 2
+    },
+    {
+      "source": "n42",
+      "target": "n182",
+      "weight": 2
+    },
+    {
+      "source": "n51",
+      "target": "n184",
+      "weight": 2
+    },
+    {
+      "source": "n50",
+      "target": "n213",
+      "weight": 2
+    },
+    {
+      "source": "n279",
+      "target": "n96",
+      "weight": 2
+    },
+    {
+      "source": "n98",
+      "target": "n229",
+      "weight": 3
+    },
+    {
+      "source": "n63",
+      "target": "n120",
+      "weight": 1
+    },
+    {
+      "source": "n276",
+      "target": "n251",
+      "weight": 1
+    },
+    {
+      "source": "n50",
+      "target": "n231",
+      "weight": 1
+    },
+    {
+      "source": "n157",
+      "target": "n297",
+      "weight": 2
+    },
+    {
+      "source": "n7",
+      "target": "n279",
+      "weight": 1
+    },
+    {
+      "source": "n217",
+      "target": "n119",
+      "weight": 3
+    },
+    {
+      "source": "n116",
+      "target": "n25",
+      "weight": 1
+    },
+    {
+      "source": "n189",
+      "target": "n288",
+      "weight": 1
+    },
+    {
+      "source": "n202",
+      "target": "n153",
+      "weight": 2
+    },
+    {
+      "source": "n65",
+      "target": "n57",
+      "weight": 2
+    },
+    {
+      "source": "n181",
+      "target": "n102",
+      "weight": 3
+    },
+    {
+      "source": "n108",
+      "target": "n54",
+      "weight": 2
+    },
+    {
+      "source": "n83",
+      "target": "n167",
+      "weight": 1
+    },
+    {
+      "source": "n2",
+      "target": "n203",
+      "weight": 2
+    },
+    {
+      "source": "n143",
+      "target": "n232",
+      "weight": 1
+    },
+    {
+      "source": "n200",
+      "target": "n113",
+      "weight": 3
+    },
+    {
+      "source": "n215",
+      "target": "n9",
+      "weight": 1
+    },
+    {
+      "source": "n164",
+      "target": "n156",
+      "weight": 2
+    },
+    {
+      "source": "n175",
+      "target": "n194",
+      "weight": 2
+    },
+    {
+      "source": "n23",
+      "target": "n146",
+      "weight": 3
+    },
+    {
+      "source": "n187",
+      "target": "n199",
+      "weight": 2
+    },
+    {
+      "source": "n225",
+      "target": "n224",
+      "weight": 3
+    },
+    {
+      "source": "n102",
+      "target": "n145",
+      "weight": 1
+    },
+    {
+      "source": "n76",
+      "target": "n72",
+      "weight": 3
+    },
+    {
+      "source": "n76",
+      "target": "n274",
+      "weight": 3
+    },
+    {
+      "source": "n150",
+      "target": "n35",
+      "weight": 3
+    },
+    {
+      "source": "n171",
+      "target": "n257",
+      "weight": 2
+    },
+    {
+      "source": "n175",
+      "target": "n40",
+      "weight": 1
+    },
+    {
+      "source": "n257",
+      "target": "n262",
+      "weight": 1
+    },
+    {
+      "source": "n54",
+      "target": "n22",
+      "weight": 2
+    },
+    {
+      "source": "n78",
+      "target": "n90",
+      "weight": 3
+    },
+    {
+      "source": "n242",
+      "target": "n224",
+      "weight": 2
+    },
+    {
+      "source": "n66",
+      "target": "n230",
+      "weight": 2
+    },
+    {
+      "source": "n175",
+      "target": "n39",
+      "weight": 3
+    },
+    {
+      "source": "n38",
+      "target": "n12",
+      "weight": 1
+    },
+    {
+      "source": "n192",
+      "target": "n201",
+      "weight": 3
+    },
+    {
+      "source": "n95",
+      "target": "n287",
+      "weight": 1
+    },
+    {
+      "source": "n276",
+      "target": "n137",
+      "weight": 1
+    },
+    {
+      "source": "n278",
+      "target": "n238",
+      "weight": 2
+    },
+    {
+      "source": "n295",
+      "target": "n128",
+      "weight": 2
+    },
+    {
+      "source": "n263",
+      "target": "n265",
+      "weight": 3
+    },
+    {
+      "source": "n185",
+      "target": "n170",
+      "weight": 3
+    },
+    {
+      "source": "n141",
+      "target": "n121",
+      "weight": 1
+    },
+    {
+      "source": "n186",
+      "target": "n144",
+      "weight": 1
+    },
+    {
+      "source": "n69",
+      "target": "n246",
+      "weight": 2
+    },
+    {
+      "source": "n39",
+      "target": "n282",
+      "weight": 2
+    },
+    {
+      "source": "n172",
+      "target": "n211",
+      "weight": 2
+    },
+    {
+      "source": "n15",
+      "target": "n163",
+      "weight": 2
+    },
+    {
+      "source": "n33",
+      "target": "n134",
+      "weight": 1
+    },
+    {
+      "source": "n11",
+      "target": "n66",
+      "weight": 1
+    },
+    {
+      "source": "n76",
+      "target": "n108",
+      "weight": 3
+    },
+    {
+      "source": "n149",
+      "target": "n107",
+      "weight": 2
+    },
+    {
+      "source": "n91",
+      "target": "n160",
+      "weight": 3
+    },
+    {
+      "source": "n135",
+      "target": "n13",
+      "weight": 3
+    },
+    {
+      "source": "n298",
+      "target": "n247",
+      "weight": 1
+    },
+    {
+      "source": "n190",
+      "target": "n51",
+      "weight": 2
+    },
+    {
+      "source": "n57",
+      "target": "n175",
+      "weight": 1
+    },
+    {
+      "source": "n185",
+      "target": "n266",
+      "weight": 3
+    },
+    {
+      "source": "n268",
+      "target": "n163",
+      "weight": 2
+    },
+    {
+      "source": "n8",
+      "target": "n103",
+      "weight": 1
+    },
+    {
+      "source": "n289",
+      "target": "n44",
+      "weight": 2
+    },
+    {
+      "source": "n268",
+      "target": "n263",
+      "weight": 1
+    },
+    {
+      "source": "n28",
+      "target": "n225",
+      "weight": 3
+    },
+    {
+      "source": "n187",
+      "target": "n215",
+      "weight": 1
+    },
+    {
+      "source": "n136",
+      "target": "n45",
+      "weight": 3
+    },
+    {
+      "source": "n7",
+      "target": "n229",
+      "weight": 1
+    },
+    {
+      "source": "n152",
+      "target": "n225",
+      "weight": 3
+    },
+    {
+      "source": "n256",
+      "target": "n43",
+      "weight": 2
+    },
+    {
+      "source": "n177",
+      "target": "n257",
+      "weight": 1
+    },
+    {
+      "source": "n250",
+      "target": "n43",
+      "weight": 3
+    },
+    {
+      "source": "n232",
+      "target": "n114",
+      "weight": 2
+    },
+    {
+      "source": "n287",
+      "target": "n177",
+      "weight": 3
+    },
+    {
+      "source": "n201",
+      "target": "n40",
+      "weight": 1
+    },
+    {
+      "source": "n85",
+      "target": "n220",
+      "weight": 2
+    },
+    {
+      "source": "n64",
+      "target": "n238",
+      "weight": 1
+    },
+    {
+      "source": "n134",
+      "target": "n141",
+      "weight": 2
+    },
+    {
+      "source": "n104",
+      "target": "n263",
+      "weight": 3
+    },
+    {
+      "source": "n26",
+      "target": "n73",
+      "weight": 2
+    },
+    {
+      "source": "n167",
+      "target": "n110",
+      "weight": 3
+    },
+    {
+      "source": "n119",
+      "target": "n120",
+      "weight": 3
+    },
+    {
+      "source": "n80",
+      "target": "n213",
+      "weight": 1
+    },
+    {
+      "source": "n160",
+      "target": "n284",
+      "weight": 1
+    },
+    {
+      "source": "n258",
+      "target": "n297",
+      "weight": 1
+    },
+    {
+      "source": "n121",
+      "target": "n169",
+      "weight": 1
+    },
+    {
+      "source": "n115",
+      "target": "n25",
+      "weight": 2
+    },
+    {
+      "source": "n27",
+      "target": "n203",
+      "weight": 1
+    },
+    {
+      "source": "n36",
+      "target": "n228",
+      "weight": 3
+    },
+    {
+      "source": "n241",
+      "target": "n276",
+      "weight": 3
+    },
+    {
+      "source": "n222",
+      "target": "n159",
+      "weight": 1
+    },
+    {
+      "source": "n198",
+      "target": "n68",
+      "weight": 1
+    },
+    {
+      "source": "n33",
+      "target": "n71",
+      "weight": 2
+    },
+    {
+      "source": "n91",
+      "target": "n241",
+      "weight": 1
+    },
+    {
+      "source": "n202",
+      "target": "n58",
+      "weight": 3
+    },
+    {
+      "source": "n37",
+      "target": "n223",
+      "weight": 2
+    },
+    {
+      "source": "n230",
+      "target": "n67",
+      "weight": 3
+    },
+    {
+      "source": "n179",
+      "target": "n32",
+      "weight": 1
+    },
+    {
+      "source": "n115",
+      "target": "n241",
+      "weight": 2
+    },
+    {
+      "source": "n218",
+      "target": "n171",
+      "weight": 2
+    },
+    {
+      "source": "n83",
+      "target": "n68",
+      "weight": 3
+    },
+    {
+      "source": "n270",
+      "target": "n135",
+      "weight": 1
+    },
+    {
+      "source": "n48",
+      "target": "n40",
+      "weight": 1
+    },
+    {
+      "source": "n75",
+      "target": "n109",
+      "weight": 1
+    },
+    {
+      "source": "n292",
+      "target": "n30",
+      "weight": 3
+    },
+    {
+      "source": "n0",
+      "target": "n99",
+      "weight": 3
+    },
+    {
+      "source": "n111",
+      "target": "n237",
+      "weight": 3
+    },
+    {
+      "source": "n203",
+      "target": "n49",
+      "weight": 1
+    },
+    {
+      "source": "n294",
+      "target": "n229",
+      "weight": 3
+    },
+    {
+      "source": "n41",
+      "target": "n234",
+      "weight": 1
+    },
+    {
+      "source": "n55",
+      "target": "n82",
+      "weight": 3
+    },
+    {
+      "source": "n96",
+      "target": "n47",
+      "weight": 1
+    },
+    {
+      "source": "n121",
+      "target": "n222",
+      "weight": 2
+    },
+    {
+      "source": "n193",
+      "target": "n295",
+      "weight": 2
+    },
+    {
+      "source": "n197",
+      "target": "n61",
+      "weight": 1
+    },
+    {
+      "source": "n274",
+      "target": "n50",
+      "weight": 3
+    },
+    {
+      "source": "n150",
+      "target": "n42",
+      "weight": 2
+    },
+    {
+      "source": "n22",
+      "target": "n110",
+      "weight": 1
+    },
+    {
+      "source": "n133",
+      "target": "n277",
+      "weight": 3
+    },
+    {
+      "source": "n17",
+      "target": "n287",
+      "weight": 1
+    },
+    {
+      "source": "n105",
+      "target": "n279",
+      "weight": 2
+    },
+    {
+      "source": "n108",
+      "target": "n107",
+      "weight": 1
+    },
+    {
+      "source": "n271",
+      "target": "n33",
+      "weight": 3
+    },
+    {
+      "source": "n2",
+      "target": "n118",
+      "weight": 2
+    },
+    {
+      "source": "n242",
+      "target": "n65",
+      "weight": 2
+    },
+    {
+      "source": "n167",
+      "target": "n215",
+      "weight": 3
+    },
+    {
+      "source": "n48",
+      "target": "n35",
+      "weight": 1
+    },
+    {
+      "source": "n67",
+      "target": "n121",
+      "weight": 1
+    },
+    {
+      "source": "n165",
+      "target": "n2",
+      "weight": 2
+    },
+    {
+      "source": "n61",
+      "target": "n92",
+      "weight": 1
+    },
+    {
+      "source": "n168",
+      "target": "n123",
+      "weight": 1
+    },
+    {
+      "source": "n116",
+      "target": "n220",
+      "weight": 2
+    },
+    {
+      "source": "n117",
+      "target": "n93",
+      "weight": 2
+    },
+    {
+      "source": "n106",
+      "target": "n15",
+      "weight": 1
+    },
+    {
+      "source": "n174",
+      "target": "n204",
+      "weight": 2
+    },
+    {
+      "source": "n50",
+      "target": "n76",
+      "weight": 1
+    },
+    {
+      "source": "n10",
+      "target": "n168",
+      "weight": 3
+    },
+    {
+      "source": "n43",
+      "target": "n28",
+      "weight": 2
+    },
+    {
+      "source": "n167",
+      "target": "n259",
+      "weight": 1
+    },
+    {
+      "source": "n134",
+      "target": "n292",
+      "weight": 2
+    },
+    {
+      "source": "n99",
+      "target": "n161",
+      "weight": 3
+    },
+    {
+      "source": "n267",
+      "target": "n208",
+      "weight": 3
+    },
+    {
+      "source": "n142",
+      "target": "n257",
+      "weight": 1
+    },
+    {
+      "source": "n53",
+      "target": "n107",
+      "weight": 3
+    },
+    {
+      "source": "n30",
+      "target": "n53",
+      "weight": 2
+    },
+    {
+      "source": "n84",
+      "target": "n292",
+      "weight": 2
+    },
+    {
+      "source": "n75",
+      "target": "n132",
+      "weight": 3
+    },
+    {
+      "source": "n95",
+      "target": "n129",
+      "weight": 3
+    },
+    {
+      "source": "n264",
+      "target": "n253",
+      "weight": 1
+    },
+    {
+      "source": "n59",
+      "target": "n99",
+      "weight": 3
+    },
+    {
+      "source": "n212",
+      "target": "n75",
+      "weight": 2
+    },
+    {
+      "source": "n90",
+      "target": "n282",
+      "weight": 2
+    },
+    {
+      "source": "n29",
+      "target": "n49",
+      "weight": 3
+    },
+    {
+      "source": "n133",
+      "target": "n62",
+      "weight": 1
+    },
+    {
+      "source": "n186",
+      "target": "n132",
+      "weight": 3
+    },
+    {
+      "source": "n41",
+      "target": "n199",
+      "weight": 3
+    },
+    {
+      "source": "n109",
+      "target": "n22",
+      "weight": 3
+    },
+    {
+      "source": "n273",
+      "target": "n110",
+      "weight": 1
+    },
+    {
+      "source": "n148",
+      "target": "n183",
+      "weight": 3
+    },
+    {
+      "source": "n110",
+      "target": "n176",
+      "weight": 1
+    },
+    {
+      "source": "n37",
+      "target": "n83",
+      "weight": 2
+    },
+    {
+      "source": "n256",
+      "target": "n12",
+      "weight": 2
+    },
+    {
+      "source": "n248",
+      "target": "n58",
+      "weight": 1
+    },
+    {
+      "source": "n154",
+      "target": "n282",
+      "weight": 3
+    },
+    {
+      "source": "n166",
+      "target": "n17",
+      "weight": 2
+    },
+    {
+      "source": "n92",
+      "target": "n289",
+      "weight": 3
+    },
+    {
+      "source": "n133",
+      "target": "n180",
+      "weight": 1
+    },
+    {
+      "source": "n11",
+      "target": "n265",
+      "weight": 2
+    },
+    {
+      "source": "n92",
+      "target": "n252",
+      "weight": 1
+    },
+    {
+      "source": "n125",
+      "target": "n63",
+      "weight": 2
+    },
+    {
+      "source": "n127",
+      "target": "n88",
+      "weight": 2
+    },
+    {
+      "source": "n149",
+      "target": "n162",
+      "weight": 3
+    },
+    {
+      "source": "n243",
+      "target": "n34",
+      "weight": 3
+    },
+    {
+      "source": "n46",
+      "target": "n173",
+      "weight": 3
+    },
+    {
+      "source": "n44",
+      "target": "n136",
+      "weight": 3
+    },
+    {
+      "source": "n218",
+      "target": "n221",
+      "weight": 3
+    },
+    {
+      "source": "n49",
+      "target": "n148",
+      "weight": 1
+    },
+    {
+      "source": "n59",
+      "target": "n75",
+      "weight": 3
+    },
+    {
+      "source": "n270",
+      "target": "n31",
+      "weight": 3
+    },
+    {
+      "source": "n16",
+      "target": "n213",
+      "weight": 2
+    },
+    {
+      "source": "n295",
+      "target": "n282",
+      "weight": 3
+    },
+    {
+      "source": "n12",
+      "target": "n122",
+      "weight": 1
+    },
+    {
+      "source": "n159",
+      "target": "n79",
+      "weight": 3
+    },
+    {
+      "source": "n297",
+      "target": "n259",
+      "weight": 1
+    },
+    {
+      "source": "n144",
+      "target": "n17",
+      "weight": 2
+    },
+    {
+      "source": "n114",
+      "target": "n37",
+      "weight": 2
+    },
+    {
+      "source": "n210",
+      "target": "n223",
+      "weight": 2
+    },
+    {
+      "source": "n84",
+      "target": "n271",
+      "weight": 1
+    },
+    {
+      "source": "n241",
+      "target": "n173",
+      "weight": 3
+    },
+    {
+      "source": "n71",
+      "target": "n109",
+      "weight": 3
+    },
+    {
+      "source": "n35",
+      "target": "n110",
+      "weight": 3
+    },
+    {
+      "source": "n167",
+      "target": "n174",
+      "weight": 2
+    },
+    {
+      "source": "n184",
+      "target": "n295",
+      "weight": 1
+    },
+    {
+      "source": "n1",
+      "target": "n114",
+      "weight": 1
+    },
+    {
+      "source": "n285",
+      "target": "n30",
+      "weight": 2
+    },
+    {
+      "source": "n250",
+      "target": "n226",
+      "weight": 3
+    },
+    {
+      "source": "n19",
+      "target": "n226",
+      "weight": 1
+    },
+    {
+      "source": "n283",
+      "target": "n236",
+      "weight": 3
+    },
+    {
+      "source": "n254",
+      "target": "n1",
+      "weight": 1
+    },
+    {
+      "source": "n77",
+      "target": "n185",
+      "weight": 3
+    },
+    {
+      "source": "n272",
+      "target": "n34",
+      "weight": 1
+    },
+    {
+      "source": "n21",
+      "target": "n192",
+      "weight": 2
+    },
+    {
+      "source": "n223",
+      "target": "n115",
+      "weight": 3
+    },
+    {
+      "source": "n124",
+      "target": "n276",
+      "weight": 2
+    },
+    {
+      "source": "n138",
+      "target": "n123",
+      "weight": 3
+    },
+    {
+      "source": "n163",
+      "target": "n14",
+      "weight": 1
+    },
+    {
+      "source": "n163",
+      "target": "n165",
+      "weight": 1
+    },
+    {
+      "source": "n59",
+      "target": "n236",
+      "weight": 2
+    },
+    {
+      "source": "n46",
+      "target": "n119",
+      "weight": 3
+    },
+    {
+      "source": "n268",
+      "target": "n15",
+      "weight": 2
+    },
+    {
+      "source": "n222",
+      "target": "n285",
+      "weight": 2
+    },
+    {
+      "source": "n280",
+      "target": "n236",
+      "weight": 3
+    },
+    {
+      "source": "n257",
+      "target": "n25",
+      "weight": 2
+    },
+    {
+      "source": "n276",
+      "target": "n173",
+      "weight": 2
+    },
+    {
+      "source": "n187",
+      "target": "n7",
+      "weight": 2
+    },
+    {
+      "source": "n236",
+      "target": "n49",
+      "weight": 1
+    },
+    {
+      "source": "n165",
+      "target": "n246",
+      "weight": 2
+    },
+    {
+      "source": "n251",
+      "target": "n116",
+      "weight": 2
+    },
+    {
+      "source": "n170",
+      "target": "n247",
+      "weight": 3
+    },
+    {
+      "source": "n164",
+      "target": "n208",
+      "weight": 3
+    },
+    {
+      "source": "n43",
+      "target": "n67",
+      "weight": 3
+    },
+    {
+      "source": "n67",
+      "target": "n255",
+      "weight": 2
+    },
+    {
+      "source": "n34",
+      "target": "n273",
+      "weight": 1
+    },
+    {
+      "source": "n186",
+      "target": "n205",
+      "weight": 3
+    },
+    {
+      "source": "n65",
+      "target": "n214",
+      "weight": 2
+    },
+    {
+      "source": "n262",
+      "target": "n170",
+      "weight": 2
+    },
+    {
+      "source": "n98",
+      "target": "n240",
+      "weight": 3
+    },
+    {
+      "source": "n81",
+      "target": "n77",
+      "weight": 1
+    },
+    {
+      "source": "n120",
+      "target": "n125",
+      "weight": 2
+    },
+    {
+      "source": "n5",
+      "target": "n218",
+      "weight": 1
+    },
+    {
+      "source": "n144",
+      "target": "n86",
+      "weight": 1
+    },
+    {
+      "source": "n263",
+      "target": "n284",
+      "weight": 2
+    },
+    {
+      "source": "n42",
+      "target": "n76",
+      "weight": 1
+    },
+    {
+      "source": "n132",
+      "target": "n258",
+      "weight": 2
+    },
+    {
+      "source": "n179",
+      "target": "n55",
+      "weight": 1
+    },
+    {
+      "source": "n183",
+      "target": "n7",
+      "weight": 1
+    },
+    {
+      "source": "n168",
+      "target": "n239",
+      "weight": 3
+    },
+    {
+      "source": "n65",
+      "target": "n208",
+      "weight": 3
+    },
+    {
+      "source": "n245",
+      "target": "n230",
+      "weight": 2
+    },
+    {
+      "source": "n232",
+      "target": "n161",
+      "weight": 3
+    },
+    {
+      "source": "n195",
+      "target": "n252",
+      "weight": 2
+    },
+    {
+      "source": "n206",
+      "target": "n299",
+      "weight": 3
+    },
+    {
+      "source": "n115",
+      "target": "n276",
+      "weight": 3
+    },
+    {
+      "source": "n179",
+      "target": "n0",
+      "weight": 1
+    },
+    {
+      "source": "n173",
+      "target": "n130",
+      "weight": 3
+    },
+    {
+      "source": "n72",
+      "target": "n146",
+      "weight": 2
+    },
+    {
+      "source": "n279",
+      "target": "n238",
+      "weight": 2
+    },
+    {
+      "source": "n136",
+      "target": "n30",
+      "weight": 1
+    },
+    {
+      "source": "n217",
+      "target": "n151",
+      "weight": 2
+    },
+    {
+      "source": "n282",
+      "target": "n6",
+      "weight": 3
+    },
+    {
+      "source": "n124",
+      "target": "n137",
+      "weight": 2
+    },
+    {
+      "source": "n102",
+      "target": "n13",
+      "weight": 3
+    },
+    {
+      "source": "n148",
+      "target": "n270",
+      "weight": 3
+    },
+    {
+      "source": "n106",
+      "target": "n21",
+      "weight": 1
+    },
+    {
+      "source": "n17",
+      "target": "n212",
+      "weight": 2
+    }
+  ],
+  "clusters": [
+    {
+      "id": "core",
+      "name": "core",
+      "symbols": [
+        {
+          "name": "core.syncNode",
+          "file": "src/core/file_13.js",
+          "kind": "function",
+          "line": 102
+        },
+        {
+          "name": "core.fetchToken",
+          "file": "src/core/file_17.js",
+          "kind": "function",
+          "line": 104
+        },
+        {
+          "name": "core.syncEvent",
+          "file": "src/core/file_22.js",
+          "kind": "function",
+          "line": 107
+        },
+        {
+          "name": "core.emitState",
+          "file": "src/core/util/file_59.js",
+          "kind": "function",
+          "line": 25
+        },
+        {
+          "name": "core.parseState",
+          "file": "src/core/util/file_75.js",
+          "kind": "function",
+          "line": 261
+        },
+        {
+          "name": "core.emitEvent",
+          "file": "src/core/file_86.js",
+          "kind": "function",
+          "line": 8
+        },
+        {
+          "name": "core.parseEvent",
+          "file": "src/core/util/file_102.js",
+          "kind": "function",
+          "line": 20
+        },
+        {
+          "name": "core.loadNode",
+          "file": "src/core/file_109.js",
+          "kind": "function",
+          "line": 9
+        },
+        {
+          "name": "core.resolvePayload",
+          "file": "src/core/types/file_132.js",
+          "kind": "function",
+          "line": 341
+        },
+        {
+          "name": "core.handleRequest",
+          "file": "src/core/file_144.js",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "core.parseState",
+          "file": "src/core/types/file_147.js",
+          "kind": "function",
+          "line": 40
+        },
+        {
+          "name": "core.syncNode",
+          "file": "src/core/util/file_157.js",
+          "kind": "function",
+          "line": 78
+        },
+        {
+          "name": "core.syncEvent",
+          "file": "src/core/util/file_166.js",
+          "kind": "function",
+          "line": 139
+        },
+        {
+          "name": "core.loadNode",
+          "file": "src/core/util/file_181.js",
+          "kind": "function",
+          "line": 213
+        },
+        {
+          "name": "core.resolveSession",
+          "file": "src/core/types/file_186.js",
+          "kind": "function",
+          "line": 123
+        },
+        {
+          "name": "core.resolveState",
+          "file": "src/core/types/file_195.js",
+          "kind": "function",
+          "line": 201
+        },
+        {
+          "name": "core.applyNode",
+          "file": "src/core/file_205.js",
+          "kind": "function",
+          "line": 32
+        },
+        {
+          "name": "core.syncState",
+          "file": "src/core/file_211.js",
+          "kind": "function",
+          "line": 262
+        },
+        {
+          "name": "core.emitPayload",
+          "file": "src/core/file_212.js",
+          "kind": "function",
+          "line": 296
+        },
+        {
+          "name": "core.resolveSession",
+          "file": "src/core/types/file_258.js",
+          "kind": "function",
+          "line": 24
+        },
+        {
+          "name": "core.applyState",
+          "file": "src/core/util/file_259.js",
+          "kind": "function",
+          "line": 80
+        },
+        {
+          "name": "core.handleToken",
+          "file": "src/core/util/file_297.js",
+          "kind": "function",
+          "line": 251
+        }
+      ],
+      "callsiteCount": 44
+    },
+    {
+      "id": "auth",
+      "name": "auth",
+      "symbols": [
+        {
+          "name": "auth.handleRequest",
+          "file": "src/auth/file_0.js",
+          "kind": "function",
+          "line": 325
+        },
+        {
+          "name": "auth.handleToken",
+          "file": "src/auth/file_9.js",
+          "kind": "function",
+          "line": 270
+        },
+        {
+          "name": "auth.loadSession",
+          "file": "src/auth/middleware/file_10.js",
+          "kind": "function",
+          "line": 81
+        },
+        {
+          "name": "auth.handleSession",
+          "file": "src/auth/file_18.js",
+          "kind": "function",
+          "line": 104
+        },
+        {
+          "name": "auth.buildPayload",
+          "file": "src/auth/middleware/file_20.js",
+          "kind": "function",
+          "line": 216
+        },
+        {
+          "name": "auth.emitRequest",
+          "file": "src/auth/file_32.js",
+          "kind": "function",
+          "line": 328
+        },
+        {
+          "name": "auth.loadNode",
+          "file": "src/auth/middleware/file_37.js",
+          "kind": "function",
+          "line": 23
+        },
+        {
+          "name": "auth.buildEvent",
+          "file": "src/auth/file_38.js",
+          "kind": "function",
+          "line": 276
+        },
+        {
+          "name": "auth.buildConfig",
+          "file": "src/auth/file_47.js",
+          "kind": "function",
+          "line": 279
+        },
+        {
+          "name": "auth.loadConfig",
+          "file": "src/auth/middleware/file_55.js",
+          "kind": "function",
+          "line": 318
+        },
+        {
+          "name": "auth.loadSession",
+          "file": "src/auth/file_82.js",
+          "kind": "function",
+          "line": 41
+        },
+        {
+          "name": "auth.applyToken",
+          "file": "src/auth/middleware/file_97.js",
+          "kind": "function",
+          "line": 322
+        },
+        {
+          "name": "auth.handleState",
+          "file": "src/auth/middleware/file_99.js",
+          "kind": "function",
+          "line": 315
+        },
+        {
+          "name": "auth.parseConfig",
+          "file": "src/auth/middleware/file_111.js",
+          "kind": "function",
+          "line": 290
+        },
+        {
+          "name": "auth.resolveSession",
+          "file": "src/auth/file_114.js",
+          "kind": "function",
+          "line": 277
+        },
+        {
+          "name": "auth.resolveState",
+          "file": "src/auth/file_123.js",
+          "kind": "function",
+          "line": 126
+        },
+        {
+          "name": "auth.applyEvent",
+          "file": "src/auth/middleware/file_142.js",
+          "kind": "function",
+          "line": 264
+        },
+        {
+          "name": "auth.fetchConfig",
+          "file": "src/auth/file_143.js",
+          "kind": "function",
+          "line": 282
+        },
+        {
+          "name": "auth.fetchToken",
+          "file": "src/auth/middleware/file_161.js",
+          "kind": "function",
+          "line": 37
+        },
+        {
+          "name": "auth.handleSession",
+          "file": "src/auth/middleware/file_162.js",
+          "kind": "function",
+          "line": 103
+        },
+        {
+          "name": "auth.resolveRequest",
+          "file": "src/auth/middleware/file_168.js",
+          "kind": "function",
+          "line": 348
+        },
+        {
+          "name": "auth.fetchSession",
+          "file": "src/auth/file_170.js",
+          "kind": "function",
+          "line": 190
+        },
+        {
+          "name": "auth.resolveToken",
+          "file": "src/auth/middleware/file_177.js",
+          "kind": "function",
+          "line": 90
+        },
+        {
+          "name": "auth.applySession",
+          "file": "src/auth/file_178.js",
+          "kind": "function",
+          "line": 232
+        },
+        {
+          "name": "auth.fetchState",
+          "file": "src/auth/middleware/file_179.js",
+          "kind": "function",
+          "line": 193
+        },
+        {
+          "name": "auth.handleEvent",
+          "file": "src/auth/middleware/file_198.js",
+          "kind": "function",
+          "line": 11
+        },
+        {
+          "name": "auth.fetchEvent",
+          "file": "src/auth/file_206.js",
+          "kind": "function",
+          "line": 143
+        },
+        {
+          "name": "auth.fetchConfig",
+          "file": "src/auth/file_215.js",
+          "kind": "function",
+          "line": 259
+        },
+        {
+          "name": "auth.applyRequest",
+          "file": "src/auth/file_232.js",
+          "kind": "function",
+          "line": 97
+        },
+        {
+          "name": "auth.parseNode",
+          "file": "src/auth/middleware/file_237.js",
+          "kind": "function",
+          "line": 381
+        },
+        {
+          "name": "auth.emitConfig",
+          "file": "src/auth/middleware/file_239.js",
+          "kind": "function",
+          "line": 195
+        },
+        {
+          "name": "auth.syncConfig",
+          "file": "src/auth/middleware/file_247.js",
+          "kind": "function",
+          "line": 50
+        },
+        {
+          "name": "auth.fetchPayload",
+          "file": "src/auth/file_260.js",
+          "kind": "function",
+          "line": 95
+        },
+        {
+          "name": "auth.loadEvent",
+          "file": "src/auth/middleware/file_262.js",
+          "kind": "function",
+          "line": 72
+        },
+        {
+          "name": "auth.loadSession",
+          "file": "src/auth/file_298.js",
+          "kind": "function",
+          "line": 293
+        },
+        {
+          "name": "auth.buildState",
+          "file": "src/auth/file_299.js",
+          "kind": "function",
+          "line": 164
+        }
+      ],
+      "callsiteCount": 72
+    },
+    {
+      "id": "api",
+      "name": "api",
+      "symbols": [
+        {
+          "name": "api.applyConfig",
+          "file": "server/api/file_7.js",
+          "kind": "function",
+          "line": 117
+        },
+        {
+          "name": "api.emitToken",
+          "file": "server/api/file_41.js",
+          "kind": "function",
+          "line": 170
+        },
+        {
+          "name": "api.resolveState",
+          "file": "server/api/routes/file_51.js",
+          "kind": "function",
+          "line": 42
+        },
+        {
+          "name": "api.applyPayload",
+          "file": "server/api/file_52.js",
+          "kind": "function",
+          "line": 256
+        },
+        {
+          "name": "api.loadRequest",
+          "file": "server/api/file_64.js",
+          "kind": "function",
+          "line": 131
+        },
+        {
+          "name": "api.parseSession",
+          "file": "server/api/file_66.js",
+          "kind": "function",
+          "line": 331
+        },
+        {
+          "name": "api.applyRequest",
+          "file": "server/api/file_88.js",
+          "kind": "function",
+          "line": 107
+        },
+        {
+          "name": "api.resolveRequest",
+          "file": "server/api/routes/file_96.js",
+          "kind": "function",
+          "line": 140
+        },
+        {
+          "name": "api.fetchSession",
+          "file": "server/api/routes/file_98.js",
+          "kind": "function",
+          "line": 285
+        },
+        {
+          "name": "api.parseConfig",
+          "file": "server/api/file_183.js",
+          "kind": "function",
+          "line": 337
+        },
+        {
+          "name": "api.syncRequest",
+          "file": "server/api/routes/file_184.js",
+          "kind": "function",
+          "line": 37
+        },
+        {
+          "name": "api.applyState",
+          "file": "server/api/file_187.js",
+          "kind": "function",
+          "line": 350
+        },
+        {
+          "name": "api.loadEvent",
+          "file": "server/api/file_190.js",
+          "kind": "function",
+          "line": 1
+        },
+        {
+          "name": "api.loadConfig",
+          "file": "server/api/routes/file_199.js",
+          "kind": "function",
+          "line": 331
+        },
+        {
+          "name": "api.syncNode",
+          "file": "server/api/routes/file_229.js",
+          "kind": "function",
+          "line": 65
+        },
+        {
+          "name": "api.fetchToken",
+          "file": "server/api/routes/file_233.js",
+          "kind": "function",
+          "line": 17
+        },
+        {
+          "name": "api.syncEvent",
+          "file": "server/api/routes/file_238.js",
+          "kind": "function",
+          "line": 91
+        },
+        {
+          "name": "api.resolveRequest",
+          "file": "server/api/routes/file_240.js",
+          "kind": "function",
+          "line": 83
+        },
+        {
+          "name": "api.loadPayload",
+          "file": "server/api/file_244.js",
+          "kind": "function",
+          "line": 197
+        },
+        {
+          "name": "api.fetchEvent",
+          "file": "server/api/routes/file_278.js",
+          "kind": "function",
+          "line": 246
+        },
+        {
+          "name": "api.handleConfig",
+          "file": "server/api/file_279.js",
+          "kind": "function",
+          "line": 5
+        },
+        {
+          "name": "api.resolveEvent",
+          "file": "server/api/routes/file_294.js",
+          "kind": "function",
+          "line": 9
+        }
+      ],
+      "callsiteCount": 44
+    },
+    {
+      "id": "ui",
+      "name": "ui",
+      "symbols": [
+        {
+          "name": "ui.emitEvent",
+          "file": "src/components/board/file_14.js",
+          "kind": "function",
+          "line": 118
+        },
+        {
+          "name": "ui.loadState",
+          "file": "src/components/file_19.js",
+          "kind": "function",
+          "line": 63
+        },
+        {
+          "name": "ui.handleState",
+          "file": "src/components/wiki/file_27.js",
+          "kind": "function",
+          "line": 335
+        },
+        {
+          "name": "ui.parseEvent",
+          "file": "src/components/board/file_30.js",
+          "kind": "function",
+          "line": 361
+        },
+        {
+          "name": "ui.syncConfig",
+          "file": "src/components/board/file_31.js",
+          "kind": "function",
+          "line": 75
+        },
+        {
+          "name": "ui.fetchPayload",
+          "file": "src/components/wiki/file_44.js",
+          "kind": "function",
+          "line": 146
+        },
+        {
+          "name": "ui.handleNode",
+          "file": "src/components/wiki/file_45.js",
+          "kind": "function",
+          "line": 323
+        },
+        {
+          "name": "ui.loadEvent",
+          "file": "src/components/file_46.js",
+          "kind": "function",
+          "line": 205
+        },
+        {
+          "name": "ui.fetchNode",
+          "file": "src/components/wiki/file_53.js",
+          "kind": "function",
+          "line": 115
+        },
+        {
+          "name": "ui.applyNode",
+          "file": "src/components/board/file_61.js",
+          "kind": "function",
+          "line": 10
+        },
+        {
+          "name": "ui.handleConfig",
+          "file": "src/components/wiki/file_63.js",
+          "kind": "function",
+          "line": 24
+        },
+        {
+          "name": "ui.applyEvent",
+          "file": "src/components/board/file_70.js",
+          "kind": "function",
+          "line": 317
+        },
+        {
+          "name": "ui.buildPayload",
+          "file": "src/components/wiki/file_92.js",
+          "kind": "function",
+          "line": 179
+        },
+        {
+          "name": "ui.buildConfig",
+          "file": "src/components/board/file_119.js",
+          "kind": "function",
+          "line": 12
+        },
+        {
+          "name": "ui.parseRequest",
+          "file": "src/components/file_120.js",
+          "kind": "function",
+          "line": 95
+        },
+        {
+          "name": "ui.fetchNode",
+          "file": "src/components/board/file_125.js",
+          "kind": "function",
+          "line": 179
+        },
+        {
+          "name": "ui.emitState",
+          "file": "src/components/file_131.js",
+          "kind": "function",
+          "line": 175
+        },
+        {
+          "name": "ui.handleConfig",
+          "file": "src/components/wiki/file_135.js",
+          "kind": "function",
+          "line": 320
+        },
+        {
+          "name": "ui.loadRequest",
+          "file": "src/components/file_136.js",
+          "kind": "function",
+          "line": 306
+        },
+        {
+          "name": "ui.applyConfig",
+          "file": "src/components/board/file_151.js",
+          "kind": "function",
+          "line": 390
+        },
+        {
+          "name": "ui.loadToken",
+          "file": "src/components/wiki/file_217.js",
+          "kind": "function",
+          "line": 242
+        },
+        {
+          "name": "ui.loadState",
+          "file": "src/components/wiki/file_235.js",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "ui.handlePayload",
+          "file": "src/components/file_252.js",
+          "kind": "function",
+          "line": 165
+        },
+        {
+          "name": "ui.resolveState",
+          "file": "src/components/board/file_267.js",
+          "kind": "function",
+          "line": 218
+        },
+        {
+          "name": "ui.handleEvent",
+          "file": "src/components/board/file_270.js",
+          "kind": "function",
+          "line": 126
+        },
+        {
+          "name": "ui.resolveNode",
+          "file": "src/components/board/file_285.js",
+          "kind": "function",
+          "line": 377
+        },
+        {
+          "name": "ui.loadToken",
+          "file": "src/components/file_289.js",
+          "kind": "function",
+          "line": 124
+        }
+      ],
+      "callsiteCount": 54
+    },
+    {
+      "id": "db",
+      "name": "db",
+      "symbols": [
+        {
+          "name": "db.syncPayload",
+          "file": "server/db/file_4.js",
+          "kind": "function",
+          "line": 82
+        },
+        {
+          "name": "db.fetchRequest",
+          "file": "server/db/migrations/file_8.js",
+          "kind": "function",
+          "line": 291
+        },
+        {
+          "name": "db.parsePayload",
+          "file": "server/db/file_12.js",
+          "kind": "function",
+          "line": 110
+        },
+        {
+          "name": "db.buildNode",
+          "file": "server/db/file_29.js",
+          "kind": "function",
+          "line": 7
+        },
+        {
+          "name": "db.applySession",
+          "file": "server/db/migrations/file_34.js",
+          "kind": "function",
+          "line": 219
+        },
+        {
+          "name": "db.handlePayload",
+          "file": "server/db/file_36.js",
+          "kind": "function",
+          "line": 271
+        },
+        {
+          "name": "db.applyState",
+          "file": "server/db/migrations/file_43.js",
+          "kind": "function",
+          "line": 358
+        },
+        {
+          "name": "db.syncState",
+          "file": "server/db/migrations/file_67.js",
+          "kind": "function",
+          "line": 90
+        },
+        {
+          "name": "db.emitPayload",
+          "file": "server/db/migrations/file_68.js",
+          "kind": "function",
+          "line": 113
+        },
+        {
+          "name": "db.buildState",
+          "file": "server/db/migrations/file_83.js",
+          "kind": "function",
+          "line": 172
+        },
+        {
+          "name": "db.loadState",
+          "file": "server/db/migrations/file_91.js",
+          "kind": "function",
+          "line": 360
+        },
+        {
+          "name": "db.parseNode",
+          "file": "server/db/file_93.js",
+          "kind": "function",
+          "line": 202
+        },
+        {
+          "name": "db.loadPayload",
+          "file": "server/db/file_100.js",
+          "kind": "function",
+          "line": 24
+        },
+        {
+          "name": "db.buildNode",
+          "file": "server/db/file_101.js",
+          "kind": "function",
+          "line": 321
+        },
+        {
+          "name": "db.syncConfig",
+          "file": "server/db/file_103.js",
+          "kind": "function",
+          "line": 143
+        },
+        {
+          "name": "db.buildEvent",
+          "file": "server/db/migrations/file_110.js",
+          "kind": "function",
+          "line": 159
+        },
+        {
+          "name": "db.handleNode",
+          "file": "server/db/file_117.js",
+          "kind": "function",
+          "line": 68
+        },
+        {
+          "name": "db.emitSession",
+          "file": "server/db/file_122.js",
+          "kind": "function",
+          "line": 96
+        },
+        {
+          "name": "db.emitPayload",
+          "file": "server/db/migrations/file_140.js",
+          "kind": "function",
+          "line": 347
+        },
+        {
+          "name": "db.buildState",
+          "file": "server/db/file_155.js",
+          "kind": "function",
+          "line": 47
+        },
+        {
+          "name": "db.emitConfig",
+          "file": "server/db/migrations/file_167.js",
+          "kind": "function",
+          "line": 113
+        },
+        {
+          "name": "db.loadPayload",
+          "file": "server/db/migrations/file_172.js",
+          "kind": "function",
+          "line": 160
+        },
+        {
+          "name": "db.emitRequest",
+          "file": "server/db/file_176.js",
+          "kind": "function",
+          "line": 344
+        },
+        {
+          "name": "db.handleNode",
+          "file": "server/db/migrations/file_189.js",
+          "kind": "function",
+          "line": 87
+        },
+        {
+          "name": "db.syncToken",
+          "file": "server/db/file_193.js",
+          "kind": "function",
+          "line": 347
+        },
+        {
+          "name": "db.fetchNode",
+          "file": "server/db/file_197.js",
+          "kind": "function",
+          "line": 265
+        },
+        {
+          "name": "db.handleConfig",
+          "file": "server/db/migrations/file_207.js",
+          "kind": "function",
+          "line": 78
+        },
+        {
+          "name": "db.handleRequest",
+          "file": "server/db/migrations/file_216.js",
+          "kind": "function",
+          "line": 375
+        },
+        {
+          "name": "db.loadSession",
+          "file": "server/db/migrations/file_226.js",
+          "kind": "function",
+          "line": 303
+        },
+        {
+          "name": "db.buildState",
+          "file": "server/db/migrations/file_227.js",
+          "kind": "function",
+          "line": 342
+        },
+        {
+          "name": "db.parsePayload",
+          "file": "server/db/migrations/file_228.js",
+          "kind": "function",
+          "line": 6
+        },
+        {
+          "name": "db.emitEvent",
+          "file": "server/db/file_230.js",
+          "kind": "function",
+          "line": 293
+        },
+        {
+          "name": "db.handleState",
+          "file": "server/db/migrations/file_243.js",
+          "kind": "function",
+          "line": 339
+        },
+        {
+          "name": "db.applySession",
+          "file": "server/db/migrations/file_250.js",
+          "kind": "function",
+          "line": 117
+        },
+        {
+          "name": "db.parseConfig",
+          "file": "server/db/file_255.js",
+          "kind": "function",
+          "line": 135
+        },
+        {
+          "name": "db.syncRequest",
+          "file": "server/db/file_256.js",
+          "kind": "function",
+          "line": 118
+        },
+        {
+          "name": "db.buildRequest",
+          "file": "server/db/file_272.js",
+          "kind": "function",
+          "line": 328
+        },
+        {
+          "name": "db.parseToken",
+          "file": "server/db/migrations/file_273.js",
+          "kind": "function",
+          "line": 165
+        },
+        {
+          "name": "db.emitState",
+          "file": "server/db/file_275.js",
+          "kind": "function",
+          "line": 137
+        },
+        {
+          "name": "db.applyEvent",
+          "file": "server/db/file_286.js",
+          "kind": "function",
+          "line": 55
+        }
+      ],
+      "callsiteCount": 80
+    },
+    {
+      "id": "agents",
+      "name": "agents",
+      "symbols": [
+        {
+          "name": "agents.buildSession",
+          "file": "agents/claude/file_2.js",
+          "kind": "function",
+          "line": 218
+        },
+        {
+          "name": "agents.parseState",
+          "file": "agents/claude/file_3.js",
+          "kind": "function",
+          "line": 77
+        },
+        {
+          "name": "agents.resolveConfig",
+          "file": "agents/claude/file_15.js",
+          "kind": "function",
+          "line": 189
+        },
+        {
+          "name": "agents.parseNode",
+          "file": "agents/claude/file_21.js",
+          "kind": "function",
+          "line": 229
+        },
+        {
+          "name": "agents.resolveRequest",
+          "file": "agents/claude/file_24.js",
+          "kind": "function",
+          "line": 240
+        },
+        {
+          "name": "agents.syncToken",
+          "file": "agents/file_49.js",
+          "kind": "function",
+          "line": 11
+        },
+        {
+          "name": "agents.resolveNode",
+          "file": "agents/claude/file_69.js",
+          "kind": "function",
+          "line": 336
+        },
+        {
+          "name": "agents.resolveConfig",
+          "file": "agents/claude/file_87.js",
+          "kind": "function",
+          "line": 173
+        },
+        {
+          "name": "agents.emitConfig",
+          "file": "agents/claude/file_95.js",
+          "kind": "function",
+          "line": 331
+        },
+        {
+          "name": "agents.applySession",
+          "file": "agents/file_106.js",
+          "kind": "function",
+          "line": 67
+        },
+        {
+          "name": "agents.loadEvent",
+          "file": "agents/worker/file_118.js",
+          "kind": "function",
+          "line": 56
+        },
+        {
+          "name": "agents.parseToken",
+          "file": "agents/file_129.js",
+          "kind": "function",
+          "line": 249
+        },
+        {
+          "name": "agents.syncPayload",
+          "file": "agents/file_148.js",
+          "kind": "function",
+          "line": 86
+        },
+        {
+          "name": "agents.loadState",
+          "file": "agents/file_163.js",
+          "kind": "function",
+          "line": 42
+        },
+        {
+          "name": "agents.parseNode",
+          "file": "agents/worker/file_165.js",
+          "kind": "function",
+          "line": 272
+        },
+        {
+          "name": "agents.parseRequest",
+          "file": "agents/file_192.js",
+          "kind": "function",
+          "line": 139
+        },
+        {
+          "name": "agents.parseToken",
+          "file": "agents/worker/file_201.js",
+          "kind": "function",
+          "line": 34
+        },
+        {
+          "name": "agents.emitState",
+          "file": "agents/worker/file_203.js",
+          "kind": "function",
+          "line": 384
+        },
+        {
+          "name": "agents.buildToken",
+          "file": "agents/worker/file_209.js",
+          "kind": "function",
+          "line": 79
+        },
+        {
+          "name": "agents.buildPayload",
+          "file": "agents/claude/file_236.js",
+          "kind": "function",
+          "line": 217
+        },
+        {
+          "name": "agents.parseEvent",
+          "file": "agents/claude/file_246.js",
+          "kind": "function",
+          "line": 366
+        },
+        {
+          "name": "agents.loadNode",
+          "file": "agents/worker/file_253.js",
+          "kind": "function",
+          "line": 365
+        },
+        {
+          "name": "agents.buildConfig",
+          "file": "agents/file_263.js",
+          "kind": "function",
+          "line": 184
+        },
+        {
+          "name": "agents.parseRequest",
+          "file": "agents/worker/file_264.js",
+          "kind": "function",
+          "line": 17
+        },
+        {
+          "name": "agents.syncToken",
+          "file": "agents/claude/file_265.js",
+          "kind": "function",
+          "line": 65
+        },
+        {
+          "name": "agents.applyPayload",
+          "file": "agents/file_268.js",
+          "kind": "function",
+          "line": 182
+        },
+        {
+          "name": "agents.loadRequest",
+          "file": "agents/file_280.js",
+          "kind": "function",
+          "line": 222
+        },
+        {
+          "name": "agents.buildToken",
+          "file": "agents/claude/file_281.js",
+          "kind": "function",
+          "line": 212
+        },
+        {
+          "name": "agents.syncState",
+          "file": "agents/claude/file_283.js",
+          "kind": "function",
+          "line": 234
+        },
+        {
+          "name": "agents.emitPayload",
+          "file": "agents/claude/file_284.js",
+          "kind": "function",
+          "line": 170
+        },
+        {
+          "name": "agents.fetchConfig",
+          "file": "agents/worker/file_287.js",
+          "kind": "function",
+          "line": 122
+        },
+        {
+          "name": "agents.emitNode",
+          "file": "agents/worker/file_293.js",
+          "kind": "function",
+          "line": 128
+        },
+        {
+          "name": "agents.fetchRequest",
+          "file": "agents/claude/file_296.js",
+          "kind": "function",
+          "line": 348
+        }
+      ],
+      "callsiteCount": 66
+    },
+    {
+      "id": "workers",
+      "name": "workers",
+      "symbols": [
+        {
+          "name": "workers.loadToken",
+          "file": "workers/file_1.js",
+          "kind": "function",
+          "line": 153
+        },
+        {
+          "name": "workers.resolveEvent",
+          "file": "workers/file_6.js",
+          "kind": "function",
+          "line": 80
+        },
+        {
+          "name": "workers.fetchState",
+          "file": "workers/file_35.js",
+          "kind": "function",
+          "line": 281
+        },
+        {
+          "name": "workers.parseConfig",
+          "file": "workers/queue/file_39.js",
+          "kind": "function",
+          "line": 66
+        },
+        {
+          "name": "workers.syncRequest",
+          "file": "workers/file_40.js",
+          "kind": "function",
+          "line": 310
+        },
+        {
+          "name": "workers.parseRequest",
+          "file": "workers/file_48.js",
+          "kind": "function",
+          "line": 36
+        },
+        {
+          "name": "workers.buildRequest",
+          "file": "workers/queue/file_56.js",
+          "kind": "function",
+          "line": 202
+        },
+        {
+          "name": "workers.parseToken",
+          "file": "workers/file_57.js",
+          "kind": "function",
+          "line": 348
+        },
+        {
+          "name": "workers.resolvePayload",
+          "file": "workers/file_60.js",
+          "kind": "function",
+          "line": 396
+        },
+        {
+          "name": "workers.buildToken",
+          "file": "workers/queue/file_65.js",
+          "kind": "function",
+          "line": 175
+        },
+        {
+          "name": "workers.resolveEvent",
+          "file": "workers/file_78.js",
+          "kind": "function",
+          "line": 197
+        },
+        {
+          "name": "workers.fetchToken",
+          "file": "workers/file_89.js",
+          "kind": "function",
+          "line": 327
+        },
+        {
+          "name": "workers.handleSession",
+          "file": "workers/queue/file_90.js",
+          "kind": "function",
+          "line": 18
+        },
+        {
+          "name": "workers.syncRequest",
+          "file": "workers/file_112.js",
+          "kind": "function",
+          "line": 105
+        },
+        {
+          "name": "workers.loadConfig",
+          "file": "workers/file_127.js",
+          "kind": "function",
+          "line": 364
+        },
+        {
+          "name": "workers.parseSession",
+          "file": "workers/queue/file_138.js",
+          "kind": "function",
+          "line": 17
+        },
+        {
+          "name": "workers.loadToken",
+          "file": "workers/file_145.js",
+          "kind": "function",
+          "line": 73
+        },
+        {
+          "name": "workers.loadSession",
+          "file": "workers/file_154.js",
+          "kind": "function",
+          "line": 389
+        },
+        {
+          "name": "workers.parsePayload",
+          "file": "workers/file_156.js",
+          "kind": "function",
+          "line": 15
+        },
+        {
+          "name": "workers.buildPayload",
+          "file": "workers/queue/file_164.js",
+          "kind": "function",
+          "line": 36
+        },
+        {
+          "name": "workers.parseEvent",
+          "file": "workers/file_174.js",
+          "kind": "function",
+          "line": 219
+        },
+        {
+          "name": "workers.syncConfig",
+          "file": "workers/queue/file_175.js",
+          "kind": "function",
+          "line": 332
+        },
+        {
+          "name": "workers.buildConfig",
+          "file": "workers/file_191.js",
+          "kind": "function",
+          "line": 2
+        },
+        {
+          "name": "workers.resolvePayload",
+          "file": "workers/file_204.js",
+          "kind": "function",
+          "line": 264
+        },
+        {
+          "name": "workers.loadRequest",
+          "file": "workers/file_208.js",
+          "kind": "function",
+          "line": 274
+        },
+        {
+          "name": "workers.applyEvent",
+          "file": "workers/file_214.js",
+          "kind": "function",
+          "line": 372
+        },
+        {
+          "name": "workers.fetchRequest",
+          "file": "workers/file_224.js",
+          "kind": "function",
+          "line": 281
+        },
+        {
+          "name": "workers.fetchSession",
+          "file": "workers/queue/file_242.js",
+          "kind": "function",
+          "line": 328
+        },
+        {
+          "name": "workers.buildEvent",
+          "file": "workers/queue/file_254.js",
+          "kind": "function",
+          "line": 301
+        },
+        {
+          "name": "workers.parseSession",
+          "file": "workers/file_282.js",
+          "kind": "function",
+          "line": 257
+        }
+      ],
+      "callsiteCount": 60
+    },
+    {
+      "id": "hooks",
+      "name": "hooks",
+      "symbols": [
+        {
+          "name": "hooks.emitNode",
+          "file": "plugin/hooks/file_5.js",
+          "kind": "function",
+          "line": 372
+        },
+        {
+          "name": "hooks.applyToken",
+          "file": "plugin/hooks/file_25.js",
+          "kind": "function",
+          "line": 57
+        },
+        {
+          "name": "hooks.syncNode",
+          "file": "plugin/hooks/file_85.js",
+          "kind": "function",
+          "line": 145
+        },
+        {
+          "name": "hooks.applyState",
+          "file": "plugin/hooks/file_115.js",
+          "kind": "function",
+          "line": 96
+        },
+        {
+          "name": "hooks.fetchPayload",
+          "file": "plugin/hooks/file_116.js",
+          "kind": "function",
+          "line": 185
+        },
+        {
+          "name": "hooks.applyPayload",
+          "file": "plugin/hooks/file_124.js",
+          "kind": "function",
+          "line": 236
+        },
+        {
+          "name": "hooks.syncSession",
+          "file": "plugin/hooks/file_130.js",
+          "kind": "function",
+          "line": 340
+        },
+        {
+          "name": "hooks.buildToken",
+          "file": "plugin/hooks/file_137.js",
+          "kind": "function",
+          "line": 384
+        },
+        {
+          "name": "hooks.handleState",
+          "file": "plugin/hooks/file_171.js",
+          "kind": "function",
+          "line": 166
+        },
+        {
+          "name": "hooks.buildNode",
+          "file": "plugin/hooks/file_173.js",
+          "kind": "function",
+          "line": 23
+        },
+        {
+          "name": "hooks.parseSession",
+          "file": "plugin/hooks/file_210.js",
+          "kind": "function",
+          "line": 2
+        },
+        {
+          "name": "hooks.buildSession",
+          "file": "plugin/hooks/file_218.js",
+          "kind": "function",
+          "line": 63
+        },
+        {
+          "name": "hooks.parseState",
+          "file": "plugin/hooks/file_219.js",
+          "kind": "function",
+          "line": 347
+        },
+        {
+          "name": "hooks.syncPayload",
+          "file": "plugin/hooks/file_220.js",
+          "kind": "function",
+          "line": 252
+        },
+        {
+          "name": "hooks.emitNode",
+          "file": "plugin/hooks/file_221.js",
+          "kind": "function",
+          "line": 343
+        },
+        {
+          "name": "hooks.applyConfig",
+          "file": "plugin/hooks/file_223.js",
+          "kind": "function",
+          "line": 347
+        },
+        {
+          "name": "hooks.resolveConfig",
+          "file": "plugin/hooks/file_231.js",
+          "kind": "function",
+          "line": 306
+        },
+        {
+          "name": "hooks.applyToken",
+          "file": "plugin/hooks/file_241.js",
+          "kind": "function",
+          "line": 187
+        },
+        {
+          "name": "hooks.fetchState",
+          "file": "plugin/hooks/file_251.js",
+          "kind": "function",
+          "line": 112
+        },
+        {
+          "name": "hooks.emitToken",
+          "file": "plugin/hooks/file_257.js",
+          "kind": "function",
+          "line": 330
+        },
+        {
+          "name": "hooks.resolvePayload",
+          "file": "plugin/hooks/file_276.js",
+          "kind": "function",
+          "line": 145
+        }
+      ],
+      "callsiteCount": 42
+    },
+    {
+      "id": "ingest",
+      "name": "ingest",
+      "symbols": [
+        {
+          "name": "ingest.buildState",
+          "file": "ingest/file_11.js",
+          "kind": "function",
+          "line": 226
+        },
+        {
+          "name": "ingest.applyRequest",
+          "file": "ingest/parsers/file_16.js",
+          "kind": "function",
+          "line": 275
+        },
+        {
+          "name": "ingest.emitConfig",
+          "file": "ingest/file_23.js",
+          "kind": "function",
+          "line": 113
+        },
+        {
+          "name": "ingest.fetchSession",
+          "file": "ingest/parsers/file_26.js",
+          "kind": "function",
+          "line": 126
+        },
+        {
+          "name": "ingest.resolveSession",
+          "file": "ingest/file_42.js",
+          "kind": "function",
+          "line": 87
+        },
+        {
+          "name": "ingest.emitSession",
+          "file": "ingest/file_50.js",
+          "kind": "function",
+          "line": 309
+        },
+        {
+          "name": "ingest.handleEvent",
+          "file": "ingest/parsers/file_54.js",
+          "kind": "function",
+          "line": 95
+        },
+        {
+          "name": "ingest.fetchEvent",
+          "file": "ingest/file_62.js",
+          "kind": "function",
+          "line": 180
+        },
+        {
+          "name": "ingest.handleRequest",
+          "file": "ingest/file_72.js",
+          "kind": "function",
+          "line": 134
+        },
+        {
+          "name": "ingest.loadToken",
+          "file": "ingest/file_73.js",
+          "kind": "function",
+          "line": 139
+        },
+        {
+          "name": "ingest.syncPayload",
+          "file": "ingest/file_76.js",
+          "kind": "function",
+          "line": 147
+        },
+        {
+          "name": "ingest.applyConfig",
+          "file": "ingest/file_79.js",
+          "kind": "function",
+          "line": 48
+        },
+        {
+          "name": "ingest.fetchRequest",
+          "file": "ingest/parsers/file_80.js",
+          "kind": "function",
+          "line": 243
+        },
+        {
+          "name": "ingest.syncEvent",
+          "file": "ingest/file_94.js",
+          "kind": "function",
+          "line": 98
+        },
+        {
+          "name": "ingest.emitRequest",
+          "file": "ingest/parsers/file_104.js",
+          "kind": "function",
+          "line": 308
+        },
+        {
+          "name": "ingest.resolveToken",
+          "file": "ingest/file_105.js",
+          "kind": "function",
+          "line": 149
+        },
+        {
+          "name": "ingest.fetchState",
+          "file": "ingest/file_107.js",
+          "kind": "function",
+          "line": 162
+        },
+        {
+          "name": "ingest.handlePayload",
+          "file": "ingest/file_108.js",
+          "kind": "function",
+          "line": 137
+        },
+        {
+          "name": "ingest.handleEvent",
+          "file": "ingest/file_126.js",
+          "kind": "function",
+          "line": 222
+        },
+        {
+          "name": "ingest.applyNode",
+          "file": "ingest/file_133.js",
+          "kind": "function",
+          "line": 260
+        },
+        {
+          "name": "ingest.buildSession",
+          "file": "ingest/file_146.js",
+          "kind": "function",
+          "line": 106
+        },
+        {
+          "name": "ingest.emitNode",
+          "file": "ingest/parsers/file_149.js",
+          "kind": "function",
+          "line": 58
+        },
+        {
+          "name": "ingest.resolveEvent",
+          "file": "ingest/file_150.js",
+          "kind": "function",
+          "line": 268
+        },
+        {
+          "name": "ingest.resolveConfig",
+          "file": "ingest/parsers/file_159.js",
+          "kind": "function",
+          "line": 235
+        },
+        {
+          "name": "ingest.handlePayload",
+          "file": "ingest/file_180.js",
+          "kind": "function",
+          "line": 371
+        },
+        {
+          "name": "ingest.emitSession",
+          "file": "ingest/file_194.js",
+          "kind": "function",
+          "line": 114
+        },
+        {
+          "name": "ingest.applyPayload",
+          "file": "ingest/file_196.js",
+          "kind": "function",
+          "line": 219
+        },
+        {
+          "name": "ingest.resolveNode",
+          "file": "ingest/file_213.js",
+          "kind": "function",
+          "line": 173
+        },
+        {
+          "name": "ingest.handleSession",
+          "file": "ingest/file_234.js",
+          "kind": "function",
+          "line": 6
+        },
+        {
+          "name": "ingest.buildNode",
+          "file": "ingest/parsers/file_245.js",
+          "kind": "function",
+          "line": 248
+        },
+        {
+          "name": "ingest.handleNode",
+          "file": "ingest/parsers/file_261.js",
+          "kind": "function",
+          "line": 157
+        },
+        {
+          "name": "ingest.syncSession",
+          "file": "ingest/file_274.js",
+          "kind": "function",
+          "line": 380
+        },
+        {
+          "name": "ingest.applyNode",
+          "file": "ingest/parsers/file_277.js",
+          "kind": "function",
+          "line": 260
+        },
+        {
+          "name": "ingest.handleRequest",
+          "file": "ingest/parsers/file_288.js",
+          "kind": "function",
+          "line": 329
+        }
+      ],
+      "callsiteCount": 68
+    },
+    {
+      "id": "bridge",
+      "name": "bridge",
+      "symbols": [
+        {
+          "name": "bridge.loadPayload",
+          "file": "bridge/mcp/file_28.js",
+          "kind": "function",
+          "line": 234
+        },
+        {
+          "name": "bridge.resolveToken",
+          "file": "bridge/file_33.js",
+          "kind": "function",
+          "line": 13
+        },
+        {
+          "name": "bridge.syncSession",
+          "file": "bridge/file_58.js",
+          "kind": "function",
+          "line": 124
+        },
+        {
+          "name": "bridge.fetchConfig",
+          "file": "bridge/mcp/file_71.js",
+          "kind": "function",
+          "line": 303
+        },
+        {
+          "name": "bridge.buildSession",
+          "file": "bridge/mcp/file_74.js",
+          "kind": "function",
+          "line": 282
+        },
+        {
+          "name": "bridge.emitNode",
+          "file": "bridge/file_77.js",
+          "kind": "function",
+          "line": 298
+        },
+        {
+          "name": "bridge.handleToken",
+          "file": "bridge/file_81.js",
+          "kind": "function",
+          "line": 391
+        },
+        {
+          "name": "bridge.parsePayload",
+          "file": "bridge/file_84.js",
+          "kind": "function",
+          "line": 314
+        },
+        {
+          "name": "bridge.emitToken",
+          "file": "bridge/mcp/file_113.js",
+          "kind": "function",
+          "line": 24
+        },
+        {
+          "name": "bridge.syncToken",
+          "file": "bridge/mcp/file_121.js",
+          "kind": "function",
+          "line": 127
+        },
+        {
+          "name": "bridge.buildRequest",
+          "file": "bridge/file_128.js",
+          "kind": "function",
+          "line": 37
+        },
+        {
+          "name": "bridge.fetchEvent",
+          "file": "bridge/file_134.js",
+          "kind": "function",
+          "line": 241
+        },
+        {
+          "name": "bridge.syncState",
+          "file": "bridge/mcp/file_139.js",
+          "kind": "function",
+          "line": 6
+        },
+        {
+          "name": "bridge.resolveNode",
+          "file": "bridge/mcp/file_141.js",
+          "kind": "function",
+          "line": 297
+        },
+        {
+          "name": "bridge.fetchRequest",
+          "file": "bridge/mcp/file_152.js",
+          "kind": "function",
+          "line": 131
+        },
+        {
+          "name": "bridge.handleToken",
+          "file": "bridge/mcp/file_153.js",
+          "kind": "function",
+          "line": 73
+        },
+        {
+          "name": "bridge.emitEvent",
+          "file": "bridge/file_158.js",
+          "kind": "function",
+          "line": 130
+        },
+        {
+          "name": "bridge.applyRequest",
+          "file": "bridge/mcp/file_160.js",
+          "kind": "function",
+          "line": 205
+        },
+        {
+          "name": "bridge.applyToken",
+          "file": "bridge/mcp/file_169.js",
+          "kind": "function",
+          "line": 32
+        },
+        {
+          "name": "bridge.buildEvent",
+          "file": "bridge/mcp/file_182.js",
+          "kind": "function",
+          "line": 371
+        },
+        {
+          "name": "bridge.emitToken",
+          "file": "bridge/file_185.js",
+          "kind": "function",
+          "line": 343
+        },
+        {
+          "name": "bridge.fetchPayload",
+          "file": "bridge/file_188.js",
+          "kind": "function",
+          "line": 49
+        },
+        {
+          "name": "bridge.buildRequest",
+          "file": "bridge/mcp/file_200.js",
+          "kind": "function",
+          "line": 39
+        },
+        {
+          "name": "bridge.syncSession",
+          "file": "bridge/file_202.js",
+          "kind": "function",
+          "line": 235
+        },
+        {
+          "name": "bridge.resolveEvent",
+          "file": "bridge/file_222.js",
+          "kind": "function",
+          "line": 203
+        },
+        {
+          "name": "bridge.handleToken",
+          "file": "bridge/mcp/file_225.js",
+          "kind": "function",
+          "line": 133
+        },
+        {
+          "name": "bridge.emitRequest",
+          "file": "bridge/mcp/file_248.js",
+          "kind": "function",
+          "line": 388
+        },
+        {
+          "name": "bridge.resolveToken",
+          "file": "bridge/mcp/file_249.js",
+          "kind": "function",
+          "line": 67
+        },
+        {
+          "name": "bridge.emitSession",
+          "file": "bridge/file_266.js",
+          "kind": "function",
+          "line": 369
+        },
+        {
+          "name": "bridge.fetchNode",
+          "file": "bridge/mcp/file_269.js",
+          "kind": "function",
+          "line": 127
+        },
+        {
+          "name": "bridge.loadConfig",
+          "file": "bridge/mcp/file_271.js",
+          "kind": "function",
+          "line": 295
+        },
+        {
+          "name": "bridge.buildSession",
+          "file": "bridge/mcp/file_290.js",
+          "kind": "function",
+          "line": 99
+        },
+        {
+          "name": "bridge.parseState",
+          "file": "bridge/mcp/file_291.js",
+          "kind": "function",
+          "line": 193
+        },
+        {
+          "name": "bridge.syncPayload",
+          "file": "bridge/file_292.js",
+          "kind": "function",
+          "line": 304
+        },
+        {
+          "name": "bridge.applyConfig",
+          "file": "bridge/file_295.js",
+          "kind": "function",
+          "line": 331
+        }
+      ],
+      "callsiteCount": 70
+    }
+  ]
+}

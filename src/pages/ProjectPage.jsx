@@ -78,6 +78,9 @@ const WikiTab = lazy(() => import('../components/project/WikiTab'))
 const TimelineTab = lazy(() => import('../components/project/TimelineTab'))
 const DecisionsTab = lazy(() => import('../components/project/DecisionsTab'))
 const LessonsLearnedTab = lazy(() => import('../components/project/LessonsLearnedTab'))
+const CodebaseMapPage = lazy(
+  () => import('../features/code-intelligence/pages/CodebaseMapPage.jsx')
+)
 
 function TabFallback() {
   return (
@@ -328,6 +331,9 @@ export default function ProjectPage() {
                   }
                 />
                 <Route path="insights/lessons" element={<LessonsLearnedTab project={project} />} />
+
+                {/* Code Intelligence — Codebase Map */}
+                <Route path="codebase-map" element={<CodebaseMapPage />} />
 
                 {/* Default redirect */}
                 <Route path="*" element={<Navigate to="overview" replace />} />

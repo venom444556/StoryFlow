@@ -1,0 +1,218 @@
+/* Layout + chrome for the graph renderer. Cluster/theme colors are in src/theme/*.css */
+
+.sf-graph-renderer {
+  position: relative;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 48px 1fr;
+  grid-template-areas:
+    'sidebar toolbar'
+    'sidebar canvas';
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  background: var(--sf-bg);
+  color: var(--sf-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+  border: 1px solid var(--sf-border);
+  border-radius: 10px;
+}
+
+.sf-graph-renderer.sf-sidebar-collapsed {
+  grid-template-columns: 0 1fr;
+}
+
+/* Sidebar */
+.sf-sidebar {
+  grid-area: sidebar;
+  background: var(--sf-bg-elev);
+  border-right: 1px solid var(--sf-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 8px 16px;
+}
+.sf-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 10px;
+  color: var(--sf-text-dim);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.sf-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sf-tree-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: var(--sf-text);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sf-tree-node:hover {
+  background: var(--sf-bg-elev-2);
+}
+.sf-tree-node.is-cluster {
+  font-weight: 500;
+}
+.sf-tree-node.is-folder {
+  color: var(--sf-text-dim);
+}
+.sf-tree-node .sf-tree-chevron {
+  width: 10px;
+  display: inline-block;
+  color: var(--sf-text-faint);
+}
+.sf-tree-node .sf-tree-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.sf-tree-node .sf-tree-count {
+  margin-left: auto;
+  color: var(--sf-text-faint);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+}
+.sf-tree-children {
+  margin-left: 14px;
+  border-left: 1px solid var(--sf-border);
+  padding-left: 4px;
+}
+
+/* Toolbar */
+.sf-toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: var(--sf-bg-elev);
+  border-bottom: 1px solid var(--sf-border);
+}
+.sf-toolbar .sf-search {
+  flex: 1;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--sf-bg);
+  border: 1px solid var(--sf-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+.sf-toolbar .sf-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--sf-text);
+  font-size: 13px;
+  width: 100%;
+}
+.sf-toolbar .sf-search input::placeholder {
+  color: var(--sf-text-faint);
+}
+.sf-toolbar .sf-filter-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  background: var(--sf-bg);
+  border: 1px solid var(--sf-border);
+  border-radius: 13px;
+  color: var(--sf-text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.sf-pill:hover {
+  border-color: var(--sf-border-strong);
+  color: var(--sf-text);
+}
+.sf-pill.is-active {
+  background: color-mix(in srgb, var(--sf-accent) 20%, var(--sf-bg));
+  border-color: var(--sf-accent);
+  color: var(--sf-text);
+}
+.sf-pill .sf-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Graph canvas */
+.sf-canvas-wrap {
+  grid-area: canvas;
+  position: relative;
+  overflow: hidden;
+  background: var(--sf-graph-bg);
+}
+.sf-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Viewport controls */
+.sf-viewport-controls {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--sf-bg-elev);
+  border: 1px solid var(--sf-border);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.sf-viewport-controls button {
+  width: 32px;
+  height: 28px;
+  background: transparent;
+  color: var(--sf-text-dim);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sf-viewport-controls button:hover {
+  background: var(--sf-bg-elev-2);
+  color: var(--sf-text);
+}
+
+.sf-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sf-text-faint);
+  pointer-events: none;
+}

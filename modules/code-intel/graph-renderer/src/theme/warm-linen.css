@@ -1,0 +1,33 @@
+/* warm-linen theme tokens for graph-renderer */
+.sf-graph-renderer[data-theme='warm-linen'] {
+  --sf-bg: #f7f2e8;
+  --sf-bg-elev: #fdf9f0;
+  --sf-bg-elev-2: #f1ead9;
+  --sf-border: #e3dbc4;
+  --sf-border-strong: #c9bfa2;
+  --sf-text: #2a2620;
+  --sf-text-dim: #6b6454;
+  --sf-text-faint: #9a9279;
+  --sf-accent: #5b3fcc;
+  --sf-accent-2: #1f86c9;
+  --sf-danger: #c2305a;
+  --sf-warn: #c07a10;
+  --sf-ok: #1e9d67;
+
+  --sf-cluster-0: #5b3fcc;
+  --sf-cluster-1: #1f86c9;
+  --sf-cluster-2: #c2305a;
+  --sf-cluster-3: #1e9d67;
+  --sf-cluster-4: #c07a10;
+  --sf-cluster-5: #8441c4;
+  --sf-cluster-6: #128b7c;
+  --sf-cluster-7: #c64a22;
+  --sf-cluster-8: #4f8c2a;
+  --sf-cluster-9: #2864a8;
+
+  --sf-edge: rgba(60, 50, 30, 0.22);
+  --sf-edge-hi: rgba(40, 30, 10, 0.55);
+  --sf-node-stroke: rgba(255, 255, 255, 0.7);
+  --sf-node-label: rgba(42, 38, 32, 0.9);
+  --sf-graph-bg: radial-gradient(ellipse at center, #fdf9f0 0%, #eee5cf 100%);
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@storyflow/code-intel-gitnexus-client",
+  "version": "0.1.0",
+  "description": "Sandboxed wrapper around the GitNexus MCP server. Enforces version pinning, LLM endpoint lockdown, and telemetry disable.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "USAGE.md",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  },
+  "license": "UNLICENSED",
+  "private": true
+}
