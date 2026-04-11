@@ -19,9 +19,9 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "vitest": "^1.6.0",
+    "vitest": "^4.1.4",
     "fast-check": "^3.19.0",
-    "@vitest/coverage-v8": "^1.6.0"
+    "@vitest/coverage-v8": "^4.1.4"
   },
   "license": "MIT"
 }
