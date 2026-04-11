@@ -51,15 +51,15 @@ Plus: events, steering_directives, agent_sessions, snapshots (all separate SQL t
 
 ## Agent Behavior
 
-### Delegation model — both ends covered
+### Delegation model — daemon + push
 
-StoryFlow PM work is handled from two directions so nothing is missed:
+StoryFlow PM work runs in two layers. Neither layer nags Claude or injects prompts mid-turn.
 
-**Claude's responsibility (push):** When you see work happening that needs tracking — feature work, bug fixes, refactors — dispatch the storyflow-agent to create stories and update the board. Don't do PM work yourself. Don't wait to be asked.
+**Background daemon (`plugin/daemon/storyflowd.mjs`):** Long-running Node process launched silently on SessionStart. Consumes signals written by hooks, watches git activity, and performs deterministic PM work autonomously via the storyflow CLI: auto-closes issues referenced in commits, tracks file edits for session summaries, refreshes boot context, saves a templated session record on idle timeout or SIGTERM. The daemon never calls Claude and never injects prompts. Logs to `/tmp/storyflow/daemon.log`.
 
-**Hooks' responsibility (pull):** The plugin hooks automatically trigger on commits (auto-mark done), file edits (nudge if untracked), session start (boot context), and session end (force reconciliation via storyflow-agent). These catch anything Claude missed.
+**Hooks (signal producers only):** SessionStart launches the daemon and writes a `session-start` signal; PostToolUse Edit|Write writes a `file-edit` signal; Stop writes a `turn-stop` signal. The only non-signal hooks that remain are `pre-commit-gate.sh` (blocks commits with no In Progress issue — real safety gate, not a nag) and `post-commit-sync.sh` (auto-closes issues referenced in commit messages with immediate feedback). Hooks never inject prompts, never gate Stop, never run the storyflow-agent.
 
-The overlap is intentional. If Claude dispatches the agent proactively, the hooks have nothing to catch. If Claude forgets, the hooks enforce it. Neither side should assume the other handled it.
+**Claude's responsibility (push):** When you see work happening that needs reasoning — writing real session summaries, creating stories with context, updating wiki pages, drafting decisions — dispatch the storyflow-agent. The daemon handles the mechanical layer; the subagent handles the reasoning layer. Don't do PM work yourself inline; delegate to the subagent when it matters.
 
 ### CLI is the interface
 

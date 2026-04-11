@@ -1,6 +1,18 @@
 {
-  "description": "StoryFlow enforcement hooks — pre-commit gate, auto-sync on commit, real context loading. Actions execute directly; the agent cannot bypass them.",
+  "description": "StoryFlow plugin hooks. Hooks are silent signal producers. All PM work is handled by the StoryFlow daemon (plugin/daemon/storyflowd.mjs), launched on SessionStart. No hook injects prompts into the Claude stream. No hook nags. The daemon handles reconciliation, session saves, and autonomous PM work via the storyflow CLI.",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/daemon/start.sh && bash ${CLAUDE_PLUGIN_ROOT}/daemon/signal.sh session-start && bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-boot.sh",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -29,30 +41,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pm-check.sh increment",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/daemon/signal.sh file-edit",
             "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pm-check.sh reset",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-boot.sh",
-            "timeout": 15
           }
         ]
       }
@@ -63,13 +53,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "storyflow ai-status set idle 2>/dev/null || true",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/daemon/signal.sh turn-stop",
             "timeout": 5
-          },
-          {
-            "type": "prompt",
-            "prompt": "Before approving stop, verify ALL of the following. If StoryFlow was never loaded or is offline, approve immediately. Otherwise DISPATCH THE STORYFLOW-AGENT to handle reconciliation — do not do this work directly:\n1. Use the Agent tool with subagent_type='storyflow:storyflow-agent' to: save session (summary, next-steps, key-decisions, work-done, learnings), reconcile the board (batch-done completed issues), audit wiki pages, and set AI status to idle.\n2. If any phase was completed this session, include hot wash generation in the agent dispatch.\n3. Do NOT run storyflow CLI commands directly for session-end reconciliation. The storyflow-agent handles it.",
-            "timeout": 30
           }
         ]
       }

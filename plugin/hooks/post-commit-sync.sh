@@ -44,6 +44,7 @@ if echo "$input" | grep -qE 'git commit'; then
     if storyflow issues done "$key" 2>/dev/null; then
       echo "StoryFlow: $key -> Done"
       synced=$((synced + 1))
+      bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/daemon/signal.sh" git-commit "issueKeys=$key" 2>/dev/null || true
     fi
   done
 
