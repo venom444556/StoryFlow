@@ -39,6 +39,9 @@ data/*.db
 data/*.json.backup
 server/data/
 
+# StoryFlow per-machine module configs (only the .example.json is committed)
+.storyflow/modules/code-intelligence.json
+
 # Development scratchpads
 workflow-builder.jsx
 workflow-execution-engine.jsx

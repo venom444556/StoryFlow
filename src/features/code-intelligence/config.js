@@ -6,12 +6,43 @@
  * to `{ enabled: false }` so a fresh clone behaves identically to vanilla
  * StoryFlow.
  *
+ * Runtime split:
+ *   - In Node (server / tests), `loadConfig()` reads the config file from
+ *     disk synchronously and returns the parsed shape.
+ *   - In the browser, there is no filesystem and no `process.cwd()`. The
+ *     loader returns `{ enabled: false }` so the lazy module singleton
+ *     constructs its disabled-mode no-op shape and never throws on import.
+ *     The actual on/off state for the browser comes from the server via
+ *     /api/code-intelligence/health (see `httpClient.js`), which the
+ *     module's `ready` promise resolves through at runtime.
+ *
  * See `CONTRACTS.md` for the full schema.
  */
 
 import fs from 'node:fs'
 import path from 'node:path'
-import process from 'node:process'
+
+// Runtime detection — distinguish "real browser" from "Node, including jsdom".
+// In a real browser bundle, `process.cwd` is undefined (Vite's node-builtin
+// shim provides a stub `process` object without the function). In jsdom test
+// environments, the underlying Node `process` is exposed and `process.cwd` is
+// callable. We treat jsdom as Node here so existing tests still exercise the
+// disk-read code path, and treat real browsers as the no-disk environment.
+//
+
+const HAS_NODE_PROCESS =
+  // eslint-disable-next-line no-undef
+  typeof process !== 'undefined' && typeof process.cwd === 'function'
+const IS_BROWSER_RUNTIME = !HAS_NODE_PROCESS
+
+/** @returns {string} The current working directory in Node, '' in the browser. */
+function safeCwd() {
+  if (HAS_NODE_PROCESS) {
+    // eslint-disable-next-line no-undef
+    return process.cwd()
+  }
+  return ''
+}
 
 /**
  * @typedef {Object} CodeIntelligenceConfig
@@ -49,7 +80,7 @@ const DEFAULT_FEATURES = Object.freeze({
 const VALID_BLAST_LEVELS = new Set(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'])
 
 function resolveConfigPath() {
-  return path.join(process.cwd(), CONFIG_RELATIVE_PATH)
+  return path.join(safeCwd(), CONFIG_RELATIVE_PATH)
 }
 
 function isOpenRouter(url) {
@@ -81,7 +112,7 @@ export function validateConfig(raw) {
   }
 
   const features = { ...DEFAULT_FEATURES, ...(raw.features || {}) }
-  const repoPath = raw.repoPath && typeof raw.repoPath === 'string' ? raw.repoPath : process.cwd()
+  const repoPath = raw.repoPath && typeof raw.repoPath === 'string' ? raw.repoPath : safeCwd()
 
   // Local-only mode: skip gitnexusVersion and llm validation entirely.
   // The frontend doesn't actually call the LLM directly — it talks to
@@ -140,10 +171,22 @@ export function validateConfig(raw) {
 
 /**
  * Load the code-intelligence config from disk. Caches the result.
+ *
+ * In the browser there is no filesystem — we return DISABLED so the lazy
+ * module singleton constructs its no-op shape and never throws on import.
+ * The browser learns the actual on/off state through the HTTP layer
+ * (`/api/code-intelligence/health`), not through this loader.
+ *
  * @returns {CodeIntelligenceConfig}
  */
 export function loadConfig() {
   if (cachedConfig) return cachedConfig
+
+  if (IS_BROWSER_RUNTIME) {
+    cachedConfig = { ...DISABLED }
+    return cachedConfig
+  }
+
   const configPath = resolveConfigPath()
 
   let fileText
