@@ -159,6 +159,7 @@ describe('loadServerConfig', () => {
     const cfg = loadServerConfig()
     expect(cfg).toMatchObject({
       enabled: true,
+      localOnly: false,
       gitnexusVersion: '1.5.3',
       repoPath: '/tmp/fake-repo',
       llm: {
@@ -167,6 +168,40 @@ describe('loadServerConfig', () => {
         allowOpenRouter: false,
       },
     })
+  })
+
+  it('accepts localOnly mode without gitnexusVersion or llm', () => {
+    writeConfig({ enabled: true, localOnly: true, repoPath: '/tmp/fake-repo' })
+    const cfg = loadServerConfig()
+    expect(cfg).toMatchObject({
+      enabled: true,
+      localOnly: true,
+      repoPath: '/tmp/fake-repo',
+    })
+    // Crucially: no llm field at all
+    expect(cfg.llm).toBeUndefined()
+    expect(cfg.gitnexusVersion).toBeUndefined()
+  })
+
+  it('localOnly mode falls back to cwd when repoPath is missing', () => {
+    writeConfig({ enabled: true, localOnly: true })
+    const cfg = loadServerConfig()
+    expect(cfg.enabled).toBe(true)
+    expect(cfg.localOnly).toBe(true)
+    expect(cfg.repoPath).toBe(process.cwd())
+  })
+
+  it('localOnly mode ignores any llm block that happens to be present', () => {
+    writeConfig({
+      enabled: true,
+      localOnly: true,
+      repoPath: '/tmp/fake-repo',
+      llm: { baseUrl: 'https://evil.example.com', apiKey: 'sk-evil' },
+    })
+    const cfg = loadServerConfig()
+    expect(cfg.enabled).toBe(true)
+    expect(cfg.localOnly).toBe(true)
+    expect(cfg.llm).toBeUndefined()
   })
 })
 
@@ -236,6 +271,21 @@ describe('startCodeIntelligence', () => {
     _resetForTests({ factory })
     await expect(startCodeIntelligence()).resolves.toBeUndefined()
     expect(console.error).toHaveBeenCalled()
+  })
+
+  it('passes localOnly:true to the client factory in local-only mode', async () => {
+    writeConfig({ enabled: true, localOnly: true, repoPath: '/tmp/fake-repo' })
+    const { factory, calls } = makeFakeFactory()
+    _resetForTests({ factory })
+    await startCodeIntelligence()
+    expect(calls.construct).toBe(1)
+    expect(calls.lastConfig).toMatchObject({
+      localOnly: true,
+      repoPath: '/tmp/fake-repo',
+    })
+    // Crucially: never passes a version or llm block in local-only mode
+    expect(calls.lastConfig.version).toBeUndefined()
+    expect(calls.lastConfig.llm).toBeUndefined()
   })
 })
 

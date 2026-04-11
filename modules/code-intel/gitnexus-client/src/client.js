@@ -20,6 +20,7 @@
 
 import { validateConfig } from './config.js'
 import { createLifecycle } from './lifecycle.js'
+import { createLocalResponder } from '../../local-indexer/src/index.js'
 
 /**
  * A responder is an injection seam: the object responsible for actually
@@ -69,6 +70,15 @@ function makeNotConnectedResponder() {
 export function createGitNexusClient(rawConfig, deps = {}) {
   // Validate at construction time — FAIL CLOSED.
   const cfg = validateConfig(rawConfig)
+
+  // Local-only mode: skip the lifecycle entirely and route through the
+  // built-in local indexer. The client looks identical to callers — same
+  // start/stop/health/impact/etc. interface — but never spawns a
+  // subprocess and never touches the network.
+  if (cfg.localOnly === true) {
+    return createLocalOnlyClient(cfg, deps)
+  }
+
   const lifecycle = createLifecycle(cfg, { spawner: deps.spawner })
   const responder = deps.responder || makeNotConnectedResponder()
 
@@ -115,6 +125,80 @@ export function createGitNexusClient(rawConfig, deps = {}) {
 
     async detectChanges() {
       ensureRunning()
+      return responder.detectChanges()
+    },
+  }
+}
+
+/**
+ * Local-only variant of the GitNexus client. Has the same interface as the
+ * remote variant but never spawns a subprocess and never touches the
+ * network. Backed by the local-indexer module.
+ *
+ * The `start()` method here is still meaningful — it triggers the first
+ * index build, which is what would have happened on subprocess spawn in
+ * the remote variant. `stop()` is a no-op (nothing to clean up).
+ *
+ * @param {Readonly<import("./index.js").GitNexusConfig>} cfg
+ * @param {{ responder?: Responder }} deps
+ * @returns {import("./index.js").GitNexusClient}
+ */
+function createLocalOnlyClient(cfg, deps = {}) {
+  // Allow callers to inject a custom responder (e.g. tests with fixtures).
+  // Default is the real local indexer bound to the configured repoPath.
+  const responder = deps.responder || createLocalResponder({ repoRoot: cfg.repoPath })
+  let started = false
+
+  return {
+    async start() {
+      // Trigger an index build by calling getStats(). The local responder
+      // builds lazily on first query, so this just primes the cache.
+      if (typeof responder.getStats === 'function') {
+        responder.getStats()
+      }
+      started = true
+    },
+
+    async stop() {
+      started = false
+    },
+
+    async health() {
+      return started ? 'ok' : 'down'
+    },
+
+    async impact(input) {
+      if (!started) {
+        throw new Error('GitNexusClient: local-only client is not started. Call start() first.')
+      }
+      return responder.impact(input)
+    },
+
+    async search(query, opts) {
+      if (!started) {
+        throw new Error('GitNexusClient: local-only client is not started. Call start() first.')
+      }
+      return responder.search(query, opts)
+    },
+
+    async listClusters() {
+      if (!started) {
+        throw new Error('GitNexusClient: local-only client is not started. Call start() first.')
+      }
+      return responder.listClusters()
+    },
+
+    async queryGraph(cypher) {
+      if (!started) {
+        throw new Error('GitNexusClient: local-only client is not started. Call start() first.')
+      }
+      return responder.queryGraph(cypher)
+    },
+
+    async detectChanges() {
+      if (!started) {
+        throw new Error('GitNexusClient: local-only client is not started. Call start() first.')
+      }
       return responder.detectChanges()
     },
   }

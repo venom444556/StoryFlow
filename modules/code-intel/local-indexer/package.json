@@ -1,0 +1,13 @@
+{
+  "name": "@storyflow/code-intel-local-indexer",
+  "version": "0.1.0",
+  "description": "Pure-local code intelligence indexer. Walks the repo with node:fs and produces ImpactRaw, SearchHit, Cluster, and ChangeSet shapes from static analysis. Zero network, zero LLM, zero external dependencies.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

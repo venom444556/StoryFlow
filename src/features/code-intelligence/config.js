@@ -72,30 +72,6 @@ export function validateConfig(raw) {
   if (!raw || typeof raw !== 'object') return { ...DISABLED }
   if (raw.enabled !== true) return { ...DISABLED }
 
-  if (!raw.gitnexusVersion || typeof raw.gitnexusVersion !== 'string') {
-    throw new Error(
-      'code-intelligence: `gitnexusVersion` is required when enabled:true (pin a semver, e.g. "1.5.3").'
-    )
-  }
-  if (raw.gitnexusVersion === 'latest') {
-    throw new Error('code-intelligence: `gitnexusVersion` must be a pinned semver, not "latest".')
-  }
-
-  if (!raw.llm || typeof raw.llm !== 'object') {
-    throw new Error('code-intelligence: `llm` block is required when enabled:true.')
-  }
-  if (!raw.llm.baseUrl || typeof raw.llm.baseUrl !== 'string') {
-    throw new Error('code-intelligence: `llm.baseUrl` is required when enabled:true.')
-  }
-  if (!raw.llm.apiKey || typeof raw.llm.apiKey !== 'string') {
-    throw new Error('code-intelligence: `llm.apiKey` is required when enabled:true.')
-  }
-  if (isOpenRouter(raw.llm.baseUrl) && raw.llm.allowOpenRouter !== true) {
-    throw new Error(
-      'code-intelligence: `llm.baseUrl` points to OpenRouter but `llm.allowOpenRouter` is not true. Refusing to bootstrap.'
-    )
-  }
-
   const thresholds = raw.thresholds || {}
   const blockAt = thresholds.preflightBlockAt || 'HIGH'
   if (!VALID_BLAST_LEVELS.has(blockAt)) {
@@ -105,11 +81,53 @@ export function validateConfig(raw) {
   }
 
   const features = { ...DEFAULT_FEATURES, ...(raw.features || {}) }
+  const repoPath = raw.repoPath && typeof raw.repoPath === 'string' ? raw.repoPath : process.cwd()
+
+  // Local-only mode: skip gitnexusVersion and llm validation entirely.
+  // The frontend doesn't actually call the LLM directly — it talks to
+  // /api/code-intelligence on the server, which is configured server-side.
+  if (raw.localOnly === true) {
+    return {
+      enabled: true,
+      localOnly: true,
+      repoPath,
+      features,
+      thresholds: { preflightBlockAt: blockAt },
+    }
+  }
+
+  // Remote mode validation below.
+  if (!raw.gitnexusVersion || typeof raw.gitnexusVersion !== 'string') {
+    throw new Error(
+      'code-intelligence: `gitnexusVersion` is required when enabled:true and localOnly is not set (pin a semver, e.g. "1.5.3").'
+    )
+  }
+  if (raw.gitnexusVersion === 'latest') {
+    throw new Error('code-intelligence: `gitnexusVersion` must be a pinned semver, not "latest".')
+  }
+
+  if (!raw.llm || typeof raw.llm !== 'object') {
+    throw new Error(
+      'code-intelligence: `llm` block is required in remote mode. Set `localOnly: true` to use the local indexer instead.'
+    )
+  }
+  if (!raw.llm.baseUrl || typeof raw.llm.baseUrl !== 'string') {
+    throw new Error('code-intelligence: `llm.baseUrl` is required in remote mode.')
+  }
+  if (!raw.llm.apiKey || typeof raw.llm.apiKey !== 'string') {
+    throw new Error('code-intelligence: `llm.apiKey` is required in remote mode.')
+  }
+  if (isOpenRouter(raw.llm.baseUrl) && raw.llm.allowOpenRouter !== true) {
+    throw new Error(
+      'code-intelligence: `llm.baseUrl` points to OpenRouter but `llm.allowOpenRouter` is not true. Refusing to bootstrap.'
+    )
+  }
 
   return {
     enabled: true,
+    localOnly: false,
     gitnexusVersion: raw.gitnexusVersion,
-    repoPath: raw.repoPath && typeof raw.repoPath === 'string' ? raw.repoPath : process.cwd(),
+    repoPath,
     llm: {
       baseUrl: raw.llm.baseUrl,
       apiKey: raw.llm.apiKey,

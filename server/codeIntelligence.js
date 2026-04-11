@@ -45,8 +45,23 @@ function isOpenRouterHost(urlStr) {
  * Load and validate the server-side code intelligence config.
  * Fail-closed: any problem => `{ enabled: false }`.
  *
+ * Two modes are supported:
+ *
+ *   1. Local-only (recommended): set `localOnly: true`. Only `repoPath`
+ *      is required (defaults to cwd). The feature uses the built-in
+ *      local indexer — zero network, zero LLM, zero external subprocess.
+ *
+ *   2. Remote (legacy): requires `gitnexusVersion` and a full `llm`
+ *      block with baseUrl + apiKey. Spawns a gitnexus subprocess that
+ *      talks to the configured LLM endpoint.
+ *
  * @returns {{enabled: false} | {
  *   enabled: true,
+ *   localOnly: true,
+ *   repoPath: string,
+ * } | {
+ *   enabled: true,
+ *   localOnly: false,
  *   gitnexusVersion: string,
  *   repoPath: string,
  *   llm: { baseUrl: string, apiKey: string, allowOpenRouter?: boolean },
@@ -81,11 +96,27 @@ export function loadServerConfig() {
     return { enabled: false }
   }
 
-  // --- Safety duplication (don't wait for the client constructor) ---
+  const repoPath =
+    typeof parsed.repoPath === 'string' && parsed.repoPath.length > 0
+      ? parsed.repoPath
+      : process.cwd()
+
+  // --- Local-only mode (zero external dependencies) ---
+  if (parsed.localOnly === true) {
+    return {
+      enabled: true,
+      localOnly: true,
+      repoPath,
+    }
+  }
+
+  // --- Remote mode validation below ---
 
   const version = parsed.gitnexusVersion
   if (typeof version !== 'string' || version.length === 0) {
-    console.error(`${LOG_PREFIX} config.gitnexusVersion is required. Feature disabled.`)
+    console.error(
+      `${LOG_PREFIX} config.gitnexusVersion is required in remote mode. Feature disabled.`
+    )
     return { enabled: false }
   }
   if (version === 'latest' || version === '@latest' || !SEMVER_RE.test(version)) {
@@ -98,7 +129,7 @@ export function loadServerConfig() {
   const llm = parsed.llm
   if (!llm || typeof llm !== 'object') {
     console.error(
-      `${LOG_PREFIX} config.llm is required with { baseUrl, apiKey }. Feature disabled.`
+      `${LOG_PREFIX} config.llm is required in remote mode with { baseUrl, apiKey }. Set localOnly:true to use the local indexer instead. Feature disabled.`
     )
     return { enabled: false }
   }
@@ -117,13 +148,9 @@ export function loadServerConfig() {
     return { enabled: false }
   }
 
-  const repoPath =
-    typeof parsed.repoPath === 'string' && parsed.repoPath.length > 0
-      ? parsed.repoPath
-      : process.cwd()
-
   return {
     enabled: true,
+    localOnly: false,
     gitnexusVersion: version,
     repoPath,
     llm: {
@@ -162,21 +189,32 @@ export async function startCodeIntelligence() {
   }
 
   try {
-    const gitNexusConfig = {
-      version: cfg.gitnexusVersion,
-      repoPath: cfg.repoPath,
-      llm: cfg.llm,
-    }
-    const instance = clientFactory(gitNexusConfig)
+    const clientConfig = cfg.localOnly
+      ? { localOnly: true, repoPath: cfg.repoPath }
+      : {
+          version: cfg.gitnexusVersion,
+          repoPath: cfg.repoPath,
+          llm: cfg.llm,
+        }
+    const instance = clientFactory(clientConfig)
     await instance.start()
     client = instance
     started = true
     installSignalHandlers()
-    console.log(
-      `${LOG_PREFIX} GitNexus client started (version ${cfg.gitnexusVersion}, repo ${cfg.repoPath})`
-    )
+    if (cfg.localOnly) {
+      console.log(
+        `${LOG_PREFIX} Local indexer started (repo ${cfg.repoPath}) — zero external dependencies`
+      )
+    } else {
+      console.log(
+        `${LOG_PREFIX} GitNexus client started (version ${cfg.gitnexusVersion}, repo ${cfg.repoPath})`
+      )
+    }
   } catch (err) {
-    console.error(`${LOG_PREFIX} Failed to start GitNexus client — feature disabled:`, err.message)
+    console.error(
+      `${LOG_PREFIX} Failed to start code intelligence — feature disabled:`,
+      err.message
+    )
     client = null
     started = false
   }

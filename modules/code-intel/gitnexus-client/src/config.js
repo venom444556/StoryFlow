@@ -33,6 +33,17 @@ export function isOpenRouterUrl(urlStr) {
  * Validate a GitNexusConfig. Throws a descriptive Error on any violation.
  * Returns a frozen, normalized copy of the config.
  *
+ * Two modes are supported:
+ *
+ *   1. Remote (default): requires `version`, `repoPath`, and a full `llm`
+ *      block. The client will spawn the gitnexus subprocess and route
+ *      queries through it.
+ *
+ *   2. Local-only: set `localOnly: true`. Only `repoPath` is required.
+ *      The `version` and `llm` blocks are ignored. The client will skip
+ *      the subprocess entirely and route queries through a built-in
+ *      local indexer that uses static analysis. Zero network, zero LLM.
+ *
  * @param {import("./index.js").GitNexusConfig} cfg
  * @returns {Readonly<import("./index.js").GitNexusConfig>}
  */
@@ -40,6 +51,27 @@ export function validateConfig(cfg) {
   if (cfg === null || typeof cfg !== 'object') {
     throw new Error('GitNexusClient: config is required. Pass a GitNexusConfig object.')
   }
+
+  const localOnly = cfg.localOnly === true
+
+  // --- repoPath (required in both modes) ---
+  const { repoPath } = cfg
+  if (typeof repoPath !== 'string' || repoPath.length === 0) {
+    throw new Error('GitNexusClient: config.repoPath is required and must be a non-empty string.')
+  }
+
+  if (localOnly) {
+    // Local-only mode: skip version and llm validation entirely.
+    return Object.freeze({
+      localOnly: true,
+      repoPath,
+      version: null,
+      llm: null,
+      scarfAnalytics: false,
+    })
+  }
+
+  // --- Remote mode validation below ---
 
   // --- version ---
   const { version } = cfg
@@ -64,18 +96,12 @@ export function validateConfig(cfg) {
     )
   }
 
-  // --- repoPath ---
-  const { repoPath } = cfg
-  if (typeof repoPath !== 'string' || repoPath.length === 0) {
-    throw new Error('GitNexusClient: config.repoPath is required and must be a non-empty string.')
-  }
-
   // --- llm block ---
   const { llm } = cfg
   if (llm === null || typeof llm !== 'object') {
     throw new Error(
-      'GitNexusClient: config.llm is REQUIRED. No default LLM endpoint is provided. ' +
-        'You must explicitly set { baseUrl, apiKey }.'
+      'GitNexusClient: config.llm is REQUIRED in remote mode. No default LLM endpoint is provided. ' +
+        'You must explicitly set { baseUrl, apiKey }, or set localOnly:true to use the local indexer.'
     )
   }
   if (typeof llm.baseUrl !== 'string' || llm.baseUrl.length === 0) {
@@ -103,6 +129,7 @@ export function validateConfig(cfg) {
   }
 
   const normalized = Object.freeze({
+    localOnly: false,
     version,
     repoPath,
     llm: Object.freeze({

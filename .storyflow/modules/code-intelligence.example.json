@@ -1,12 +1,7 @@
 {
   "enabled": false,
-  "gitnexusVersion": "1.5.3",
+  "localOnly": true,
   "repoPath": "",
-  "llm": {
-    "baseUrl": "http://localhost:11434/v1",
-    "apiKey": "${STORYFLOW_LLM_KEY}",
-    "allowOpenRouter": false
-  },
   "features": {
     "impactBadges": true,
     "preflightHook": true,
