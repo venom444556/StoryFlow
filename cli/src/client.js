@@ -3,11 +3,13 @@
 // Direct HTTP client for the Express API
 // ---------------------------------------------------------------------------
 
-import { readFileSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync, existsSync, appendFileSync, mkdirSync } from 'node:fs'
+import { join, dirname, resolve as resolvePath } from 'node:path'
 import { homedir } from 'node:os'
 
-const CONFIG_PATH = join(homedir(), '.config', 'storyflow', 'config.json')
+const CONFIG_DIR = join(homedir(), '.config', 'storyflow')
+const CONFIG_PATH = join(CONFIG_DIR, 'config.json')
+const REFUSAL_LOG = join(CONFIG_DIR, 'write-refusals.log')
 const REQUEST_TIMEOUT_MS = parseInt(process.env.STORYFLOW_TIMEOUT_MS, 10) || 15_000
 
 // --- Config ---
@@ -36,10 +38,187 @@ function getAuthToken() {
   return config.token || null
 }
 
+// --- Project binding -------------------------------------------------------
+// A board belongs to a REPO, not to the machine. Resolution order, most
+// specific first:
+//
+//   1. --project / positional argument       explicit, per invocation
+//   2. STORYFLOW_PROJECT in the environment  explicit, per shell or session
+//   3. a binding file at or above the cwd    explicit, travels with the repo
+//        .storyflow.json             -> { "project": "<id>" }
+//        .claude/settings.local.json -> { "env": { "STORYFLOW_PROJECT": "<id>" } }
+//        .claude/settings.json       -> same
+//   4. projectsByPath in the global config   explicit, for repos you cannot edit
+//   5. defaultProject in the global config   NOT explicit -- a machine-wide guess
+//
+// Only 1-4 mean somebody named the board for THIS working tree. Step 5 is a
+// guess, and a guess must never mutate a board: assertWriteIsScoped() refuses
+// any non-GET request carrying an id that arrived that way. Reads still fall
+// back so the CLI stays usable, and announce the choice on stderr.
+
+const BINDING_FILES = [
+  { file: '.storyflow.json', pick: (j) => j && j.project },
+  {
+    file: join('.claude', 'settings.local.json'),
+    pick: (j) => j && j.env && j.env.STORYFLOW_PROJECT,
+  },
+  { file: join('.claude', 'settings.json'), pick: (j) => j && j.env && j.env.STORYFLOW_PROJECT },
+]
+
+function readJsonFile(path) {
+  if (!existsSync(path)) return null
+  try {
+    return JSON.parse(readFileSync(path, 'utf-8'))
+  } catch {
+    return null
+  }
+}
+
+function bindingInDir(dir) {
+  for (const { file, pick } of BINDING_FILES) {
+    const path = join(dir, file)
+    const value = pick(readJsonFile(path))
+    if (typeof value === 'string' && value.trim()) {
+      return { project: value.trim(), source: 'repo', where: path, explicit: true }
+    }
+  }
+  return null
+}
+
+function findRepoBinding(startDir) {
+  const home = resolvePath(homedir())
+  let dir = resolvePath(startDir)
+  for (;;) {
+    // Stop AT the home directory. ~/.claude/settings.json is the global agent
+    // config, not a per-repo binding -- reading it here would relabel a
+    // machine-wide default as "explicit" and re-arm the trap this closes.
+    if (dir === home) return null
+    const found = bindingInDir(dir)
+    if (found) return found
+    const parent = dirname(dir)
+    if (parent === dir) return null
+    dir = parent
+  }
+}
+
+function findPathMapBinding(startDir) {
+  const map = readConfig().projectsByPath
+  if (!map || typeof map !== 'object') return null
+  const cwd = resolvePath(startDir)
+  let best = null
+  for (const [rawPath, project] of Object.entries(map)) {
+    if (typeof project !== 'string' || !project.trim()) continue
+    const base = resolvePath(rawPath.replace(/^~(?=$|\/)/, homedir()))
+    if (cwd !== base && !cwd.startsWith(base + '/')) continue
+    // Longest prefix wins, so a nested repo beats the tree it sits inside.
+    if (!best || base.length > best.base.length) best = { base, project: project.trim() }
+  }
+  if (!best) return null
+  return {
+    project: best.project,
+    source: 'path-map',
+    where: CONFIG_PATH + ' projectsByPath["' + best.base + '"]',
+    explicit: true,
+  }
+}
+
+export function getProjectBinding(cwd = process.cwd()) {
+  const env = process.env.STORYFLOW_PROJECT
+  if (typeof env === 'string' && env.trim()) {
+    return { project: env.trim(), source: 'env', where: 'STORYFLOW_PROJECT', explicit: true }
+  }
+  const repo = findRepoBinding(cwd)
+  if (repo) return repo
+  const mapped = findPathMapBinding(cwd)
+  if (mapped) return mapped
+  const fallback = readConfig().defaultProject
+  if (typeof fallback === 'string' && fallback.trim()) {
+    return {
+      project: fallback.trim(),
+      source: 'global-default',
+      where: CONFIG_PATH + ' defaultProject',
+      explicit: false,
+    }
+  }
+  return { project: null, source: 'none', where: null, explicit: false }
+}
+
 export function getDefaultProject() {
-  if (process.env.STORYFLOW_PROJECT) return process.env.STORYFLOW_PROJECT
-  const config = readConfig()
-  return config.defaultProject || null
+  return getProjectBinding().project
+}
+
+export function bindingHelp(cwd) {
+  return [
+    'No StoryFlow board is bound to ' + cwd + '.',
+    'Bind one (any of these):',
+    '  ' + join(cwd, '.storyflow.json') + '   ->  { "project": "<project-id>" }',
+    '  ' +
+      join(cwd, '.claude', 'settings.json') +
+      '   ->  { "env": { "STORYFLOW_PROJECT": "<project-id>" } }',
+    '  ' + CONFIG_PATH + '   ->  "projectsByPath": { "' + cwd + '": "<project-id>" }',
+    'Or name it per command:  --project <project-id>',
+  ].join('\n')
+}
+
+// --- Write scoping ---------------------------------------------------------
+// Ids that reached us from the machine-wide default rather than from anything
+// that named this working tree. One CLI invocation is one process, so this is
+// the provenance of THIS command. Consulted by every outbound request, which is
+// why a new command -- or a fifth hook script -- cannot forget to check.
+
+const unscopedIds = new Set()
+let unscopedBinding = null
+
+function recordProvenance(id, binding) {
+  if (binding.explicit) {
+    unscopedIds.delete(id)
+  } else {
+    unscopedIds.add(id)
+    unscopedBinding = binding
+  }
+}
+
+function logRefusal(line) {
+  try {
+    mkdirSync(CONFIG_DIR, { recursive: true })
+    appendFileSync(REFUSAL_LOG, new Date().toISOString() + ' ' + line + '\n')
+  } catch {
+    // The refusal is the point; never fail because the log could not be written.
+  }
+}
+
+function isMutating(method, path) {
+  if (method !== 'GET') return true
+  // One GET mutates: consuming the steering queue pops directives off it.
+  return path.includes('/steering-queue') && path.includes('consume=true')
+}
+
+function assertWriteIsScoped(method, path) {
+  if (unscopedIds.size === 0) return
+  const segments = path.split('?')[0].split('/')
+  for (const id of unscopedIds) {
+    if (!segments.includes(enc(id))) continue
+    const b = unscopedBinding || {}
+    const cwd = process.cwd()
+    logRefusal(
+      'REFUSED ' + method + ' ' + path + ' cwd=' + cwd + ' would-have-written=' + b.project
+    )
+    throw new Error(
+      'Refusing to ' +
+        method +
+        ' ' +
+        path +
+        '\n' +
+        'No StoryFlow board is bound to ' +
+        cwd +
+        ', so this write would land on "' +
+        b.project +
+        '" -- the machine-wide default from ' +
+        b.where +
+        ', which has nothing to do with this working tree.\n' +
+        bindingHelp(cwd)
+    )
+  }
 }
 
 export function isConfigured() {
@@ -52,15 +231,32 @@ export function isConfigured() {
 let _projectCache = null
 
 export async function resolveProject(input) {
-  if (!input) {
-    const def = getDefaultProject()
-    if (!def)
-      throw new Error(
-        'No project specified and no default set. Run: storyflow config set-default <project>'
+  let binding
+  if (input) {
+    binding = { project: input, source: 'argument', where: '--project', explicit: true }
+  } else {
+    binding = getProjectBinding()
+    if (!binding.project) throw new Error(bindingHelp(process.cwd()))
+    if (!binding.explicit) {
+      // Say what we chose and why. stderr, so --json stdout stays parseable.
+      console.error(
+        'storyflow: no board bound to ' +
+          process.cwd() +
+          '; reading "' +
+          binding.project +
+          '" from ' +
+          binding.where +
+          '. Writes from here are refused -- bind the repo or pass --project.'
       )
-    input = def
+    }
   }
 
+  const id = await resolveProjectId(binding.project)
+  recordProvenance(id, binding)
+  return id
+}
+
+async function resolveProjectId(input) {
   // Full UUID — skip resolution
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-/.test(input)) return input
 
@@ -97,6 +293,9 @@ export async function resolveProject(input) {
 // --- HTTP ---
 
 async function request(path, options = {}) {
+  const method = (options.method || 'GET').toUpperCase()
+  if (isMutating(method, path)) assertWriteIsScoped(method, path)
+
   const base = getBaseUrl()
   if (!base) {
     throw new Error('StoryFlow not configured. Run: storyflow config set-url <url>')

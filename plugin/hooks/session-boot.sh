@@ -24,11 +24,27 @@ if ! storyflow status &>/dev/null 2>&1; then
   exit 0
 fi
 
+# --- PROJECT SCOPING GUARD (2026-09-08) ---
+# Resolve the board bound to THIS working tree via the CLI's single resolver:
+#   env STORYFLOW_PROJECT > .storyflow.json or .claude/settings.json in the repo
+#   > projectsByPath in the global config.
+# --require-explicit refuses the machine-wide defaultProject on purpose. Without
+# this, every call below fell through to that one board regardless of which repo
+# the session was in -- which is how one project's issues collected three months
+# of another project's commit and test-failure writes.
+# This hook CLOSES issues (see the git cross-reference tail), so it fails closed.
+SF_PROJECT="$(storyflow config project --require-explicit 2>/dev/null)" || SF_PROJECT=""
+if [ -z "$SF_PROJECT" ]; then
+  echo "StoryFlow: no board is bound to $PWD, so session boot was skipped rather than reporting — or closing — issues on the global default board."
+  echo "StoryFlow: bind one in this repo's .claude/settings.json:  { \"env\": { \"STORYFLOW_PROJECT\": \"<project-id>\" } }"
+  exit 0
+fi
+
 # Set AI status to working
-storyflow ai-status set working &>/dev/null 2>&1 || true
+storyflow ai-status set working --project "$SF_PROJECT" &>/dev/null 2>&1 || true
 
 # --- Single-call context boot ---
-ctx=$(storyflow context boot --json 2>/dev/null) || ctx=''
+ctx=$(storyflow context boot "$SF_PROJECT" --json 2>/dev/null) || ctx=''
 
 if [ -z "$ctx" ]; then
   echo "StoryFlow session boot complete. AI status: working."
@@ -153,7 +169,7 @@ recent_keys=$(git log --oneline -20 2>/dev/null | grep -oE '\b[A-Z]{1,5}-[0-9]{1
 
 if [ -n "$recent_keys" ]; then
   for key in $recent_keys; do
-    status=$(storyflow issues show "$key" --json 2>/dev/null | python3 -c "
+    status=$(storyflow issues show "$key" --project "$SF_PROJECT" --json 2>/dev/null | python3 -c "
 import json, sys
 try:
     print(json.load(sys.stdin).get('status', ''))
@@ -161,7 +177,7 @@ except:
     pass
 " 2>/dev/null) || status=''
     if [ "$status" = "To Do" ]; then
-      storyflow issues done "$key" 2>/dev/null && echo "AUTO-FIX: $key was To Do but already in git history -> Done"
+      storyflow issues done "$key" --project "$SF_PROJECT" 2>/dev/null && echo "AUTO-FIX: $key was To Do but already in git history -> Done (project: $SF_PROJECT)"
     fi
   done
 fi
