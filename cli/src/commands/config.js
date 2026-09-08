@@ -5,7 +5,13 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { homedir } from 'node:os'
-import { checkConnection, getBaseUrl, getDefaultProject, resolveProject } from '../client.js'
+import {
+  checkConnection,
+  getBaseUrl,
+  getDefaultProject,
+  getProjectBinding,
+  resolveProject,
+} from '../client.js'
 import * as out from '../output.js'
 
 const CONFIG_PATH = join(homedir(), '.config', 'storyflow', 'config.json')
@@ -65,12 +71,56 @@ export function register(program) {
     .action(() => {
       const url = getBaseUrl()
       const cfg = readConfig()
-      const def = getDefaultProject()
+      const binding = getProjectBinding()
       out.heading('StoryFlow Config')
       out.kv('URL', url || '(not set)')
       out.kv('Token', cfg.token ? '****' + cfg.token.slice(-4) : '(not set)')
-      out.kv('Default project', def || '(not set)')
+      out.kv('Working dir', process.cwd())
+      out.kv('Project', binding.project || '(none)')
+      out.kv('Bound by', binding.where || '(nothing)')
+      out.kv(
+        'Writes',
+        binding.explicit
+          ? 'allowed (this board was named for this directory)'
+          : 'REFUSED (machine-wide default, not a binding for this directory)'
+      )
+      out.kv('Default project', getDefaultProject() || '(not set)')
       out.kv('Config file', CONFIG_PATH)
+    })
+
+  // The one resolver every caller should ask, so that hooks, scripts and the
+  // CLI itself cannot drift into four different answers. Prints the bound
+  // project on stdout; explains itself on stderr.
+  //   --require-explicit  print nothing and exit 3 unless the board was named
+  //                       for this directory. This is what a WRITING caller
+  //                       (a hook) must use: no binding, no write.
+  config
+    .command('project')
+    .description('Print the StoryFlow project bound to the current directory')
+    .option('--require-explicit', 'Exit 3 unless a board is explicitly bound here')
+    .option('--json', 'Output raw JSON')
+    .action((opts) => {
+      const binding = getProjectBinding()
+      if (opts.json) {
+        console.log(JSON.stringify({ cwd: process.cwd(), ...binding }, null, 2))
+      }
+      if (!binding.project || (opts.requireExplicit && !binding.explicit)) {
+        console.error(
+          binding.project
+            ? 'storyflow: ' +
+                process.cwd() +
+                ' has no bound board; "' +
+                binding.project +
+                '" is only the machine-wide default from ' +
+                binding.where +
+                '.'
+            : 'storyflow: ' + process.cwd() + ' has no bound board and no default is set.'
+        )
+        process.exitCode = 3
+        return
+      }
+      if (!opts.json) console.log(binding.project)
+      console.error('storyflow: project "' + binding.project + '" via ' + binding.where)
     })
 
   // Top-level status command

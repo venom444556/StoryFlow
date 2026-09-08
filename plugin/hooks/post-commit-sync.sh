@@ -9,6 +9,24 @@ set -euo pipefail
 # Read hook input
 input=$(cat)
 
+# --- PROJECT SCOPING GUARD (2026-09-08) ---
+# Resolve the board bound to THIS working tree via the CLI's single resolver:
+#   env STORYFLOW_PROJECT > .storyflow.json or .claude/settings.json in the repo
+#   > projectsByPath in the global config.
+# --require-explicit refuses the machine-wide defaultProject on purpose. Without
+# this, every call below fell through to that one board regardless of which repo
+# the session was in -- which is how one project's issues collected three months
+# of another project's commit and test-failure writes.
+# HANDLER 3 comments on the first In Progress issue of whatever board resolves,
+# with no key match required at all -- so this hook fails closed.
+SF_PROJECT="$(storyflow config project --require-explicit 2>/dev/null)" || SF_PROJECT=""
+if [ -z "$SF_PROJECT" ]; then
+  if echo "$input" | grep -qE 'git commit|gh pr create'; then
+    echo "StoryFlow: sync skipped — no board is bound to $PWD, and an unscoped 'issues done' would close issues on the global default board."
+  fi
+  exit 0
+fi
+
 # --- Prerequisite checks (shared across all handlers) ---
 sf_ready() {
   command -v storyflow &>/dev/null || return 1
@@ -41,7 +59,7 @@ if echo "$input" | grep -qE 'git commit'; then
 
   synced=0
   for key in $keys; do
-    if storyflow issues done "$key" 2>/dev/null; then
+    if storyflow issues done "$key" --project "$SF_PROJECT" 2>/dev/null; then
       echo "StoryFlow: $key -> Done"
       synced=$((synced + 1))
       bash "${CLAUDE_PLUGIN_ROOT:-$(dirname "$0")/..}/daemon/signal.sh" git-commit "issueKeys=$key" 2>/dev/null || true
@@ -78,7 +96,7 @@ if echo "$input" | grep -qE 'gh pr create'; then
 
   if [ -n "$keys" ]; then
     for key in $keys; do
-      if storyflow issues comment "$key" -m "PR created: $pr_url" 2>/dev/null; then
+      if storyflow issues comment "$key" --project "$SF_PROJECT" -m "PR created: $pr_url" 2>/dev/null; then
         echo "StoryFlow: Linked $key to $pr_url"
       fi
     done
@@ -100,7 +118,7 @@ if echo "$input" | grep -qiE '(npm test|npx vitest|vitest run|jest|pytest|cargo 
   sf_ready || exit 0
 
   # Get first In Progress issue key
-  ip_key=$(storyflow issues list -s "In Progress" --json 2>/dev/null | python3 -c "
+  ip_key=$(storyflow issues list "$SF_PROJECT" -s "In Progress" --json 2>/dev/null | python3 -c "
 import json, sys
 try:
     d = json.load(sys.stdin)
@@ -112,7 +130,7 @@ except:
 " 2>/dev/null) || ip_key=''
 
   if [ -n "$ip_key" ]; then
-    storyflow issues comment "$ip_key" -m "Test failure detected during implementation." 2>/dev/null \
+    storyflow issues comment "$ip_key" --project "$SF_PROJECT" -m "Test failure detected during implementation." 2>/dev/null \
       && echo "StoryFlow: Test failure logged on $ip_key"
   fi
 
